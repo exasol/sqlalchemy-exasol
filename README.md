@@ -1,4 +1,4 @@
-h1. sqlalchemy_exasol
+# sqlalchemy_exasol
 
 This is an SQLAlchemy dialect for the EXASOL database. To learn more about:
 

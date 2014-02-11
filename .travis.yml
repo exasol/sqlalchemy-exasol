@@ -2,8 +2,7 @@ language: python
 python:
   - "2.7"
 env:
-  - secure: "P9LU3GVl7m44h/LpqOBsP3CnRnMlkz8fd0FQLVjcq8ZE50ERwLfluQXGEtT/wEtgOVUQqP6A69QJDBmn9Z2HUGQZ/aoiSVApZaPrxlRwPfa4Nbk8aXeGpIPzDChCbd1cvvcZK/RRZyWFPU5yX4VKm+UIbIg/Jw3e/QGZmkGF5I8="
-  - ODBCSYSINI=odbcconfig/
+  - secure: "P9LU3GVl7m44h/LpqOBsP3CnRnMlkz8fd0FQLVjcq8ZE50ERwLfluQXGEtT/wEtgOVUQqP6A69QJDBmn9Z2HUGQZ/aoiSVApZaPrxlRwPfa4Nbk8aXeGpIPzDChCbd1cvvcZK/RRZyWFPU5yX4VKm+UIbIg/Jw3e/QGZmkGF5I8=" ODBCSYSINI=odbcconfig/
 # command to install dependencies
 install:
   - sudo apt-get install unixODBC unixODBC-dev
@@ -14,6 +13,7 @@ before_script:
   - echo $TESTDB >> setup.cfg
   # append Driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
+  - cat odbcconfig/odbcinst.ini
   
 # command to run tests
 script: python run_tests.py

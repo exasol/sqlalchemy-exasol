@@ -1,7 +1,15 @@
 language: python
 python:
   - "2.7"
+env:
+  - secure: "P9LU3GVl7m44h/LpqOBsP3CnRnMlkz8fd0FQLVjcq8ZE50ERwLfluQXGEtT/wEtgOVUQqP6A69QJDBmn9Z2HUGQZ/aoiSVApZaPrxlRwPfa4Nbk8aXeGpIPzDChCbd1cvvcZK/RRZyWFPU5yX4VKm+UIbIg/Jw3e/QGZmkGF5I8="
+  - ODBCSYSINI=odbcconfig/
 # command to install dependencies
-#install: "pip install -r requirements.txt --use-mirrors"
+install:
+  - pip install -r test_requirements.txt
+  - python setup.py -q install
+before_script:
+  # append Test DB connection string to setup.cfg
+  - echo $TESTDB >> setup.cfg
 # command to run tests
-script: python -c "print 'todo'"
+script: python run_tests.py

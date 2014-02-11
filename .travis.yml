@@ -6,10 +6,14 @@ env:
   - ODBCSYSINI=odbcconfig/
 # command to install dependencies
 install:
+  - sudo apt-get install unixODBC unixODBC-dev
   - pip install -r test_requirements.txt
   - python setup.py -q install
 before_script:
   # append Test DB connection string to setup.cfg
   - echo $TESTDB >> setup.cfg
+  # append Driver location to odbc config
+  - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
+  
 # command to run tests
 script: python run_tests.py

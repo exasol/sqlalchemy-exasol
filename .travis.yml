@@ -20,4 +20,4 @@ before_script:
   # fix unixODBC so.1 so.2 mess (EXASOL driver requires so.2 only so.1 are installed)
   
 # command to run tests
-script: python run_tests.py
+script: python run_tests.py --log-debug=sqlalchemy.engine

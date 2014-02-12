@@ -7,7 +7,7 @@ env:
     - ODBCSYSINI=odbcconfig/
 # command to install dependencies
 install:
-  - sudo apt-get install unixODBC=2.2.14p2-5 unixODBC-dev=2.2.14p2-5
+  - sudo apt-get install unixODBC unixODBC-dev
   - dpkg -s unixODBC
   - find / -iname lbodbccr.so.1
   - pip install -r test_requirements.txt

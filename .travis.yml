@@ -7,7 +7,9 @@ env:
     - ODBCSYSINI=odbcconfig/
 # command to install dependencies
 install:
-  - sudo apt-get install unixODBC unixODBC-dev
+  - sudo apt-get install unixODBC=2.2.14 unixODBC-dev=2.2.14
+  - dpkg -s unixODBC
+  - locate libodbccr
   - pip install -r test_requirements.txt
   - python setup.py -q install
 before_script:
@@ -15,7 +17,7 @@ before_script:
   - echo $TESTDB >> setup.cfg
   # append Driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
-  - cat odbcconfig/odbcinst.ini
+  # fix unixODBC so.1 so.2 mess (EXASOL driver requires so.2 only so.1 are installed)
   
 # command to run tests
 script: python run_tests.py

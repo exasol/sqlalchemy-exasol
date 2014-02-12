@@ -4,7 +4,7 @@ python:
 env:
   global:
     - secure: "P9LU3GVl7m44h/LpqOBsP3CnRnMlkz8fd0FQLVjcq8ZE50ERwLfluQXGEtT/wEtgOVUQqP6A69QJDBmn9Z2HUGQZ/aoiSVApZaPrxlRwPfa4Nbk8aXeGpIPzDChCbd1cvvcZK/RRZyWFPU5yX4VKm+UIbIg/Jw3e/QGZmkGF5I8=" 
-    - ODBCSYSINI=odbcconfig/
+    - ODBCSYSINI=~/odbcconfig
 # command to install dependencies
 install:
   - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
@@ -16,7 +16,7 @@ install:
 before_script:
   # append Test DB connection string to setup.cfg
   - echo $TESTDB >> setup.cfg
-  - echo $TESTDB | head -c 22
+  - echo $TESTDB | head -c 22 | cat
   # append Driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
   

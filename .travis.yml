@@ -9,7 +9,7 @@ env:
 install:
   - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
   - dpkg -L libodbc1
-  - fix_unixodbc_so.sh
+  - ./fix_unixodbc_so.sh
   - pip install -r test_requirements.txt
   - python setup.py -q install
 before_script:

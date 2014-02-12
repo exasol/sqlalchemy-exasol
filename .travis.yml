@@ -8,16 +8,17 @@ env:
 # command to install dependencies
 install:
   - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
-  - dpkg -L libodbc1
+  # fix unixODBC so.1 so.2 mess (EXASOL driver requires so.2 only so.1 are installed)
   - ./fix_unixodbc_so.sh
+  - odbcinst -j
   - pip install -r test_requirements.txt
   - python setup.py -q install
 before_script:
   # append Test DB connection string to setup.cfg
   - echo $TESTDB >> setup.cfg
+  - echo $TESTDB | head -c 22
   # append Driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
-  # fix unixODBC so.1 so.2 mess (EXASOL driver requires so.2 only so.1 are installed)
   
 # command to run tests
-script: python run_tests.py --log-debug=sqlalchemy.engine
+script: python run_tests.py

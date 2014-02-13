@@ -15,7 +15,7 @@ class Requirements(SuiteRequirements):
     @property
     def unique_constraint_reflection(self):
         """target dialect supports reflection of unique constraints"""
-       return exclusions.closed()
+        return exclusions.closed()
 
     @property
     def self_referential_foreign_keys(self):

@@ -12,6 +12,7 @@ install:
   - ./fix_unixodbc_so.sh
   # - odbcinst -j
   - pip install -r test_requirements.txt
+  - pip install coveralls
   - python setup.py -q install
 before_script:
   # append Test DB connection string to setup.cfg
@@ -21,3 +22,6 @@ before_script:
   
 # command to run tests
 script: python run_tests.py
+
+after_success:
+  coveralls

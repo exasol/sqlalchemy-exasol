@@ -7,7 +7,7 @@ Auto Increment Behavior
 ``IDENTITY`` columns are supported by using SQLAlchemy
 ``schema.Sequence()`` objects. Example:
 
-    from sqlalchemy import Table, Integer, Sequence, Column
+    from sqlalchemy import Table, Integer, String, Sequence, Column
 
     Table('test', metadata,
            Column('id', Integer,

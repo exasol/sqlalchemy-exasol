@@ -10,14 +10,14 @@ from exa.base import EXADialect, EXAExecutionContext
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
 from string import uppercase
-
+from distutils.version import LooseVersion
 
 class EXADialect_pyodbc(PyODBCConnector, EXADialect):
 
     execution_ctx_cls = EXAExecutionContext
 
     pyodbc_driver_name = "EXAODBC"
-
+    driver_version = None
     server_version_info = None
 
     def __init__(self, **kw):
@@ -25,15 +25,28 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
         kw.setdefault('convert_unicode', True)
         super(EXADialect_pyodbc, self).__init__(**kw)
 
+    def get_driver_version(self, connection):
+        # LooseVersion will also work with interim versions like '4.2.7dev1' or '5.0.rc4'
+        self.driver_version = LooseVersion( connection.connection.getinfo( self.dbapi.SQL_DRIVER_VER ) or '2.0.0' )
+
     def _get_server_version_info(self, connection):
-        #TODO: need to check if current version of EXASOL returns proper server version
-        # string on ODBC call
         if self.server_version_info is None:
-            query = ("select DBMS_VERSION from EXA_STATISTICS.EXA_SYSTEM_EVENTS "
-                 "where EVENT_TYPE='STARTUP' order by MEASURE_TIME desc "
-                 "limit 1")
-            result = connection.execute(query).fetchone()[0].split('.')
+            # get driver version first
+            if self.driver_version is None:
+                self.get_driver_version( connection )
+
+            # need to check if current version of EXAODBC returns proper server version
+            if self.driver_version >= LooseVersion('4.2.1'):
+                # v4.2.1 and above should deliver usable SQL_DBMS_VER
+                result = connection.connection.getinfo( self.dbapi.SQL_DBMS_VER ).split('.')
+            else:
+                # Older versions do not include patchlevels, so we need to get info through SQL call
+                query = "select PARAM_VALUE from SYS.EXA_METADATA where PARAM_NAME = 'databaseProductVersion'"
+                result = connection.execute(query).fetchone()[0].split('.')
+
             self.server_version_info = (int(result[0]), int(result[1]), int(result[2]))
+            
+        # return cached info
         return self.server_version_info
 
     def create_connect_args(self, url):

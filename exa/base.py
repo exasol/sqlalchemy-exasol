@@ -449,11 +449,13 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
         schema = schema or connection.engine.url.database
-        sql_stmnt = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS "
-        if schema is not None:
-            sql_stmnt += "WHERE view_schema = :schema "
-        sql_stmnt += " ORDER BY view_name"
-        rs = connection.execute(sql.text(sql_stmnt),
+        sql_stmnt = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS WHERE view_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA ORDER BY view_name"
+            rs = connection.execute(sql.text(sql_stmnt))
+        else:
+            sql_stmnt += ":schema ORDER BY view_name"
+            rs = connection.execute(sql.text(sql_stmnt),
                 schema=self.denormalize_name(schema))
         return [self.normalize_name(row[0]) for row in rs]
 

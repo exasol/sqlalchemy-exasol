@@ -422,11 +422,13 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def get_table_names(self, connection, schema, **kw):
         schema = schema or connection.engine.url.database
-        sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES "
-        if schema is not None:
-            sql_stmnt += "WHERE table_schema = :schema"
-        sql_stmnt += " ORDER BY table_name"
-        rs = connection.execute(sql.text(sql_stmnt), \
+        sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA ORDER BY table_name"
+            rs = connection.execute(sql_stmnt)
+        else:
+            sql_stmnt += ":schema ORDER BY table_name"
+            rs = connection.execute(sql.text(sql_stmnt), \
                 schema=self.denormalize_name(schema))
         return [self.normalize_name(row[0]) for row in rs]
 

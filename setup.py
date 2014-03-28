@@ -13,8 +13,6 @@ do not forget to document your changes in CHANGES.md
 import os
 from setuptools import setup
 
-VERSION = '0.7.0'
-
 ## Get long_description from README.md:
 here = os.path.dirname(os.path.abspath(__file__))
 long_description = ''
@@ -23,7 +21,7 @@ with open(os.path.join(here, 'README.md')) as f:
 
 setup(
     name='sqlaexasol',
-    version=VERSION,
+    version='0.7.0',
     license='License :: OSI Approved :: BSD License',
     url='https://github.com/BY-jk/sqlalchemy_exasol',
     classifiers=[
@@ -37,10 +35,10 @@ setup(
     description='EXASOL dialect for SQLAlchemy',
     long_description=long_description,
     author='Blue Yonder GmbH',
-    packages=['exa'],
+    packages=['sqlalchemy_exasol'],
     install_requires=["SQLAlchemy>=0.8.2, <0.9", "pyodbc>=3.0.6"],
-    tests_require=['nose>=0.11', 'coverage>=3.7.1', 'mock>=1.0.1'],
-    test_suite='test.test_exa',
+    tests_require=['nose>=0.11', 'coverage>=3.7.1', 'mock>=1.0.1', 'pytest'],
+    test_suite='run_tests.setup_py_test',
     entry_points={
           'sqlalchemy.dialects': ['exa.pyodbc = exa:pyodbc.dialect']
     },

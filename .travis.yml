@@ -21,7 +21,7 @@ before_script:
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
   
 # command to run tests
-script: python run_tests.py
+script: python run_tests.py -v
 
 after_success:
   coveralls

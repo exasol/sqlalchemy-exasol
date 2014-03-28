@@ -1,5 +1,5 @@
 
-from exa import base, pyodbc
+from sqlalchemy_exasol import base, pyodbc
 
 # default dialect
 base.dialect = pyodbc.dialect

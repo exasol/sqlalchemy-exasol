@@ -37,8 +37,8 @@ setup(
     author='Blue Yonder GmbH',
     packages=['sqlalchemy_exasol'],
     install_requires=["SQLAlchemy>=0.8.2, <0.9", "pyodbc>=3.0.6"],
-    tests_require=['nose>=0.11', 'coverage>=3.7.1', 'mock>=1.0.1', 'pytest'],
-    test_suite='run_tests.setup_py_test',
+    tests_require=['nose>=0.11', 'coverage>=3.7.1', 'mock>=1.0.1'],
+    test_suite='test.test_exa',
     entry_points={
           'sqlalchemy.dialects': ['exa.pyodbc = exa:pyodbc.dialect']
     },

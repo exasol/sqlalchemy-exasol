@@ -6,7 +6,7 @@ Connect string::
 
 """
 
-from exa.base import EXADialect, EXAExecutionContext
+from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
 from string import uppercase

@@ -554,9 +554,12 @@ class EXADialect(default.DefaultDialect):
         schema_int = schema or connection.engine.url.database
         sql_stmnt = "SELECT constraint_name, column_name, referenced_schema, referenced_table, " \
                     "referenced_column FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS " \
-                    "WHERE constraint_type = 'FOREIGN KEY' AND constraint_table = :table_name "
-        if schema_int is not None:
-                sql_stmnt += "AND constraint_schema = :schema "
+                    "WHERE constraint_type = 'FOREIGN KEY' AND constraint_table = :table_name " \
+                    "AND constraint_schema = "
+        if schema_int is None:
+            sql_stmnt += "CURRENT_SCHEMA "
+        else:
+            sql_stmnt += ":schema "
         sql_stmnt += "ORDER BY ordinal_position"
         rp = connection.execute(sql.text(sql_stmnt),
                     table_name=self.denormalize_name(table_name),

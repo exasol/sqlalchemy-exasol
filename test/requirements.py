@@ -84,3 +84,9 @@ class Requirements(SuiteRequirements):
         inserted id, would return closed/fail/skip for this.
         """
         return exclusions.open()
+
+    @property
+    def schemas(self):
+        """Target database supports named schemas
+        """
+        return exclusions.open()

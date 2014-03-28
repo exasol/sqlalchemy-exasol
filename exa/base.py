@@ -536,9 +536,13 @@ class EXADialect(default.DefaultDialect):
         pkeys = []
         constraint_name = None
         sql_stmnt = "SELECT column_name, constraint_name from SYS.EXA_ALL_CONSTRAINT_COLUMNS " \
-                    "WHERE constraint_type = 'PRIMARY KEY' AND constraint_table = :table_name "
-        if schema is not None:
-                sql_stmnt += "AND constraint_schema = :schema"
+                    "WHERE constraint_type = 'PRIMARY KEY' AND constraint_table = :table_name " \
+                    "AND constraint_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA"
+        else:
+            sql_stmnt += ":schema"
+        sql_stmnt += " ORDER BY ordinal_position"
         rp = connection.execute(sql.text(sql_stmnt),
                     table_name=self.denormalize_name(table_name),
                     schema=self.denormalize_name(schema))

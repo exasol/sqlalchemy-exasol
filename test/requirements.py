@@ -90,3 +90,21 @@ class Requirements(SuiteRequirements):
         inserted id, would return closed/fail/skip for this.
         """
         return exclusions.open()
+
+    @property
+    def schemas(self):
+        """Target database supports named schemas
+        """
+        return exclusions.open()
+
+    @property
+    def view_reflection(self):
+        """Target database supports view metadata
+        """
+        return exclusions.open()
+
+    @property
+    def precision_numerics_enotation_large(self):
+        """Dialect converts small/large scale decimals into scientific notation
+        """
+        return exclusions.open()

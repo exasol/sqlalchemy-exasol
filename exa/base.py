@@ -417,16 +417,18 @@ class EXADialect(default.DefaultDialect):
     def get_schema_names(self, connection, **kw):
         sql_stmnt = "select SCHEMA_NAME from SYS.EXA_SCHEMAS"
         rs = connection.execute(sql.text(sql_stmnt))
-        return [row[0] for row in rs]
+        return [self.normalize_name(row[0]) for row in rs]
 
     @reflection.cache
     def get_table_names(self, connection, schema, **kw):
         schema = schema or connection.engine.url.database
-        sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES "
-        if schema is not None:
-            sql_stmnt += "WHERE table_schema = :schema"
-        sql_stmnt += " ORDER BY table_name"
-        rs = connection.execute(sql.text(sql_stmnt), \
+        sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA ORDER BY table_name"
+            rs = connection.execute(sql_stmnt)
+        else:
+            sql_stmnt += ":schema ORDER BY table_name"
+            rs = connection.execute(sql.text(sql_stmnt), \
                 schema=self.denormalize_name(schema))
         return [self.normalize_name(row[0]) for row in rs]
 
@@ -447,21 +449,25 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
         schema = schema or connection.engine.url.database
-        sql_stmnt = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS "
-        if schema is not None:
-            sql_stmnt += "WHERE view_schema = :schema "
-        sql_stmnt += " ORDER BY view_name"
-        rs = connection.execute(sql.text(sql_stmnt),
+        sql_stmnt = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS WHERE view_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA ORDER BY view_name"
+            rs = connection.execute(sql.text(sql_stmnt))
+        else:
+            sql_stmnt += ":schema ORDER BY view_name"
+            rs = connection.execute(sql.text(sql_stmnt),
                 schema=self.denormalize_name(schema))
         return [self.normalize_name(row[0]) for row in rs]
 
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):
         schema = schema or connection.engine.url.database
-        sql_stmnt = "SELECT view_text FROM sys.exa_all_views "
-        if schema is not None:
-            sql_stmnt += "WHERE view_schema = :schema "
-        rp = connection.execute(sql_stmnt,
+        sql_stmnt = "SELECT view_text FROM sys.exa_all_views WHERE view_name = :view_name AND view_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA"
+        else:
+            sql_stmnt += ":schema"
+        rp = connection.execute(sql.text(sql_stmnt),
                 view_name=self.denormalize_name(view_name),
                 schema=self.denormalize_name(schema)).scalar()
         if rp:
@@ -474,9 +480,11 @@ class EXADialect(default.DefaultDialect):
         schema = schema or connection.engine.url.database
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
                     "column_is_nullable, column_default, column_identity FROM sys.exa_all_columns "  \
-                    "WHERE column_object_type IN ('TABLE', 'VIEW') AND column_table = :table_name "
-        if schema is not None:
-                sql_stmnt += "AND column_schema = :schema "
+                    "WHERE column_object_type IN ('TABLE', 'VIEW') AND column_table = :table_name AND column_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA "
+        else:
+            sql_stmnt += ":schema "
         sql_stmnt += "ORDER BY column_ordinal_position"
         c = connection.execute(sql.text(sql_stmnt),
                 table_name=self.denormalize_name(table_name),
@@ -532,9 +540,13 @@ class EXADialect(default.DefaultDialect):
         pkeys = []
         constraint_name = None
         sql_stmnt = "SELECT column_name, constraint_name from SYS.EXA_ALL_CONSTRAINT_COLUMNS " \
-                    "WHERE constraint_type = 'PRIMARY KEY' AND constraint_table = :table_name "
-        if schema is not None:
-                sql_stmnt += "AND constraint_schema = :schema"
+                    "WHERE constraint_type = 'PRIMARY KEY' AND constraint_table = :table_name " \
+                    "AND constraint_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA"
+        else:
+            sql_stmnt += ":schema"
+        sql_stmnt += " ORDER BY ordinal_position"
         rp = connection.execute(sql.text(sql_stmnt),
                     table_name=self.denormalize_name(table_name),
                     schema=self.denormalize_name(schema))
@@ -550,9 +562,12 @@ class EXADialect(default.DefaultDialect):
         schema_int = schema or connection.engine.url.database
         sql_stmnt = "SELECT constraint_name, column_name, referenced_schema, referenced_table, " \
                     "referenced_column FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS " \
-                    "WHERE constraint_type = 'FOREIGN KEY' AND constraint_table = :table_name "
-        if schema_int is not None:
-                sql_stmnt += "AND constraint_schema = :schema "
+                    "WHERE constraint_type = 'FOREIGN KEY' AND constraint_table = :table_name " \
+                    "AND constraint_schema = "
+        if schema_int is None:
+            sql_stmnt += "CURRENT_SCHEMA "
+        else:
+            sql_stmnt += ":schema "
         sql_stmnt += "ORDER BY ordinal_position"
         rp = connection.execute(sql.text(sql_stmnt),
                     table_name=self.denormalize_name(table_name),

@@ -27,16 +27,14 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
 
     def get_driver_version(self, connection):
         # LooseVersion will also work with interim versions like '4.2.7dev1' or '5.0.rc4'
-        self.driver_version = LooseVersion( connection.connection.getinfo( self.dbapi.SQL_DRIVER_VER ) or '2.0.0' )
+        if self.driver_version is None:
+            self.driver_version = LooseVersion( connection.connection.getinfo( self.dbapi.SQL_DRIVER_VER ) or '2.0.0' )
+        return self.driver_version
 
     def _get_server_version_info(self, connection):
         if self.server_version_info is None:
-            # get driver version first
-            if self.driver_version is None:
-                self.get_driver_version( connection )
-
             # need to check if current version of EXAODBC returns proper server version
-            if self.driver_version >= LooseVersion('4.2.1'):
+            if self.get_driver_version(connection) >= LooseVersion('4.2.1'):
                 # v4.2.1 and above should deliver usable SQL_DBMS_VER
                 result = connection.connection.getinfo( self.dbapi.SQL_DBMS_VER ).split('.')
             else:

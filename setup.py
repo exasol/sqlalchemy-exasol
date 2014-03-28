@@ -12,6 +12,7 @@ do not forget to document your changes in CHANGES.md
 """
 import os
 from setuptools import setup
+# version string handling: http://dcreager.net/2010/02/10/setuptools-git-version-numbers/
 from version import get_git_version
 
 ## Get long_description from README.md:

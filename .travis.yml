@@ -3,7 +3,7 @@ python:
   - "2.7"
 env:
   global:
-    - secure: "P9LU3GVl7m44h/LpqOBsP3CnRnMlkz8fd0FQLVjcq8ZE50ERwLfluQXGEtT/wEtgOVUQqP6A69QJDBmn9Z2HUGQZ/aoiSVApZaPrxlRwPfa4Nbk8aXeGpIPzDChCbd1cvvcZK/RRZyWFPU5yX4VKm+UIbIg/Jw3e/QGZmkGF5I8=" 
+    - secure: "BnqtV1ritp0kwzZ5Z9JauFHhVl5rIenefSH4d46O+OaekZA2zT8CA9S3MBEhtSi5QH2KrTX71hARwMXd5d3EDGLvywrqQ0kTSYKRugPMgLjUsCzeuZN8SknMf4KlziPpxCPJGv2aqfaBryjGzkNpbvYj5CwGzyKOdhiE3nER1AM="
     - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
 # command to install dependencies
 install:
@@ -19,7 +19,7 @@ before_script:
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
   
 # command to run tests
-script: python run_tests.py -v --dburi "${TESTDB#*=}"
+script: python run_tests.py -v --dburi "$TESTDB"
 
 after_success:
   coveralls

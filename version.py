@@ -71,46 +71,27 @@ def write_release_version(version):
 
 def get_git_version(abbrev=4):
     # Read in the version that's currently in RELEASE-VERSION.
-
     release_version = read_release_version()
 
     # First try to get the current version using “git describe”.
-
     version = call_git_describe(abbrev)
-
-    #adapt to PEP 386 compatible versioning scheme
-    if version:
-        version = pep386adapt(version)
 
     # If that doesn't work, fall back on the value that's in
     # RELEASE-VERSION.
-
     if version is None:
         version = release_version
 
     # If we still don't have anything, that's an error.
-
     if version is None:
         raise ValueError("Cannot find the version number!")
 
     # If the current version is different from what's in the
     # RELEASE-VERSION file, update the file to be current.
-
     if version != release_version:
         write_release_version(version)
 
     # Finally, return the current version.
-
     return version
-
-
-def pep386adapt(version):
-    # adapt git-describe version to be in line with PEP 386
-    parts = version.split('-')
-    parts[-2] = 'post'+parts[-2]
-    version = '.'.join(parts[:-1])
-    return version
-
 
 if __name__ == "__main__":
     print get_git_version()

@@ -4,4 +4,8 @@ registry.register("exa.pyodbc", "sqlalchemy_exasol.pyodbc", "EXADialect_pyodbc")
 
 from sqlalchemy.testing import runner
 
-runner.main()
+def run():
+    runner.main()
+
+if __name__ == '__main__':
+    run()

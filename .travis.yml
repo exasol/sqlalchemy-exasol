@@ -4,7 +4,7 @@ python:
 env:
   global:
   - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
-  - secure: Y6GW6Daaro5Onv4dg0LHrOi7fQmCoNObz+iucIhe0eMNghgAdt253fNi46QxagLAjhbTDgs1yEiqrQ4TmedCFfAZuR4m3xY2yq/0snMW+gphv98xYKmPDF6xOuwEyuHQ/844yUDFmrk6FG2cPrlg+InGr6cM9tUxs9F4+cL4s7s=
+  - secure: "P9LU3GVl7m44h/LpqOBsP3CnRnMlkz8fd0FQLVjcq8ZE50ERwLfluQXGEtT/wEtgOVUQqP6A69QJDBmn9Z2HUGQZ/aoiSVApZaPrxlRwPfa4Nbk8aXeGpIPzDChCbd1cvvcZK/RRZyWFPU5yX4VKm+UIbIg/Jw3e/QGZmkGF5I8="
 install:
 - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
 - ./fix_unixodbc_so.sh
@@ -13,5 +13,5 @@ install:
 - python setup.py -q install
 before_script:
 - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
-script: python run_tests.py -v --dburi "$TESTDB"
+script: python run_tests.py -v --dburi "${TESTDB#*=}"
 after_success: coveralls

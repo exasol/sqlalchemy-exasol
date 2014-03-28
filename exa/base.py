@@ -460,10 +460,12 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):
         schema = schema or connection.engine.url.database
-        sql_stmnt = "SELECT view_text FROM sys.exa_all_views "
-        if schema is not None:
-            sql_stmnt += "WHERE view_schema = :schema "
-        rp = connection.execute(sql_stmnt,
+        sql_stmnt = "SELECT view_text FROM sys.exa_all_views WHERE view_name = :view_name AND view_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA"
+        else:
+            sql_stmnt += ":schema"
+        rp = connection.execute(sql.text(sql_stmnt),
                 view_name=self.denormalize_name(view_name),
                 schema=self.denormalize_name(schema)).scalar()
         if rp:

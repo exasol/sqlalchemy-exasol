@@ -476,9 +476,11 @@ class EXADialect(default.DefaultDialect):
         schema = schema or connection.engine.url.database
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
                     "column_is_nullable, column_default, column_identity FROM sys.exa_all_columns "  \
-                    "WHERE column_object_type IN ('TABLE', 'VIEW') AND column_table = :table_name "
-        if schema is not None:
-                sql_stmnt += "AND column_schema = :schema "
+                    "WHERE column_object_type IN ('TABLE', 'VIEW') AND column_table = :table_name AND column_schema = "
+        if schema is None:
+            sql_stmnt += "CURRENT_SCHEMA "
+        else:
+            sql_stmnt += ":schema "
         sql_stmnt += "ORDER BY column_ordinal_position"
         c = connection.execute(sql.text(sql_stmnt),
                 table_name=self.denormalize_name(table_name),

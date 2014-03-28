@@ -96,3 +96,9 @@ class Requirements(SuiteRequirements):
         """Target database supports view metadata
         """
         return exclusions.open()
+
+    @property
+    def precision_numerics_enotation_large(self):
+        """Dialect converts small/large scale decimals into scientific notation
+        """
+        return exclusions.open()

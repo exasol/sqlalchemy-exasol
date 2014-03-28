@@ -90,3 +90,9 @@ class Requirements(SuiteRequirements):
         """Target database supports named schemas
         """
         return exclusions.open()
+
+    @property
+    def view_reflection(self):
+        """Target database supports view metadata
+        """
+        return exclusions.open()

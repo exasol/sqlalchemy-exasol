@@ -15,13 +15,11 @@ install:
   - pip install coveralls
   - python setup.py -q install
 before_script:
-  # append Test DB connection string to setup.cfg
-  - echo $TESTDB >> setup.cfg
   # append Driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
   
 # command to run tests
-script: python run_tests.py -v
+script: python run_tests.py -v --dburi "$TESTDB"
 
 after_success:
   coveralls

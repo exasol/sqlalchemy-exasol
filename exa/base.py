@@ -417,7 +417,7 @@ class EXADialect(default.DefaultDialect):
     def get_schema_names(self, connection, **kw):
         sql_stmnt = "select SCHEMA_NAME from SYS.EXA_SCHEMAS"
         rs = connection.execute(sql.text(sql_stmnt))
-        return [row[0] for row in rs]
+        return [self.normalize_name(row[0]) for row in rs]
 
     @reflection.cache
     def get_table_names(self, connection, schema, **kw):

@@ -1,25 +1,17 @@
 language: python
 python:
-  - "2.7"
+- '2.7'
 env:
   global:
-    - secure: "BnqtV1ritp0kwzZ5Z9JauFHhVl5rIenefSH4d46O+OaekZA2zT8CA9S3MBEhtSi5QH2KrTX71hARwMXd5d3EDGLvywrqQ0kTSYKRugPMgLjUsCzeuZN8SknMf4KlziPpxCPJGv2aqfaBryjGzkNpbvYj5CwGzyKOdhiE3nER1AM="
-    - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
-# command to install dependencies
+  - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
+  - secure: Y6GW6Daaro5Onv4dg0LHrOi7fQmCoNObz+iucIhe0eMNghgAdt253fNi46QxagLAjhbTDgs1yEiqrQ4TmedCFfAZuR4m3xY2yq/0snMW+gphv98xYKmPDF6xOuwEyuHQ/844yUDFmrk6FG2cPrlg+InGr6cM9tUxs9F4+cL4s7s=
 install:
-  - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
-  # fix unixODBC so.1 so.2 mess (EXASOL driver requires so.2 only so.1 are installed)
-  - ./fix_unixodbc_so.sh
-  # - odbcinst -j
-  - pip install -r test_requirements.txt
-  - pip install coveralls
-  - python setup.py -q install
+- sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
+- ./fix_unixodbc_so.sh
+- pip install -r test_requirements.txt
+- pip install coveralls
+- python setup.py -q install
 before_script:
-  # append Driver location to odbc config
-  - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
-  
-# command to run tests
+- echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
 script: python run_tests.py -v --dburi "$TESTDB"
-
-after_success:
-  coveralls
+after_success: coveralls

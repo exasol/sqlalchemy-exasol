@@ -18,7 +18,7 @@ from version import get_git_version
 ## Get long_description from README.md:
 here = os.path.dirname(os.path.abspath(__file__))
 long_description = ''
-with open(os.path.join(here, 'README.md')) as f:
+with open(os.path.join(here, 'README.rst')) as f:
     long_description = f.read().strip()
 
 setup(

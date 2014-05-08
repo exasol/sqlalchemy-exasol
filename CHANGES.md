@@ -1,3 +1,7 @@
+# 0.7.5
+
+* moved repository to blue-yonder organization
+
 # 0.7.4
 
 * changed README from md to rst to display reasonable content on pypi

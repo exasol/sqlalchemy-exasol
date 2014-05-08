@@ -1,5 +1,6 @@
 .. image:: https://travis-ci.org/BY-jk/sqlalchemy_exasol.svg?branch=master   :target: https://travis-ci.org/BY-jk/sqlalchemy_exasol
-.. image:: https://coveralls.io/repos/BY-jk/sqlalchemy_exasol/badge.png?branch=master :target: https://coveralls.io/r/BY-jk/sqlalchemy_exasol?branch=master
+
+.. image:: https://coveralls.io/repos/blue-yonder/sqlalchemy_exasol/badge.png :target: https://coveralls.io/r/blue-yonder/sqlalchemy_exasol
 
 sqlalchemy_exasol
 -----------------

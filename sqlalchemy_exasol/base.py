@@ -154,12 +154,6 @@ class EXACompiler(compiler.SQLCompiler):
     def visit_now_func(self, fn, **kw):
         return "CURRENT_TIMESTAMP"
 
-    def visit_true(self, expr, **kw):
-        return '1'
-
-    def visit_false(self, expr, **kw):
-        return '0'
-
     def visit_char_length_func(self, fn, **kw):
         return "length%s" % self.function_argspec(fn)
 

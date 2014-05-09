@@ -10,10 +10,13 @@ do not forget to document your changes in CHANGES.md
 :authors: Blue Yonder GmbH
 :date: 2014/02/11
 """
+import versioneer
+versioneer.versionfile_source = 'sqlalchemy_exasol/_version.py'
+versioneer.versionfile_build = '_version.py'
+versioneer.tag_prefix = '' # tags are like 1.2.0
+versioneer.parentdir_prefix = 'myproject-' # dirname like 'myproject-1.2.0'
 import os
 from setuptools import setup
-# version string handling: http://dcreager.net/2010/02/10/setuptools-git-version-numbers/
-from version import get_git_version
 
 ## Get long_description from README.md:
 here = os.path.dirname(os.path.abspath(__file__))
@@ -23,7 +26,8 @@ with open(os.path.join(here, 'README.rst')) as f:
 
 setup(
     name='sqlalchemy_exasol',
-    version=get_git_version(),
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     license='License :: OSI Approved :: BSD License',
     url='https://github.com/BY-jk/sqlalchemy_exasol',
     classifiers=[

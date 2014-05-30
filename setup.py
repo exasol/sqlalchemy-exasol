@@ -42,10 +42,10 @@ setup(
     long_description=long_description,
     author='Blue Yonder GmbH',
     packages=['sqlalchemy_exasol'],
-    install_requires=["SQLAlchemy>=0.8.2, <0.9", "pyodbc>=3.0.6"],
-    tests_require=['nose>=0.11', 'coverage>=3.7.1', 'mock>=1.0.1'],
-    test_suite='run_tests.run',
+    install_requires=["SQLAlchemy>=0.8.2, <0.10", "pyodbc>=3.0.6"],
+    tests_require=['pytest', 'pytest-cov', 'mock>=1.0.1'],
+    test_suite='pytest.main',
     entry_points={
-          'sqlalchemy.dialects': ['exa.pyodbc = exa:pyodbc.dialect']
+          'sqlalchemy.dialects': ['exa.pyodbc = sqlalchemy_exasol.pyodbc:EXADialect_pyodbc']
     },
 )

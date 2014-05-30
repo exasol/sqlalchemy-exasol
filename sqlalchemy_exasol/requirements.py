@@ -98,6 +98,12 @@ class Requirements(SuiteRequirements):
         return exclusions.open()
 
     @property
+    def views(self):
+        """Target database must support VIEWs."""
+
+        return exclusions.open()
+
+    @property
     def view_reflection(self):
         """Target database supports view metadata
         """

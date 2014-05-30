@@ -113,15 +113,8 @@ RESERVED_WORDS = set([
 colspecs = {
 }
 
-
-class EXABOOLEAN(sqltypes.BOOLEAN):
-    """Because Exasol does not support CHECK constraints"""
-    def __init__(self, create_constraint=False, name=None):
-        super(EXABOOLEAN, self).__init__(create_constraint, name)
-
-
 ischema_names = {
-    'BOOLEAN': EXABOOLEAN,
+    'BOOLEAN': sqltypes.BOOLEAN,
     'CHAR': sqltypes.CHAR,
     'CLOB': sqltypes.TEXT,
     'DATE': sqltypes.DATE,
@@ -215,11 +208,12 @@ class EXADDLCompiler(compiler.DDLCompiler):
                 )
 
         for c in [c for c in table._sorted_constraints if c is not table.primary_key]:
-            event.listen(
-                table,
-                "after_create",
-                AddConstraint(c)
-            )
+            if c._create_rule is None or c._create_rule(self):
+                event.listen(
+                    table,
+                    "after_create",
+                    AddConstraint(c)
+                )
 
         return table_constraint_str
 
@@ -247,6 +241,7 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
 
 class EXAIdentifierPreparer(compiler.IdentifierPreparer):
     reserved_words = RESERVED_WORDS
+    illegal_initial_characters = compiler.ILLEGAL_INITIAL_CHARACTERS.union('_')
 
 
 class EXAExecutionContext(default.DefaultExecutionContext):
@@ -274,24 +269,24 @@ class EXAExecutionContext(default.DefaultExecutionContext):
             raise Exception
         else:
             id_col = self.dialect.denormalize_name(autoinc_pk_columns[0])
-            id_col = self.compiled.render_literal_value(id_col, None)
 
             table = self.compiled.sql_compiler.statement.table.name
             table = self.dialect.denormalize_name(table)
-            table = self.compiled.render_literal_value(table, None)
 
             sql_stmnt = "SELECT column_identity from SYS.EXA_ALL_COLUMNS "\
                         "WHERE column_object_type = 'TABLE' and column_table "\
-                        "= " + table + " AND column_name = " + id_col
+                        "= ? AND column_name = ?"
 
             schema = self.compiled.sql_compiler.statement.table.schema
             if schema is not None:
                 schema = self.dialect.denormalize_name(schema)
-                schema = self.compiled.render_literal_value(schema, None)
-                sql_stmnt += " AND column_schema = " + schema
+                sql_stmnt += " AND column_schema = ?"
 
             cursor = self.create_cursor()
-            cursor.execute(sql_stmnt)
+            if schema:
+                cursor.execute(sql_stmnt, table, id_col, schema)
+            else:
+                cursor.execute(sql_stmnt, table, id_col)
             lastrowid = cursor.fetchone()[0] - 1
             cursor.close()
             return lastrowid
@@ -334,6 +329,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
 
 class EXADialect(default.DefaultDialect):
     name = 'exasol'
+    supports_native_boolean = True
     supports_alter = True
     supports_unicode_statements = True
     supports_unicode_binds = True

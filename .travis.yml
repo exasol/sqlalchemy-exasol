@@ -8,13 +8,13 @@ env:
 install:
   - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
   - ./fix_unixodbc_so.sh
-  - pip install -r test_requirements.txt
+  - pip install -r requirements_test.txt
   - pip install coveralls
   - python setup.py -q install
 before_script:
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
 script: 
-  - python run_tests.py -v --dburi "${TESTDB#*=}"
+  - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy --dburi "${TESTDB#*=}"
 after_success: 
   - coveralls
 deploy:

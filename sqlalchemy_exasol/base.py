@@ -255,7 +255,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         if column.default.is_sequence:
             return 'DEFAULT'
         else:
-            return super(EXAExecutionContext, self).get_insert_default(self, column)
+            return super(EXAExecutionContext, self).get_insert_default(column)
 
     def get_lastrowid(self):
         columns = self.compiled.sql_compiler.statement.table.columns

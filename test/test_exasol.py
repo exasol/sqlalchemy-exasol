@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
-from sqlalchemy import Table, Column, Integer, String
+from sqlalchemy import Table, Column, Integer, String, Date
 from sqlalchemy.testing import fixtures, config
+import datetime
 
 from sqlalchemy_exasol.merge import merge
 
@@ -93,7 +94,7 @@ class MergeTest(fixtures.TablesTest):
                 dict(id=2, age=20),
             ]
         )
-        
+
         m = merge(t, s, t.c.id == s.c.id).insert()
         config.db.execute(m)
         r = config.db.execute(t.select()).fetchall()
@@ -117,7 +118,7 @@ class MergeTest(fixtures.TablesTest):
                 dict(id=3, age=2),
             ]
         )
-        
+
         m = merge(t, s, t.c.id == s.c.id).insert(
                 where=s.c.age > 5
             )
@@ -143,7 +144,7 @@ class MergeTest(fixtures.TablesTest):
                 dict(id=2, age=20),
             ]
         )
-        
+
         m = merge(t, s, t.c.id == s.c.id).delete()
         config.db.execute(m)
         r = config.db.execute(t.select()).fetchall()
@@ -166,7 +167,7 @@ class MergeTest(fixtures.TablesTest):
                 dict(id=2, age=20),
             ]
         )
-        
+
         m = merge(t, s, t.c.id == s.c.id).update(
                 values={t.c.age: s.c.age}
             ).insert()
@@ -186,7 +187,7 @@ class MergeTest(fixtures.TablesTest):
             s.insert(),
             [dict(id=1, age=10)]
         )
-        
+
         m = merge(t, s, t.c.id == s.c.id).update(
                 values={t.c.age: s.c.age}
             ).delete()
@@ -206,7 +207,7 @@ class MergeTest(fixtures.TablesTest):
             s.insert(),
             [dict(id=1, age=10)]
         )
-        
+
         m = merge(t, s, t.c.id == s.c.id).update(
                 values={t.c.age: s.c.age}
             ).delete(t.c.id == s.c.id)
@@ -215,3 +216,24 @@ class MergeTest(fixtures.TablesTest):
         assert len(r) == 0
 
 
+class DefaultsTest(fixtures.TablesTest):
+    __backend__ = True
+
+    @classmethod
+    def define_tables(cls, metadata):
+        default_date = datetime.date(1900, 1, 1)
+        Table('t', metadata,
+            Column('id', Integer),
+            Column('name', String(20)),
+            Column('active_from', Date, default=default_date)
+        )
+
+    def test_insert_with_default_value(self):
+        t = self.tables.t
+
+        config.db.execute(
+            t.insert(),
+            [{'name': 'Henrik'}]
+        )
+        (_, _, active_from) = config.db.execute(t.select()).fetchone()
+        assert active_from == datetime.date(1900, 1, 1)

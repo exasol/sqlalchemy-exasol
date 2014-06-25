@@ -484,7 +484,6 @@ class EXADialect(default.DefaultDialect):
         c = connection.execute(sql.text(sql_stmnt),
                 table_name=self.denormalize_name(table_name),
                 schema=self.denormalize_name(schema))
-        print(self.denormalize_name(table_name))
 
         columns = []
         for row in c:

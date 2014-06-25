@@ -11,7 +11,7 @@ from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
 if six.PY3:
-    from string import ascii_uppercase as uppsercase
+    from string import ascii_uppercase as uppercase
 else:
     from string import uppercase
 from distutils.version import LooseVersion

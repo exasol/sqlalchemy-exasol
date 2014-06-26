@@ -13,13 +13,14 @@ install:
   - pip install coveralls
   - python setup.py -q install
 before_script:
+  # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
 script: 
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy --dburi "${TESTDB#*=}"
 after_success: 
   - coveralls
-  - git status
-  - git describe --tags --dirty --always
+  # revert changes to odbc config to avoid dirty tag on deploy
+  - git checkout odbcconfig/odbcinst.ini
 deploy:
   provider: pypi
   user: BY-jk

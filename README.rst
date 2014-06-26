@@ -10,5 +10,5 @@ SQLAlchemy Dialect for EXASOL DB
 
 This is an SQLAlchemy dialect for the EXASOL database.
 
-- _EXASOL: http://www.exasol.com
-- _SQLAlchemy: http://www.sqlalchemy.org
+- EXASOL: http://www.exasol.com
+- SQLAlchemy: http://www.sqlalchemy.org

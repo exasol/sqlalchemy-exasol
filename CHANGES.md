@@ -1,8 +1,7 @@
 # 0.8.0
 
-* added support for MERGE
-* upgraded to SQLA 0.9.x
-* switched to versioneer
+* added support for SQL MERGE
+* upgraded to SQLA 0.9.x (build requires >= 0.9.6)
 * bug fixes
     * incorrect quoting of identifiers with leading _
     * incorrect implementation for retrieving last generated PK (for auto inc columns)

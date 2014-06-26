@@ -6,10 +6,14 @@ Connect string::
 
 """
 
+import six
 from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
-from string import uppercase
+if six.PY3:
+    from string import ascii_uppercase as uppercase
+else:
+    from string import uppercase
 from distutils.version import LooseVersion
 
 class EXADialect_pyodbc(PyODBCConnector, EXADialect):
@@ -43,7 +47,7 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
                 result = connection.execute(query).fetchone()[0].split('.')
 
             self.server_version_info = (int(result[0]), int(result[1]), int(result[2]))
-            
+
         # return cached info
         return self.server_version_info
 
@@ -95,7 +99,7 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
             connectors.append("AutoTranslate=%s" %
                                 keys.pop("odbc_autotranslate"))
 
-        connectors.extend(['%s=%s' % (k, v) for k, v in keys.iteritems()])
+        connectors.extend(['%s=%s' % (k, v) for k, v in six.iteritems(keys)])
         return [[";".join(connectors)], connect_args]
 
 dialect = EXADialect_pyodbc

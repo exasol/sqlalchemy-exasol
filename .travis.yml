@@ -18,6 +18,8 @@ script:
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy --dburi "${TESTDB#*=}"
 after_success: 
   - coveralls
+  - git status
+  - git describe --tags --dirty --always
 deploy:
   provider: pypi
   user: BY-jk

@@ -1,7 +1,7 @@
 language: python
 python:
   - '2.7'
-  - '3.4'
+  #- '3.4' // TODO: waiting for Travis Issue: https://github.com/travis-ci/travis-ci/issues/1366 to limit concurrent builds on Travis CI
 env:
   global:
   - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig

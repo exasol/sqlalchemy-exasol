@@ -1,6 +1,7 @@
 # 0.8.1
 
 * updated repository url
+* p3k support - contribution by iadrich
 
 # 0.8.0
 

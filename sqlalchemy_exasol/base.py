@@ -46,6 +46,9 @@ representation (all uppercase).
 
 """
 
+import six
+if six.PY3:
+    from six import u as unicode
 from decimal import Decimal
 from sqlalchemy import sql, schema, types as sqltypes, util, event
 from sqlalchemy.schema import AddConstraint
@@ -118,7 +121,7 @@ ischema_names = {
     'CHAR': sqltypes.CHAR,
     'CLOB': sqltypes.TEXT,
     'DATE': sqltypes.DATE,
-    'DECIMAL': sqltypes.DECIMAL, 
+    'DECIMAL': sqltypes.DECIMAL,
     'DOUBLE': sqltypes.FLOAT,  # EXASOL mapps DOUBLE, DOUBLE PRECISION, FLOAT to DOUBLE PRECISION
                                  # internally but returns 'DOUBLE' as type when asking the DB catalog
     # INTERVAL DAY [(p)] TO SECOND [(fp)] TODO: missing support for EXA Datatype, check Oracle Engine
@@ -367,10 +370,11 @@ class EXADialect(default.DefaultDialect):
         """
         if name is None:
             return None
-        # Py2K
-        if isinstance(name, str):
-            name = name.decode(self.encoding)
-        # end Py2K
+
+        if six.PY2:
+            if isinstance(name, str):
+                name = name.decode(self.encoding)
+
         if name.upper() == name and \
               not self.identifier_preparer._requires_quotes(name.lower()):
             return name.lower()
@@ -387,12 +391,13 @@ class EXADialect(default.DefaultDialect):
         elif name.lower() == name and \
                 not self.identifier_preparer._requires_quotes(name.lower()):
             name = name.upper()
-        # Py2K
-        if not self.supports_unicode_binds:
-            name = name.encode(self.encoding)
-        else:
-            name = unicode(name)
-        # end Py2K
+
+        if six.PY2:
+            if not self.supports_unicode_binds:
+                name = name.encode(self.encoding)
+            else:
+                name = unicode(name)
+
         return name
 
     def get_isolation_level(self, connection):
@@ -515,7 +520,7 @@ class EXADialect(default.DefaultDialect):
                 'default': default
             }
             # if we have a positive identity value add a sequence
-            if identity >= 0:
+            if identity is not None and identity >= 0:
                 cdict['sequence'] = {'name':''}
                 # TODO: we have to possibility to encode the current identity value count
                 # into the column metadata. But the consequence is that it would also be used
@@ -587,7 +592,7 @@ class EXADialect(default.DefaultDialect):
                 # we need to take care of calls without schema. the sqla test suite
                 # expects referred_schema to be None if None is passed in to this function
                 if schema is None and schema_int == self.normalize_name(remote_schema):
-                    rec['referred_schema'] = None 
+                    rec['referred_schema'] = None
                 else:
                     rec['referred_schema'] = self.normalize_name(remote_schema)
 

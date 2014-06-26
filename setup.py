@@ -29,7 +29,7 @@ setup(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     license='License :: OSI Approved :: BSD License',
-    url='https://github.com/BY-jk/sqlalchemy_exasol',
+    url='https://github.com/blue-yonder/sqlalchemy_exasol',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

@@ -1,3 +1,7 @@
+# 0.8.1
+
+* updated repository url
+
 # 0.8.0
 
 * added support for SQL MERGE

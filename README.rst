@@ -1,5 +1,5 @@
 SQLAlchemy Dialect for EXASOL DB
------------------
+--------------------------------
 
 
 .. image:: https://travis-ci.org/blue-yonder/sqlalchemy_exasol.svg?branch=master 

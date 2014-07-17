@@ -1,3 +1,6 @@
+# 0.8.2
+* added missing README.rst
+
 # 0.8.1
 
 * updated repository url

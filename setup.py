@@ -12,7 +12,7 @@ do not forget to document your changes in CHANGES.md
 """
 import versioneer
 versioneer.versionfile_source = 'sqlalchemy_exasol/_version.py'
-versioneer.versionfile_build = '_version.py'
+versioneer.versionfile_build = 'sqlalchemy_exasol/_version.py'
 versioneer.tag_prefix = '' # tags are like 1.2.0
 versioneer.parentdir_prefix = 'myproject-' # dirname like 'myproject-1.2.0'
 import os

@@ -1,3 +1,6 @@
+# 0.8.3
+* fix versioneer build parameter in setup.py to enable pip install
+
 # 0.8.2
 * added missing README.rst
 

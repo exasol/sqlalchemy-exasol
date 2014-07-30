@@ -1,3 +1,6 @@
+# 0.8.4
+* reduce dependency version to python package six from >=1.7 to >=1.5
+
 # 0.8.3
 * fix versioneer build parameter in setup.py to enable pip install
 

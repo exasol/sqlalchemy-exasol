@@ -363,6 +363,12 @@ class EXADialect(default.DefaultDialect):
         'SERIALIZABLE': 0
     }
 
+    def _get_default_schema_name(self, connection):
+        """
+        Using 'SYS' as default schema. Tables in 'SYS' are not reflectable!
+        """
+        return u"SYS"
+
     def normalize_name(self, name):
         """
         Converting EXASol case insensitive identifiers (upper case)

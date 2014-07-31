@@ -310,7 +310,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                     ident = '?'
                     if value is None:
                         db_query = db_query.replace(ident, 'NULL', 1)
-                    elif isinstance(value, (int, long)):
+                    elif isinstance(value, six.integer_types):
                         db_query = db_query.replace(ident, str(value), 1)
                     elif isinstance(value, (float, Decimal)):
                         db_query = db_query.replace(ident, str(float(value)), 1)

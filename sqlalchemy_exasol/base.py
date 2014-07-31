@@ -472,7 +472,10 @@ class EXADialect(default.DefaultDialect):
                 view_name=self.denormalize_name(view_name),
                 schema=self.denormalize_name(schema)).scalar()
         if rp:
-            return rp.decode(self.encoding)
+            if six.PY3:
+                return rp
+            else:
+                return rp.decode(self.encoding)
         else:
             return None
 

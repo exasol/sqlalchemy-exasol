@@ -1,5 +1,7 @@
 # 0.8.5
 * default schema is set to 'SYS' to create reasonable reflections
+* fixes for Python 3.4 support
+* Python 3.4 test included in Travis build
 
 # 0.8.4
 * reduce dependency version to python package six from >=1.7 to >=1.5

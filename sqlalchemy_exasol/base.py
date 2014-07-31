@@ -608,7 +608,7 @@ class EXADialect(default.DefaultDialect):
             local_cols.append(self.normalize_name(local_column))
             remote_cols.append(self.normalize_name(remote_column))
 
-        return fkeys.values()
+        return list(fkeys.values())
 
     @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):

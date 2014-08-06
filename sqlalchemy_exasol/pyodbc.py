@@ -102,4 +102,11 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
         connectors.extend(['%s=%s' % (k, v) for k, v in six.iteritems(keys)])
         return [[";".join(connectors)], connect_args]
 
+    def is_disconnect(self, e, connection, cursor):
+        messages = [
+            "[HY000] [EXASOL][EXASolution driver]Socket closed by peer.",
+            "[40004] [EXASOL][EXASolution driver]Connection lost."
+            ]
+        return any(msg in str(e) for msg in messages)
+
 dialect = EXADialect_pyodbc

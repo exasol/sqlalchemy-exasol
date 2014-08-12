@@ -103,10 +103,14 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
         return [[";".join(connectors)], connect_args]
 
     def is_disconnect(self, e, connection, cursor):
-        messages = [
-            "[HY000] [EXASOL][EXASolution driver]Socket closed by peer.",
-            "[40004] [EXASOL][EXASolution driver]Connection lost."
-            ]
-        return any(msg in str(e) for msg in messages)
+        if isinstance(e, self.dbapi.Error):
+            error_codes = [
+                    '40004', # Connection lost.
+                    '40009', # Connection lost after internal server error.
+                    '40018', # Connection lost after system running out of memory.
+                    '40020', # Connection lost after system running out of memory.
+                    ]
+            return e.args[0] in error_codes
+        return super(EXADialect_pyodbc, self).is_disconnect(e, connection, cursor)
 
 dialect = EXADialect_pyodbc

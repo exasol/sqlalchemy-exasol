@@ -1,3 +1,6 @@
+# HEAD
+* Implemented is_disconnect in driver to mark connections in pool as closed to prevent reuse
+
 # 0.8.5
 * default schema is set to 'SYS' to create reasonable reflections
 * fixes for Python 3.4 support

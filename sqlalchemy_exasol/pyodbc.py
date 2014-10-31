@@ -10,10 +10,6 @@ import six
 from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
-if six.PY3:
-    from string import ascii_uppercase as uppercase
-else:
-    from string import uppercase
 from distutils.version import LooseVersion
 
 class EXADialect_pyodbc(PyODBCConnector, EXADialect):
@@ -67,7 +63,7 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
         connect_args = {}
         for param in ('ansi', 'unicode_results', 'autocommit'):
             if param in keys:
-                connect_args[uppercase(param)] = asbool(keys.pop(param))
+                connect_args[param.upper()] = asbool(keys.pop(param))
 
         dsn_connection = 'dsn' in keys or \
                         ('host' in keys and 'port' not in keys)

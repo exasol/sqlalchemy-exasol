@@ -33,9 +33,9 @@ Meet the system requirements
 
 On Linux/Unix like systems you need:
 
-- the packages unixODBC and unixODBC-dev > 2.2.14
-- Python > 2.7
-- Download and install the ODBC client drivers from EXASOL
+- the packages unixODBC and unixODBC-dev >= 2.2.14
+- Python >= 2.7
+- Download and install the ODBC client drivers from EXASOL >= 4.2
 - configure ODBC.ini and ODBCINST.ini
 
 Setup you python project and install sqlalchemy-exasol

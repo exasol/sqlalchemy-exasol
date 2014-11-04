@@ -51,5 +51,5 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
 
     def test_create_connect_args_with_unknown_params(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?clientname=test&querytimeout=10",
-                 ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y;querytimeout=10;clientname=test'],
+                 ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y;clientname=test;querytimeout=10'],
                  {})

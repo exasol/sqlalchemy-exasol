@@ -95,7 +95,7 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
             connectors.append("AutoTranslate=%s" %
                                 keys.pop("odbc_autotranslate"))
 
-        connectors.extend(['%s=%s' % (k, v) for k, v in six.iteritems(keys)])
+        connectors.extend(['%s=%s' % (k, v) for k, v in sorted(six.iteritems(keys))])
         return [[";".join(connectors)], connect_args]
 
     def is_disconnect(self, e, connection, cursor):

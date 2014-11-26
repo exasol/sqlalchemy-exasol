@@ -10,7 +10,7 @@ install:
   - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
   - ./fix_unixodbc_so.sh
   - pip install -r requirements_test.txt
-  - pip install coveralls
+  - pip install python-coveralls
   - python setup.py -q install
 before_script:
   # append db driver location to odbc config

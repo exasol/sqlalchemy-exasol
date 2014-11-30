@@ -358,7 +358,6 @@ class EXADialect(default.DefaultDialect):
     def __init__(self, isolation_level=None, native_datetime=False, **kwargs):
         default.DefaultDialect.__init__(self, **kwargs)
         self.isolation_level = isolation_level
-        self.info_cache = {}
 
     _isolation_lookup = {
         'SERIALIZABLE': 0
@@ -500,7 +499,7 @@ class EXADialect(default.DefaultDialect):
         schema=self.denormalize_name(schema)
 
         columns = []
-        for row in self._get_all_columns(connection, info_cache=self.info_cache):
+        for row in self._get_all_columns(connection, info_cache=kw.get("info_cache")):
             if (row[8] != table_name and table_name is not None) or (row[9] != schema and table_name is not None):
                 continue
             (colname, coltype, length, precision, scale, nullable, default, identity) = \
@@ -565,7 +564,7 @@ class EXADialect(default.DefaultDialect):
         table_name=self.denormalize_name(table_name)
         schema=self.denormalize_name(schema)
 
-        for row in self._get_all_constraints(connection, info_cache=self.info_cache):
+        for row in self._get_all_constraints(connection, info_cache=kw.get("info_cache")):
             if (row[5] != table_name and table_name is not None) or (row[6] != schema and schema is not None) or row[7] !=  'PRIMARY KEY':
                 continue
             pkeys.append(self.normalize_name(row[1]))
@@ -591,7 +590,7 @@ class EXADialect(default.DefaultDialect):
 
         fkeys = util.defaultdict(fkey_rec)
 
-        for row in self._get_all_constraints(connection, info_cache=self.info_cache):
+        for row in self._get_all_constraints(connection, info_cache=kw.get("info_cache")):
             if (row[5] != table_name and table_name is not None) or (row[6] != schema and schema is not None) or row[7] != 'FOREIGN KEY':
                 continue
             (cons_name, local_column, remote_schema, remote_table, remote_column) = \

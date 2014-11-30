@@ -481,7 +481,7 @@ class EXADialect(default.DefaultDialect):
 
 
     @reflection.cache
-    def _get_all_columns(self, connection, schema=None, **kwargs):
+    def _get_all_columns(self, connection, schema=None, **kw):
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
                     "column_is_nullable, column_default, column_identity, column_table " \
                     "FROM sys.exa_all_columns  WHERE column_object_type IN ('TABLE', 'VIEW') " \
@@ -553,7 +553,7 @@ class EXADialect(default.DefaultDialect):
         return columns
 
     @reflection.cache
-    def _get_all_constraints(self, connection, schema=None, **kwargs):
+    def _get_all_constraints(self, connection, schema=None, **kw):
         sql_stmnt = "SELECT constraint_name, column_name, referenced_schema, referenced_table, " \
                      "referenced_column, constraint_table, constraint_type " \
                      "FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS where constraint_schema = "

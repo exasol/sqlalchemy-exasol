@@ -479,23 +479,37 @@ class EXADialect(default.DefaultDialect):
         else:
             return None
 
+
     @reflection.cache
-    def get_columns(self, connection, table_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
+    def _get_all_columns(self, connection, schema=None, **kw):
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
-                    "column_is_nullable, column_default, column_identity FROM sys.exa_all_columns "  \
-                    "WHERE column_object_type IN ('TABLE', 'VIEW') AND column_table = :table_name AND column_schema = "
+                    "column_is_nullable, column_default, column_identity, column_table " \
+                    "FROM sys.exa_all_columns  WHERE column_object_type IN ('TABLE', 'VIEW') " \
+                    "AND column_schema = "
+
         if schema is None:
             sql_stmnt += "CURRENT_SCHEMA "
         else:
             sql_stmnt += ":schema "
         sql_stmnt += "ORDER BY column_ordinal_position"
-        c = connection.execute(sql.text(sql_stmnt),
-                table_name=self.denormalize_name(table_name),
+        rp = connection.execute(sql.text(sql_stmnt),
                 schema=self.denormalize_name(schema))
 
+        return list(rp)
+
+
+    @reflection.cache
+    def get_columns(self, connection, table_name, schema=None, **kw):
+        schema = schema or connection.engine.url.database
+        if schema is None:
+            schema = connection.execute("select CURRENT_SCHEMA from dual").scalar()
+        table_name=self.denormalize_name(table_name)
+        schema=self.denormalize_name(schema)
+
         columns = []
-        for row in c:
+        for row in self._get_all_columns(connection, schema, info_cache=kw.get("info_cache")):
+            if row[8] != table_name and table_name is not None:
+                continue
             (colname, coltype, length, precision, scale, nullable, default, identity) = \
                 (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
 
@@ -539,45 +553,40 @@ class EXADialect(default.DefaultDialect):
         return columns
 
     @reflection.cache
-    def get_pk_constraint(self, connection, table_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
-        pkeys = []
-        constraint_name = None
-        sql_stmnt = "SELECT column_name, constraint_name from SYS.EXA_ALL_CONSTRAINT_COLUMNS " \
-                    "WHERE constraint_type = 'PRIMARY KEY' AND constraint_table = :table_name " \
-                    "AND constraint_schema = "
-        if schema is None:
-            sql_stmnt += "CURRENT_SCHEMA"
-        else:
-            sql_stmnt += ":schema"
-        sql_stmnt += " ORDER BY ordinal_position"
-        rp = connection.execute(sql.text(sql_stmnt),
-                    table_name=self.denormalize_name(table_name),
-                    schema=self.denormalize_name(schema))
-        constraint_data = rp.fetchall()
-
-        for row in constraint_data:
-            pkeys.append(self.normalize_name(row[0]))
-            constraint_name = self.normalize_name(row[1])
-        return {'constrained_columns': pkeys, 'name': constraint_name}
-
-    @reflection.cache
-    def get_foreign_keys(self, connection, table_name, schema=None, **kw):
-        schema_int = schema or connection.engine.url.database
+    def _get_all_constraints(self, connection, schema=None, **kw):
         sql_stmnt = "SELECT constraint_name, column_name, referenced_schema, referenced_table, " \
-                    "referenced_column FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS " \
-                    "WHERE constraint_type = 'FOREIGN KEY' AND constraint_table = :table_name " \
-                    "AND constraint_schema = "
-        if schema_int is None:
+                     "referenced_column, constraint_table, constraint_type " \
+                     "FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS where constraint_schema = "
+
+        if schema is None:
             sql_stmnt += "CURRENT_SCHEMA "
         else:
             sql_stmnt += ":schema "
         sql_stmnt += "ORDER BY ordinal_position"
         rp = connection.execute(sql.text(sql_stmnt),
-                    table_name=self.denormalize_name(table_name),
-                    schema=self.denormalize_name(schema_int))
-        constraint_data = rp.fetchall()
+                schema=self.denormalize_name(schema))
 
+        return list(rp)
+
+
+    @reflection.cache
+    def get_pk_constraint(self, connection, table_name, schema=None, **kw):
+        schema = schema or connection.engine.url.database
+        pkeys = []
+        constraint_name = None
+        table_name=self.denormalize_name(table_name)
+
+        for row in self._get_all_constraints(connection, schema, info_cache=kw.get("info_cache")):
+            if (row[5] != table_name and table_name is not None) or row[6] != 'PRIMARY KEY':
+                continue
+            pkeys.append(self.normalize_name(row[1]))
+            constraint_name = self.normalize_name(row[0])
+        return {'constrained_columns': pkeys, 'name': constraint_name}
+
+    @reflection.cache
+    def get_foreign_keys(self, connection, table_name, schema=None, **kw):
+        schema_int = schema or connection.engine.url.database
+        table_name=self.denormalize_name(table_name)
         def fkey_rec():
             return {
                 'name': None,
@@ -589,7 +598,9 @@ class EXADialect(default.DefaultDialect):
 
         fkeys = util.defaultdict(fkey_rec)
 
-        for row in constraint_data:
+        for row in self._get_all_constraints(connection, schema=schema, info_cache=kw.get("info_cache")):
+            if (row[5] != table_name and table_name is not None) or row[6] != 'FOREIGN KEY':
+                continue
             (cons_name, local_column, remote_schema, remote_table, remote_column) = \
                     (row[0], row[1], row[2], row[3], row[4])
             rec = fkeys[self.normalize_name(cons_name)]

@@ -10,6 +10,8 @@ You need an account on the EXASOL user portal. Sign up here: https://www.exasol.
 
 In the issue tracker (https://www.exasol.com/support/secure/Dashboard.jspa) create a ticket on Project "Public Demo" with Type "Registration". Fill in whatever fields are required. You will receive an e-mail with an automatically generated user account with test schemata in an EXASolution 4.x and 5.x database cluster (as of January 2015). 
 
+The SQLAlchemy test suite requires the schema 'test_schema' for all tests to pass. So you will have to ask EXASOL to grant your user access to this schema.
+
 ## 3 - Install Travis Command Line Client
 
 You need to install the Travis command line client. Find installation instructions on the travis-ci-org homepage or try this link https://github.com/travis-ci/travis.rb#installation (January 2015).

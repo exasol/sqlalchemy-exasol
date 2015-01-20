@@ -18,9 +18,13 @@ You need to install the Travis command line client. Find installation instructio
 
 Change into a directory that belongs the to git repository of the sqlalchemy_exasol project. Travis CLI inspects the directory to check for a git repo. For each database version run the following command:
 
-  travis encrypt TESTDB=exa+pyodbc://<USER>:<PASSWORD>@<IP-RANGE>:<PORT>/<USER> EXA_<MAJOR_VERSION>=nil
+    travis encrypt TESTDB=exa+pyodbc://<USER>:<PASSWORD>@<IP-RANGE>:<PORT>/<USER> EXA_<MAJOR_VERSION>=nil
 
-From the output copy the line starting with 'secure'
+e.g.
+
+    travis encrypt TESTDB=exa+pyodbc://USER10:SECURE@8.8.8.8..9:1234/USER10 EXA_4=nil
+
+The EXA_<MAJOR_VERSION> environment variable is used to make identification of the DB backend easy from the travis build page. From the output copy the line starting with 'secure'
 
 # 5 - Update the .travis.yml Config File
 
@@ -28,7 +32,7 @@ Add the generated secure strings to the 'env > matrix' section of the .travis.ym
 
 Check the configuration file syntax with:
 
-  travis lint
+    travis lint
 
 If everything is fine, commit and push your changes and watch the builds unfold.
 

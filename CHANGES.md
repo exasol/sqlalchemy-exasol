@@ -1,6 +1,7 @@
 # HEAD
 * Bug Fix: conversion to uppercase in connection parameters (https://github.com/blue-yonder/sqlalchemy_exasol/commit/a2b06ea0933a47e5dadf853f54bd9a28f202b16e)
 * Implemented is_disconnect in driver to mark connections in pool as closed to prevent reuse
+* Use bulk reflection per schema and imporoved caching for inspection
 
 # 0.8.5
 * default schema is set to 'SYS' to create reasonable reflections

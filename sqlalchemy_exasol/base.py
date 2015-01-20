@@ -611,7 +611,7 @@ class EXADialect(default.DefaultDialect):
                 rec['referred_table'] = self.normalize_name(remote_table)
                 # we need to take care of calls without schema. the sqla test suite
                 # expects referred_schema to be None if None is passed in to this function
-                if schema is None and schema_int == self.normalize_name(remote_schema):
+                if schema is None and self.normalize_name(schema_int) == self.normalize_name(remote_schema):
                     rec['referred_schema'] = None
                 else:
                     rec['referred_schema'] = self.normalize_name(remote_schema)

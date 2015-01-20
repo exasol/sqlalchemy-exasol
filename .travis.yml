@@ -6,8 +6,8 @@ env:
   global:
     - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
   matrix:
-    - secure: "YqIgV0u7mmR6jlKAnco4RgQ9ZJZwogjf4YafeUU13a+S0oRWwYnGrUNwyNoy+4HjjO12aPV5liJg6IoKpBTthwpRd4BEK95xR+U3O/Q4xLzbCY+qIfwIwxwsMd+PPKeUb1BFx+JJtAMvkfafUPn8ksAo8rkXxIfAbM/NdCNUUbA="
-    - secure: "dxIMxYjPYH1P5Z7oldg2/fZilaVONrRp+Cbg/2gSwhgqpIYsH7RAyw6qtIdCWUr9+tt8zH3R8U1twm7vsZQZoSq4W+TGVddvrul/9XJJWhHJG34+knWNjfoB2Hoa7yJcENTwD91y9+5VMECwh/+KQ7ErAwftNgjzqB95G1eWRmc="
+    - secure: "H/q3JA5v9HGZkvYfEXqLjEblLHncOui9Akh4qSMYi0oxPwPAbMb3bUjfEXq4nebW5oIIJncSJ+7Rigq9BCTqcNx/sLhIN5zhuV01pY0HjCqpGAVmqe5GVOsBE+j9EQ2zRSqXHc9ZFlD0sbnoc7Z28DcMlL4F9k6FjxZZkLW02lQ="
+    - secure: "VM8Mc225TnKz6wiN0B497kAMTohU3g5PbOmRWme0QDl1R3DdfEw2jlBo6dYshYqlqX7TAAL6FJngrySMsYrSIGXP0XPSj96bEzH2Kb2oT98upH+xUR0rE3MSDwXovUFxUg/AplOWC1HWpRI3YcJyBsgH/srFM4vU3I7WQTyOTYY="
 install:
   - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
   - ./fix_unixodbc_so.sh

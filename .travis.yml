@@ -11,7 +11,7 @@ env:
 install:
   - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
   - ./fix_unixodbc_so.sh
-  - pip install -r requirements.txt
+  - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc 
   - pip install -r requirements_test.txt
   - pip install python-coveralls
 before_script:

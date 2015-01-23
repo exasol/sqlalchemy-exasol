@@ -210,6 +210,9 @@ class EXADDLCompiler(compiler.DDLCompiler):
                         )) if p is not None
                 )
 
+        if len(dk_c in table.c if dk_c.is_distribution_key):
+            table_constraint_str = "DISTRIBUTE BY " + ",".join(dk for dk in table.c if dk.is_distribution_key) + "\n\t")
+
         for c in [c for c in table._sorted_constraints if c is not table.primary_key]:
             if c._create_rule is None or c._create_rule(self):
                 event.listen(
@@ -219,6 +222,9 @@ class EXADDLCompiler(compiler.DDLCompiler):
                 )
 
         return table_constraint_str
+
+    def visit_distribute_by_constraint(self, constraint):
+        return "DISTRIBUTE BY " + ",".join(c.name for c in constraint.columns)
 
     def define_constraint_remote_table(self, constraint, table, preparer):
         """Format the remote table clause of a CREATE CONSTRAINT clause."""
@@ -483,7 +489,7 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def _get_all_columns(self, connection, schema=None, **kw):
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
-                    "column_is_nullable, column_default, column_identity, column_table " \
+                    "column_is_nullable, column_default, column_identity, column_table, column_is_distribution_key " \
                     "FROM sys.exa_all_columns  WHERE column_object_type IN ('TABLE', 'VIEW') " \
                     "AND column_schema = "
 
@@ -510,8 +516,8 @@ class EXADialect(default.DefaultDialect):
         for row in self._get_all_columns(connection, schema, info_cache=kw.get("info_cache")):
             if row[8] != table_name and table_name is not None:
                 continue
-            (colname, coltype, length, precision, scale, nullable, default, identity) = \
-                (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+            (colname, coltype, length, precision, scale, nullable, default, identity, is_distribution_key) = \
+                (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
 
             # FIXME: Missing type support: INTERVAL DAY [(p)] TO SECOND [(fp)], INTERVAL YEAR[(p)] TO MONTH
 
@@ -540,7 +546,8 @@ class EXADialect(default.DefaultDialect):
                 'name': self.normalize_name(colname),
                 'type': coltype,
                 'nullable': nullable,
-                'default': default
+                'default': default,
+                'is_distribution_key': is_distribution_key
             }
             # if we have a positive identity value add a sequence
             if identity is not None and identity >= 0:

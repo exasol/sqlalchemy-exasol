@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 from sqlalchemy import Table, Column, Integer, String, Date
 from sqlalchemy.testing import fixtures, config
+from sqlalchemy import testing
+
 import datetime
 
 from sqlalchemy_exasol.merge import merge
@@ -237,3 +239,21 @@ class DefaultsTest(fixtures.TablesTest):
         )
         (_, _, active_from) = config.db.execute(t.select()).fetchone()
         assert active_from == datetime.date(1900, 1, 1)
+
+class ConstraintsTest(fixtures.TestTest):
+    __backend__ = True
+
+    def test_distribute_by_constraint(self):
+        t = Table('t', metadata,
+           Column('a', Integer),
+           Column('b', Integer),
+           Column('c', Integer),
+           DistributeByConstraint('a', 'b')
+        )
+        t.create()
+        try:
+           reflected = Table('t', MetaData(testing.db), autoload=True)
+
+        assert t.c.a.name == 'a'
+        # TODO: check for D_B constraint existance
+        assert False

@@ -209,12 +209,13 @@ class EXADDLCompiler(compiler.DDLCompiler):
                             not getattr(constraint, 'use_alter', False)
                         )) if p is not None
                 )
-        if len([dk_c for dk_c in table.c if hasattr(dk_c, 'is_distribution_key')]): 
-            table_constraint_str = "DISTRIBUTE BY " + ",".join(
-                [dk for dk in table.c if hasattr(dk, 'is_distribution_key')] + "\n\t")
 
         for c in [c for c in table._sorted_constraints if c is not table.primary_key]:
-            if c._create_rule is None or c._create_rule(self):
+            from .constraints import DistributeByConstraint
+            if  isinstance(c, DistributeByConstraint):
+                self.process(c)
+                #table_constraint_str += 'DISTRIBUTE BY ' + ','.join(c.name for c in c.columns)
+            elif c._create_rule is None or c._create_rule(self):
                 event.listen(
                     table,
                     "after_create",

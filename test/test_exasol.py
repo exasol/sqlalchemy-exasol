@@ -258,4 +258,5 @@ class ConstraintsTest(fixtures.TablesTest):
            reflected = Table('t', MetaData(testing.db), autoload=True)
         except:
            assert False
-        assert False
+        #TODO: check that reflected table object is identical
+        # i.e. contains the constraint

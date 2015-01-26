@@ -1,4 +1,4 @@
-from sqlalchemy.schme import ColmunCollectionConstraint
+from sqlalchemy.schema import ColumnCollectionConstraint
 
 class DistributeByConstraint(ColumnCollectionConstraint):
 

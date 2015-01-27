@@ -244,16 +244,17 @@ class DefaultsTest(fixtures.TablesTest):
 class ConstraintsTest(fixtures.TablesTest):
     __backend__ = True
 
-
-    def test_distribute_by_constraint(self):
-        metadata = MetaData(testing.db)
-        t = Table('t', metadata,
+    @classmethod
+    def define_tables(cls, metadata):
+        Table('t', metadata,
            Column('a', Integer),
            Column('b', Integer),
            Column('c', Integer),
            DistributeByConstraint('a', 'b')
         )
-        t.create()
+
+
+    def test_distribute_by_constraint(self):
         try:
            reflected = Table('t', MetaData(testing.db), autoload=True)
         except:

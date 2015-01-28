@@ -51,7 +51,7 @@ if six.PY3:
     from six import u as unicode
 from decimal import Decimal
 from sqlalchemy import sql, schema, types as sqltypes, util, event
-from sqlalchemy.schema import AddConstraint
+from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
 from sqlalchemy.engine import default, reflection
 from sqlalchemy.sql import compiler
 from datetime import date, datetime
@@ -198,31 +198,16 @@ class EXADDLCompiler(compiler.DDLCompiler):
         return colspec
 
     def create_table_constraints(self, table):
-        table_constraint_str = ", \n\t".join(p for p in
-                        (self.process(constraint)
-                        for constraint in [table.primary_key]
-                        if (
-                            constraint._create_rule is None or
-                            constraint._create_rule(self))
-                        and (
-                            not self.dialect.supports_alter or
-                            not getattr(constraint, 'use_alter', False)
-                        )) if p is not None
-                )
-
-        for c in [c for c in table._sorted_constraints if c is not table.primary_key]:
-            from .constraints import DistributeByConstraint
-            if  isinstance(c, DistributeByConstraint):
-                self.process(c)
-                #table_constraint_str += 'DISTRIBUTE BY ' + ','.join(c.name for c in c.columns)
-            elif c._create_rule is None or c._create_rule(self):
-                event.listen(
-                    table,
-                    "after_create",
-                    AddConstraint(c)
-                )
-
-        return table_constraint_str
+        # EXASOL does not support FK constraints that reference
+        # the table being created. Thus, these need to be created
+        # via ALTER TABLE after table creation
+        # TODO: FKs that reference other tables could be inlined
+        # the create rule could be more specific but for now, ALTER
+        # TABLE for all FKs work.
+        for c in [c for c in table._sorted_constraints if isinstance(c, ForeignKeyConstraint)]:
+            c._create_rule = lambda: False
+            event.listen(table, "after_create", AddConstraint(c))
+        return super(EXADDLCompiler, self).create_table_constraints(table)
 
     def visit_distribute_by_constraint(self, constraint):
         return "DISTRIBUTE BY " + ",".join(c.name for c in constraint.columns)
@@ -490,7 +475,7 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def _get_all_columns(self, connection, schema=None, **kw):
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
-                    "column_is_nullable, column_default, column_identity, column_table, column_is_distribution_key " \
+                    "column_is_nullable, column_default, column_identity, column_is_distribution_key, column_table " \
                     "FROM sys.exa_all_columns  WHERE column_object_type IN ('TABLE', 'VIEW') " \
                     "AND column_schema = "
 
@@ -515,7 +500,7 @@ class EXADialect(default.DefaultDialect):
 
         columns = []
         for row in self._get_all_columns(connection, schema, info_cache=kw.get("info_cache")):
-            if row[8] != table_name and table_name is not None:
+            if row[9] != table_name and table_name is not None:
                 continue
             (colname, coltype, length, precision, scale, nullable, default, identity, is_distribution_key) = \
                 (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])

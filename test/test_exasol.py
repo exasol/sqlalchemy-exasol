@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from sqlalchemy import MetaData, Table, Column, Integer, String, Date
 from sqlalchemy.testing import fixtures, config
-from sqlalchemy import testing
+from sqlalchemy import testing, inspect
 
 import datetime
 
@@ -261,3 +261,7 @@ class ConstraintsTest(fixtures.TablesTest):
            assert False
         #TODO: check that reflected table object is identical
         # i.e. contains the constraint
+        insp = inspect(testing.db)
+        for c in insp.get_columns('t'):
+            if c['name'] <> 'c':
+                assert c['is_distribution_key'] == True

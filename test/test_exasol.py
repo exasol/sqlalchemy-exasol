@@ -263,5 +263,5 @@ class ConstraintsTest(fixtures.TablesTest):
         # i.e. contains the constraint
         insp = inspect(testing.db)
         for c in insp.get_columns('t'):
-            if c['name'] <> 'c':
+            if not (c['name'] == 'c'):
                 assert c['is_distribution_key'] == True

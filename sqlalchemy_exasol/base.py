@@ -51,10 +51,11 @@ if six.PY3:
     from six import u as unicode
 from decimal import Decimal
 from sqlalchemy import sql, schema, types as sqltypes, util, event
-from sqlalchemy.schema import AddConstraint
+from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
 from sqlalchemy.engine import default, reflection
 from sqlalchemy.sql import compiler
 from datetime import date, datetime
+from .constraints import DistributeByConstraint
 import re
 
 RESERVED_WORDS = set([
@@ -198,27 +199,35 @@ class EXADDLCompiler(compiler.DDLCompiler):
         return colspec
 
     def create_table_constraints(self, table):
-        table_constraint_str = ", \n\t".join(p for p in
-                        (self.process(constraint)
-                        for constraint in [table.primary_key]
-                        if (
-                            constraint._create_rule is None or
-                            constraint._create_rule(self))
-                        and (
-                            not self.dialect.supports_alter or
-                            not getattr(constraint, 'use_alter', False)
-                        )) if p is not None
-                )
+        # EXASOL does not support FK constraints that reference
+        # the table being created. Thus, these need to be created
+        # via ALTER TABLE after table creation
+        # TODO: FKs that reference other tables could be inlined
+        # the create rule could be more specific but for now, ALTER
+        # TABLE for all FKs work.
+        for c in [c for c in table._sorted_constraints if isinstance(c, ForeignKeyConstraint)]:
+            c._create_rule = lambda: False
+            event.listen(table, "after_create", AddConstraint(c))
+        return super(EXADDLCompiler, self).create_table_constraints(table)
 
-        for c in [c for c in table._sorted_constraints if c is not table.primary_key]:
-            if c._create_rule is None or c._create_rule(self):
-                event.listen(
-                    table,
-                    "after_create",
-                    AddConstraint(c)
-                )
+    def visit_add_constraint(self, create):
+        if isinstance(create.element, DistributeByConstraint):
+            return "ALTER TABLE %s %s" %(
+                        self.preparer.format_table(create.element.table),
+                        self.process(create.element)
+                    )
+        else:
+            return super(EXADDLCompiler, self).visit_add_constraint(create)
+        
+    def visit_drop_constraint(self, drop):
+        if isinstance(drop.element, DistributeByConstraint):
+            return "ALTER TABLE %s DROP DISTRIBUTION KEYS" % (
+                self.preparer.format_table(drop.element.table))
+        else:
+            return super(EXADDLCompiler, self).visit_drop_constraint(drop)
 
-        return table_constraint_str
+    def visit_distribute_by_constraint(self, constraint):
+        return "DISTRIBUTE BY " + ",".join(c.name for c in constraint.columns)
 
     def define_constraint_remote_table(self, constraint, table, preparer):
         """Format the remote table clause of a CREATE CONSTRAINT clause."""
@@ -245,7 +254,6 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
 class EXAIdentifierPreparer(compiler.IdentifierPreparer):
     reserved_words = RESERVED_WORDS
     illegal_initial_characters = compiler.ILLEGAL_INITIAL_CHARACTERS.union('_')
-
 
 class EXAExecutionContext(default.DefaultExecutionContext):
 
@@ -483,7 +491,7 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def _get_all_columns(self, connection, schema=None, **kw):
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
-                    "column_is_nullable, column_default, column_identity, column_table " \
+                    "column_is_nullable, column_default, column_identity, column_is_distribution_key, column_table " \
                     "FROM sys.exa_all_columns  WHERE column_object_type IN ('TABLE', 'VIEW') " \
                     "AND column_schema = "
 
@@ -508,10 +516,10 @@ class EXADialect(default.DefaultDialect):
 
         columns = []
         for row in self._get_all_columns(connection, schema, info_cache=kw.get("info_cache")):
-            if row[8] != table_name and table_name is not None:
+            if row[9] != table_name and table_name is not None:
                 continue
-            (colname, coltype, length, precision, scale, nullable, default, identity) = \
-                (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+            (colname, coltype, length, precision, scale, nullable, default, identity, is_distribution_key) = \
+                (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
 
             # FIXME: Missing type support: INTERVAL DAY [(p)] TO SECOND [(fp)], INTERVAL YEAR[(p)] TO MONTH
 
@@ -540,7 +548,8 @@ class EXADialect(default.DefaultDialect):
                 'name': self.normalize_name(colname),
                 'type': coltype,
                 'nullable': nullable,
-                'default': default
+                'default': default,
+                'is_distribution_key': is_distribution_key
             }
             # if we have a positive identity value add a sequence
             if identity is not None and identity >= 0:

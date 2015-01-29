@@ -1,9 +1,13 @@
 # -*- coding: UTF-8 -*-
-from sqlalchemy import Table, Column, Integer, String, Date
+from sqlalchemy import MetaData, Table, Column, Integer, String, Date
 from sqlalchemy.testing import fixtures, config
+from sqlalchemy import testing, inspect
+from sqlalchemy.schema import DropConstraint, AddConstraint
+
 import datetime
 
 from sqlalchemy_exasol.merge import merge
+from sqlalchemy_exasol.constraints import DistributeByConstraint
 
 class MergeTest(fixtures.TablesTest):
 
@@ -237,3 +241,50 @@ class DefaultsTest(fixtures.TablesTest):
         )
         (_, _, active_from) = config.db.execute(t.select()).fetchone()
         assert active_from == datetime.date(1900, 1, 1)
+
+class ConstraintsTest(fixtures.TablesTest):
+    __backend__ = True
+
+    @classmethod
+    def define_tables(cls, metadata):
+        Table('t', metadata,
+           Column('a', Integer),
+           Column('b', Integer),
+           Column('c', Integer),
+           DistributeByConstraint('a', 'b')
+        )
+
+
+    def test_distribute_by_constraint(self):
+        try:
+           reflected = Table('t', MetaData(testing.db), autoload=True)
+        except:
+           assert False
+        #TODO: check that reflected table object is identical
+        # i.e. contains the constraint
+        insp = inspect(testing.db)
+        for c in insp.get_columns('t'):
+            if not (c['name'] == 'c'):
+                assert c['is_distribution_key'] == True
+            else:
+                assert c['is_distribution_key'] == False
+
+    def test_alter_table_distribute_by(self):
+        dbc = DistributeByConstraint('a', 'b')
+        self.tables.t.append_constraint(dbc)
+
+        config.db.execute(DropConstraint(dbc))
+
+        insp = inspect(testing.db)
+        for c in insp.get_columns('t'):
+            assert c['is_distribution_key'] == False
+
+        config.db.execute(AddConstraint(dbc))
+
+        insp = inspect(testing.db)
+        for c in insp.get_columns('t'):
+            if not (c['name'] == 'c'):
+                assert c['is_distribution_key'] == True
+            else:
+                assert c['is_distribution_key'] == False
+

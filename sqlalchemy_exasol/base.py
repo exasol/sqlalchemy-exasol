@@ -255,13 +255,6 @@ class EXAIdentifierPreparer(compiler.IdentifierPreparer):
     reserved_words = RESERVED_WORDS
     illegal_initial_characters = compiler.ILLEGAL_INITIAL_CHARACTERS.union('_')
 
-    @util.dependencies("sqlalchemy.sql.naming")
-    def format_constraint(self, naming, constraint):
-        if isinstance(constraint, DistributeByConstraint):
-            return ""
-        else:
-            super(EXAIdentifierPreparer, self).format_constraint(naming, constraint)
-
 class EXAExecutionContext(default.DefaultExecutionContext):
 
     executemany=True

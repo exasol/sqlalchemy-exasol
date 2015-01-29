@@ -55,6 +55,7 @@ from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
 from sqlalchemy.engine import default, reflection
 from sqlalchemy.sql import compiler
 from datetime import date, datetime
+from .constraints import DistributeByConstraint
 import re
 
 RESERVED_WORDS = set([
@@ -209,6 +210,22 @@ class EXADDLCompiler(compiler.DDLCompiler):
             event.listen(table, "after_create", AddConstraint(c))
         return super(EXADDLCompiler, self).create_table_constraints(table)
 
+    def visit_add_constraint(self, create):
+        if isinstance(create.element, DistributeByConstraint):
+            return "ALTER TABLE %s %s" %(
+                        self.preparer.format_table(create.element.table),
+                        self.process(create.element)
+                    )
+        else:
+            return super(EXADDLCompiler, self).visit_add_constraint(create)
+        
+    def visit_drop_constraint(self, drop):
+        if isinstance(drop.element, DistributeByConstraint):
+            return "ALTER TABLE %s DROP DISTRIBUTION KEYS" % (
+                self.preparer.format_table(drop.element.table))
+        else:
+            return super(EXADDLCompiler, self).visit_drop_constraint(drop)
+
     def visit_distribute_by_constraint(self, constraint):
         return "DISTRIBUTE BY " + ",".join(c.name for c in constraint.columns)
 
@@ -238,6 +255,12 @@ class EXAIdentifierPreparer(compiler.IdentifierPreparer):
     reserved_words = RESERVED_WORDS
     illegal_initial_characters = compiler.ILLEGAL_INITIAL_CHARACTERS.union('_')
 
+    @util.dependencies("sqlalchemy.sql.naming")
+    def format_constraint(self, naming, constraint):
+        if isinstance(constraint, DistributeByConstraint):
+            return ""
+        else:
+            super(EXAIdentifierPreparer, self).format_constraint(naming, constraint)
 
 class EXAExecutionContext(default.DefaultExecutionContext):
 

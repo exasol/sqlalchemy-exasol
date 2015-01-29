@@ -2,6 +2,7 @@
 from sqlalchemy import MetaData, Table, Column, Integer, String, Date
 from sqlalchemy.testing import fixtures, config
 from sqlalchemy import testing, inspect
+from sqlalchemy.schema import DropConstraint, AddConstraint
 
 import datetime
 
@@ -265,3 +266,25 @@ class ConstraintsTest(fixtures.TablesTest):
         for c in insp.get_columns('t'):
             if not (c['name'] == 'c'):
                 assert c['is_distribution_key'] == True
+            else:
+                assert c['is_distribution_key'] == False
+
+    def test_alter_table_distribute_by(self):
+        dbc = DistributeByConstraint('a', 'b')
+        self.tables.t.append_constraint(dbc)
+
+        config.db.execute(DropConstraint(dbc))
+
+        insp = inspect(testing.db)
+        for c in insp.get_columns('t'):
+            assert c['is_distribution_key'] == False
+
+        config.db.execute(AddConstraint(dbc))
+
+        insp = inspect(testing.db)
+        for c in insp.get_columns('t'):
+            if not (c['name'] == 'c'):
+                assert c['is_distribution_key'] == True
+            else:
+                assert c['is_distribution_key'] == False
+

@@ -1,4 +1,6 @@
 # HEAD
+
+# 0.9.1
 * support for DISTRIBUTE BY table constraints
 
 # 0.9.0

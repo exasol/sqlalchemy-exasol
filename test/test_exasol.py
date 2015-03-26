@@ -6,6 +6,7 @@ from sqlalchemy.schema import DropConstraint, AddConstraint
 
 import datetime
 
+from sqlalchemy_exasol.base import RESERVED_WORDS
 from sqlalchemy_exasol.merge import merge
 from sqlalchemy_exasol.constraints import DistributeByConstraint
 
@@ -241,6 +242,16 @@ class DefaultsTest(fixtures.TablesTest):
         )
         (_, _, active_from) = config.db.execute(t.select()).fetchone()
         assert active_from == datetime.date(1900, 1, 1)
+
+class KeywordTest(fixtures.TablesTest):
+    
+    __backend__ = True
+
+    def test_keywords(self):
+        keywords = config.db.execute('select distinct(lower(keyword)) as keyword ' +
+            'from SYS.EXA_SQL_KEYWORDS where reserved = True order by keyword').fetchall()
+        db_keywords = set([k[0] for k in keywords])
+        assert db_keywords <= RESERVED_WORDS
 
 class ConstraintsTest(fixtures.TablesTest):
     __backend__ = True

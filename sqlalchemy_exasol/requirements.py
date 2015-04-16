@@ -115,7 +115,7 @@ class Requirements(SuiteRequirements):
         """
         return exclusions.open()
         
-   @property
+    @property
     def temporary_tables(self):
         """target database supports temporary tables"""
         return exclusions.closed()

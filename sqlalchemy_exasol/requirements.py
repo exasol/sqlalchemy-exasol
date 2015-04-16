@@ -114,3 +114,8 @@ class Requirements(SuiteRequirements):
         """Dialect converts small/large scale decimals into scientific notation
         """
         return exclusions.open()
+        
+   @property
+    def temporary_tables(self):
+        """target database supports temporary tables"""
+        return exclusions.closed()

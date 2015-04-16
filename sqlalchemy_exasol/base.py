@@ -265,7 +265,7 @@ class EXADDLCompiler(compiler.DDLCompiler):
             colspec += " NOT NULL"
         return colspec
 
-    def create_table_constraints(self, table):
+    def create_table_constraints(self, table, _include_foreign_key_constraints=None):
         # EXASOL does not support FK constraints that reference
         # the table being created. Thus, these need to be created
         # via ALTER TABLE after table creation

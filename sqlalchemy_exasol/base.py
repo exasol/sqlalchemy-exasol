@@ -403,7 +403,9 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                         raise TypeError('Data type not supported: %s' % type(value))
             self.statement = db_query
             self.parameters = [[]]
-
+        
+        if self.isupdate:
+            self.executemany = False
 
 class EXADialect(default.DefaultDialect):
     name = 'exasol'

@@ -1,4 +1,5 @@
 # HEAD
+* upgrade to sqlalchemy 1.0.x (incompatible changes drop support for older sqlalchemy versions)
 
 # 0.9.3
 * change execute behaviour for deletes as fixed in 0.9.2 for updates (#36)

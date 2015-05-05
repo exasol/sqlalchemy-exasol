@@ -2,6 +2,7 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import ClauseElement, Executable, ValuesBase, \
     and_, UpdateBase
 from sqlalchemy.sql.base import _generative
+from sqlalchemy.sql import crud
 from sqlalchemy.schema import Column
 
 
@@ -98,7 +99,7 @@ def visit_merge(element, compiler, **kw):
     msql += "ON ( %s ) " % compiler.process(element._on)
 
     if element._merge_update_values is not None:
-        cols = compiler._get_colparams(element._merge_update_values)
+        cols = crud._get_crud_params(compiler, element._merge_update_values)
         msql += "\nWHEN MATCHED THEN UPDATE SET "
         msql += ', '.join(compiler.visit_column(c[0]) + '=' + c[1] for c in cols)
         if element._merge_delete:
@@ -114,7 +115,7 @@ def visit_merge(element, compiler, **kw):
             if element._delete_where is not None:
                 msql += "WHERE %s" % compiler.process(element._delete_where)
     if element._merge_insert_values is not None:
-        cols = compiler._get_colparams(element._merge_insert_values)
+        cols = crud._get_crud_params(compiler, element._merge_insert_values)
         msql += "\nWHEN NOT MATCHED THEN INSERT "
         msql += "(%s) " % ', '.join(compiler.visit_column(c[0]) for c in cols)
         msql += "VALUES (%s) " % ', '.join(c[1] for c in cols)

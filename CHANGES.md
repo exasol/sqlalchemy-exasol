@@ -1,4 +1,5 @@
 # HEAD
+* upgrade to sqlalchemy 1.0.x (incompatible changes drop support for older sqlalchemy versions)
 
 # 0.9.1
 * support for DISTRIBUTE BY table constraints

@@ -119,3 +119,28 @@ class Requirements(SuiteRequirements):
     def temporary_tables(self):
         """target database supports temporary tables"""
         return exclusions.closed()
+
+    @property
+    def temp_table_names(self):
+        """target dialect supports listing of temporary table names"""
+        return exclusions.closed()
+
+    @property
+    def temp_table_reflection(self):
+        return exclusions.closed()
+
+    @property
+    def offset(self):
+        """target database can render OFFSET, or an equivalent, in a
+        SELECT.
+        """
+        #TODO For Exasol 5.0 offset is supported
+        return exclusions.closed()
+
+    @property
+    def bound_limit_offset(self):
+        """target database can render LIMIT and/or OFFSET using a bound
+        parameter
+        """
+
+        return exclusions.closed()

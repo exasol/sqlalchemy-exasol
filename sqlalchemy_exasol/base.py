@@ -404,6 +404,8 @@ class EXAExecutionContext(default.DefaultExecutionContext):
             self.statement = db_query
             self.parameters = [[]]
 
+        if self.isupdate and len(self.parameters) == 1:
+            self.executemany = False
 
 class EXADialect(default.DefaultDialect):
     name = 'exasol'

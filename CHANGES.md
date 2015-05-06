@@ -1,5 +1,8 @@
 # HEAD
 
+# 0.9.2
+* change execute behaviour for updates fixes #36
+
 # 0.9.1
 * support for DISTRIBUTE BY table constraints
 

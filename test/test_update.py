@@ -66,13 +66,14 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
 
     def test_update_simple(self):
         users =  self.tables.users
-        testing.db.execute(users.update().values(name="peter").where(users.c.id == 10))
+        result = testing.db.execute(users.update().values(name="peter").where(users.c.id == 10))
         expected = [
                 (7, 'jack'),
                 (8, 'ed'),
                 (9, 'fred'),
                 (10, 'peter')
                 ]
+        assert result.rowcount ==  1
         self._assert_users(users, expected)
 
     def test_update_executemany(self):

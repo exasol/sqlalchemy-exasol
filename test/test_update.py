@@ -65,6 +65,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
     __backend__ = True
 
     def test_update_simple(self):
+        """test simple update and assert that exasol returns the right rowcount"""
         users =  self.tables.users
         result = testing.db.execute(users.update().values(name="peter").where(users.c.id == 10))
         expected = [
@@ -75,8 +76,23 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
                 ]
         assert result.rowcount ==  1
         self._assert_users(users, expected)
+    
+    def test_update_simple_multiple_rows_rowcount(self):
+        """test simple update and assert that exasol returns the right rowcount"""
+        users =  self.tables.users
+        result = testing.db.execute(users.update().values(name="peter").where(users.c.id >= 9))
+        expected = [
+                (7, 'jack'),
+                (8, 'ed'),
+                (9, 'peter'),
+                (10, 'peter')
+                ]
+        assert result.rowcount == 2 
+        self._assert_users(users, expected)
 
     def test_update_executemany(self):
+        """test that update with executemany work as well, but rowcount
+        is undefined for executemany updates"""
         users =  self.tables.users
         
         stmt = users.update().\
@@ -86,13 +102,14 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
         values = [{'oldname':'jack', 'newname':'jack2'},
                   {'oldname':'fred', 'newname':'fred2'}]
 
-        testing.db.execute(stmt, values)
+        result = testing.db.execute(stmt, values)
         expected = [ 
                 (7, 'jack2'),
                 (8, 'ed'),
                 (9, 'fred2'),
                 (10, 'chuck')
                 ]  
+        assert result.rowcount ==  -1
         self._assert_users(users, expected)
 
     

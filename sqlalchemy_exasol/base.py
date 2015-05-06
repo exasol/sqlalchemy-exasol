@@ -403,8 +403,13 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                         raise TypeError('Data type not supported: %s' % type(value))
             self.statement = db_query
             self.parameters = [[]]
+<<<<<<< Updated upstream
         
         if self.isupdate:
+=======
+
+        if self.isupdate and len(self.parameters) == 1:
+>>>>>>> Stashed changes
             self.executemany = False
 
 class EXADialect(default.DefaultDialect):

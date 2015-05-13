@@ -404,7 +404,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
             self.statement = db_query
             self.parameters = [[]]
 
-        if self.isupdate and len(self.parameters) == 1:
+        if len(self.parameters) == 1 and (self.isupdate or self.isdelete):
             self.executemany = False
 
 class EXADialect(default.DefaultDialect):

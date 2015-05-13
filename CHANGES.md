@@ -1,5 +1,8 @@
 # HEAD
 
+# 0.9.3
+* change execute behaviour for deletes as fixed in 0.9.2 for updates (#36)
+
 # 0.9.2
 * change execute behaviour for updates fixes #36
 

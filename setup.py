@@ -43,7 +43,7 @@ setup(
     long_description=long_description,
     author='Blue Yonder GmbH',
     packages=['sqlalchemy_exasol'],
-    install_requires=["SQLAlchemy>=1.0.0, <1.1.0", "pyodbc>=3.0.6", "six>=1.5"],
+    install_requires=["SQLAlchemy>=1.0.4, <1.1.0", "pyodbc>=3.0.6", "six>=1.5"],
     tests_require=['pytest', 'pytest-cov', 'mock>=1.0.1'],
     test_suite='pytest.main',
     entry_points={

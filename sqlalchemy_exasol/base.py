@@ -226,10 +226,10 @@ class EXACompiler(compiler.SQLCompiler):
         if select._limit is not None:
             text += "\n LIMIT %d" % int(select._limit)
         if select._offset is not None:
-            if self.root_connection.dialect.server_version_info < (5, 0, 0):
-                util.warn("EXASolution does not support OFFSET")
-            else:
-                text += "\n OFFSET %d" % int(select._offset)
+            #if self.root_connection.dialect.server_version_info < (5, 0, 0):
+            #    util.warn("EXASolution does not support OFFSET")
+            #else:
+            text += "\n OFFSET %d" % int(select._offset)
 
         return text
 

@@ -19,7 +19,8 @@ before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
 script: 
-  - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy --dburi "${TESTDB#*=}"
+  - py.test --dropfirst  --dburi "${TESTDB#*=}"
+  #- py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy --dburi "${TESTDB#*=}"
 after_success: 
   - coveralls
   # revert changes to odbc config to avoid dirty tag on deploy

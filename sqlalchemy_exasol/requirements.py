@@ -134,7 +134,7 @@ class Requirements(SuiteRequirements):
         """target database can render OFFSET, or an equivalent, in a
         SELECT.
         """
-        return exclusions.open()
+        return exclusions.closed()
 
     @property
     def bound_limit_offset(self):

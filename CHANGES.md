@@ -1,3 +1,6 @@
+# 1.0.1
+* add OFFSET Support for Exasol 5.X
+
 # 1.0.0
 * upgrade to sqlalchemy 1.0.x (incompatible changes drop support for older sqlalchemy versions)
 

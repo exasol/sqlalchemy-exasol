@@ -134,8 +134,7 @@ class Requirements(SuiteRequirements):
         """target database can render OFFSET, or an equivalent, in a
         SELECT.
         """
-        #TODO For Exasol 5.0 offset is supported
-        return exclusions.closed()
+        return exclusions.open()
 
     @property
     def bound_limit_offset(self):
@@ -144,3 +143,8 @@ class Requirements(SuiteRequirements):
         """
 
         return exclusions.closed()
+
+    @property
+    def duplicate_key_raises_integrity_error(self):
+        return exclusions.closed()
+

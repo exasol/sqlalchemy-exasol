@@ -1,4 +1,10 @@
+import pyodbc
+
+from mock import Mock
+
 from sqlalchemy.engine import url as sa_url
+
+from sqlalchemy.pool import _ConnectionFairy
 
 from sqlalchemy.testing import fixtures
 from sqlalchemy.testing import eq_
@@ -7,9 +13,10 @@ from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
 
 
 class EXADialect_pyodbcTest(fixtures.TestBase):
-    
+
     def setup(self):
         self.dialect = EXADialect_pyodbc()
+        self.dialect.dbapi = pyodbc
 
     def assert_parsed(self, dsn, expected_connector, expected_args):
         url = sa_url.make_url(dsn)
@@ -22,7 +29,7 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema",
                  ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
                  {})
-    
+
     def test_create_connect_args_with_driver(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?driver=FOOBAR",
                  ['DRIVER={FOOBAR};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
@@ -37,20 +44,20 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
         self.assert_parsed("exa+pyodbc://192.168.1.2..8:1234/my_schema",
                  ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;Trusted_Connection=Yes;INTTYPESINRESULTSIFPOSSIBLE=y'],
                  {})
-   
+
 
     def test_create_connect_args_autotranslate(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?odbc_autotranslate=Yes",
                  ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;AutoTranslate=Yes;INTTYPESINRESULTSIFPOSSIBLE=y'],
                  {})
 
-        
+
     def test_create_connect_args_with_param(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?autocommit=true",
                  ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
                  {'AUTOCOMMIT': True})
-    
-    
+
+
     def test_create_connect_args_with_param_multiple(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?autocommit=true&ansi=false&unicode_results=false",
                  ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
@@ -62,3 +69,14 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
                  ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y;clientname=test;querytimeout=10'],
                  {})
 
+    def test_is_disconnect(self):
+        connection = Mock(spec=_ConnectionFairy)
+        cursor = Mock(spec=pyodbc.Cursor)
+        e = pyodbc.Error(
+            'HY000',
+            '[HY000] [EXASOL][EXASolution driver]Connection lost in socket read attempt. Operation timed out (-1) (SQLExecDirectW)'
+        )
+
+        status = self.dialect.is_disconnect(e, connection, cursor)
+
+        eq_(status, True)

@@ -6,6 +6,7 @@ Connect string::
 
 """
 
+import re
 import six
 from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
@@ -100,13 +101,33 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
     def is_disconnect(self, e, connection, cursor):
         if isinstance(e, self.dbapi.Error):
-            error_codes = [
-                    '40004', # Connection lost.
-                    '40009', # Connection lost after internal server error.
-                    '40018', # Connection lost after system running out of memory.
-                    '40020', # Connection lost after system running out of memory.
-                    ]
-            return e.args[0] in error_codes
+            error_codes = {
+                '40004', # Connection lost.
+                '40009', # Connection lost after internal server error.
+                '40018', # Connection lost after system running out of memory.
+                '40020', # Connection lost after system running out of memory.
+            }
+            exasol_error_codes = {
+                'HY000': (  # Generic Exasol error code
+                    re.compile(ur'operation timed out', re.IGNORECASE),
+                    re.compile(ur'connection lost', re.IGNORECASE),
+                )
+            }
+
+            error_code, error_msg = e.args[:2]
+
+            # import pdb; pdb.set_trace()
+            if error_code in exasol_error_codes:
+                # Check exasol error
+                for msg_re in exasol_error_codes[error_code]:
+                    if msg_re.search(error_msg):
+                        return True
+
+                return False
+
+            # Check Pyodbc error
+            return error_code in error_codes
+
         return super(EXADialect_pyodbc, self).is_disconnect(e, connection, cursor)
 
 dialect = EXADialect_pyodbc

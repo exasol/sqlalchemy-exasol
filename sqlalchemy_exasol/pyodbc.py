@@ -12,7 +12,7 @@ from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
 from distutils.version import LooseVersion
 
-class EXADialect_pyodbc(PyODBCConnector, EXADialect):
+class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
     execution_ctx_cls = EXAExecutionContext
 

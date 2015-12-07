@@ -69,17 +69,18 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         dsn_connection = 'dsn' in keys or \
                         ('host' in keys and 'port' not in keys)
         if dsn_connection:
-            connectors = ['DSN=%s' % (keys.pop('host', '') or \
-                        keys.pop('dsn', ''))]
+            connectors = ['DSN=%s' % (keys.pop('dsn', '') or \
+                        keys.pop('host', ''))]
         else:
-            port = ''
-            if 'port' in keys and not 'port' in query:
-                port = ':%d' % int(keys.pop('port'))
-
             connectors = ["DRIVER={%s}" %
-                            keys.pop('driver', self.pyodbc_driver_name),
-                          'EXAHOST=%s%s' % (keys.pop('host', ''), port),
-                          'EXASCHEMA=%s' % keys.pop('database', '')]
+                            keys.pop('driver', self.pyodbc_driver_name)]
+
+        port = ''
+        if 'port' in keys and not 'port' in query:
+            port = ':%d' % int(keys.pop('port'))
+
+        connectors.extend(['EXAHOST=%s%s' % (keys.pop('host', ''), port),
+                          'EXASCHEMA=%s' % keys.pop('database', '')])
 
         user = keys.pop("user", None)
         if user:

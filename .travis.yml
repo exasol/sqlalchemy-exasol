@@ -21,7 +21,7 @@ before_script:
 script: 
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB#*=}"
 after_success: 
-  - coveralls debug
+  - coveralls
   # revert changes to odbc config to avoid dirty tag on deploy
   - git checkout odbcconfig/odbcinst.ini
 deploy:

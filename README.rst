@@ -4,8 +4,8 @@ SQLAlchemy Dialect for EXASOL DB
 
 .. image:: https://travis-ci.org/blue-yonder/sqlalchemy_exasol.svg?branch=master 
     :target: https://travis-ci.org/blue-yonder/sqlalchemy_exasol
-.. image:: https://coveralls.io/repos/blue-yonder/sqlalchemy_exasol/badge.png 
-    :target: https://coveralls.io/r/blue-yonder/sqlalchemy_exasol
+.. image:: https://coveralls.io/repos/github/blue-yonder/sqlalchemy_exasol/badge.svg?branch=master
+    :target: https://coveralls.io/github/blue-yonder/sqlalchemy_exasol?branch=master
 .. image:: https://requires.io/github/blue-yonder/sqlalchemy_exasol/requirements.svg?branch=master
      :target: https://requires.io/github/blue-yonder/sqlalchemy_exasol/requirements/?branch=master
      :alt: Requirements Status
@@ -45,7 +45,7 @@ Setup you python project and install sqlalchemy-exasol
 
 	> pip install sqlalchemy-exasol
 	
-Talk to EXASolution using SQlAlchemy
+Talk to EXASolution using SQLAlchemy
 ````````````````````````````````````
 
 ::
@@ -60,6 +60,10 @@ The dialect supports two connection urls for create_engine. A DSN (Data Source N
 DSN url   'exa+pyodbc://USER:PWD@exa_test'
 Host url  'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
 ========  ====================================================================
+
+*Features*:
+- SELECT, INSERT, UPDATE, DELETE statements
+- you can even use the MERGE statement (see unit tests for examples)
 
 *Note*: 
 

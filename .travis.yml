@@ -14,7 +14,7 @@ install:
   - ./fix_unixodbc_so.sh
   - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc 
   - pip install -r requirements_test.txt
-  - pip install python-coveralls
+  - pip install coveralls
 before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini

@@ -10,7 +10,7 @@ env:
     - secure: "QUAD5FrpEyUSN+crGmTIA3yKVctkxqRXlc6t0421dF+/Sal0ed1H95ySNNgDDeXTfVxcrLpdf5zZCvPHXJeqb5z1v76LrnDzG/o1iV/R3avFMgWAo4B9OX8mgq/4nzs+pFR1HMeTh2aORVcCWnRsPwE6ZpDMh/Ho2uRSMy2ifRo="
     - secure: "NrbXBxe4OnR3ak9WCa31GtED82s5D59/auWccXyDfnvGTgtkxqk7AtKDc7QBzGKOS9Hkj2GTC3li9OjK2ZQftvvDt/RVHvv2m7cK3ejjVsnG6Gf2lxUnyGsUqnWFnLmHjGZlWbc0vQ3sKI7cj7w0/tigfZ5GNwAqSn61tX8pzdI="
 install:
-  - sudo apt-get install unixODBC=2.2.14p2-5ubuntu3 unixODBC-dev=2.2.14p2-5ubuntu3
+  - sudo apt-get install unixODBC unixODBC-dev
   - ./fix_unixodbc_so.sh
   - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc 
   - pip install -r requirements_test.txt

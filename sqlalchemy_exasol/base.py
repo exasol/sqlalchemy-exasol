@@ -57,6 +57,7 @@ from sqlalchemy.sql import compiler
 from datetime import date, datetime
 from .constraints import DistributeByConstraint
 import re
+import sys
 
 RESERVED_WORDS = set([
     'abs', 'absolute', 'acos', 'action', 'add', 'add_days', 'add_hours',
@@ -289,7 +290,7 @@ class EXADDLCompiler(compiler.DDLCompiler):
                     )
         else:
             return super(EXADDLCompiler, self).visit_add_constraint(create)
-        
+
     def visit_drop_constraint(self, drop):
         if isinstance(drop.element, DistributeByConstraint):
             return "ALTER TABLE %s DROP DISTRIBUTION KEYS" % (
@@ -415,8 +416,10 @@ class EXADialect(default.DefaultDialect):
     name = 'exasol'
     supports_native_boolean = True
     supports_alter = True
-    supports_unicode_statements = True
-    supports_unicode_binds = True
+    # Uniceoe not supported on Darwin
+    # See https://www.exasol.com/support/browse/EXA-10027
+    supports_unicode_statements = sys.platform != 'darwin'
+    supports_unicode_binds = sys.platform != 'darwin'
     supports_default_values = True
     supports_empty_insert = False
     supports_sequences = False

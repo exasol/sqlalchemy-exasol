@@ -415,6 +415,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
 class EXADialect(default.DefaultDialect):
     name = 'exasol'
     supports_native_boolean = True
+    supports_native_decimal = True
     supports_alter = True
     # Uniceoe not supported on Darwin
     # See https://www.exasol.com/support/browse/EXA-10027

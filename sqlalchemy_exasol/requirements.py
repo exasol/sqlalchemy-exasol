@@ -148,3 +148,7 @@ class Requirements(SuiteRequirements):
     def duplicate_key_raises_integrity_error(self):
         return exclusions.closed()
 
+    @property
+    def independent_connections(self):
+        return exclusions.open()
+

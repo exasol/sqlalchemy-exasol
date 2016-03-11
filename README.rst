@@ -2,7 +2,7 @@ SQLAlchemy Dialect for EXASOL DB
 ================================
 
 
-.. image:: https://travis-ci.org/blue-yonder/sqlalchemy_exasol.svg?branch=master 
+.. image:: https://travis-ci.org/blue-yonder/sqlalchemy_exasol.svg?branch=master
     :target: https://travis-ci.org/blue-yonder/sqlalchemy_exasol
 .. image:: https://coveralls.io/repos/github/blue-yonder/sqlalchemy_exasol/badge.svg?branch=master
     :target: https://coveralls.io/github/blue-yonder/sqlalchemy_exasol?branch=master
@@ -44,7 +44,7 @@ Setup you python project and install sqlalchemy-exasol
 ::
 
 	> pip install sqlalchemy-exasol
-	
+
 Talk to EXASolution using SQLAlchemy
 ````````````````````````````````````
 
@@ -66,10 +66,26 @@ Host url  'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
 - you can even use the MERGE statement (see unit tests for examples)
 
 *Note*: 
-
 - Schema name and parameters are optional for the host url string
 - Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
 - As of EXASol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
+
+
+Unit tests
+``````````
+
+To run the unit tests you need:
+
+1. set the `default` connection string in the `setup.cfg` file;
+1. set the `DRIVER` path under the `EXAODBC` section in the
+   `odbcconfig/odbcinst.ini` file;
+1. set the `ODBCINSTINI` and `ODBCINST` environment variables to point to the
+   full path of `odbcconfig/odbcinst.ini`
+
+and finally run the unit tests:
+
+    $ py.test test/
+
 
 Troubleshooting
 ```````````````

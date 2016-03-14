@@ -37,7 +37,7 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
 
     def test_create_connect_args_dsn(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@exa_test",
-                 ['DSN=exa_test;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
+                 ['DSN=exa_test;EXAHOST=;EXASCHEMA=;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
                  {})
 
     def test_create_connect_args_trusted(self):

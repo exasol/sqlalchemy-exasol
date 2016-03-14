@@ -1,3 +1,8 @@
+# 1.0.2
+* fix Unicode Problems for OSX/Darwin
+* better DSN handling
+* add supports_native_decimal Flag
+
 # 1.0.1
 * add OFFSET Support for Exasol 5.X
 * add Tests for Python 3.5

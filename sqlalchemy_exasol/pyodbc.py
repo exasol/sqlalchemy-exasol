@@ -112,6 +112,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
                 'HY000': (  # Generic Exasol error code
                     re.compile(six.u(r'operation timed out'), re.IGNORECASE),
                     re.compile(six.u(r'connection lost'), re.IGNORECASE),
+                    re.compile(six.u(r'Socket closed by peer'), re.IGNORECASE),
                 )
             }
 

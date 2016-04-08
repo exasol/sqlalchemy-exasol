@@ -72,11 +72,19 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
     def test_is_disconnect(self):
         connection = Mock(spec=_ConnectionFairy)
         cursor = Mock(spec=pyodbc.Cursor)
-        e = pyodbc.Error(
-            'HY000',
-            '[HY000] [EXASOL][EXASolution driver]Connection lost in socket read attempt. Operation timed out (-1) (SQLExecDirectW)'
-        )
 
-        status = self.dialect.is_disconnect(e, connection, cursor)
+        errors = [
+            pyodbc.Error(
+                'HY000',
+                '[HY000] [EXASOL][EXASolution driver]Connection lost in socket read attempt. Operation timed out (-1) (SQLExecDirectW)'
+            ),
+            pyodbc.Error(
+                'HY000',
+                '[HY000] [EXASOL][EXASolution driver]Socket closed by peer.'
+            ),
+        ]
 
-        eq_(status, True)
+        for error in errors:
+            status = self.dialect.is_disconnect(error, connection, cursor)
+
+            eq_(status, True)

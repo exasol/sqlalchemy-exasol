@@ -1,3 +1,6 @@
+# 1.0.3
+* Reconnect after socket closed
+
 # 1.0.2
 * fix Unicode Problems for OSX/Darwin
 * better DSN handling

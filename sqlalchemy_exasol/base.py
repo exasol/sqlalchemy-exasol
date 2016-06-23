@@ -672,6 +672,8 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def get_foreign_keys(self, connection, table_name, schema=None, **kw):
         schema_int = schema or connection.engine.url.database
+        if schema_int is None:
+            schema_int = connection.execute("select CURRENT_SCHEMA from dual").scalar()
         table_name=self.denormalize_name(table_name)
         def fkey_rec():
             return {

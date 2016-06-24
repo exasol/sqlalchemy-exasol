@@ -44,6 +44,12 @@ Setup you python project and install sqlalchemy-exasol
 ::
 
 	> pip install sqlalchemy-exasol
+	
+for turbodbc support:
+
+::
+
+	> pip install sqlalchemy-exasol[turbodbc]
 
 Talk to EXASolution using SQLAlchemy
 ````````````````````````````````````
@@ -53,6 +59,15 @@ Talk to EXASolution using SQLAlchemy
 	from sqlalchemy import create_engine
 	e = create_engine("exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema")
 	r = e.execute("select 42 from dual").fetch_all()
+	
+to use turbodbc as driver:
+
+::
+
+	from sqlalchemy import create_engine
+	e = create_engine("exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema")
+	r = e.execute("select 42 from dual").fetch_all()
+
 
 The dialect supports two connection urls for create_engine. A DSN (Data Source Name) mode and a host mode:
 

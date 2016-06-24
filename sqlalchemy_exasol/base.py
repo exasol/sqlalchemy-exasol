@@ -370,9 +370,9 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                 cursor.execute(sql_stmnt, (table, id_col, schema))
             else:
                 cursor.execute(sql_stmnt, (table, id_col))
-            lastrowid = cursor.fetchone()[0] - 1
+            result = cursor.fetchone()
             cursor.close()
-            return lastrowid
+            return int(result[0]) - 1
 
     def pre_exec(self):
         """

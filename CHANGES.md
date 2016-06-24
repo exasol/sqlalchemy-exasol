@@ -1,3 +1,6 @@
+# 1.1.0
+* Add support for the [turbodbc](https://github.com/blue-yonder/turbodbc) driver
+
 # 1.0.3
 * Reconnect after socket closed
 

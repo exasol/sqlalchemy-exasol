@@ -1,3 +1,4 @@
+import unittest
 from sqlalchemy import *
 from sqlalchemy import testing
 from sqlalchemy.dialects import mysql
@@ -59,11 +60,11 @@ class _UpdateTestBase(object):
         )
 
 
-
-
 class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
     __backend__ = True
 
+    @unittest.skipIf(testing.db.dialect.driver == 'turbodbc',
+                     'not supported by turbodbc')
     def test_update_simple(self):
         """test simple update and assert that exasol returns the right rowcount"""
         users =  self.tables.users
@@ -76,7 +77,9 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
                 ]
         assert result.rowcount ==  1
         self._assert_users(users, expected)
-    
+
+    @unittest.skipIf(testing.db.dialect.driver == 'turbodbc',
+                     'not supported by turbodbc')
     def test_update_simple_multiple_rows_rowcount(self):
         """test simple update and assert that exasol returns the right rowcount"""
         users =  self.tables.users
@@ -90,11 +93,13 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
         assert result.rowcount == 2 
         self._assert_users(users, expected)
 
+    @unittest.skipIf(testing.db.dialect.driver == 'turbodbc',
+                     'not supported by turbodbc')
     def test_update_executemany(self):
         """test that update with executemany work as well, but rowcount
         is undefined for executemany updates"""
         users =  self.tables.users
-        
+
         stmt = users.update().\
                 where(users.c.name == bindparam('oldname')).\
                 values(name=bindparam('newname'))
@@ -112,14 +117,10 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
         assert result.rowcount ==  -1
         self._assert_users(users, expected)
 
-    
     def _assert_addresses(self, addresses, expected):
         stmt = addresses.select().order_by(addresses.c.id)
         eq_(testing.db.execute(stmt).fetchall(), expected)
 
-   
     def _assert_users(self, users, expected):
         stmt = users.select().order_by(users.c.id)
         eq_(testing.db.execute(stmt).fetchall(), expected)
-
-

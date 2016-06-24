@@ -367,9 +367,9 @@ class EXAExecutionContext(default.DefaultExecutionContext):
 
             cursor = self.create_cursor()
             if schema:
-                cursor.execute(sql_stmnt, table, id_col, schema)
+                cursor.execute(sql_stmnt, (table, id_col, schema))
             else:
-                cursor.execute(sql_stmnt, table, id_col)
+                cursor.execute(sql_stmnt, (table, id_col))
             lastrowid = cursor.fetchone()[0] - 1
             cursor.close()
             return lastrowid

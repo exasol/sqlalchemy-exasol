@@ -12,7 +12,7 @@ env:
     - secure: "LtESv012PiHTLM+2o1NV064XnkOkh0Q/1MSOUUDnmd+okhf1ACrUVzGrPBf2Ao7JKm15Xrbiw7KsIjtjDbD4P6fZyx99+L1Fd4BYwZ8JjPURapV8OwlvYZ3BrdNE96MA7BQAXw2wRdwkfZ/PCbaJsW4E9rQcfAKuGi7yxmR3Y6Y="
 dist: trusty
 install:
-  - sudo apt-get install unixODBC unixODBC-dev
+  - sudo apt-get install unixODBC unixODBC-dev libboost-all-dev
   - ./fix_unixodbc_so.sh
   - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc 
   - pip install -r requirements_test.txt

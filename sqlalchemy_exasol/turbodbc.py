@@ -1,6 +1,5 @@
 from sqlalchemy import types as sqltypes
 from sqlalchemy_exasol.base import EXADialect
-from distutils.version import LooseVersion
 import decimal
 
 DEFAULT_DRIVER_NAME = 'EXAODBC'
@@ -44,6 +43,7 @@ class _ExaInteger(sqltypes.INTEGER):
 
     def result_processor(self, dialect, coltype):
         def to_integer(value):
+            # cast if turbodbc returns a VARCHAR
             if coltype == 30:
                 return int(value)
             else:

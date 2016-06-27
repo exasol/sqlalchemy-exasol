@@ -9,6 +9,8 @@ env:
   matrix:
     - secure: "QUAD5FrpEyUSN+crGmTIA3yKVctkxqRXlc6t0421dF+/Sal0ed1H95ySNNgDDeXTfVxcrLpdf5zZCvPHXJeqb5z1v76LrnDzG/o1iV/R3avFMgWAo4B9OX8mgq/4nzs+pFR1HMeTh2aORVcCWnRsPwE6ZpDMh/Ho2uRSMy2ifRo="
     - secure: "NrbXBxe4OnR3ak9WCa31GtED82s5D59/auWccXyDfnvGTgtkxqk7AtKDc7QBzGKOS9Hkj2GTC3li9OjK2ZQftvvDt/RVHvv2m7cK3ejjVsnG6Gf2lxUnyGsUqnWFnLmHjGZlWbc0vQ3sKI7cj7w0/tigfZ5GNwAqSn61tX8pzdI="
+    - secure: "LtESv012PiHTLM+2o1NV064XnkOkh0Q/1MSOUUDnmd+okhf1ACrUVzGrPBf2Ao7JKm15Xrbiw7KsIjtjDbD4P6fZyx99+L1Fd4BYwZ8JjPURapV8OwlvYZ3BrdNE96MA7BQAXw2wRdwkfZ/PCbaJsW4E9rQcfAKuGi7yxmR3Y6Y="
+dist: trusty
 install:
   - sudo apt-get install unixODBC unixODBC-dev
   - ./fix_unixodbc_so.sh
@@ -20,7 +22,8 @@ before_script:
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
 script: 
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB#*=}"
-after_success: 
+  - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB_TURBODBC#*=}"
+after_success:
   - coveralls
   # revert changes to odbc config to avoid dirty tag on deploy
   - git checkout odbcconfig/odbcinst.ini

@@ -17,9 +17,12 @@ matrix:
     - python: "3.4"
       env:
         - secure: "NrbXBxe4OnR3ak9WCa31GtED82s5D59/auWccXyDfnvGTgtkxqk7AtKDc7QBzGKOS9Hkj2GTC3li9OjK2ZQftvvDt/RVHvv2m7cK3ejjVsnG6Gf2lxUnyGsUqnWFnLmHjGZlWbc0vQ3sKI7cj7w0/tigfZ5GNwAqSn61tX8pzdI="
+    # turbodbc test run, currently only with 2.7
     - python: "2.7"
       env:
-        - secure: "FYixONt4RHti4KrJoZZOEyieLA0PdO7GwNZj7rnYFYIDHdfueAzDre4Qvk3m4XRYJJCjtfPceryH1id3z6EvCzbMf5lUd99YBM4r3Oog3wTRlUpzJgndKXkFdoxT6rZQBzW/bR1mGhDI+X87FPzGkZus4e56JTO/bhWryuTAx0w="
+        - secure: "RgjJWQbuzrVN/YDNIG9ftx4CYTXD2oD3iuML0DnTrV2RpLivGyXdGGbhPl8v+7L46VOAnqwT2+jwOnxb2M4HRLtiOY3ixSJXmfN2i5VwK2lKyF2Agewec3D7bnp697rxTfdI1ejBFo3FwtGejn3dAGZ2KR73w4lY74Qd81ff4nA="
+      install:
+        - pip install -r requirements_extras.txt
 dist: trusty
 install:
   - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev

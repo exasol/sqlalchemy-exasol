@@ -1,11 +1,5 @@
-import pyodbc
-import turbodbc
-from mock import Mock
-
+from sqlalchemy import testing
 from sqlalchemy.engine import url as sa_url
-
-from sqlalchemy.pool import _ConnectionFairy
-
 from sqlalchemy.testing import fixtures
 from sqlalchemy.testing import eq_
 
@@ -13,6 +7,8 @@ from sqlalchemy_exasol.turbodbc import EXADialect_turbodbc, DEFAULT_CONNECTION_P
 
 
 class EXADialectTurbodbcTest(fixtures.TestBase):
+    __skip_if__ = (lambda: testing.db.dialect.driver != 'turbodbc',)
+
     dialect = None
     default_host_args = {
         'EXAHOST': '192.168.1.2..8:1234',

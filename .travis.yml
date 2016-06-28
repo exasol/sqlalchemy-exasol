@@ -23,7 +23,7 @@ matrix:
       env:
         - secure: "RgjJWQbuzrVN/YDNIG9ftx4CYTXD2oD3iuML0DnTrV2RpLivGyXdGGbhPl8v+7L46VOAnqwT2+jwOnxb2M4HRLtiOY3ixSJXmfN2i5VwK2lKyF2Agewec3D7bnp697rxTfdI1ejBFo3FwtGejn3dAGZ2KR73w4lY74Qd81ff4nA="
       before_install:
-        - sudo apt-get install libboost-all-dev
+        - sudo apt-get install -y libboost-all-dev
       install:
         - pip install -r requirements_extras.txt
 dist: trusty

@@ -1,15 +1,25 @@
 language: python
-python:
-  - '2.7'
-  - '3.4'
-    #- '3.5'
+
 env:
   global:
     - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
-  matrix:
-    - secure: "QUAD5FrpEyUSN+crGmTIA3yKVctkxqRXlc6t0421dF+/Sal0ed1H95ySNNgDDeXTfVxcrLpdf5zZCvPHXJeqb5z1v76LrnDzG/o1iV/R3avFMgWAo4B9OX8mgq/4nzs+pFR1HMeTh2aORVcCWnRsPwE6ZpDMh/Ho2uRSMy2ifRo="
-    - secure: "NrbXBxe4OnR3ak9WCa31GtED82s5D59/auWccXyDfnvGTgtkxqk7AtKDc7QBzGKOS9Hkj2GTC3li9OjK2ZQftvvDt/RVHvv2m7cK3ejjVsnG6Gf2lxUnyGsUqnWFnLmHjGZlWbc0vQ3sKI7cj7w0/tigfZ5GNwAqSn61tX8pzdI="
-    - secure: "FYixONt4RHti4KrJoZZOEyieLA0PdO7GwNZj7rnYFYIDHdfueAzDre4Qvk3m4XRYJJCjtfPceryH1id3z6EvCzbMf5lUd99YBM4r3Oog3wTRlUpzJgndKXkFdoxT6rZQBzW/bR1mGhDI+X87FPzGkZus4e56JTO/bhWryuTAx0w="
+matrix:
+  include:
+    - python: "2.7"
+      env:
+        - secure: "QUAD5FrpEyUSN+crGmTIA3yKVctkxqRXlc6t0421dF+/Sal0ed1H95ySNNgDDeXTfVxcrLpdf5zZCvPHXJeqb5z1v76LrnDzG/o1iV/R3avFMgWAo4B9OX8mgq/4nzs+pFR1HMeTh2aORVcCWnRsPwE6ZpDMh/Ho2uRSMy2ifRo="
+    - python: "3.4"
+      env:
+        - secure: "QUAD5FrpEyUSN+crGmTIA3yKVctkxqRXlc6t0421dF+/Sal0ed1H95ySNNgDDeXTfVxcrLpdf5zZCvPHXJeqb5z1v76LrnDzG/o1iV/R3avFMgWAo4B9OX8mgq/4nzs+pFR1HMeTh2aORVcCWnRsPwE6ZpDMh/Ho2uRSMy2ifRo="
+    - python: "2.7"
+      env:
+        - secure: "NrbXBxe4OnR3ak9WCa31GtED82s5D59/auWccXyDfnvGTgtkxqk7AtKDc7QBzGKOS9Hkj2GTC3li9OjK2ZQftvvDt/RVHvv2m7cK3ejjVsnG6Gf2lxUnyGsUqnWFnLmHjGZlWbc0vQ3sKI7cj7w0/tigfZ5GNwAqSn61tX8pzdI="
+    - python: "3.4"
+      env:
+        - secure: "NrbXBxe4OnR3ak9WCa31GtED82s5D59/auWccXyDfnvGTgtkxqk7AtKDc7QBzGKOS9Hkj2GTC3li9OjK2ZQftvvDt/RVHvv2m7cK3ejjVsnG6Gf2lxUnyGsUqnWFnLmHjGZlWbc0vQ3sKI7cj7w0/tigfZ5GNwAqSn61tX8pzdI="
+    - python: "2.7"
+      env:
+        - secure: "FYixONt4RHti4KrJoZZOEyieLA0PdO7GwNZj7rnYFYIDHdfueAzDre4Qvk3m4XRYJJCjtfPceryH1id3z6EvCzbMf5lUd99YBM4r3Oog3wTRlUpzJgndKXkFdoxT6rZQBzW/bR1mGhDI+X87FPzGkZus4e56JTO/bhWryuTAx0w="
 dist: trusty
 install:
   - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev

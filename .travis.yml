@@ -8,16 +8,18 @@ python:
 env:
   global:
     - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
-    # EXA5_TESTDB
-    - secure: "f6IiDtarGpr32z9BDtnjPS7dfomRnJvY6T6cxbgC/MJCxLBda5Sz4GFQNwwUnDqJ5wXPyKMWu3geFbdqJqSBiY/TTj19sVmrOYrPQLaH/JyHKiVIWL3hUdkdTNlCNuceCvBZJ5spihhKNJJ5NagYmZEIzleiMG/+SQFGU0sq1kY="
+    # EXA5_TESTDB_PYODBC
+    - secure: "C0lXZlYkVV0OnDM1BySxFmGFxFX4+Cz7pMQ+Z5JSaLEHnjlOIMAK9LJhQRtcuo4W7aQD2NWb0nXRXcNKvIcDfHtGvpV7kmI00Q4Ly7YNTbiEPi7zDuhlsHVSHe07t5SJMcj9g/GYtPTSiu45OUhKiONPOLJxxTFvWzDmKM1TqiE="
+    # EXA5_TESTDB_TURBODBC
+    - secure: "RjP3t6u9Zd+ozHHY1n/8jtFH7FLkFierkAsvdxfLNONZA/srQ0+EUe1y5nNBJaJKzmdc9K0JCViGHvcl5mx8umwvtnrui95IqtkBo5EcjsgT7OPIvCyqZXDc9CcCOTuJsNiq8L+CRx4qcul/kyT3u0nZ8kq5/8xQ5LbVCfjptts="
   matrix:
-    - TESTDB="${EXA5_TESTDB}" EXA_5=nil EXTRA_REQUIREMENTS=""
-    - TESTDB="${EXA5_TESTDB}" EXA_5=nil EXTRA_REQUIREMENTS="-r requirements_extras.txt"
+    - TESTDB="${EXA5_TESTDB_PYODBC}" EXA_5=nil EXTRA_REQUIREMENTS=""
+    - TESTDB="${EXA5_TESTDB_TURBODBC}" EXA_5=nil EXTRA_REQUIREMENTS="-r requirements_extras.txt"
 
 matrix:
   exclude:
     - python: "3.4"
-      env: TESTDB="${EXA5_TESTDB}" EXA_5=nil EXTRA_REQUIREMENTS="-r requirements_extras.txt"
+      env: TESTDB="${EXA5_TESTDB_TURBODBC}" EXA_5=nil EXTRA_REQUIREMENTS="-r requirements_extras.txt"
 
 before_install:
   - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev

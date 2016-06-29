@@ -1,48 +1,45 @@
 language: python
+dist: trusty
+
+python:
+  - "2.7"
+  - "3.4"
 
 env:
   global:
     - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
+    # EXA5_TESTDB
+    - secure: "f6IiDtarGpr32z9BDtnjPS7dfomRnJvY6T6cxbgC/MJCxLBda5Sz4GFQNwwUnDqJ5wXPyKMWu3geFbdqJqSBiY/TTj19sVmrOYrPQLaH/JyHKiVIWL3hUdkdTNlCNuceCvBZJ5spihhKNJJ5NagYmZEIzleiMG/+SQFGU0sq1kY="
+  matrix:
+    - TESTDB="${EXA5_TESTDB}" EXA_5=nil EXTRA_REQUIREMENTS=""
+    - TESTDB="${EXA5_TESTDB}" EXA_5=nil EXTRA_REQUIREMENTS="-r requirements_extras.txt"
+
 matrix:
-  include:
-#
-#    - python: "2.7"
-#      env:
-#        - secure: "QUAD5FrpEyUSN+crGmTIA3yKVctkxqRXlc6t0421dF+/Sal0ed1H95ySNNgDDeXTfVxcrLpdf5zZCvPHXJeqb5z1v76LrnDzG/o1iV/R3avFMgWAo4B9OX8mgq/4nzs+pFR1HMeTh2aORVcCWnRsPwE6ZpDMh/Ho2uRSMy2ifRo="
-#    - python: "3.4"
-#      env:
-#        - secure: "QUAD5FrpEyUSN+crGmTIA3yKVctkxqRXlc6t0421dF+/Sal0ed1H95ySNNgDDeXTfVxcrLpdf5zZCvPHXJeqb5z1v76LrnDzG/o1iV/R3avFMgWAo4B9OX8mgq/4nzs+pFR1HMeTh2aORVcCWnRsPwE6ZpDMh/Ho2uRSMy2ifRo="
-    - python: "2.7"
-      env:
-        - secure: "NrbXBxe4OnR3ak9WCa31GtED82s5D59/auWccXyDfnvGTgtkxqk7AtKDc7QBzGKOS9Hkj2GTC3li9OjK2ZQftvvDt/RVHvv2m7cK3ejjVsnG6Gf2lxUnyGsUqnWFnLmHjGZlWbc0vQ3sKI7cj7w0/tigfZ5GNwAqSn61tX8pzdI="
+  exclude:
     - python: "3.4"
-      env:
-        - secure: "NrbXBxe4OnR3ak9WCa31GtED82s5D59/auWccXyDfnvGTgtkxqk7AtKDc7QBzGKOS9Hkj2GTC3li9OjK2ZQftvvDt/RVHvv2m7cK3ejjVsnG6Gf2lxUnyGsUqnWFnLmHjGZlWbc0vQ3sKI7cj7w0/tigfZ5GNwAqSn61tX8pzdI="
-    # turbodbc test run, currently only with 2.7
-    - python: "2.7.6"
-      env:
-        - secure: "RgjJWQbuzrVN/YDNIG9ftx4CYTXD2oD3iuML0DnTrV2RpLivGyXdGGbhPl8v+7L46VOAnqwT2+jwOnxb2M4HRLtiOY3ixSJXmfN2i5VwK2lKyF2Agewec3D7bnp697rxTfdI1ejBFo3FwtGejn3dAGZ2KR73w4lY74Qd81ff4nA="
-      before_install:
-        - sudo apt-get install -y libboost-all-dev
-      install:
-        - pip install -r requirements_extras.txt
-dist: trusty
+      env: TESTDB="${EXA5_TESTDB}" EXA_5=nil EXTRA_REQUIREMENTS="-r requirements_extras.txt"
+
 before_install:
-  - sudo apt-get install -y unixODBC unixODBC-dev
+  - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev
   - ./fix_unixodbc_so.sh
+
 install:
   - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc 
-  - pip install -r requirements_test.txt
+  - pip install -r requirements_test.txt $EXTRA_REQUIREMENTS
   - pip install coveralls
+
 before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
+
 script: 
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB#*=}"
+
 after_success:
   - coveralls
   # revert changes to odbc config to avoid dirty tag on deploy
   - git checkout odbcconfig/odbcinst.ini
+
 deploy:
   provider: pypi
   user: BY-jk

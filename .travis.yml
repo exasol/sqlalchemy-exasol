@@ -22,7 +22,7 @@ matrix:
       env: TESTDB="${EXA5_TESTDB_TURBODBC}" EXA_5=nil EXTRA_REQUIREMENTS="-r requirements_extras.txt"
 
 before_install:
-  - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev
+  - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev libmyodbc
   - ./fix_unixodbc_so.sh
 
 install:

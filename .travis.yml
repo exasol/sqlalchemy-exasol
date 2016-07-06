@@ -14,7 +14,7 @@ env:
     # EXAUID
     - secure: "M0TKnrWXD97TT2QXKrujBQn9vK19hScY7Re+j6ipuok63dGOweO8FPmrE2Vf5r8ks+zxEgLzDaEsIqIYdpGnP6R8MGhLV0O9wexNX9gt86wSfme8qQ35uBypgkFT4WJ4hTy6ojEbcO6xMRJY7GVYUv50Q05TRlmnnnKcPpVGhfo="
     # EXAHOST
-    - secure: "D0eVQ3sITt9pK3L9h60AQIUNxzCisfY97dU3+9BUoIvJw0kaLC5bPBF2heF5hXiTQGeeS/u2cwrP2yyQDv8a801rHVubwLK6K19D7MUOmCduoKrGjzykCfdD9/fzkFn9QJeWgKO9GKtQf8ANhN+7liW5TIPABVjAu02lu+cCy7U="
+    - secure: "RTiZTG1kNfMLltERKobiNFOr7EpkBwUn2MptQTGKp5oBLlktGYpXTmR/4+tY9/mtWpZSdJ5YCVv4wMxklUozzdksiyFx6XyZ4OCEUAK4m2z6fn5iEojamJpsDoiSRB6jEcrosWALOZLug0k+GVAZtD+4mKK3ww+QFUV3waeQArs="
   matrix:
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS=""
     - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt"

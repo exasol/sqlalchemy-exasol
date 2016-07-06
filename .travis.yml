@@ -25,6 +25,7 @@ matrix:
       env: TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt"
 
 before_install:
+  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
   - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev libmyodbc
   - ./fix_unixodbc_so.sh
 

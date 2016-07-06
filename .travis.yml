@@ -9,18 +9,20 @@ python:
 env:
   global:
     - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
-    # EXA5_TESTDB_PYODBC
-    - secure: "C0lXZlYkVV0OnDM1BySxFmGFxFX4+Cz7pMQ+Z5JSaLEHnjlOIMAK9LJhQRtcuo4W7aQD2NWb0nXRXcNKvIcDfHtGvpV7kmI00Q4Ly7YNTbiEPi7zDuhlsHVSHe07t5SJMcj9g/GYtPTSiu45OUhKiONPOLJxxTFvWzDmKM1TqiE="
-    # EXA5_TESTDB_TURBODBC
-    - secure: "RjP3t6u9Zd+ozHHY1n/8jtFH7FLkFierkAsvdxfLNONZA/srQ0+EUe1y5nNBJaJKzmdc9K0JCViGHvcl5mx8umwvtnrui95IqtkBo5EcjsgT7OPIvCyqZXDc9CcCOTuJsNiq8L+CRx4qcul/kyT3u0nZ8kq5/8xQ5LbVCfjptts="
+    # EXAPWD
+    - secure: "HC2JuDQ0DLO35eG2ZJCO/9Kntgk+MqaEylsDo0lfjSAbOvgncgh7ljyq+1anCC9r3zfPOISWU3ul6BARaDIbnUATguN2/HVQKWLFB+uu38lcP/c46aTYsMh6jH/eURjJBPfCWosvs02BXpKMphHd+dmPG+XrizzzBU35w2w6kQo="
+    # EXAUID
+    - secure: "M0TKnrWXD97TT2QXKrujBQn9vK19hScY7Re+j6ipuok63dGOweO8FPmrE2Vf5r8ks+zxEgLzDaEsIqIYdpGnP6R8MGhLV0O9wexNX9gt86wSfme8qQ35uBypgkFT4WJ4hTy6ojEbcO6xMRJY7GVYUv50Q05TRlmnnnKcPpVGhfo="
+    # EXAHOST
+    - secure: "D0eVQ3sITt9pK3L9h60AQIUNxzCisfY97dU3+9BUoIvJw0kaLC5bPBF2heF5hXiTQGeeS/u2cwrP2yyQDv8a801rHVubwLK6K19D7MUOmCduoKrGjzykCfdD9/fzkFn9QJeWgKO9GKtQf8ANhN+7liW5TIPABVjAu02lu+cCy7U="
   matrix:
-    - TESTDB="${EXA5_TESTDB_PYODBC}" EXA_5=nil EXTRA_REQUIREMENTS=""
-    - TESTDB="${EXA5_TESTDB_TURBODBC}" EXA_5=nil EXTRA_REQUIREMENTS="-r requirements_extras.txt"
+    - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS=""
+    - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt"
 
 matrix:
   exclude:
     - python: "3.4"
-      env: TESTDB="${EXA5_TESTDB_TURBODBC}" EXA_5=nil EXTRA_REQUIREMENTS="-r requirements_extras.txt"
+    - env: TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt"
 
 before_install:
   - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev libmyodbc

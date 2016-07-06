@@ -22,7 +22,7 @@ env:
 matrix:
   exclude:
     - python: "3.4"
-    - env: TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt"
+      env: TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt"
 
 before_install:
   - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev libmyodbc

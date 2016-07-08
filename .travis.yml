@@ -1,4 +1,4 @@
-language: python
+language: generic
 dist: trusty
 sudo: required
 
@@ -25,15 +25,17 @@ before_install:
   - ./fix_unixodbc_so.sh
 
 install:
-  - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc 
+  - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc
   - pip install -r requirements_test.txt $EXTRA_REQUIREMENTS
   - pip install coveralls
+  - pip freeze
 
 before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
 
 script: 
+  - python --version
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB#*=}"
 
 after_success:

@@ -17,7 +17,7 @@ env:
     - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python2.7"
 
 before_install:
-  - virtualenv -p ${PYTHON_VERSION} venv && . venv/bin/activate
+  - virtualenv -p ${PYTHON_VERSION} --system-site-packages venv && . venv/bin/activate
   - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev libmyodbc
   - sudo apt-get install python3-dev python-dev
   - ./fix_unixodbc_so.sh

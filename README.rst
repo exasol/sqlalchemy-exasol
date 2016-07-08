@@ -35,8 +35,15 @@ On Linux/Unix like systems you need:
 
 - the packages unixODBC and unixODBC-dev >= 2.2.14
 - Python >= 2.7
-- Download and install the ODBC client drivers from EXASOL >= 4.2
+- Download and install the ODBC client drivers from EXASOL >= 5
 - configure ODBC.ini and ODBCINST.ini
+
+Turbodbc support
+````````````````
+
+- Currently only python 2.7 is supported by turbodbc and therefore for sqlalchemy-exasol, too.
+- Multi row update is not supported, see `test/test_update.py <test/test_update.py>`_ for an example.
+
 
 Setup you python project and install sqlalchemy-exasol
 ``````````````````````````````````````````````````````

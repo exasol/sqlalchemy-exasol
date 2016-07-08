@@ -19,6 +19,7 @@ env:
 before_install:
   - virtualenv -p ${PYTHON_VERSION} venv && . venv/bin/activate
   - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev libmyodbc
+  - sudo apt-get install python3-dev python-dev
   - ./fix_unixodbc_so.sh
 
 install:

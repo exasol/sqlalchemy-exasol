@@ -1,29 +1,48 @@
-language: python
-python:
-  - '2.7'
-  - '3.4'
-    #- '3.5'
+language: generic
+dist: trusty
+sudo: required
+
 env:
   global:
     - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
+    # EXAPWD
+    - secure: "HC2JuDQ0DLO35eG2ZJCO/9Kntgk+MqaEylsDo0lfjSAbOvgncgh7ljyq+1anCC9r3zfPOISWU3ul6BARaDIbnUATguN2/HVQKWLFB+uu38lcP/c46aTYsMh6jH/eURjJBPfCWosvs02BXpKMphHd+dmPG+XrizzzBU35w2w6kQo="
+    # EXAUID
+    - secure: "M0TKnrWXD97TT2QXKrujBQn9vK19hScY7Re+j6ipuok63dGOweO8FPmrE2Vf5r8ks+zxEgLzDaEsIqIYdpGnP6R8MGhLV0O9wexNX9gt86wSfme8qQ35uBypgkFT4WJ4hTy6ojEbcO6xMRJY7GVYUv50Q05TRlmnnnKcPpVGhfo="
+    # EXAHOST
+    - secure: "RTiZTG1kNfMLltERKobiNFOr7EpkBwUn2MptQTGKp5oBLlktGYpXTmR/4+tY9/mtWpZSdJ5YCVv4wMxklUozzdksiyFx6XyZ4OCEUAK4m2z6fn5iEojamJpsDoiSRB6jEcrosWALOZLug0k+GVAZtD+4mKK3ww+QFUV3waeQArs="
   matrix:
-    - secure: "QUAD5FrpEyUSN+crGmTIA3yKVctkxqRXlc6t0421dF+/Sal0ed1H95ySNNgDDeXTfVxcrLpdf5zZCvPHXJeqb5z1v76LrnDzG/o1iV/R3avFMgWAo4B9OX8mgq/4nzs+pFR1HMeTh2aORVcCWnRsPwE6ZpDMh/Ho2uRSMy2ifRo="
-    - secure: "NrbXBxe4OnR3ak9WCa31GtED82s5D59/auWccXyDfnvGTgtkxqk7AtKDc7QBzGKOS9Hkj2GTC3li9OjK2ZQftvvDt/RVHvv2m7cK3ejjVsnG6Gf2lxUnyGsUqnWFnLmHjGZlWbc0vQ3sKI7cj7w0/tigfZ5GNwAqSn61tX8pzdI="
-install:
-  - sudo apt-get install unixODBC unixODBC-dev
+    - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python2.7"
+    - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python3.4"
+    - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python2.7"
+
+before_install:
+  - sudo apt-get install python3-dev python-dev
+  - virtualenv -p ${PYTHON_VERSION} venv && . venv/bin/activate
+  - python --version
+  - pip install setuptools
+  - sudo apt-get install -y unixODBC unixODBC-dev libboost-all-dev libmyodbc
   - ./fix_unixodbc_so.sh
-  - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc 
-  - pip install -r requirements_test.txt
+
+install:
+  - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc
+  - pip install -r requirements_test.txt $EXTRA_REQUIREMENTS
   - pip install coveralls
+  - pip freeze
+
 before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
+
 script: 
+  - python --version
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB#*=}"
-after_success: 
+
+after_success:
   - coveralls
   # revert changes to odbc config to avoid dirty tag on deploy
   - git checkout odbcconfig/odbcinst.ini
+
 deploy:
   provider: pypi
   user: BY-jk

@@ -6,6 +6,7 @@ from sqlalchemy.engine import url as sa_url
 
 from sqlalchemy.pool import _ConnectionFairy
 
+from sqlalchemy import testing
 from sqlalchemy.testing import fixtures
 from sqlalchemy.testing import eq_
 
@@ -13,6 +14,7 @@ from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
 
 
 class EXADialect_pyodbcTest(fixtures.TestBase):
+    __skip_if__ = (lambda: testing.db.dialect.driver != 'pyodbc',)
 
     def setup(self):
         self.dialect = EXADialect_pyodbc()

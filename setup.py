@@ -44,9 +44,11 @@ setup(
     author='Blue Yonder GmbH',
     packages=['sqlalchemy_exasol'],
     install_requires=["SQLAlchemy>=1.0.4, <1.1.0", "pyodbc>=3.0.6", "six>=1.5"],
+    extras_require={'turbodbc': ['turbodbc>=0.2.4']},
     tests_require=['pytest', 'pytest-cov', 'mock>=1.0.1'],
     test_suite='pytest.main',
     entry_points={
-          'sqlalchemy.dialects': ['exa.pyodbc = sqlalchemy_exasol.pyodbc:EXADialect_pyodbc']
+          'sqlalchemy.dialects': ['exa.pyodbc = sqlalchemy_exasol.pyodbc:EXADialect_pyodbc',
+                                  'exa.turbodbc = sqlalchemy_exasol.turbodbc:EXADialect_turbodbc']
     },
 )

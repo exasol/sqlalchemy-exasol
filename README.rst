@@ -84,10 +84,12 @@ Host url  'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
 ========  ====================================================================
 
 *Features*:
+
 - SELECT, INSERT, UPDATE, DELETE statements
 - you can even use the MERGE statement (see unit tests for examples)
 
-*Note*: 
+*Note*:
+
 - Schema name and parameters are optional for the host url string
 - Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
 - As of EXASol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
@@ -98,7 +100,9 @@ Unit tests
 
 To run the unit tests you need:
 
-1. set the `default` connection string in the `setup.cfg` file;
+1. set the `default` connection string in the `setup.cfg` file, which should contain
+   an existing schema to run tests against.  Note that the tests also use a schema
+   "test_schema";
 1. set the `DRIVER` path under the `EXAODBC` section in the
    `odbcconfig/odbcinst.ini` file;
 1. set the `ODBCINSTINI` and `ODBCINST` environment variables to point to the

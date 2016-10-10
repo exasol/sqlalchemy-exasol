@@ -152,3 +152,10 @@ class Requirements(SuiteRequirements):
     def independent_connections(self):
         return exclusions.open()
 
+    @property
+    def parens_in_union_contained_select_w_limit_offset(self):
+        return exclusions.closed()
+
+    @property
+    def parens_in_union_contained_select_wo_limit_offset(self):
+        return exclusions.closed()

@@ -2,15 +2,22 @@ from sqlalchemy import types as sqltypes
 from sqlalchemy_exasol.base import EXADialect
 import decimal
 
+
+def _get_default_buffer_size():
+    try:
+        real_turbodbc = __import__('turbodbc')
+        return real_turbodbc.Megabytes(50)
+    except ImportError:
+        return None
+
+
 DEFAULT_DRIVER_NAME = 'EXAODBC'
 
-# EXASOL sometimes gives 2M big text columns, combined with a too big default buffer value
-# this could lead to a MemoryError. Because of this we reduce the turbodbc default
 DEFAULT_CONNECTION_PARAMS = {
-    'rows_to_buffer': 100,
+    'read_buffer_size': _get_default_buffer_size(),
     'driver': DEFAULT_DRIVER_NAME,
     # always enable efficient conversion to Python types: see https://www.exasol.com/support/browse/EXASOL-898
-    'INTTYPESINRESULTSIFPOSSIBLE': 'y',
+    'inttypesinresultsifpossible': 'y',
 }
 
 
@@ -66,36 +73,11 @@ class EXADialect_turbodbc(EXADialect):
         return __import__('turbodbc')
 
     def create_connect_args(self, url):
-        in_opts = url.translate_connect_args(username='user')
-        in_opts.update(url.query)
+        options = self._get_options_with_defaults(url)
+        self._translate_none(options)
+        self._interpret_destination(options)
 
-        opts = dict()
-        keys = list(in_opts)
-        for key in keys:
-            opts[key.lower()] = in_opts[key]
-
-        for default_setting in DEFAULT_CONNECTION_PARAMS:
-            opts[default_setting] = opts.pop(default_setting,
-                                             DEFAULT_CONNECTION_PARAMS[default_setting])
-            if opts[default_setting] == 'None':
-                opts[default_setting] = None
-
-        if all(key not in opts for key in ['port', 'database']):
-            dsn = opts.pop('host')
-        else:
-            dsn = None
-
-        if 'user' in opts:
-            opts['UID'] = opts.pop('user')
-        if 'password' in opts:
-            opts['PWD'] = opts.pop('password')
-        if 'database' in opts:
-            opts['EXASCHEMA'] = opts.pop('database')
-
-        if 'host' in opts:
-            opts['EXAHOST'] = "{}:{}".format(opts.pop('host'), opts.pop('port'))
-
-        return [[dsn], opts]
+        return [[options.pop("dsn", None)], options]
 
     def _get_server_version_info(self, connection):
         if self.server_version_info is None:
@@ -107,5 +89,29 @@ class EXADialect_turbodbc(EXADialect):
 
         return self.server_version_info
 
+    def _get_options_with_defaults(self, url):
+        user_options = url.translate_connect_args(username='uid',
+                                                  password='pwd',
+                                                  database='exaschema',
+                                                  host='destination')
+        user_options.update(url.query)
+
+        options = {key.lower(): value for (key, value) in DEFAULT_CONNECTION_PARAMS.items()}
+        for key in user_options.keys():
+            options[key.lower()] = user_options[key]
+
+        return options
+
+    def _interpret_destination(self, options):
+        if ('port' in options) or ('database' in options):
+            options['exahost'] = "{}:{}".format(options.pop('destination'),
+                                                options.pop('port'))
+        else:
+            options['dsn'] = options.pop('destination')
+
+    def _translate_none(self, options):
+        for key in options:
+            if options[key] == 'None':
+                options[key] = None
 
 dialect = EXADialect_turbodbc

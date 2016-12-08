@@ -11,16 +11,21 @@ class EXADialectTurbodbcTest(fixtures.TestBase):
 
     dialect = None
     default_host_args = {
-        'EXAHOST': '192.168.1.2..8:1234',
-        'EXASCHEMA': 'my_schema'
+        'exahost': '192.168.1.2..8:1234',
+        'exaschema': 'my_schema'
     }
     default_user_args = {
-        'UID': 'scott',
-        'PWD': 'tiger',
+        'uid': 'scott',
+        'pwd': 'tiger',
     }
 
     def setup(self):
         self.dialect = EXADialect_turbodbc()
+
+    def _get_connection_arguments(self, dsn):
+        url = sa_url.make_url(dsn)
+        _, args = self.dialect.create_connect_args(url)
+        return args
 
     def assert_parsed(self, dsn, expected_connector, expected_args):
         url = sa_url.make_url(dsn)
@@ -57,30 +62,38 @@ class EXADialectTurbodbcTest(fixtures.TestBase):
         expected.update(DEFAULT_CONNECTION_PARAMS)
         self.assert_parsed("exa+pyodbc://192.168.1.2..8:1234/my_schema", [None], expected)
 
-    def test_create_connect_args_with_param(self):
-        expected = self.default_host_args.copy()
-        expected.update(self.default_user_args)
-        expected.update(DEFAULT_CONNECTION_PARAMS)
-        expected['autocommit'] = 'true'
-        self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?AUTOCOMMIT=true",
-                           [None], expected)
+    def test_create_connect_args_with_custom_parameter(self):
+        base_url = "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema"
+        assert "custom" not in self._get_connection_arguments(base_url)
+        assert self._get_connection_arguments(base_url + "?CUSTOM=something")["custom"] == 'something'
+
+    def test_create_connect_args_with_parameter_set_to_none(self):
+        base_url = "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema"
+        assert self._get_connection_arguments(base_url + "?CUSTOM=None")["custom"] is None
+
+
+    # def test_create_connect_args_overrides_default(self):
+    #     base_url = "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema"
+    #     assert self._get_connection_arguments(base_url)["read_buffer_size"] !=
+    #            self._get_connection_arguments(base_url)["inttypesifpossible"]
+    #     assert self._get_connection_arguments(base_url + "?CUSTOM=something")["custom"] == 'something'
 
     def test_create_connect_args_default_turbodbc_buffer(self):
         expected = self.default_host_args.copy()
         expected.update(self.default_user_args)
         expected.update(DEFAULT_CONNECTION_PARAMS)
-        expected['rows_to_buffer'] = None
+        expected['read_buffer_size'] = None
         self.assert_parsed(
-            "exa+turbodbc://scott:tiger@192.168.1.2..8:1234/my_schema?rows_to_buffer=None",
+            "exa+turbodbc://scott:tiger@192.168.1.2..8:1234/my_schema?read_buffer_size=None",
             [None], expected)
 
     def test_create_connect_args_with_param_multiple(self):
         expected = self.default_host_args.copy()
         expected.update(self.default_user_args)
         expected.update(DEFAULT_CONNECTION_PARAMS)
-        expected['rows_to_buffer'] = None
+        expected['read_buffer_size'] = None
         expected['driver'] = 'EXADBDRIVER'
         expected['autocommit'] = 'true'
         self.assert_parsed(
-            "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?autocommit=true&rows_to_buffer=None&driver=EXADBDRIVER",
+            "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?autocommit=true&read_buffer_size=None&driver=EXADBDRIVER",
             [None], expected)

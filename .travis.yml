@@ -15,6 +15,7 @@ env:
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python2.7"
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python3.4"
     - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python2.7"
+    - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python3.6"
 
 before_install:
   - sudo apt-get install python3-dev python-dev

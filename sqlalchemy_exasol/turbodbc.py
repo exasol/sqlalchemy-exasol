@@ -11,11 +11,11 @@ def _get_default_buffer_size():
         return None
 
 
-DEFAULT_DRIVER_NAME = 'EXAODBC'
+# DEFAULT_DRIVER_NAME = 'EXAODBC'
 
 DEFAULT_CONNECTION_PARAMS = {
     'read_buffer_size': _get_default_buffer_size(),
-    'driver': DEFAULT_DRIVER_NAME,
+    # 'driver': DEFAULT_DRIVER_NAME,
     # always enable efficient conversion to Python types: see https://www.exasol.com/support/browse/EXASOL-898
     'inttypesinresultsifpossible': 'y',
 }

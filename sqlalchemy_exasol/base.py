@@ -382,7 +382,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
               in case a delete query is executed.
         """
         if self.isdelete or self.root_connection.dialect.server_version_info < (4, 1, 8):
-            db_query = self.statement
+            db_query = self.unicode_statement
             for i in range(1, len(self.parameters)):
                 db_query += ", (" + ", ".join(['?'] * len(self.parameters[i])) + ")"
             for db_para in self.parameters:

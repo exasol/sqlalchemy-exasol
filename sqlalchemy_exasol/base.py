@@ -628,6 +628,8 @@ class EXADialect(default.DefaultDialect):
                 'default': default,
                 'is_distribution_key': is_distribution_key
             }
+            if identity:
+                identity = int(identity)
             # if we have a positive identity value add a sequence
             if identity is not None and identity >= 0:
                 cdict['sequence'] = {'name':''}

@@ -1,7 +1,8 @@
-# unreleased
+# 1.2.0
 * Turbodbc support uses buffer size based on memory budget
   instead of a fixed number of rows.
 * Turbodbc support requires turbodbc>=0.4.1
+* Add Support for Python 3.6
 
 # 1.1.1
 * Upgrade sqlalchemy version requirement to 1.x; use 1.1.1 in tests

@@ -1,3 +1,6 @@
+# head
+* Fixed ODBC Driver name that is to be used
+
 # 1.2.0
 * Turbodbc support uses buffer size based on memory budget
   instead of a fixed number of rows.

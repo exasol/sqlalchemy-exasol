@@ -57,7 +57,6 @@ from sqlalchemy.sql import compiler
 from datetime import date, datetime
 from .constraints import DistributeByConstraint
 import re
-import sys
 
 RESERVED_WORDS = set([
     'abs', 'absolute', 'acos', 'action', 'add', 'add_days', 'add_hours',
@@ -419,8 +418,8 @@ class EXADialect(default.DefaultDialect):
     supports_alter = True
     # Uniceoe not supported on Darwin
     # See https://www.exasol.com/support/browse/EXA-10027
-    supports_unicode_statements = sys.platform != 'darwin'
-    supports_unicode_binds = sys.platform != 'darwin'
+    supports_unicode_statements = True
+    supports_unicode_binds = True
     supports_default_values = True
     supports_empty_insert = False
     supports_sequences = False

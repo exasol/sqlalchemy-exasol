@@ -222,7 +222,7 @@ class EXACompiler(compiler.SQLCompiler):
     def visit_char_length_func(self, fn, **kw):
         return "length%s" % self.function_argspec(fn)
 
-    def limit_clause(self, select):
+    def limit_clause(self, select, **kw):
         text = ""
         if select._limit is not None:
             text += "\n LIMIT %d" % int(select._limit)

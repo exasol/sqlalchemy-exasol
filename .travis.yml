@@ -10,7 +10,7 @@ env:
     # EXAUID
     - secure: "M0TKnrWXD97TT2QXKrujBQn9vK19hScY7Re+j6ipuok63dGOweO8FPmrE2Vf5r8ks+zxEgLzDaEsIqIYdpGnP6R8MGhLV0O9wexNX9gt86wSfme8qQ35uBypgkFT4WJ4hTy6ojEbcO6xMRJY7GVYUv50Q05TRlmnnnKcPpVGhfo="
     # EXAHOST
-    - secure: "ZFlg1SzvLkaskT7R/enhELvEMLipVTnDG+6bJS4pSO91U/w6LCPPJgflnlM0wTXSvzzL9abWphxR5/aPveJlTfI2OHBulBVG0PNDqvcCd0rNXGsL1d6S6dlU+BzOgqecJslAmDmxBuI9lMis1QcOQMKuC1QV8XTtlg++W24z6mE="
+    - secure: "SjLko6qL+YwJfotBb7/vwjAUuLGfKcNdKoc2uC90ZtFuvKeL/hf+pws++IO0wmJa6RQ92lWD35IaFAi7FsJCi4Om1TFoR8ppw4SZEvj2jMVF01uXegUuuAczrnzRtoJEwpj8GVSxMTiOdRFWIW7rk3yB84omvmkQizVZd/bpilU="
   matrix:
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python2.7"
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python3.4"

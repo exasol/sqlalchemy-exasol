@@ -17,7 +17,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
     execution_ctx_cls = EXAExecutionContext
 
-    pyodbc_driver_name = "EXASolution Driver"
+    pyodbc_driver_name = "EXAODBC"
     driver_version = None
     server_version_info = None
 

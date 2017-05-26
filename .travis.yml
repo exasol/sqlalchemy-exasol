@@ -1,5 +1,5 @@
 language: generic
-dist: xenial
+dist: trusty
 sudo: required
 
 env:
@@ -44,6 +44,8 @@ after_success:
   # revert changes to odbc config to avoid dirty tag on deploy
   - git checkout odbcconfig/odbcinst.ini
 
+before_deploy: 
+  - sudo pip install twine
 
 deploy:
   provider: pypi

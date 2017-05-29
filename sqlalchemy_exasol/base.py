@@ -57,7 +57,6 @@ from sqlalchemy.sql import compiler
 from datetime import date, datetime
 from .constraints import DistributeByConstraint
 import re
-import sys
 
 RESERVED_WORDS = set([
     'abs', 'absolute', 'acos', 'action', 'add', 'add_days', 'add_hours',

@@ -29,7 +29,7 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
 
     def test_create_connect_args(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema",
-                 ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
+                 ['DRIVER={'+EXADialect_pyodbc.pyodbc_driver_name+'};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
                  {})
 
     def test_create_connect_args_with_driver(self):
@@ -44,13 +44,13 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
 
     def test_create_connect_args_trusted(self):
         self.assert_parsed("exa+pyodbc://192.168.1.2..8:1234/my_schema",
-                 ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;Trusted_Connection=Yes;INTTYPESINRESULTSIFPOSSIBLE=y'],
+                 ['DRIVER={'+EXADialect_pyodbc.pyodbc_driver_name+'};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;Trusted_Connection=Yes;INTTYPESINRESULTSIFPOSSIBLE=y'],
                  {})
 
 
     def test_create_connect_args_autotranslate(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?odbc_autotranslate=Yes",
-                 ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;AutoTranslate=Yes;INTTYPESINRESULTSIFPOSSIBLE=y'],
+                 ['DRIVER={'+EXADialect_pyodbc.pyodbc_driver_name+'};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;AutoTranslate=Yes;INTTYPESINRESULTSIFPOSSIBLE=y'],
                  {})
 
 
@@ -62,13 +62,13 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
 
     def test_create_connect_args_with_param_multiple(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?autocommit=true&ansi=false&unicode_results=false",
-                 ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
+                 ['DRIVER={'+EXADialect_pyodbc.pyodbc_driver_name+'};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y'],
                  {'AUTOCOMMIT': True, 'ANSI': False, 'UNICODE_RESULTS': False})
 
 
     def test_create_connect_args_with_unknown_params(self):
         self.assert_parsed("exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?clientname=test&querytimeout=10",
-                 ['DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y;clientname=test;querytimeout=10'],
+                 ['DRIVER={'+EXADialect_pyodbc.pyodbc_driver_name+'};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y;clientname=test;querytimeout=10'],
                  {})
 
     def test_is_disconnect(self):

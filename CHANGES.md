@@ -1,5 +1,11 @@
 # head
+
+# 1.2.2
+* fix for failing upload of build results to pypi
+
+# 1.2.1
 * Fixed ODBC Driver name that is to be used
+* Use unicode on osx for turbodbc fixes #63
 
 # 1.2.0
 * Turbodbc support uses buffer size based on memory budget

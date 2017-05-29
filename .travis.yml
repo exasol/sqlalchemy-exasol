@@ -10,7 +10,7 @@ env:
     # EXAUID
     - secure: "M0TKnrWXD97TT2QXKrujBQn9vK19hScY7Re+j6ipuok63dGOweO8FPmrE2Vf5r8ks+zxEgLzDaEsIqIYdpGnP6R8MGhLV0O9wexNX9gt86wSfme8qQ35uBypgkFT4WJ4hTy6ojEbcO6xMRJY7GVYUv50Q05TRlmnnnKcPpVGhfo="
     # EXAHOST
-    - secure: "RTiZTG1kNfMLltERKobiNFOr7EpkBwUn2MptQTGKp5oBLlktGYpXTmR/4+tY9/mtWpZSdJ5YCVv4wMxklUozzdksiyFx6XyZ4OCEUAK4m2z6fn5iEojamJpsDoiSRB6jEcrosWALOZLug0k+GVAZtD+4mKK3ww+QFUV3waeQArs="
+    - secure: "SjLko6qL+YwJfotBb7/vwjAUuLGfKcNdKoc2uC90ZtFuvKeL/hf+pws++IO0wmJa6RQ92lWD35IaFAi7FsJCi4Om1TFoR8ppw4SZEvj2jMVF01uXegUuuAczrnzRtoJEwpj8GVSxMTiOdRFWIW7rk3yB84omvmkQizVZd/bpilU="
   matrix:
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python2.7"
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python3.4"
@@ -35,7 +35,7 @@ before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
 
-script: 
+script:
   - python --version
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB#*=}"
 
@@ -44,9 +44,15 @@ after_success:
   # revert changes to odbc config to avoid dirty tag on deploy
   - git checkout odbcconfig/odbcinst.ini
 
+before_deploy:
+  - sudo pip install twine
+
 deploy:
   provider: pypi
   user: BY-jk
+  skip_cleanup: true
+  skip_upload_docs: true
+
   password:
     secure: SNyP2s6DV0Hm/gcFEk0iqllmeIvRU16YI/Gn7SF6+kT3EXyzE3gkPq0v/VRV4+n6wpNT2FELl69tZL87vXtYPxEiLXzSsWAuKmy9dapbf1bjzLjr3fVepEpesLPivYFFxToYa7osjunVVKxRNOzW5epCpRcWJP8bDiJKxH5BF38=
   on:

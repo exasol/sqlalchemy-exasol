@@ -44,12 +44,13 @@ after_success:
   # revert changes to odbc config to avoid dirty tag on deploy
   - git checkout odbcconfig/odbcinst.ini
 
-before_deploy: 
+before_deploy:
   - sudo pip install twine
 
 deploy:
   provider: pypi
   user: BY-jk
+  skip_cleanup: true
   skip_upload_docs: true
 
   password:

@@ -1,23 +1,20 @@
-from sqlalchemy import types as sqltypes
-from sqlalchemy_exasol.base import EXADialect
 import decimal
 
+from sqlalchemy import types as sqltypes, util
 
-def _get_default_buffer_size():
-    try:
-        real_turbodbc = __import__('turbodbc')
-        return real_turbodbc.Megabytes(50)
-    except ImportError:
-        return None
+from sqlalchemy_exasol.base import EXADialect
 
 
 DEFAULT_DRIVER_NAME = 'EXAODBC'
 
 DEFAULT_CONNECTION_PARAMS = {
-    'read_buffer_size': _get_default_buffer_size(),
     'driver': DEFAULT_DRIVER_NAME,
     # always enable efficient conversion to Python types: see https://www.exasol.com/support/browse/EXASOL-898
     'inttypesinresultsifpossible': 'y',
+}
+
+DEFAULT_TURBODBC_PARAMS = {
+    'read_buffer_size': 50
 }
 
 
@@ -89,7 +86,8 @@ class EXADialect_turbodbc(EXADialect):
 
         return self.server_version_info
 
-    def _get_options_with_defaults(self, url):
+    @staticmethod
+    def _get_options_with_defaults(url):
         user_options = url.translate_connect_args(username='uid',
                                                   password='pwd',
                                                   database='exaschema',
@@ -97,19 +95,37 @@ class EXADialect_turbodbc(EXADialect):
         user_options.update(url.query)
 
         options = {key.lower(): value for (key, value) in DEFAULT_CONNECTION_PARAMS.items()}
+        options.update({key.lower(): value for (key, value) in DEFAULT_TURBODBC_PARAMS.items()})
         for key in user_options.keys():
             options[key.lower()] = user_options[key]
 
+        real_turbodbc = __import__('turbodbc')
+        turbodbc_options = {}
+        for param in ('read_buffer_size', 'parameter_sets_to_buffer', 'use_async_io'):
+            if param in options:
+                raw = options.pop(param)
+                if param == 'use_async_io':
+                    value = util.asbool(raw)
+                elif param == 'read_buffer_size':
+                    value = real_turbodbc.Megabytes(util.asint(raw))
+                else:
+                    value = util.asint(raw)
+                turbodbc_options[param] = value
+
+        options['turbodbc_options'] = real_turbodbc.make_options(**turbodbc_options)
+
         return options
 
-    def _interpret_destination(self, options):
+    @staticmethod
+    def _interpret_destination(options):
         if ('port' in options) or ('database' in options):
             options['exahost'] = "{}:{}".format(options.pop('destination'),
                                                 options.pop('port'))
         else:
             options['dsn'] = options.pop('destination')
 
-    def _translate_none(self, options):
+    @staticmethod
+    def _translate_none(options):
         for key in options:
             if options[key] == 'None':
                 options[key] = None

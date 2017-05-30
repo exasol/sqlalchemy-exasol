@@ -1,4 +1,5 @@
 # head
+* missing kw arg in limit_clause (contribution from sroecker)
 
 # 1.2.2
 * fix for failing upload of build results to pypi

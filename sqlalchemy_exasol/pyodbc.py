@@ -43,7 +43,8 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
                 query = "select PARAM_VALUE from SYS.EXA_METADATA where PARAM_NAME = 'databaseProductVersion'"
                 result = connection.execute(query).fetchone()[0].split('.')
 
-            self.server_version_info = (int(result[0]), int(result[1]), int(result[2]))
+            # last version position can something like: '12-S' for an EXASolo
+            self.server_version_info = (int(result[0]), int(result[1]), int(result[2].split('-')[0]))
 
         # return cached info
         return self.server_version_info

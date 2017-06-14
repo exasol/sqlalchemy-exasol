@@ -12,10 +12,10 @@ env:
     # EXAHOST
     - secure: "SjLko6qL+YwJfotBb7/vwjAUuLGfKcNdKoc2uC90ZtFuvKeL/hf+pws++IO0wmJa6RQ92lWD35IaFAi7FsJCi4Om1TFoR8ppw4SZEvj2jMVF01uXegUuuAczrnzRtoJEwpj8GVSxMTiOdRFWIW7rk3yB84omvmkQizVZd/bpilU="
   matrix:
-    - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python2.7"
-    - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python3.4"
-    - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python2.7"
-    - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python3.4"
+    - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python2.7"
+    - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python3.4"
+    - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python2.7"
+    - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python3.4"
 
 before_install:
   - sudo apt-get install python3-dev python-dev

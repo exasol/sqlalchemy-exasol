@@ -416,8 +416,8 @@ class EXADialect(default.DefaultDialect):
     supports_native_boolean = True
     supports_native_decimal = True
     supports_alter = True
-    supports_unicode_statements = True 
-    supports_unicode_binds = True 
+    supports_unicode_statements = True
+    supports_unicode_binds = True
     supports_default_values = True
     supports_empty_insert = False
     supports_sequences = False
@@ -449,7 +449,7 @@ class EXADialect(default.DefaultDialect):
         """
         Using 'SYS' as default schema. Tables in 'SYS' are not reflectable!
         """
-        return u"SYS"
+        return self.normalize_name(u"SYS")
 
     def normalize_name(self, name):
         """
@@ -504,7 +504,8 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_table_names(self, connection, schema, **kw):
-        schema = schema or connection.engine.url.database
+        schema = self.denormalize_name(schema or
+                connection.engine.url.database)
         sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "
         if schema is None:
             sql_stmnt += "CURRENT_SCHEMA ORDER BY table_name"

@@ -328,8 +328,6 @@ class EXAIdentifierPreparer(compiler.IdentifierPreparer):
 
 class EXAExecutionContext(default.DefaultExecutionContext):
 
-    executemany=True
-
     def fire_sequence(self, default, type_):
         raise NotImplemented
 
@@ -407,9 +405,6 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                         raise TypeError('Data type not supported: %s' % type(value))
             self.statement = db_query
             self.parameters = [[]]
-
-        if len(self.parameters) == 1 and (self.isupdate or self.isdelete):
-            self.executemany = False
 
 class EXADialect(default.DefaultDialect):
     name = 'exasol'

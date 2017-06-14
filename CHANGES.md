@@ -1,5 +1,7 @@
 # head
 * missing kw arg in limit_clause (contribution from sroecker)
+* reverted EXAExecutionContext.executemany to default 'False' to fix failing
+  test in SQLAlchemy 1.1.10
 
 # 1.2.2
 * fix for failing upload of build results to pypi

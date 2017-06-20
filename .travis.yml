@@ -37,7 +37,7 @@ before_script:
 
 script:
   - python --version
-  - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB#*=}"
+  - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB}"
 
 after_success:
   - coveralls

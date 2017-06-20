@@ -54,6 +54,7 @@ from sqlalchemy import sql, schema, types as sqltypes, util, event
 from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
 from sqlalchemy.engine import default, reflection
 from sqlalchemy.sql import compiler
+from sqlalchemy.sql.elements import quoted_name
 from datetime import date, datetime
 from .constraints import DistributeByConstraint
 import re
@@ -442,9 +443,16 @@ class EXADialect(default.DefaultDialect):
 
     def _get_default_schema_name(self, connection):
         """
-        Using 'SYS' as default schema. Tables in 'SYS' are not reflectable!
+        Default schema is derived from current connections url
+        or 'SYS'. Tables in 'SYS' are not reflectable!
         """
-        return self.normalize_name(u"SYS")
+        schema = None
+        if connection.engine.url is not None:
+            schema = self.normalize_name(
+                    connection.engine.url.translate_connect_args().get('database'))
+        else:
+            schema = self.normalihe_name(u"SYS")
+        return schema
 
     def normalize_name(self, name):
         """
@@ -461,6 +469,8 @@ class EXADialect(default.DefaultDialect):
         if name.upper() == name and \
               not self.identifier_preparer._requires_quotes(name.lower()):
             return name.lower()
+        elif name.lower() == name:
+            return quoted_name(name, quote=True)
         else:
             return name
 

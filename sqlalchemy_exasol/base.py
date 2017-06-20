@@ -450,7 +450,7 @@ class EXADialect(default.DefaultDialect):
         if connection.engine.url is not None:
             schema = self.normalize_name(
                     connection.engine.url.translate_connect_args().get('database'))
-        else:
+        if schema is None:
             schema = self.normalihe_name(u"SYS")
         return schema
 

@@ -1,5 +1,8 @@
-# head
+# 1.2.3
 * missing kw arg in limit_clause (contribution from sroecker)
+* bumped SQLAlchemy to 1.1.10
+* fixed bug with incorrect handling of case insensitive names (lower case in SQLA, upper case in EXASOL)
+* fixed bug in lookup of default schema name to include schema provided in connection url
 * reverted EXAExecutionContext.executemany to default 'False' to fix failing
   test in SQLAlchemy 1.1.10
 

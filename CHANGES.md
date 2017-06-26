@@ -1,3 +1,6 @@
+# 1.2.4
+* fixed bug introduced by typo in base.py:454
+
 # 1.2.3
 * missing kw arg in limit_clause (contribution from sroecker)
 * bumped SQLAlchemy to 1.1.11

@@ -1,3 +1,6 @@
+# HEAD
+* bumped to version pyodbc 4.0.17
+
 # 1.2.4
 * fixed bug introduced by typo in base.py:454
 

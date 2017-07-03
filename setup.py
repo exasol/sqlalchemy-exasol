@@ -44,7 +44,7 @@ setup(
     author='Blue Yonder GmbH',
     packages=['sqlalchemy_exasol'],
     install_requires=["SQLAlchemy>=1.0.4, <2", "pyodbc>=3.0.6", "six>=1.5"],
-    extras_require={'turbodbc': ['turbodbc>=0.4.1']},
+    extras_require={'turbodbc': ['turbodbc>=1.1.0']},
     tests_require=['pytest', 'pytest-cov', 'mock>=1.0.1'],
     test_suite='pytest.main',
     entry_points={

@@ -49,7 +49,6 @@ install:
 before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
-  - ping -c 1 213.95.157.51
 
 script:
   - python --version

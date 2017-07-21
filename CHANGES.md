@@ -1,5 +1,7 @@
 # HEAD
 * bumped to version pyodbc 4.0.17
+* adjusted list of reserved keywords to EXASOL 6
+* added EXASOL 6 to build matrix
 
 # 1.2.4
 * fixed bug introduced by typo in base.py:454

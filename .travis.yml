@@ -12,11 +12,25 @@ env:
     - secure: "M0TKnrWXD97TT2QXKrujBQn9vK19hScY7Re+j6ipuok63dGOweO8FPmrE2Vf5r8ks+zxEgLzDaEsIqIYdpGnP6R8MGhLV0O9wexNX9gt86wSfme8qQ35uBypgkFT4WJ4hTy6ojEbcO6xMRJY7GVYUv50Q05TRlmnnnKcPpVGhfo="
     # EXAHOST
     - secure: "SjLko6qL+YwJfotBb7/vwjAUuLGfKcNdKoc2uC90ZtFuvKeL/hf+pws++IO0wmJa6RQ92lWD35IaFAi7FsJCi4Om1TFoR8ppw4SZEvj2jMVF01uXegUuuAczrnzRtoJEwpj8GVSxMTiOdRFWIW7rk3yB84omvmkQizVZd/bpilU="
+    # EXAPWD6
+    - secure: "CjjG4X6TJpeCwDvXSQnfwvev4FpDFClHhD4gkdMF7go5rookqQzBH4wzWy5bB0L2zsoEDV+EtmkB/v9CxQa3DLVthBGlzXZ9zOxBsD1LJ8Wr9YWnOiVMOnb3KKG1uWBGu0+XLGdUlXFQu/wFUUuvR+D1wARo+Mq81B+jGZv+OB4="
+    # EXAUID6
+    - secure: "Diw0AgGIbjd7WvD7B9HA2npPpXmgDgQBaU0dXWy1qGG5X4ZNVc0vmlviYLyUT3et1pHgGsoxXFa7P5KDPGNnh5Ni3vkQZ47epznooGvRI3fx5McCrNZb4YrfbX/R6EJzdLiY+yAurQ/kcCUdU6buEXWOwU0Vx/Os042zcfqYWtY="
+    # EXAHOST6
+    - secure: "MSSHgJ40EQVQbg97hfCR8CJdcfYcLW1TW+omnyaGpBmKwCD0WpMbY4cWhFOAhCk4Gm2de3srj4jGItw53CSbc2NS/czgy5hKRenjCcBaK59Z5x5FQItB88h+gY2Tdb7+nT3KLm+j6peUoU23onCWw5e7LL+1BShYLw46n2O3PH8="
   matrix:
+    # EXASOL 5 - pyodbc
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python2.7"
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python3.4"
+    # EXASOL 5 - turbodbc
     - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python2.7"
     - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python3.4"
+    # EXASOL 6 - pyodbc
+    - TESTDB="exa+pyodbc://${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python2.7"
+    - TESTDB="exa+pyodbc://${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="" PYTHON_VERSION="python3.4"
+    # EXASOL 6 - turbodbc
+    - TESTDB="exa+turbodbc://${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python2.7"
+    - TESTDB="exa+turbodbc://${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="-r requirements_extras.txt" PYTHON_VERSION="python3.4"
 
 before_install:
   - sudo apt-get install python3-dev python-dev

@@ -49,6 +49,7 @@ install:
 before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214.so >> odbcconfig/odbcinst.ini
+  - echo $EXAHOST6
 
 script:
   - python --version

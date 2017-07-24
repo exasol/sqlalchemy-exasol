@@ -1,3 +1,7 @@
+# HEAD
+* added EXASOL 6 driver (6.0.2)
+* Fixed #53 - TRUNCATE statements now autocommited (if autocommit = True)
+
 # 1.2.5
 * bumped to version pyodbc 4.0.17
 * added EXASOL 6 to build matrix

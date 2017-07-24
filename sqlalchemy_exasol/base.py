@@ -59,6 +59,10 @@ from datetime import date, datetime
 from .constraints import DistributeByConstraint
 import re
 
+AUTOCOMMIT_REGEXP = re.compile(
+            r'\s*(?:UPDATE|INSERT|CREATE|DELETE|DROP|ALTER|TRUNCATE)',
+                re.I | re.UNICODE)
+
 RESERVED_WORDS = set([ 'absolute', 'action', 'add', 'after', 'all', 'allocate',
 'alter', 'and', 'any', 'append', 'are', 'array', 'as', 'asc', 'asensitive',
 'assertion', 'at', 'attribute', 'authid', 'authorization', 'before', 'begin',
@@ -356,6 +360,9 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                         raise TypeError('Data type not supported: %s' % type(value))
             self.statement = db_query
             self.parameters = [[]]
+
+    def should_autocommit_text(self, statement):
+        return AUTOCOMMIT_REGEXP.match(statement)
 
 class EXADialect(default.DefaultDialect):
     name = 'exasol'

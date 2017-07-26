@@ -33,9 +33,9 @@ addons:
       python3-dev
       python-dev
       unixodbc
-      unixodbc-dev
-      libboost-all-dev
-      libmyodbc
+      # unixodbc-dev
+      # libboost-all-dev
+      # libmyodbc
 
 #before_install:
 #  - pip install setuptools

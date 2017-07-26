@@ -2,10 +2,6 @@ language: python
 dist: trusty
 sudo: false
 
-python:
-  - "2.7"
-  - "3.4"
-
 env:
   global:
     - ODBCSYSINI=$TRAVIS_BUILD_DIR/odbcconfig
@@ -61,11 +57,11 @@ before_deploy:
 
 jobs:
   include:
-    - stage: test
+    - stage: test # supposed to be pyodbc_Python2
       python: 2.7
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"
-    - stage: Python3
+    - stage: pyodbc_Python3
       python: 3.4
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"

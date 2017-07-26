@@ -22,8 +22,10 @@ env:
     # EXAHOST6
     - secure: "OwYWkuDMxvBmKTpSP4ZZdpZlPmF1Nnu+eeimB4KlUmfU89FFf/tyUkr7CR27BxyIMB1VC5Gms6ukJS0A+0rGYkOj3p2lwIo+ymaE28g+KdbglQ2gh72xxkoIeJP3ujOZNqTGyU6Sibt+ORHlt99s3+WTorVLwZh3iSHjmFqovcc="
   matrix:
-    # EXASOL 6 - pyodbc
-    - TESTDB="exa+pyodbc://${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS=""
+    # EXASOL 6
+    - TESTDB="${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8"
+    # EXASOL 5
+    - TESTDB="${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8"
 
 addons:
   apt:
@@ -39,14 +41,24 @@ before_install:
   - pip install setuptools
 
 install:
-  - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc
-  - pip install -r requirements_test.txt $EXTRA_REQUIREMENTS
+  - pip install -r requirements.txt --allow-external pyodbc
+  - pip install -r requirements_test.txt
+  - pip install -r requirements_extras.txt
   - pip install coveralls
   - pip freeze
 
 before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini
+
+jobs:
+  include:
+    - stage: pyodbc
+      script - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
+      script - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"
+    - stage: turbodbc
+      script - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB5}"
+      script - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB6}"
 
 script:
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB}"

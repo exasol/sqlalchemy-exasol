@@ -36,13 +36,13 @@ addons:
       libmyodbc
 
 before_install:
-  - pip install --user setuptools
+  - pip install setuptools
   - ./fix_unixodbc_so.sh
 
 install:
-  - pip install --user -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc
-  - pip install --user -r requirements_test.txt $EXTRA_REQUIREMENTS
-  - pip install --user coveralls
+  - pip install -r requirements.txt --allow-external pyodbc --allow-unverified pyodbc
+  - pip install -r requirements_test.txt $EXTRA_REQUIREMENTS
+  - pip install coveralls
   - pip freeze
 
 before_script:

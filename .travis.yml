@@ -58,10 +58,6 @@ after_success:
 before_deploy:
   - sudo pip install twine
 
-script:
-  - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB}"
-  - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB}"
-
 jobs:
   include:
     - stage: test

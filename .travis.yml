@@ -51,18 +51,6 @@ before_script:
   # append db driver location to odbc config
   - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini
 
-jobs:
-  include:
-    - stage: pyodbc
-      script - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
-      script - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"
-    - stage: turbodbc
-      script - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB5}"
-      script - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB6}"
-
-script:
-  - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB}"
-
 after_success:
   - coveralls
   # revert changes to odbc config to avoid dirty tag on deploy
@@ -71,14 +59,35 @@ after_success:
 before_deploy:
   - sudo pip install twine
 
-deploy:
-  provider: pypi
-  distributions: "sdist bdist_wheel"
-  skip_cleanup: true
-  skip_upload_docs: true
-  user: BY-jk
-  password:
-    secure: SNyP2s6DV0Hm/gcFEk0iqllmeIvRU16YI/Gn7SF6+kT3EXyzE3gkPq0v/VRV4+n6wpNT2FELl69tZL87vXtYPxEiLXzSsWAuKmy9dapbf1bjzLjr3fVepEpesLPivYFFxToYa7osjunVVKxRNOzW5epCpRcWJP8bDiJKxH5BF38=
-  on:
-    tags: true
-    repo: blue-yonder/sqlalchemy_exasol
+jobs:
+  include:
+    - stage: test
+      python: 2.7
+      script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
+      script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"
+    - stage: test P3
+      python: 3.4
+      script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
+      script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"
+    - stage: test turbodbc P2
+      python: 2.7
+      script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB5}"
+      script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB6}"
+    - stage: test turbodbc P3
+      python: 3.4
+      script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB5}"
+      script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB6}"
+    - stage: deploy
+      deploy:
+        provider: pypi
+        distributions: "sdist bdist_wheel"
+        skip_cleanup: true
+        skip_upload_docs: true
+        user: BY-jk
+        password:
+          secure: SNyP2s6DV0Hm/gcFEk0iqllmeIvRU16YI/Gn7SF6+kT3EXyzE3gkPq0v/VRV4+n6wpNT2FELl69tZL87vXtYPxEiLXzSsWAuKmy9dapbf1bjzLjr3fVepEpesLPivYFFxToYa7osjunVVKxRNOzW5epCpRcWJP8bDiJKxH5BF38=
+        on:
+          tags: true
+          repo: blue-yonder/sqlalchemy_exasol
+
+

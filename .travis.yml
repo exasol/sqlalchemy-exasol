@@ -46,7 +46,7 @@ install:
 
 before_script:
   # append db driver location to odbc config
-  - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214lv2.so >> odbcconfig/odbcinst.ini
+  - echo DRIVER=$TRAVIS_BUILD_DIR/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini
 
 script:
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "${TESTDB}"

@@ -65,15 +65,15 @@ jobs:
       python: 2.7
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"
-    - stage: test P3
+    - stage: Python3
       python: 3.4
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"
-    - stage: test turbodbc P2
+    - stage: turbodbc_Python2
       python: 2.7
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB5}"
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB6}"
-    - stage: test turbodbc P3
+    - stage: turbodbc_Python3
       python: 3.4
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB5}"
       script: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB6}"

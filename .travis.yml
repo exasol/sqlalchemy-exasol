@@ -21,11 +21,10 @@ env:
     - secure: "Diw0AgGIbjd7WvD7B9HA2npPpXmgDgQBaU0dXWy1qGG5X4ZNVc0vmlviYLyUT3et1pHgGsoxXFa7P5KDPGNnh5Ni3vkQZ47epznooGvRI3fx5McCrNZb4YrfbX/R6EJzdLiY+yAurQ/kcCUdU6buEXWOwU0Vx/Os042zcfqYWtY="
     # EXAHOST6
     - secure: "OwYWkuDMxvBmKTpSP4ZZdpZlPmF1Nnu+eeimB4KlUmfU89FFf/tyUkr7CR27BxyIMB1VC5Gms6ukJS0A+0rGYkOj3p2lwIo+ymaE28g+KdbglQ2gh72xxkoIeJP3ujOZNqTGyU6Sibt+ORHlt99s3+WTorVLwZh3iSHjmFqovcc="
-  matrix:
     # EXASOL 6
-    - TESTDB="${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8"
+    - TESTDB6="${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8"
     # EXASOL 5
-    - TESTDB="${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8"
+    - TESTDB5="${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8"
 
 addons:
   apt:
@@ -63,15 +62,38 @@ script:
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB}"
   - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB}"
 
-deploy:
-  provider: pypi
-  distributions: "sdist bdist_wheel"
-  skip_cleanup: true
-  skip_upload_docs: true
-  user: BY-jk
-  password:
-    secure: SNyP2s6DV0Hm/gcFEk0iqllmeIvRU16YI/Gn7SF6+kT3EXyzE3gkPq0v/VRV4+n6wpNT2FELl69tZL87vXtYPxEiLXzSsWAuKmy9dapbf1bjzLjr3fVepEpesLPivYFFxToYa7osjunVVKxRNOzW5epCpRcWJP8bDiJKxH5BF38=
-  on:
-    tags: true
-    repo: blue-yonder/sqlalchemy_exasol
+jobs:
+  include:
+    - stage: test
+      python: 2.7
+      script:
+        - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
+        - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"
+    - stage: test_2
+      python: 3.4
+      script:
+        - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB5}"
+        - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+pyodbc://${TESTDB6}"
+    - stage: test_to
+      python: 2.7
+      script:
+        - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB5}"
+        - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB6}"
+    - stage: test_to_2
+      python: 3.4
+      script:
+        - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB5}"
+        - py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchey_exasol --dburi "exa+turbodbc://${TESTDB6}"
+    - stage: delpoy
+      deploy:
+        provider: pypi
+        distributions: "sdist bdist_wheel"
+        skip_cleanup: true
+        skip_upload_docs: true
+        user: BY-jk
+        password:
+          secure: SNyP2s6DV0Hm/gcFEk0iqllmeIvRU16YI/Gn7SF6+kT3EXyzE3gkPq0v/VRV4+n6wpNT2FELl69tZL87vXtYPxEiLXzSsWAuKmy9dapbf1bjzLjr3fVepEpesLPivYFFxToYa7osjunVVKxRNOzW5epCpRcWJP8bDiJKxH5BF38=
+        on:
+          tags: true
+          repo: blue-yonder/sqlalchemy_exasol
 

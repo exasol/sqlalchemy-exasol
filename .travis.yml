@@ -61,6 +61,7 @@ after_success:
 
 before_deploy:
   - sudo pip install twine
+  - sudo pip install urllib3[secure]
 
 deploy:
   provider: pypi

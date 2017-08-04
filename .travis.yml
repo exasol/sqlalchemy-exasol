@@ -36,7 +36,9 @@ addons:
       python-dev
       unixodbc
       unixodbc-dev
-      libboost-all-dev
+      libboost-date-time-dev
+      libboost-locale-dev
+      libboost-system-dev
       libmyodbc
 
 install:

@@ -22,10 +22,12 @@ env:
     # EXAHOST6
     - secure: "OwYWkuDMxvBmKTpSP4ZZdpZlPmF1Nnu+eeimB4KlUmfU89FFf/tyUkr7CR27BxyIMB1VC5Gms6ukJS0A+0rGYkOj3p2lwIo+ymaE28g+KdbglQ2gh72xxkoIeJP3ujOZNqTGyU6Sibt+ORHlt99s3+WTorVLwZh3iSHjmFqovcc="
   matrix:
-    # EXASOL 6 - pyodbc
+    # EXASOL 6
     - TESTDB="exa+pyodbc://${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS=""
-    # EXASOL 5 - pyodbc
+    - TESTDB="exa+turbodbc://${EXAUID6}:${EXAPWD6}@${EXAHOST6}/TEST?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="-r requirements_extras.txt"
+    # EXASOL 5
     - TESTDB="exa+pyodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS=""
+    - TESTDB="exa+turbodbc://${EXAUID}:${EXAPWD}@${EXAHOST}/${EXAUID}?CONNECTIONLCALL=en_US.UTF-8" EXTRA_REQUIREMENTS="-r requirements_extras.txt"
 
 addons:
   apt:
@@ -33,12 +35,9 @@ addons:
       python3-dev
       python-dev
       unixodbc
-      # unixodbc-dev
-      # libboost-all-dev
-      # libmyodbc
-
-#before_install:
-#  - pip install setuptools
+      unixodbc-dev
+      libboost-all-dev
+      libmyodbc
 
 install:
   - pip install -r requirements.txt

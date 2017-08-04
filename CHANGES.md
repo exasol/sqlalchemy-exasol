@@ -1,3 +1,6 @@
+# HEAD
+* bumped to SQLAlchemy 1.1.13
+
 # 1.3.0
 * added EXASOL 6 driver (6.0.2)
 * Fixed #53 - TRUNCATE statements now autocommited (if autocommit = True)

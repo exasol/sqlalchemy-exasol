@@ -43,9 +43,6 @@ addons:
 
 install:
   - pip install -r requirements.txt
-  # pybind is a turbodbc requirement to avoid pip trying to build wheel
-  # see https://github.com/blue-yonder/turbodbc/issues/59
-  - pip install pybind11
   - pip install -r requirements_test.txt $EXTRA_REQUIREMENTS
   - pip freeze
   - pip install coveralls

@@ -1,5 +1,6 @@
 # HEAD
 * bumped to SQLAlchemy 1.1.13
+* add raw_sql to util.py for debuging
 
 # 1.3.0
 * added EXASOL 6 driver (6.0.2)

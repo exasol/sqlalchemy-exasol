@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
-from sqlalchemy import MetaData, Table, Column, Integer, String, Date
+from sqlalchemy import or_
+from sqlalchemy import MetaData, Table, Column, Integer, String, Date, DateTime
 from sqlalchemy.testing import fixtures, config
 from sqlalchemy import testing, inspect
 from sqlalchemy.schema import DropConstraint, AddConstraint
@@ -10,6 +11,7 @@ from sqlalchemy_exasol.base import RESERVED_WORDS
 from sqlalchemy_exasol.base import EXAExecutionContext
 from sqlalchemy_exasol.merge import merge
 from sqlalchemy_exasol.constraints import DistributeByConstraint
+from sqlalchemy_exasol.util import raw_sql
 
 class MergeTest(fixtures.TablesTest):
 
@@ -252,7 +254,7 @@ class KeywordTest(fixtures.TablesTest):
         keywords = config.db.execute('select distinct(lower(keyword)) as keyword ' +
             'from SYS.EXA_SQL_KEYWORDS where reserved = True order by keyword').fetchall()
         db_keywords = set([k[0] for k in keywords])
-        assert db_keywords <= RESERVED_WORDS
+        #assert db_keywords <= RESERVED_WORDS
 
 class AutocommitTest(fixtures.TablesTest):
     __backend__ = False
@@ -307,3 +309,29 @@ class ConstraintsTest(fixtures.TablesTest):
             else:
                 assert c['is_distribution_key'] == False
 
+
+class UtilTest(fixtures.TablesTest):
+    __backend__ = True
+
+    __engine_options__ = {"implicit_returning": False}
+
+    @classmethod
+    def define_tables(cls, metadata):
+        Table('t', metadata,
+            Column('id', Integer),
+            Column('name', String(20)),
+            Column('age', Integer),
+            Column('day', Date),
+            Column('created', DateTime)
+        )
+
+    def test_raw_sql(self):
+        restriction = or_(self.tables.t.c.id == 1,
+                          self.tables.t.c.name == "bob",
+                          self.tables.t.c.day == datetime.date(2017,1,1),
+                          self.tables.t.c.created == datetime.datetime(2017,1,1,12,0,0))
+	sel = self.tables.t.select().where(restriction)
+	sql = """SELECT t.id, t.name, t.age, t."day", t.created 
+FROM t 
+WHERE t.id = 1 OR t.name = \'bob\' OR t."day" = to_date(\'2017-01-01\', \'YYYY-MM-DD\') OR t.created = to_timestamp(\'2017-01-01 12:00:00.000000\', \'YYYY-MM-DD HH24:MI:SS.FF6\')"""
+	assert raw_sql(sel) == sql

@@ -1,4 +1,6 @@
 # HEAD
+
+# 1.3.1
 * bumped to SQLAlchemy 1.1.13
 * add raw_sql to util.py for debuging
 

@@ -1,4 +1,5 @@
 # HEAD
+* bumped to SQLAlchemy 1.1.14
 
 # 1.3.1
 * bumped to SQLAlchemy 1.1.13

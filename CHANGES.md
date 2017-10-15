@@ -1,4 +1,4 @@
-# HEAD
+# 1.3.2
 * bumped to SQLAlchemy 1.1.14
 * switched to travis builds without root, bumped tests to Python 3.6
 

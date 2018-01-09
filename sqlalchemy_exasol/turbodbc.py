@@ -5,10 +5,7 @@ from sqlalchemy import types as sqltypes, util
 from sqlalchemy_exasol.base import EXADialect
 
 
-DEFAULT_DRIVER_NAME = 'EXAODBC'
-
 DEFAULT_CONNECTION_PARAMS = {
-    'driver': DEFAULT_DRIVER_NAME,
     # always enable efficient conversion to Python types: see https://www.exasol.com/support/browse/EXASOL-898
     'inttypesinresultsifpossible': 'y',
 }

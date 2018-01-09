@@ -1,3 +1,9 @@
+# 2.0.0
+* BREAKING CHANGE: default driver name removed from dialect. The driver must now be explicitly
+  specified. Either in the DSN or in the connection string using the
+  optional 'driver' parameter (e.g. appending &driver=EXAODBC to connection URL)
+* bumped to SQLAlchemy 1.2.0, pyodbc 4.0.21
+
 # 1.3.2
 * bumped to SQLAlchemy 1.1.14
 * switched to travis builds without root, bumped tests to Python 3.6

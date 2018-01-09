@@ -23,10 +23,15 @@ class Requirements(SuiteRequirements):
         return exclusions.open()
 
     @property
+    def implicitly_named_constraints(self):
+        """target database must apply names to unnamed constraints."""
+        return exclusions.open()
+
+    @property
     def returning(self):
         """target platform supports RETURNING."""
         return exclusions.closed()
-    
+
     @property
     def empty_strings_varchar(self):
         """target database can persist/return an empty string with a
@@ -35,7 +40,7 @@ class Requirements(SuiteRequirements):
 
     @property
     def text_type(self):
-        """Target database must support an unbounded Text() 
+        """Target database must support an unbounded Text()
         type such as TEXT or CLOB """
         return exclusions.closed()
 
@@ -85,7 +90,7 @@ class Requirements(SuiteRequirements):
         """"target dialect retrieves cursor.lastrowid, or fetches
         from a database-side function after an insert() construct executes,
         within the get_lastrowid() method.
-    
+
         Only dialects that "pre-execute", or need RETURNING to get last
         inserted id, would return closed/fail/skip for this.
         """
@@ -114,7 +119,7 @@ class Requirements(SuiteRequirements):
         """Dialect converts small/large scale decimals into scientific notation
         """
         return exclusions.open()
-        
+
     @property
     def temporary_tables(self):
         """target database supports temporary tables"""
@@ -135,6 +140,13 @@ class Requirements(SuiteRequirements):
         SELECT.
         """
         return exclusions.closed()
+
+    @property
+    def order_by_col_from_union(self):
+        """target database supports ordering by a column from a SELECT
+           inside of a UNION
+           E.g.  (SELECT id, ...) UNION (SELECT id, ...) ORDER BY id """
+        return exclusions.open()
 
     @property
     def bound_limit_offset(self):
@@ -158,4 +170,8 @@ class Requirements(SuiteRequirements):
 
     @property
     def parens_in_union_contained_select_wo_limit_offset(self):
+        return exclusions.closed()
+
+    @property
+    def broken_cx_oracle6_numerics(config):
         return exclusions.closed()

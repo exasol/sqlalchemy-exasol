@@ -17,7 +17,6 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
     execution_ctx_cls = EXAExecutionContext
 
-    pyodbc_driver_name = "EXAODBC"
     driver_version = None
     server_version_info = None
 
@@ -74,7 +73,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
                         keys.pop('host', ''))]
         else:
             connectors = ["DRIVER={%s}" %
-                            keys.pop('driver', self.pyodbc_driver_name)]
+                    keys.pop('driver', None)]
 
         port = ''
         if 'port' in keys and not 'port' in query:

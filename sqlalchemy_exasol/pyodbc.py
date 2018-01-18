@@ -8,6 +8,7 @@ Connect string::
 
 import re
 import six
+import sys
 from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
@@ -47,6 +48,25 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
         # return cached info
         return self.server_version_info
+
+    if sys.platform == 'darwin':
+        def connect(self, *cargs, **cparams):
+            # Get connection
+            conn = super(EXADialect_pyodbc, self).connect(*cargs, **cparams)
+
+            # Set up encodings
+            conn.setdecoding(self.dbapi.SQL_CHAR, encoding='utf-8')
+            conn.setdecoding(self.dbapi.SQL_WCHAR, encoding='utf-8')
+            conn.setdecoding(self.dbapi.SQL_WMETADATA, encoding='utf-8')
+
+            if six.PY2:
+                conn.setencoding(str, encoding='utf-8')
+                conn.setencoding(unicode, encoding='utf-8')
+            else:
+                conn.setencoding(encoding='utf-8')
+
+            # Return connection
+            return conn
 
     def create_connect_args(self, url):
         """

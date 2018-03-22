@@ -1,4 +1,5 @@
 # Head
+* dropped EXASOL 5 from integration tests
 * bumped to SQLAlchemy 1.2.5, pyodbc 4.0.22
 
 # 2.0.0

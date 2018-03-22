@@ -1,3 +1,6 @@
+# Head
+* bumped to SQLAlchemy 1.2.5, pyodbc 4.0.22
+
 # 2.0.0
 * BREAKING CHANGE: default driver name removed from dialect. The driver must now be explicitly
   specified. Either in the DSN or in the connection string using the

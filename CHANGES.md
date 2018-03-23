@@ -1,6 +1,6 @@
 # Head
 * dropped EXASOL 5 from integration tests
-* bumped to SQLAlchemy 1.2.5, pyodbc 4.0.22
+* bumped to SQLAlchemy 1.2.5
 
 # 2.0.0
 * BREAKING CHANGE: default driver name removed from dialect. The driver must now be explicitly

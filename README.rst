@@ -108,12 +108,12 @@ Unit tests
 
 To run the unit tests you need:
 
-# set the `default` connection string in the `setup.cfg` file, which should contain
+1. set the `default` connection string in the `setup.cfg` file, which should contain
 an existing schema to run tests against.  Note that the tests also use a schema
 "test_schema";
-# set the `DRIVER` path under the `EXAODBC` section in the
+2. set the `DRIVER` path under the `EXAODBC` section in the
 `odbcconfig/odbcinst.ini` file;
-# set the `ODBCINSTINI` and `ODBCINST` environment variables to point to the
+3. set the `ODBCINSTINI` and `ODBCINST` environment variables to point to the
 full path of `odbcconfig/odbcinst.ini`
 
 and finally run the unit tests:

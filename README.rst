@@ -97,8 +97,8 @@ Host url  'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
 
 - Schema name and parameters are optional for the host url string
 - At least on Linux/Unix systems it has proven valuable to pass 'CONNECTIONLCALL=en_US.UTF-8'
-  as a url parameter. This will make sure that the client process (Python) and
-  the EXASOL driver (UTF-8 internal) know how to interpret code pages correctly.
+as a url parameter. This will make sure that the client process (Python) and
+the EXASOL driver (UTF-8 internal) know how to interpret code pages correctly.
 - Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
 - As of EXASol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
 
@@ -108,13 +108,13 @@ Unit tests
 
 To run the unit tests you need:
 
-1. set the `default` connection string in the `setup.cfg` file, which should contain
-   an existing schema to run tests against.  Note that the tests also use a schema
-   "test_schema";
-1. set the `DRIVER` path under the `EXAODBC` section in the
-   `odbcconfig/odbcinst.ini` file;
-1. set the `ODBCINSTINI` and `ODBCINST` environment variables to point to the
-   full path of `odbcconfig/odbcinst.ini`
+# set the `default` connection string in the `setup.cfg` file, which should contain
+an existing schema to run tests against.  Note that the tests also use a schema
+"test_schema";
+# set the `DRIVER` path under the `EXAODBC` section in the
+`odbcconfig/odbcinst.ini` file;
+# set the `ODBCINSTINI` and `ODBCINST` environment variables to point to the
+full path of `odbcconfig/odbcinst.ini`
 
 and finally run the unit tests:
 

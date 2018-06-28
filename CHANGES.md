@@ -1,6 +1,8 @@
 # Head
 * dropped EXASOL 5 from integration tests
 * bumped to SQLAlchemy 1.2.5
+* Support the turbodbc parameters `varchar_max_character_limit`, `prefer_unicode`,
+  `large_decimals_as_64_bit_types`, and `limit_varchar_results_to_max`.
 
 # 2.0.0
 * BREAKING CHANGE: default driver name removed from dialect. The driver must now be explicitly

@@ -75,10 +75,17 @@ class EXADialectTurbodbcTest(fixtures.TestBase):
         expected.update(self.default_user_args)
         expected.update(DEFAULT_CONNECTION_PARAMS)
         self.assert_parsed("exa+turbodbc://scott:tiger@192.168.1.2..8:1234/my_schema?"
-                           "read_buffer_size=4200&parameter_sets_to_buffer=111&use_async_io=True",
+                           "read_buffer_size=4200&parameter_sets_to_buffer=111&use_async_io=True"
+                           "&varchar_max_character_limit=99&prefer_unicode=True"
+                           "&large_decimals_as_64_bit_types=True"
+                           "&limit_varchar_results_to_max=True",
                            [None], expected, {'read_buffer_size': 4200,
                                               'parameter_sets_to_buffer': 111,
-                                              'use_async_io': True})
+                                              'use_async_io': True,
+                                              'varchar_max_character_limit': 99,
+                                              'prefer_unicode': True,
+                                              'large_decimals_as_64_bit_types': True,
+                                              'limit_varchar_results_to_max': True})
 
     def test_create_connect_args_trusted(self):
         expected = self.default_host_args.copy()

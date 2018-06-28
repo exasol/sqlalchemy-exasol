@@ -1,4 +1,6 @@
 # Head
+
+# 2.0.1
 * dropped EXASOL 5 from integration tests
 * bumped to SQLAlchemy 1.2.8
 * Support the turbodbc parameters `varchar_max_character_limit`, `prefer_unicode`,

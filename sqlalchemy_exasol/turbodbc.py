@@ -14,6 +14,12 @@ DEFAULT_TURBODBC_PARAMS = {
     'read_buffer_size': 50
 }
 
+TURBODBC_TRANSLATED_PARAMS = {
+    'read_buffer_size', 'parameter_sets_to_buffer', 'use_async_io',
+    'varchar_max_character_limit', 'prefer_unicode',
+    'large_decimals_as_64_bit_types', 'limit_varchar_results_to_max'
+}
+
 
 class _ExaDecimal(sqltypes.DECIMAL):
     def bind_processor(self, dialect):
@@ -98,10 +104,12 @@ class EXADialect_turbodbc(EXADialect):
 
         real_turbodbc = __import__('turbodbc')
         turbodbc_options = {}
-        for param in ('read_buffer_size', 'parameter_sets_to_buffer', 'use_async_io'):
+        for param in TURBODBC_TRANSLATED_PARAMS:
             if param in options:
                 raw = options.pop(param)
-                if param == 'use_async_io':
+                if param in {'use_async_io', 'prefer_unicode',
+                             'large_decimals_as_64_bit_types',
+                             'limit_varchar_results_to_max'}:
                     value = util.asbool(raw)
                 elif param == 'read_buffer_size':
                     value = real_turbodbc.Megabytes(util.asint(raw))

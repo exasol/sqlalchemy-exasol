@@ -66,5 +66,5 @@ deploy:
     branch: master
     tags: true
     python: '3.6'
-    condition: -z "EXTRA_REQUIREMENTS"
+    condition: ${EXTRA_REQUIREMENTS} > 0
     repo: blue-yonder/sqlalchemy_exasol

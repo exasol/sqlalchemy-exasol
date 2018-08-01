@@ -17,7 +17,8 @@ DEFAULT_TURBODBC_PARAMS = {
 TURBODBC_TRANSLATED_PARAMS = {
     'read_buffer_size', 'parameter_sets_to_buffer', 'use_async_io',
     'varchar_max_character_limit', 'prefer_unicode',
-    'large_decimals_as_64_bit_types', 'limit_varchar_results_to_max'
+    'large_decimals_as_64_bit_types', 'limit_varchar_results_to_max',
+    'autocommit'
 }
 
 
@@ -109,7 +110,8 @@ class EXADialect_turbodbc(EXADialect):
                 raw = options.pop(param)
                 if param in {'use_async_io', 'prefer_unicode',
                              'large_decimals_as_64_bit_types',
-                             'limit_varchar_results_to_max'}:
+                             'limit_varchar_results_to_max',
+                             'autocommit'}:
                     value = util.asbool(raw)
                 elif param == 'read_buffer_size':
                     value = real_turbodbc.Megabytes(util.asint(raw))

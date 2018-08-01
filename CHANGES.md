@@ -1,5 +1,8 @@
 # Head
 
+# 2.0.2
+* Pass the autocommit parameter when specified also to turodbc.
+
 # 2.0.1
 * dropped EXASOL 5 from integration tests
 * bumped to SQLAlchemy 1.2.8

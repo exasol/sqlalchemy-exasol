@@ -78,7 +78,7 @@ class EXADialectTurbodbcTest(fixtures.TestBase):
                            "read_buffer_size=4200&parameter_sets_to_buffer=111&use_async_io=True"
                            "&varchar_max_character_limit=99&prefer_unicode=True"
                            "&large_decimals_as_64_bit_types=True"
-                           "&limit_varchar_results_to_max=True",
+                           "&limit_varchar_results_to_max=True"
                            "&autocommit=True",
                            [None], expected, {'read_buffer_size': 4200,
                                               'parameter_sets_to_buffer': 111,

@@ -61,7 +61,7 @@ deploy:
   skip_upload_docs: true
   user: BY-jk
   password:
-    secure: SNyP2s6DV0Hm/gcFEk0iqllmeIvRU16YI/Gn7SF6+kT3EXyzE3gkPq0v/VRV4+n6wpNT2FELl69tZL87vXtYPxEiLXzSsWAuKmy9dapbf1bjzLjr3fVepEpesLPivYFFxToYa7osjunVVKxRNOzW5epCpRcWJP8bDiJKxH5BF38=
+    secure: IWn0cBNuEmEJoLv7Va12f5wk4jfL8E036n0EnBRy6ARwnZL/67fe8MFlTrM2MyaFCW7oDba8vEJNgA7SfZXyEQhV4KH+aUvx42M0XNKGq5GY8M6y5AXAhtV45+3PbrAatd8sV/kYbCZySjvneJn4ldvTKgFsaXyF+nK7ZbJ0/GE=
   on:
     branch: master
     tags: true

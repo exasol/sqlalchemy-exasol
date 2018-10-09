@@ -1,3 +1,6 @@
+# 2.0.4
+* Use setuptools_scm to get proper development package versions.
+
 # 2.0.3
 * Pass the autocommit parameter when specified also to turodbc.
 * bumped to SQLAlchemy 1.2.10

@@ -5,6 +5,7 @@
 *.so
 
 # Packages
+.eggs/
 *.egg
 *.egg-info
 dist
@@ -19,6 +20,7 @@ develop-eggs
 .installed.cfg
 lib
 lib64
+sqlalchemy_exasol/_version.py
 
 # Installer logs
 pip-log.txt

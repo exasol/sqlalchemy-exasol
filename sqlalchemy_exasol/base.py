@@ -352,9 +352,9 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                         db_query = db_query.replace(ident, "to_timestamp('%s', 'YYYY-MM-DD HH24:MI:SS.FF6')" % value.strftime('%Y-%m-%d %H:%M:%S.%f'), 1)
                     elif isinstance(value, date):
                         db_query = db_query.replace(ident, "to_date('%s', 'YYYY-MM-DD')" % value.strftime('%Y-%m-%d'), 1)
-                    elif isinstance(value, str):
+                    elif isinstance(value, six.binary_type):
                         db_query = db_query.replace(ident, "'%s'" % value.decode('UTF-8'), 1)
-                    elif isinstance(value, unicode):
+                    elif isinstance(value, six.text_type):
                         db_query = db_query.replace(ident, "'%s'" % value, 1)
                     else:
                         raise TypeError('Data type not supported: %s' % type(value))

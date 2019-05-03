@@ -1,3 +1,7 @@
+# 2.0.5
+* bumped to SQLAlchemy 1.2.18
+* fixed bug in server version string parsing (turbodbc)
+
 # 2.0.4
 * Use setuptools_scm to get proper development package versions
 * bumped pyodbc to 4.0.24

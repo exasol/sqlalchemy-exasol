@@ -1,5 +1,5 @@
 language: python
-dist: trusty
+dist: xenial
 sudo: false
 
 python:
@@ -30,7 +30,6 @@ addons:
       libboost-date-time-dev
       libboost-locale-dev
       libboost-system-dev
-      libmyodbc
 
 install:
   - pip install -r requirements.txt

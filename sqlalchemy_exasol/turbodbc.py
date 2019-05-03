@@ -6,7 +6,8 @@ from sqlalchemy_exasol.base import EXADialect
 
 
 DEFAULT_CONNECTION_PARAMS = {
-    # always enable efficient conversion to Python types: see https://www.exasol.com/support/browse/EXASOL-898
+    # always enable efficient conversion to Python types: 
+    # see https://www.exasol.com/support/browse/EXASOL-898
     'inttypesinresultsifpossible': 'y',
 }
 
@@ -84,10 +85,19 @@ class EXADialect_turbodbc(EXADialect):
         if self.server_version_info is None:
             query = "select PARAM_VALUE from SYS.EXA_METADATA where PARAM_NAME = 'databaseProductVersion'"
             result = connection.execute(query).fetchone()[0].split('.')
+            major, minor, patch = 0, 0, 0
+            major = int(result[0])
+            minor = int(result[1])
+            try:
+                # last version position can something like: '12-S' or 'RC2'
+                # might fail with ValueError
+                patch = int(result[2].split('-')[0])
+            except ValueError:
+                # ignore if there is some funky string in the patch field
+                pass
+            self.server_version_info = (major, minor, patch)
 
-            # last version position can something like: '12-S'
-            self.server_version_info = (int(result[0]), int(result[1]), int(result[2].split('-')[0]))
-
+        # return cached info
         return self.server_version_info
 
     @staticmethod
@@ -136,5 +146,6 @@ class EXADialect_turbodbc(EXADialect):
         for key in options:
             if options[key] == 'None':
                 options[key] = None
+
 
 dialect = EXADialect_turbodbc

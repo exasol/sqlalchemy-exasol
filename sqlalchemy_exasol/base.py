@@ -26,7 +26,7 @@ will yield::
 Note that the ``start`` value for sequences is optional and will default to 1.
 The start value of a sequence cannot be retrieved when reflecting a Table
 object.
-The autoincrement flag for Column Objects is not supporte by exadialect.
+The autoincrement flag for Column Objects is not supported by exadialect.
 
 Identifier Casing
 -----------------
@@ -181,9 +181,6 @@ class EXACompiler(compiler.SQLCompiler):
         if select._limit is not None:
             text += "\n LIMIT %d" % int(select._limit)
         if select._offset is not None:
-            #if self.root_connection.dialect.server_version_info < (5, 0, 0):
-            #    util.warn("EXASolution does not support OFFSET")
-            #else:
             text += "\n OFFSET %d" % int(select._offset)
 
         return text
@@ -269,6 +266,16 @@ class EXADDLCompiler(compiler.DDLCompiler):
 
 
 class EXATypeCompiler(compiler.GenericTypeCompiler):
+
+    ''' force mapping of BIGINT to DECIMAL(19)
+    The mapping back is done by the driver using flag 
+    INTTYPESINRESULTSIFPOSSIBLE=Y. This is enforced by default by this
+    dialect. However, BIGINT is mapped to DECIMAL(36) and the driver only
+    converts types decimal scale==0 and 9<precision<=19 back to BIGINT 
+    https://www.exasol.com/support/browse/EXA-23267
+    '''
+    def visit_big_integer(self, type_, **kw):
+        return "DECIMAL(19)"
 
     def visit_large_binary(self, type_):
         return self.visit_BLOB(type_)
@@ -570,8 +577,11 @@ class EXADialect(default.DefaultDialect):
                 elif coltype == 'DECIMAL':
                     # this Dialect forces INTTYPESINRESULTSIFPOSSIBLE=y on ODBC level
                     # thus, we need to convert DECIMAL(<=18,0) back to INTEGER type
+                    # and DECIMAL(36,0) back to BIGINT type
                     if scale == 0 and precision <= 18:
                         coltype = sqltypes.INTEGER()
+                    elif scale ==0 and precision == 36:
+                        coltype = sqltypes.BIGINT()
                     else:
                         coltype = sqltypes.DECIMAL(precision, scale)
                 else:
@@ -673,8 +683,5 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
-        # EXASolution has no indexes
-        # TODO: check if indexes are used by SQLA for optimizing SQL Statements.
-        # If so, we should return all columns as being indexed
+        # EXASolution has no explicit indexes
         return []

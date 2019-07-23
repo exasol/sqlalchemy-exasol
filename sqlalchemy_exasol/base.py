@@ -574,6 +574,8 @@ class EXADialect(default.DefaultDialect):
             try:
                 if coltype == 'VARCHAR':
                     coltype = sqltypes.VARCHAR(length)
+                elif coltype == 'CHAR':
+                    coltype = sqltypes.CHAR(length)
                 elif coltype == 'DECIMAL':
                     # this Dialect forces INTTYPESINRESULTSIFPOSSIBLE=y on ODBC level
                     # thus, we need to convert DECIMAL(<=18,0) back to INTEGER type

@@ -1,3 +1,6 @@
+# HEAD
+* fixed bug in reflection of CHAR colums (missing length). Contribution from @vamega
+
 # 2.0.5
 * bumped to SQLAlchemy 1.2.18
 * fixed bug in server version string parsing (turbodbc)

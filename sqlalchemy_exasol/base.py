@@ -386,6 +386,7 @@ class EXADialect(default.DefaultDialect):
     # postfetch_lastrowid = True
     supports_cast = True
     requires_name_normalize = True
+    cte_follows_insert = True
 
     default_paramstyle = 'qmark'
     execution_ctx_cls = EXAExecutionContext

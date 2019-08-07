@@ -183,6 +183,8 @@ class Requirements(SuiteRequirements):
     @property
     def ctes(self):
         """Target database supports CTEs"""
+        """Can't be opened as CTE tests require DB support for 'WITH RECURSIVE'
+           not supported by EXASOL"""
 
-        return exclusions.open()
+        return exclusions.closed()
    

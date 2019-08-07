@@ -179,3 +179,9 @@ class Requirements(SuiteRequirements):
     @property
     def cross_schema_fk_reflection(self):
         return exclusions.closed()
+
+    @property
+    def ctes(self):
+        """Target database supports CTEs"""
+
+        return exclusions.closed()

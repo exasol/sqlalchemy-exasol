@@ -184,4 +184,5 @@ class Requirements(SuiteRequirements):
     def ctes(self):
         """Target database supports CTEs"""
 
-        return exclusions.closed()
+        return exclusions.open()
+   

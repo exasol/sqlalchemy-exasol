@@ -1,5 +1,6 @@
 # HEAD
 * fixed bug in reflection of CHAR colums (missing length). Contribution from @vamega
+* fixed bug in rendering of SQL statements with common table expressions (CTE). Contribution from @vamega
 
 # 2.0.5
 * bumped to SQLAlchemy 1.2.18

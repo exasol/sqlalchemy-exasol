@@ -196,6 +196,9 @@ class EXACompiler(compiler.SQLCompiler):
         """
         return " FROM DUAL"
 
+    def visit_empty_set_expr(self, type_):
+        return "SELECT 1 FROM DUAL WHERE 1!=1"
+
 
 class EXADDLCompiler(compiler.DDLCompiler):
 

@@ -2,6 +2,7 @@ from sqlalchemy.testing.requirements import SuiteRequirements
 
 from sqlalchemy.testing import exclusions
 
+
 class Requirements(SuiteRequirements):
 
     @property
@@ -153,7 +154,6 @@ class Requirements(SuiteRequirements):
         """target database can render LIMIT and/or OFFSET using a bound
         parameter
         """
-
         return exclusions.closed()
 
     @property
@@ -175,7 +175,7 @@ class Requirements(SuiteRequirements):
     @property
     def broken_cx_oracle6_numerics(config):
         return exclusions.closed()
-    
+
     @property
     def cross_schema_fk_reflection(self):
         return exclusions.closed()
@@ -185,6 +185,4 @@ class Requirements(SuiteRequirements):
         """Target database supports CTEs"""
         """Can't be opened as CTE tests require DB support for 'WITH RECURSIVE'
            not supported by EXASOL"""
-
         return exclusions.closed()
-   

@@ -22,8 +22,6 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     server_version_info = None
 
     def __init__(self, **kw):
-        # deal with http://code.google.com/p/pyodbc/issues/detail?id=25
-        kw.setdefault('convert_unicode', True)
         super(EXADialect_pyodbc, self).__init__(**kw)
 
     def get_driver_version(self, connection):
@@ -151,5 +149,6 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             return error_code in error_codes
 
         return super(EXADialect_pyodbc, self).is_disconnect(e, connection, cursor)
+
 
 dialect = EXADialect_pyodbc

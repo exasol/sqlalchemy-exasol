@@ -3,6 +3,7 @@
 * fixed bug in rendering of SQL statements with common table expressions (CTE). Contribution from @vamega
 * added support for empty set expressions required by new SQLA tests
 * removed deprecated setting of 'convert_unicode' on engine
+* bumped PyODBC and pytest-cov dependencies
 
 # 2.0.5
 * bumped to SQLAlchemy 1.2.18

@@ -4,6 +4,7 @@ import six
 from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
 from sqlalchemy_exasol import base
 
+
 def raw_sql(query):
     """
     Converts an SQLAlchemy object to a single raw SQL string. Note

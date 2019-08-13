@@ -1,3 +1,6 @@
+# HEAD
+* bumped travis build system to Ubuntu bionic (~Debian 9)
+
 # 2.0.6
 * fixed bug in reflection of CHAR colums (missing length). Contribution from @vamega
 * fixed bug in rendering of SQL statements with common table expressions (CTE). Contribution from @vamega

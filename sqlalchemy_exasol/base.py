@@ -269,14 +269,13 @@ class EXADDLCompiler(compiler.DDLCompiler):
 
 
 class EXATypeCompiler(compiler.GenericTypeCompiler):
-
-    ''' force mapping of BIGINT to DECIMAL(19)
-    The mapping back is done by the driver using flag 
+    """ force mapping of BIGINT to DECIMAL(19)
+    The mapping back is done by the driver using flag
     INTTYPESINRESULTSIFPOSSIBLE=Y. This is enforced by default by this
     dialect. However, BIGINT is mapped to DECIMAL(36) and the driver only
-    converts types decimal scale==0 and 9<precision<=19 back to BIGINT 
+    converts types decimal scale==0 and 9<precision<=19 back to BIGINT
     https://www.exasol.com/support/browse/EXA-23267
-    '''
+    """
     def visit_big_integer(self, type_, **kw):
         return "DECIMAL(19)"
 
@@ -290,6 +289,7 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
 class EXAIdentifierPreparer(compiler.IdentifierPreparer):
     reserved_words = RESERVED_WORDS
     illegal_initial_characters = compiler.ILLEGAL_INITIAL_CHARACTERS.union('_')
+
 
 class EXAExecutionContext(default.DefaultExecutionContext):
 
@@ -373,6 +373,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
 
     def should_autocommit_text(self, statement):
         return AUTOCOMMIT_REGEXP.match(statement)
+
 
 class EXADialect(default.DefaultDialect):
     name = 'exasol'

@@ -1,5 +1,6 @@
-# HEAD
+# 2.0.7
 * bumped travis build system to Ubuntu bionic (~Debian 9)
+* bumped SQLAlchemy to 1.3.8
 
 # 2.0.6
 * fixed bug in reflection of CHAR colums (missing length). Contribution from @vamega

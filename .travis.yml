@@ -59,9 +59,8 @@ deploy:
   distributions: "sdist bdist_wheel"
   skip_cleanup: true
   skip_upload_docs: true
-  user: BY-jk
-  password:
-    secure: IWn0cBNuEmEJoLv7Va12f5wk4jfL8E036n0EnBRy6ARwnZL/67fe8MFlTrM2MyaFCW7oDba8vEJNgA7SfZXyEQhV4KH+aUvx42M0XNKGq5GY8M6y5AXAhtV45+3PbrAatd8sV/kYbCZySjvneJn4ldvTKgFsaXyF+nK7ZbJ0/GE=
+  user: __token__
+  password: ${PYPI_API_TOKEN}
   on:
     branch: master
     tags: true

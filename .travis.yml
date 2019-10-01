@@ -60,7 +60,7 @@ deploy:
   skip_cleanup: true
   skip_upload_docs: true
   user: __token__
-  password: ${PYPI_API_TOKEN}
+  # API token used in env var PYPI_PASSWORD, set in Travis CI
   on:
     branch: master
     tags: true

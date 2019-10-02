@@ -1,5 +1,7 @@
-# HEAD
+# 2.0.8
 * added new EXASOL keywords (contribution from @vamega)
+* added MERGE statement to auto commit heuristic (contribution from @vamega)
+* switched to API token for PyPi upload
 
 # 2.0.7
 * bumped travis build system to Ubuntu bionic (~Debian 9)

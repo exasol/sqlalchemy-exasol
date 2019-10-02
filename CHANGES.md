@@ -1,3 +1,6 @@
+# HEAD
+* added new EXASOL keywords (contribution from @vamega)
+
 # 2.0.7
 * bumped travis build system to Ubuntu bionic (~Debian 9)
 * bumped SQLAlchemy to 1.3.8

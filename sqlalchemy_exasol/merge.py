@@ -86,6 +86,7 @@ class Merge(UpdateBase):
             where = addition
         return where
 
+
 def merge(target_table, source_expr, on):
     return Merge(target_table, source_expr, on)
 

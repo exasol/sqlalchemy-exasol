@@ -60,7 +60,7 @@ from .constraints import DistributeByConstraint
 import re
 
 AUTOCOMMIT_REGEXP = re.compile(
-            r'\s*(?:UPDATE|INSERT|CREATE|DELETE|DROP|ALTER|TRUNCATE)',
+            r'\s*(?:UPDATE|INSERT|CREATE|DELETE|DROP|ALTER|TRUNCATE|MERGE)',
                 re.I | re.UNICODE)
 
 RESERVED_WORDS = {

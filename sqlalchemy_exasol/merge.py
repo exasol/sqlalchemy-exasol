@@ -9,10 +9,7 @@ class Merge(UpdateBase):
 
     __visit_name__ = 'merge'
 
-    def __init__(self,
-                 target_table,
-                 source_expr,
-                 on):
+    def __init__(self, target_table, source_expr, on):
         self._target_table = target_table
         self._source_expr = source_expr
         self._on = on
@@ -20,7 +17,7 @@ class Merge(UpdateBase):
         elements_to_check = list(on.get_children())
         for e in elements_to_check:
             if isinstance(e, Column):
-                if  e.table == self._target_table:
+                if e.table == self._target_table:
                     self._on_columns.append(e)
             else:
                 elements_to_check.extend(e.get_children())
@@ -117,8 +114,8 @@ def visit_merge(element, compiler, **kw):
     if element._merge_insert_values is not None:
         cols = crud._get_crud_params(compiler, element._merge_insert_values)
         msql += "\nWHEN NOT MATCHED THEN INSERT "
-        msql += "(%s) " % ', '.join(compiler.visit_column(c[0]) for c in cols)
-        msql += "VALUES (%s) " % ', '.join(c[1] for c in cols)
+        msql += "(%s) " % ", ".join(compiler.visit_column(c[0]) for c in cols)
+        msql += "VALUES (%s) " % ", ".join(c[1] for c in cols)
         if element._insert_where is not None:
             msql += "WHERE %s" % compiler.process(element._insert_where)
 

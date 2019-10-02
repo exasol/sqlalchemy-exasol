@@ -1,9 +1,8 @@
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.sql.expression import ClauseElement, Executable, ValuesBase, \
-    and_, UpdateBase
-from sqlalchemy.sql.base import _generative
-from sqlalchemy.sql import crud
 from sqlalchemy.schema import Column
+from sqlalchemy.sql import crud
+from sqlalchemy.sql.base import _generative
+from sqlalchemy.sql.expression import ValuesBase, and_, UpdateBase, ColumnClause
 
 
 class Merge(UpdateBase):
@@ -36,7 +35,7 @@ class Merge(UpdateBase):
         source_cols = {}
         elements_to_check = list(self._source_expr.get_children())
         for e in elements_to_check:
-            if isinstance(e, Column):
+            if isinstance(e, ColumnClause):
                 source_cols[e.name] = e
         return source_cols
 
@@ -55,7 +54,7 @@ class Merge(UpdateBase):
         if where is not None:
             if self._merge_delete:
                 self._delete_where = self._append_where(self._delete_where, where)
-            else: 
+            else:
                 self._update_where = self._append_where(self._update_where, where)
 
     @_generative

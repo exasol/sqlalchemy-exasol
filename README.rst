@@ -9,8 +9,6 @@ SQLAlchemy Dialect for EXASOL DB
 .. image:: https://requires.io/github/blue-yonder/sqlalchemy_exasol/requirements.svg?branch=master
      :target: https://requires.io/github/blue-yonder/sqlalchemy_exasol/requirements/?branch=master
      :alt: Requirements Status
-.. image:: https://snyk.io/test/github/blue-yonder/sqlalchemy_exasol/badge.svg?targetFile=requirements.txt
-    :target: https://snyk.io/test/github/blue-yonder/sqlalchemy_exasol?targetFile=requirements.txt
 
 This is an SQLAlchemy dialect for the EXASOL database.
 

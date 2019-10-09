@@ -1,17 +1,17 @@
 # -*- coding: UTF-8 -*-
-from sqlalchemy import or_
-from sqlalchemy import MetaData, Table, Column, Integer, String, Date, DateTime
-from sqlalchemy.testing import fixtures, config
-from sqlalchemy import testing, inspect
-from sqlalchemy.schema import DropConstraint, AddConstraint
-
 import datetime
 
-from sqlalchemy_exasol.base import RESERVED_WORDS
+from sqlalchemy import MetaData, Table, Column, Integer, String, Date, DateTime
+from sqlalchemy import or_, select, literal_column
+from sqlalchemy import testing, inspect
+from sqlalchemy.schema import DropConstraint, AddConstraint
+from sqlalchemy.testing import fixtures, config
+
 from sqlalchemy_exasol.base import EXAExecutionContext
-from sqlalchemy_exasol.merge import merge
 from sqlalchemy_exasol.constraints import DistributeByConstraint
+from sqlalchemy_exasol.merge import merge
 from sqlalchemy_exasol.util import raw_sql
+
 
 class MergeTest(fixtures.TablesTest):
 
@@ -157,6 +157,57 @@ class MergeTest(fixtures.TablesTest):
         config.db.execute(m)
         r = config.db.execute(t.select()).fetchall()
         assert len(r) == 1
+
+    def test_merge_insert_computed_column(self):
+        t = self.tables.t
+        s = self.tables.s
+
+        config.db.execute(t.insert(), [dict(id=1, name="Ulf")])
+        config.db.execute(s.insert(), [dict(id=1, age=10), dict(id=2, age=20)])
+
+        source_expr = select(
+            [
+                (s.c.id * literal_column("20")).label("id"),
+                (s.c.age * literal_column("20")).label("age"),
+                literal_column("'Bernd'").label("name"),
+            ]
+        ).alias("source")
+
+        # Expecting both rows of source_expr to be inserted
+        m = merge(t, source_expr, t.c.id == source_expr.c.id).insert()
+        config.db.execute(m)
+        results = config.db.execute(t.select().where(t.c.name == "Bernd")).fetchall()
+        assert len(results) == 2
+
+        for r in results:
+            assert r.id > 10
+            assert r.age >= 10
+            assert r.name == "Bernd"
+
+    def test_merge_update_computed_column(self):
+        t = self.tables.t
+        s = self.tables.s
+
+        config.db.execute(t.insert(), [dict(id=1, name="Ulf")])
+        config.db.execute(s.insert(), [dict(id=1, age=10), dict(id=2, age=20)])
+
+        # Only id=1 will match, so only one row should be updated.
+        source_expr = select(
+            [
+                s.c.id.label("id"),
+                (s.c.age * literal_column("20")).label("age"),
+                literal_column("'Bernd'").label("name"),
+            ]
+        ).alias("source")
+
+        m = merge(t, source_expr, t.c.id == source_expr.c.id).update()
+        mr = config.db.execute(m)
+
+        results = config.db.execute(t.select().where(t.c.name == "Bernd")).fetchall()
+        assert len(results) == 1
+        r = results[0]
+        assert r.age == 200
+        assert r.name == "Bernd"
 
     def test_merge_update_insert(self):
         t = self.tables.t

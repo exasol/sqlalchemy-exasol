@@ -1,3 +1,6 @@
+# 2.0.9
+* bumped SQLAlchemy to 1.3.10
+
 # 2.0.8
 * added new EXASOL keywords (contribution from @vamega)
 * added MERGE statement to auto commit heuristic (contribution from @vamega)

@@ -1,19 +1,15 @@
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.sql.expression import ClauseElement, Executable, ValuesBase, \
-    and_, UpdateBase
-from sqlalchemy.sql.base import _generative
-from sqlalchemy.sql import crud
 from sqlalchemy.schema import Column
+from sqlalchemy.sql import crud
+from sqlalchemy.sql.base import _generative
+from sqlalchemy.sql.expression import ValuesBase, and_, UpdateBase, ColumnClause
 
 
 class Merge(UpdateBase):
 
     __visit_name__ = 'merge'
 
-    def __init__(self,
-                 target_table,
-                 source_expr,
-                 on):
+    def __init__(self, target_table, source_expr, on):
         self._target_table = target_table
         self._source_expr = source_expr
         self._on = on
@@ -21,7 +17,7 @@ class Merge(UpdateBase):
         elements_to_check = list(on.get_children())
         for e in elements_to_check:
             if isinstance(e, Column):
-                if  e.table == self._target_table:
+                if e.table == self._target_table:
                     self._on_columns.append(e)
             else:
                 elements_to_check.extend(e.get_children())
@@ -36,7 +32,7 @@ class Merge(UpdateBase):
         source_cols = {}
         elements_to_check = list(self._source_expr.get_children())
         for e in elements_to_check:
-            if isinstance(e, Column):
+            if isinstance(e, ColumnClause):
                 source_cols[e.name] = e
         return source_cols
 
@@ -55,7 +51,7 @@ class Merge(UpdateBase):
         if where is not None:
             if self._merge_delete:
                 self._delete_where = self._append_where(self._delete_where, where)
-            else: 
+            else:
                 self._update_where = self._append_where(self._update_where, where)
 
     @_generative
@@ -118,8 +114,8 @@ def visit_merge(element, compiler, **kw):
     if element._merge_insert_values is not None:
         cols = crud._get_crud_params(compiler, element._merge_insert_values)
         msql += "\nWHEN NOT MATCHED THEN INSERT "
-        msql += "(%s) " % ', '.join(compiler.visit_column(c[0]) for c in cols)
-        msql += "VALUES (%s) " % ', '.join(c[1] for c in cols)
+        msql += "(%s) " % ", ".join(compiler.visit_column(c[0]) for c in cols)
+        msql += "VALUES (%s) " % ", ".join(c[1] for c in cols)
         if element._insert_where is not None:
             msql += "WHERE %s" % compiler.process(element._insert_where)
 

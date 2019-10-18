@@ -186,3 +186,10 @@ class Requirements(SuiteRequirements):
         """Can't be opened as CTE tests require DB support for 'WITH RECURSIVE'
            not supported by EXASOL"""
         return exclusions.closed()
+
+    @property
+    def standalone_null_binds_whereclause(self):
+        """target database/driver supports bound parameters with NULL in the
+        WHERE clause, in situations where it has to be typed.
+        """
+        return exclusions.closed()

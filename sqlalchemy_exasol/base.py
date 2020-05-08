@@ -382,6 +382,7 @@ class EXADialect(default.DefaultDialect):
     supports_default_values = True
     supports_empty_insert = False
     supports_sequences = False
+    supports_is_distinct_from = False
     # sequences_optional = True
     # controls in SQLAlchemy base which columns are part of an insert statement
     # postfetch_lastrowid = True

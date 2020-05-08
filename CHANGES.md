@@ -1,3 +1,8 @@
+# 2.0.10
+* bumped SQLAlchemy to 1.3.16
+* bumped six to 1.14.0
+* bumped pyodbc to 4.0.30
+
 # 2.0.9
 * bumped SQLAlchemy to 1.3.10
 * merge supports computed columns (contribution by @vamega)

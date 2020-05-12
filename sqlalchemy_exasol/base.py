@@ -52,7 +52,7 @@ if six.PY3:
 from decimal import Decimal
 from sqlalchemy import sql, schema, types as sqltypes, util, event
 from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
-from sqlalchemy.engine import default, reflection
+from sqlalchemy.engine import default, reflection, Engine, Connection
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql.elements import quoted_name
 from datetime import date, datetime
@@ -467,53 +467,54 @@ class EXADialect(default.DefaultDialect):
         # TODO: set isolation level
         pass
 
+    def getODBCConnection(self, connection):
+        if isinstance(connection,Engine):
+            odbc_connection = connection.raw_connection().connection
+        elif isinstance(connection,Connection):
+            odbc_connection = connection.connection.connection
+        else:
+            raise Exception("Do not know how to get a pyodbc connection, from %s"%(type(connection)))
+        if str(type(odbc_connection))=="<class 'pyodbc.Connection'>":
+            return odbc_connection
+        else:
+            raise Exception("Did not find a pyodbc connection, found %s"%(type(odbc_connection))) 
+
     # never called during reflection
     @reflection.cache
     def get_schema_names(self, connection, **kw):
-        sql_stmnt = "select SCHEMA_NAME from SYS.EXA_SCHEMAS"
-        rs = connection.execute(sql.text(sql_stmnt))
-        return [self.normalize_name(row[0]) for row in rs]
+        with self.getODBCConnection(connection).cursor().tables() as table_cursor:
+            return list({self.normalize_name(row.table_schem) for row in table_cursor})
+
+    def _get_current_schema(self,connection):
+        current_schema_stmnt = "/*snapshot execution*/ SELECT CURRENT_SCHEMA"
+        current_schema = connection.execute(current_schema_stmnt).fetchone()[0]
+        return current_schema
+
+
+    def _get_tables_for_schema(self, connection, schema):
+        with self.getODBCConnection(connection).cursor().tables() as table_cursor:
+            schema = None
+            if schema is None:
+                schema = self._get_current_schema(connection)
+            schema = self.denormalize_name(schema or
+                            connection.engine.url.database)
+            return [row for row in table_cursor if row.table_schem==schema]
 
     @reflection.cache
     def get_table_names(self, connection, schema, **kw):
-        schema = self.denormalize_name(schema or
-                connection.engine.url.database)
-        sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "
-        if schema is None:
-            sql_stmnt += "CURRENT_SCHEMA ORDER BY table_name"
-            rs = connection.execute(sql_stmnt)
-        else:
-            sql_stmnt += ":schema ORDER BY table_name"
-            rs = connection.execute(sql.text(sql_stmnt), \
-                schema=self.denormalize_name(schema))
-        return [self.normalize_name(row[0]) for row in rs]
+        tables=self._get_tables_for_schema(connection,schema)
+        return [self.normalize_name(row.table_name) 
+                for row in tables] # TODO check if tables + views, or only tables 
 
     def has_table(self, connection, table_name, schema=None):
-        schema = schema or connection.engine.url.database
-        sql_stmnt = "SELECT table_name from SYS.EXA_ALL_TABLES "\
-                    "WHERE table_name = :table_name "
-        if schema is not None:
-            sql_stmnt += "AND table_schema = :schema"
-        rp = connection.execute(
-                sql.text(sql_stmnt),
-                table_name=self.denormalize_name(table_name),
-                schema=self.denormalize_name(schema))
-        row = rp.fetchone()
-
-        return (row is not None)
+        return table_name in self.get_table_names(connection, schema)
 
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
-        schema = schema or connection.engine.url.database
-        sql_stmnt = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS WHERE view_schema = "
-        if schema is None:
-            sql_stmnt += "CURRENT_SCHEMA ORDER BY view_name"
-            rs = connection.execute(sql.text(sql_stmnt))
-        else:
-            sql_stmnt += ":schema ORDER BY view_name"
-            rs = connection.execute(sql.text(sql_stmnt),
-                schema=self.denormalize_name(schema))
-        return [self.normalize_name(row[0]) for row in rs]
+        tables=self._get_tables_for_schema(connection,schema)
+        return [self.normalize_name(row.table_name) 
+                for row in tables 
+                if row.table_type=="VIEW"]
 
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):

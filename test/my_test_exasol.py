@@ -29,3 +29,14 @@ class ConstraintsTest(fixtures.TablesTest):
             print("SCHEMA_conn",schema)
         for view in insp.get_view_names():
             print("VIEW_conn",view)
+            print(insp.get_view_definition(view))
+        print("Columns for table",insp.get_table_names()[0])
+        for column in insp.get_columns(table_name=insp.get_table_names()[0]):
+            print("COLUMN",column)
+        config.db.execute("DROP table fk_test")
+        config.db.execute("CREATE OR REPLACE TABLE pk_test ( id1 int, id2 int, constraint pk_name_test  primary key (id1,id2))")
+        print("pk",insp.get_pk_constraint("pk_test"))
+     
+        config.db.execute("CREATE OR REPLACE TABLE fk_test ( pk int, id1 int, id2 int, constraint fk_name_test  foreign key (id1,id2) references pk_test)")
+        config.db.execute("commit")
+        print("fk",insp.get_foreign_keys("fk_test"))

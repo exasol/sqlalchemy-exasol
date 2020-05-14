@@ -53,6 +53,7 @@ from decimal import Decimal
 from sqlalchemy import sql, schema, types as sqltypes, util, event
 from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
 from sqlalchemy.engine import default, reflection, Engine, Connection
+from sqlalchemy.orm.session import Session
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql.elements import quoted_name
 from datetime import date, datetime
@@ -470,6 +471,9 @@ class EXADialect(default.DefaultDialect):
     def getODBCConnection(self, connection):
         if isinstance(connection,Engine):
                     odbc_connection = connection.raw_connection().connection
+        elif isinstance(connection,Session):
+            odbc_connection = connection.connection()
+            return self.getODBCConnection(odbc_connection)
         elif isinstance(connection,Connection):
             odbc_connection = connection.connection.connection
         else:

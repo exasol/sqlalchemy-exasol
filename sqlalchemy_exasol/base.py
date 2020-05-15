@@ -506,18 +506,16 @@ class EXADialect(default.DefaultDialect):
         rs = connection.execute(sql.text(sql_stmnt))
         return [self.normalize_name(row[0]) for row in rs]
 
-    @reflection.cache
     def _get_current_schema(self,connection):
         current_schema_stmnt = "/*snapshot execution*/ SELECT CURRENT_SCHEMA"
         current_schema = connection.execute(current_schema_stmnt).fetchone()[0]
         return current_schema
 
     def _get_tables_for_schema_odbc(self, connection, odbc_connection, schema, table_type=None, table_name=None):
-        schema = None
-        if schema is None:
-            schema = self._get_current_schema(connection)
         schema = self.denormalize_name(schema or
                         connection.engine.url.database)
+        if schema is None:
+            schema = self._get_current_schema(connection)
         table_name=self.denormalize_name(table_name)
         with odbc_connection.cursor().tables(schema=schema,tableType=table_type,table=table_name) as table_cursor:
             return [row for row in table_cursor]
@@ -668,6 +666,8 @@ class EXADialect(default.DefaultDialect):
             return list(rp)
         elif len(tables)>1:
             raise Exception("Should not happen, got more then one table %s"%tables)
+        else:
+            return []
 
     def _get_all_columns_sql(self, connection, schema=None, **kw):
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
@@ -685,13 +685,12 @@ class EXADialect(default.DefaultDialect):
 
         return list(rp)
     
-    @reflection.cache
     def _get_all_columns(self, connection, table_name=None, schema=None, **kw):
         odbc_connection = self.getODBCConnection(connection)
         if odbc_connection is not None and not self.use_sql_fallback(**kw):
             return self._get_all_columns_odbc(connection, odbc_connection, schema, table_name, **kw)
         else:
-            return self._get_all_columns_sql(connection, schema, **kw)
+            return self._get_all_columns_sql(connection, schema, info_cache=kw.get("info_cache"))
 
     @reflection.cache
     def get_columns(self, connection, table_name, schema=None, **kw):
@@ -702,7 +701,8 @@ class EXADialect(default.DefaultDialect):
         schema=self.denormalize_name(schema)
 
         columns = []
-        for row in self._get_all_columns(connection, table_name=table_name, schema=schema, info_cache=kw.get("info_cache")):
+        rows = self._get_all_columns(connection, table_name=table_name, schema=schema, **kw)
+        for row in rows:
             if row[9] != table_name and table_name is not None:
                 continue
             (colname, coltype, length, precision, scale, nullable, default, identity, is_distribution_key) = \
@@ -835,6 +835,10 @@ class EXADialect(default.DefaultDialect):
             rp = connection.execute(sql.text(sql_stmnt),
                     schema=self.denormalize_name(schema))
             return list(rp)
+        elif len(tables)==0:
+            return []
+        else:
+            raise Exception("Should not happen, found more than one table in %s"%tables)
 
     @reflection.cache
     def _get_foreign_keys_sql(self, connection, table_name, schema=None, **kw):

@@ -9,7 +9,7 @@ from sqlalchemy.testing import fixtures, config
 
 from sqlalchemy_exasol.base import EXADialect
 
-
+#TODO get_schema_names, get_view_names and get_view_definition didn't cause deadlocks in this scenario
 class MetadataTest(fixtures.TablesTest):
     __backend__ = True
 
@@ -32,6 +32,21 @@ class MetadataTest(fixtures.TablesTest):
         def with_fallback(session2, schema, table):
             dialect = EXADialect()
             dialect.get_table_names(session2, schema=schema, use_sql_fallback=True)
+
+        with pytest.raises(Exception):
+            self.run_deadlock_for_table(with_fallback)
+    
+    def test_deadlock_for_get_columns_without_fallback(self):
+        def without_fallback(session2, schema, table):
+            dialect = EXADialect()
+            dialect.get_columns(session2, schema=schema, table_name=table, use_sql_fallback=False)
+
+        self.run_deadlock_for_table(without_fallback)
+
+    def test_deadlock_for_get_columns_with_fallback(self):
+        def with_fallback(session2, schema, table):
+            dialect = EXADialect()
+            dialect.get_columns(session2, schema=schema, table_name=table, use_sql_fallback=True)
 
         with pytest.raises(Exception):
             self.run_deadlock_for_table(with_fallback)

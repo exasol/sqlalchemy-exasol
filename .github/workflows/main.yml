@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: [ "master" ]
 
-env:
-  ODBCSYSINI: $TRAVIS_BUILD_DIR/odbcconfig
 
 
 jobs:
@@ -19,8 +17,6 @@ jobs:
         connector:
           - pyodbc          
           - turbodbc
-    env:
-      TESTDB: "exa+${{ matrix.connector }}://sys:exasol@$localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
     steps:
     - uses: actions/checkout@v2
 
@@ -61,6 +57,16 @@ jobs:
       run: git clone https://github.com/exasol/integration-test-docker-environment.git
 
     - name: Spawn environemnt
-      run: pushd integration-test-docker-environment; ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666; popd
+      run: pushd integration-test-docker-environment; ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666; popd; rm -rf integration-test-docker-environment
 
+    - name: Prepare odbcinst.ini
+      run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini; cat odbcconfig/odbcinst.ini; ls -l $GITHUB_WORKSPACE
+
+    - name: Run tests
+      run: export ODBCSYSINI=$GITHUB_WORKSPACE/odbcconfig; py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB"
+      env:
+        TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
+
+    - name: Coveralls GitHub Action
+      uses: coverallsapp/github-action@v1.1.1
 

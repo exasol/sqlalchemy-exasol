@@ -19,13 +19,15 @@ jobs:
       run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
     - name: Install pipenv
       uses: dschep/install-pipenv-action@v1
-    - name: Pip Installer
+    - name: Pip install requirements
       uses: BSFishy/pip-action@v1
       with:
-        requirements: 
-          - requirements.txt
-          - requirements_tests.txt
+        requirements: requirements.txt
+    - name: Pip install requirements
+      uses: BSFishy/pip-action@v1
+      with:
+        requirements: requirements_test.txt
     - name: Checkout test environment
       run: git clone https://github.com/exasol/integration-test-docker-environment.git
     - name: Spawn environemnt
-      run: push integration-test-docker-environment; ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666; popd
+      run: pushd integration-test-docker-environment; ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666; popd

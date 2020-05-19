@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Install via apt
+      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
+    - name: Install pipenv
+      uses: dschep/install-pipenv-action@v1
+    - name: Pip Installer
+      uses: BSFishy/pip-action@v1
+      with:
+        requirements: 
+          - requirements.txt
+          - requirements_tests.txt
+    - name: Checkout test environment
+      run: git clone https://github.com/exasol/integration-test-docker-environment.git
+    - name: Spawn environemnt
+      run: push integration-test-docker-environment; ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666; popd

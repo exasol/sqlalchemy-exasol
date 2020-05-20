@@ -55,20 +55,26 @@ jobs:
 
     - name: Checkout test environment
       run: git clone https://github.com/exasol/integration-test-docker-environment.git
+      working-directory: .. 
 
     - name: Add TEST_SCHEMA to test DDL
-      run: echo "CREATE SCHEMA TEST_SCHEMA;" >> integration-test-docker-environment/tests/test/enginedb_small/schema.sql
+      run: echo "CREATE SCHEMA TEST_SCHEMA;" >> tests/test/enginedb_small/schema.sql
+      working-directory: ../integration-test-docker-environment
 
     - name: Add TEST_SCHEMA_2 to test DDL
-      run: echo "CREATE SCHEMA_2 TEST_SCHEMA;" >> integration-test-docker-environment/tests/test/enginedb_small/schema.sql
+      run: echo "CREATE SCHEMA TEST_SCHEMA_2;" >> tests/test/enginedb_small/schema.sql
+      working-directory: ../integration-test-docker-environment
 
     - name: Spawn EXASOL environemnt
-      run: pushd integration-test-docker-environment; ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666; popd; rm -rf integration-test-docker-environment
+      run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666
+      working-directory: ../integration-test-docker-environment
 
     - name: Prepare odbcinst.ini
-      run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini; cat odbcconfig/odbcinst.ini; ls -l $GITHUB_WORKSPACE
+      run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini
 
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: export ODBCSYSINI=$GITHUB_WORKSPACE/odbcconfig; py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB"
+      run: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB"
       env:
+        ODBCSYSINI: "${{ github.workspace }}/odbcconfig"
         TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
+

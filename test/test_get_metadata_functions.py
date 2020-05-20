@@ -52,6 +52,8 @@ class MetadataTest(fixtures.TablesTest):
         dialect = EXADialect()
         schema_names_fallback = dialect.get_schema_names(connection=c, use_sql_fallback=True)
         schema_names_odbc = dialect.get_schema_names(connection=c)
+        print("schema_names_fallback",schema_names_fallback)
+        print("schema_names_odbc",schema_names_odbc)
         assert sorted(schema_names_fallback) == sorted(schema_names_odbc)
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])

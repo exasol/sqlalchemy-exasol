@@ -56,6 +56,9 @@ jobs:
     - name: Checkout test environment
       run: git clone https://github.com/exasol/integration-test-docker-environment.git
 
+    - name: Add TEST_SCHEMA to test DDL
+      run: echo "CREATE SCHEMA TEST_SCHEMA;" >> integration-test-docker-environment/tests/test/enginedb_small/schema.sql
+
     - name: Spawn environemnt
       run: pushd integration-test-docker-environment; ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666; popd; rm -rf integration-test-docker-environment
 

@@ -68,7 +68,7 @@ jobs:
     - name: Prepare odbcinst.ini
       run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini; cat odbcconfig/odbcinst.ini; ls -l $GITHUB_WORKSPACE
 
-    - name: Run Test for Python ${{ matrix.python }} using ${{ connector }}
+    - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
       run: export ODBCSYSINI=$GITHUB_WORKSPACE/odbcconfig; py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB"
       env:
         TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
@@ -77,7 +77,7 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.github_token }}
-        flag-name: run-python_${{ matrix.python }}-${{ connector }}
+        flag-name: run-python_${{ matrix.python }}-${{ matrix.connector }}
         parallel: true
 
   finish:

@@ -59,6 +59,9 @@ jobs:
     - name: Add TEST_SCHEMA to test DDL
       run: echo "CREATE SCHEMA TEST_SCHEMA;" >> integration-test-docker-environment/tests/test/enginedb_small/schema.sql
 
+    - name: Add TEST_SCHEMA_2 to test DDL
+      run: echo "CREATE SCHEMA_2 TEST_SCHEMA;" >> integration-test-docker-environment/tests/test/enginedb_small/schema.sql
+
     - name: Spawn environemnt
       run: pushd integration-test-docker-environment; ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666; popd; rm -rf integration-test-docker-environment
 

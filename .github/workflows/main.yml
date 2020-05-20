@@ -72,9 +72,3 @@ jobs:
       run: export ODBCSYSINI=$GITHUB_WORKSPACE/odbcconfig; py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB"
       env:
         TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
-
-    - name: CodeCov coverage report
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        name: Python_${{ matrix.python }}-${{ matrix.connector }}

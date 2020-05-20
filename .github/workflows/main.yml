@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.6, 2.7]
+        connector:
+          - pyodbc          
+          - turbodbc
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python 3.6 for integration-test-docker-environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+      if: ${{ matrix.python != 3.6 }}
+
+    - name: Setup Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install via apt
+      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
+
+    - name: Install pipenv
+      uses: dschep/install-pipenv-action@v1
+
+    - name: Pip install requirements
+      uses: BSFishy/pip-action@v1
+      with:
+        requirements: requirements.txt
+
+    - name: Pip install test requirements
+      uses: BSFishy/pip-action@v1
+      with:
+        requirements: requirements_test.txt
+
+    - name: Pip install extra requirements
+      uses: BSFishy/pip-action@v1
+      with:
+        requirements: requirements_extras.txt
+      if: ${{ matrix.connector == 'turbodbc' }}
+
+    - name: Checkout test environment
+      run: git clone https://github.com/exasol/integration-test-docker-environment.git
+
+    - name: Add TEST_SCHEMA to test DDL
+      run: echo "CREATE SCHEMA TEST_SCHEMA;" >> integration-test-docker-environment/tests/test/enginedb_small/schema.sql
+
+    - name: Add TEST_SCHEMA_2 to test DDL
+      run: echo "CREATE SCHEMA_2 TEST_SCHEMA;" >> integration-test-docker-environment/tests/test/enginedb_small/schema.sql
+
+    - name: Spawn environemnt
+      run: pushd integration-test-docker-environment; ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666; popd; rm -rf integration-test-docker-environment
+
+    - name: Prepare odbcinst.ini
+      run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini; cat odbcconfig/odbcinst.ini; ls -l $GITHUB_WORKSPACE
+
+    - name: Run tests
+      run: export ODBCSYSINI=$GITHUB_WORKSPACE/odbcconfig; py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB"
+      env:
+        TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
+
+    - name: Coveralls GitHub Action
+      uses: coverallsapp/github-action@v1.1.1
+

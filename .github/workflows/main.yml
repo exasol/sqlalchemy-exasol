@@ -73,21 +73,8 @@ jobs:
       env:
         TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
 
-    - name: Coveralls Parallel
-      uses: coverallsapp/github-action@master
+    - name: CodeCov coverage report
+      uses: codecov/codecov-action@v1
       with:
-        github-token: ${{ secrets.github_token }}
-        path-to-lcov: .coverage
-        flag-name: run-python_${{ matrix.python }}-${{ matrix.connector }}
-        parallel: true
-
-  finish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.github_token }}
-        parallel-finished: true
-
+        token: ${{ secrets.CODECOV_TOKEN }}
+        name: Python_${{ matrix.python }}-${{ matrix.connector }}

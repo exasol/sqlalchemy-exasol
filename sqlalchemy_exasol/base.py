@@ -496,19 +496,11 @@ class EXADialect(default.DefaultDialect):
     # never called during reflection
     @reflection.cache
     def get_schema_names(self, connection, **kw):
-        odbc_connection = self.getODBCConnection(connection)
-        if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            return self.get_schema_names_odbc(odbc_connection, **kw)
+        if self.use_sql_fallback(**kw):
+            prefix = "/*snapshot execution*/ "
         else:
-            return self.get_schema_names_sql(connection, **kw)
-
-    def get_schema_names_odbc(self, odbc_connection, **kw):
-        with odbc_connection.cursor().tables() as table_cursor:
-            return list({self.normalize_name(row.table_schem) for row in table_cursor
-                         if not row.table_schem == "SYS" and not row.table_schem == "EXA_STATISTICS"})
-
-    def get_schema_names_sql(self, connection, **kw):
-        sql_stmnt = "/*snapshot execution*/ select SCHEMA_NAME from SYS.EXA_SCHEMAS"
+            prefix= ""
+        sql_stmnt = "%sselect SCHEMA_NAME from SYS.EXA_SCHEMAS"%prefix
         rs = connection.execute(sql.text(sql_stmnt))
         return [self.normalize_name(row[0]) for row in rs]
 

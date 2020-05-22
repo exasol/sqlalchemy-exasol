@@ -80,7 +80,7 @@ jobs:
       working-directory: ../integration-test-docker-environment
 
     - name: Restart DB to ensure snapshot represents setup
-      run: docker stop db_container_test; docker start db_container_test; sleep 120;
+      run: docker stop -t 180 db_container_test; docker start db_container_test; sleep 120;
       working-directory: ../integration-test-docker-environment
 
     - name: Prepare odbcinst.ini

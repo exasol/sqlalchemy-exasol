@@ -62,7 +62,7 @@ jobs:
       working-directory: ../integration-test-docker-environment
 
     - name: Add TEST_SCHEMA_2 to test DDL
-      run: echo "CREATE SCHEMA TEST_SCHEMA_2;" >> tests/test/enginedb_small/schema.sql
+      run: echo "CREATE SCHEMA TEST_SCHEMA_2; COMMIT;" >> tests/test/enginedb_small/schema.sql
       working-directory: ../integration-test-docker-environment
 
     - name: Spawn EXASOL environemnt

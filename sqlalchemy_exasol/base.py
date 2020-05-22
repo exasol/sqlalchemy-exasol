@@ -420,11 +420,15 @@ class EXADialect(default.DefaultDialect):
         or 'SYS'. Tables in 'SYS' are not reflectable!
         """
         schema = None
-        if connection.engine.url is not None:
-            schema = self.normalize_name(
-                connection.engine.url.translate_connect_args().get('database'))
+        schema = self._get_schema_from_url(connection, schema)
         if schema is None:
             schema = self.normalize_name(u"SYS")
+        return schema
+
+    def _get_schema_from_url(self, connection, schema):
+        if connection.engine.url is not None and connection.engine.url != "":
+            schema = self.normalize_name(
+                connection.engine.url.translate_connect_args().get('database'))
         return schema
 
     def normalize_name(self, name):
@@ -499,21 +503,28 @@ class EXADialect(default.DefaultDialect):
         if self.use_sql_fallback(**kw):
             prefix = "/*snapshot execution*/ "
         else:
-            prefix= ""
-        sql_stmnt = "%sselect SCHEMA_NAME from SYS.EXA_SCHEMAS"%prefix
+            prefix = ""
+        sql_stmnt = "%sselect SCHEMA_NAME from SYS.EXA_SCHEMAS" % prefix
         rs = connection.execute(sql.text(sql_stmnt))
         return [self.normalize_name(row[0]) for row in rs]
 
+    def _get_schema_for_input_or_current(self, connection, schema):
+        schema = self._get_schema_for_input(connection, schema)
+        if schema is None:
+            schema = self._get_current_schema(connection)
+        return schema
+
+    def _get_schema_for_input(self, connection, schema):
+        schema = self.denormalize_name(schema or self._get_schema_from_url(connection, schema))
+        return schema
+
     def _get_current_schema(self, connection):
-        current_schema_stmnt = "/*snapshot execution*/ SELECT CURRENT_SCHEMA"
+        current_schema_stmnt = "SELECT CURRENT_SCHEMA"
         current_schema = connection.execute(current_schema_stmnt).fetchone()[0]
         return current_schema
 
     def _get_tables_for_schema_odbc(self, connection, odbc_connection, schema, table_type=None, table_name=None):
-        schema = self.denormalize_name(schema or
-                                       connection.engine.url.database)
-        if schema is None:
-            schema = self._get_current_schema(connection)
+        schema = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
         with odbc_connection.cursor().tables(schema=schema, tableType=table_type, table=table_name) as table_cursor:
             return [row for row in table_cursor]
@@ -532,8 +543,7 @@ class EXADialect(default.DefaultDialect):
                 for row in tables]
 
     def get_table_names_sql(self, connection, schema, **kw):
-        schema = self.denormalize_name(schema or
-                                       connection.engine.url.database)
+        schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "
         if schema is None:
             sql_stmnt += "CURRENT_SCHEMA ORDER BY table_name"
@@ -547,15 +557,17 @@ class EXADialect(default.DefaultDialect):
     def has_table(self, connection, table_name, schema=None, **kw):
         odbc_connection = self.getODBCConnection(connection)
         if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            return self.has_table_odbc(connection, odbc_connection, table_name, **kw)
+            return self.has_table_odbc(connection, odbc_connection, schema=schema, table_name=table_name, **kw)
         else:
-            return self.has_table_names_sql(connection, table_name, **kw)
+            return self.has_table_sql(connection, schema=schema, table_name=table_name, **kw)
 
     def has_table_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
-        return table_name in self.get_table_names(connection, schema, table_name=table_name)
+        return self.normalize_name(table_name) in self.get_table_names_odbc(connection=connection,
+                                                                            odbc_connection=odbc_connection,
+                                                                            schema=schema, table_name=table_name, **kw)
 
     def has_table_sql(self, connection, table_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
+        schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT table_name from SYS.EXA_ALL_TABLES " \
                     "WHERE table_name = :table_name "
         if schema is not None:
@@ -582,7 +594,7 @@ class EXADialect(default.DefaultDialect):
                 for row in tables]
 
     def get_view_names_sql(self, connection, schema=None, **kw):
-        schema = schema or connection.engine.url.database
+        schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS WHERE view_schema = "
         if schema is None:
             sql_stmnt += "CURRENT_SCHEMA ORDER BY view_name"
@@ -627,7 +639,7 @@ class EXADialect(default.DefaultDialect):
             raise Exception("Should not happen, got more then one table %s" % tables)
 
     def get_view_definition_sql(self, connection, view_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
+        schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT view_text FROM sys.exa_all_views WHERE view_name = :view_name AND view_schema = "
         if schema is None:
             sql_stmnt += "CURRENT_SCHEMA"
@@ -644,11 +656,9 @@ class EXADialect(default.DefaultDialect):
         else:
             return None
 
-    def _get_all_columns_odbc(self, connection, odbc_connection, schema, table_name=None, **kw):
-        if schema is None:
-            schema = self._get_current_schema(connection)
-        schema = self.denormalize_name(schema or
-                                       connection.engine.url.database)
+    @reflection.cache
+    def _get_all_columns_odbc(self, connection, odbc_connection, schema, **kw):
+        schema = self._get_schema_for_input_or_current(connection, schema)
         # We need to check if the schema is valid
         tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema=schema)
 
@@ -671,7 +681,9 @@ class EXADialect(default.DefaultDialect):
         else:
             return []
 
+    @reflection.cache
     def _get_all_columns_sql(self, connection, schema=None, **kw):
+        schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
                     "column_is_nullable, column_default, column_identity, column_is_distribution_key, column_table " \
                     "FROM sys.exa_all_columns  WHERE column_object_type IN ('TABLE', 'VIEW') " \
@@ -687,21 +699,17 @@ class EXADialect(default.DefaultDialect):
 
         return list(rp)
 
-    def _get_all_columns(self, connection, table_name=None, schema=None, **kw):
+    def _get_all_columns(self, connection, schema=None, **kw):
         odbc_connection = self.getODBCConnection(connection)
-        if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            return self._get_all_columns_odbc(connection, odbc_connection, schema, table_name, **kw)
+        if odbc_connection is not None and not self.use_sql_fallback():
+            return self._get_all_columns_odbc(connection, odbc_connection, schema, info_cache=kw.get("info_cache"))
         else:
             columns = self._get_all_columns_sql(connection, schema, info_cache=kw.get("info_cache"))
             return columns
 
     @reflection.cache
     def get_columns(self, connection, table_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
-        if schema is None:
-            schema = connection.execute("/*snapshot execution*/ select CURRENT_SCHEMA from dual").scalar()
         table_name = self.denormalize_name(table_name)
-        schema = self.denormalize_name(schema)
 
         columns = []
         rows = self._get_all_columns(connection, table_name=table_name, schema=schema, **kw)
@@ -771,14 +779,10 @@ class EXADialect(default.DefaultDialect):
         sql_stmnt += "ORDER BY ordinal_position"
         rp = connection.execute(sql.text(sql_stmnt),
                                 schema=self.denormalize_name(schema))
-
         return list(rp)
 
     def get_pk_constraint_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
-        if schema is None:
-            schema = self._get_current_schema(connection)
-        schema = self.denormalize_name(schema or
-                                       connection.engine.url.database)
+        schema = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
         with odbc_connection.cursor().primaryKeys(table=table_name, schema=schema) as primaryKeys_cursor:
             pkeys = []
@@ -792,7 +796,7 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_pk_constraint_sql(self, connection, table_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
+        schema = self._get_schema_for_input(connection, schema)
         pkeys = []
         constraint_name = None
         table_name = self.denormalize_name(table_name)
@@ -822,8 +826,8 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def _get_foreign_keys_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
         # Need to use a workaround, because SQLForeignKeys functions doesn't work for an unknown reason
-
-        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema=schema, table_name=table_name)
+        tables = self._get_tables_for_schema_odbc(connection=connection, odbc_connection=odbc_connection,
+                                                  schema=schema, table_name=table_name, table_type="TABLE")
         if len(tables) > 0:
             quoted_schema_string = self.quote_string_value(tables[0][1])
             sql_stmnt = \
@@ -846,11 +850,8 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_foreign_keys(self, connection, table_name, schema=None, **kw):
-        schema_int = schema or connection.engine.url.database
-        if schema_int is None:
-            schema_int = connection.execute("/*snapshot execution*/ select CURRENT_SCHEMA from dual").scalar()
+        schema_int = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
-        schema_int = self.denormalize_name(schema_int)
 
         def fkey_rec():
             return {

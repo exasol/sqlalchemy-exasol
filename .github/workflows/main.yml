@@ -87,7 +87,7 @@ jobs:
       run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini
 
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB"
+      run: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB" test/test_get_metadata_functions.py
       env:
         ODBCSYSINI: "${{ github.workspace }}/odbcconfig"
         TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"

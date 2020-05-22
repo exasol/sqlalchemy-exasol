@@ -76,7 +76,7 @@ jobs:
     
    
     - name: Logs
-      run: cat $(find . -name log | grep Populate)
+      run: cat $(find . -name log | grep Populate); sleep 60
       working-directory: ../integration-test-docker-environment
 
     - name: Prepare odbcinst.ini

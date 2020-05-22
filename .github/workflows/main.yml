@@ -60,11 +60,8 @@ jobs:
     - name: Add TEST_SCHEMA and TEST_SCHEMA_" to test DDL
       run: |
         echo 'CREATE SCHEMA TEST;' > tests/test/enginedb_small/import.sql;
-        echo 'COMMIT;' >> tests/test/enginedb_small/import.sql; 
         echo 'CREATE SCHEMA TEST_SCHEMA;' >> tests/test/enginedb_small/import.sql;
-        echo 'COMMIT;' >> tests/test/enginedb_small/import.sql;
         echo 'CREATE SCHEMA TEST_SCHEMA_2;' >> tests/test/enginedb_small/import.sql;
-        echo 'COMMIT;' >> tests/test/enginedb_small/import.sql;
         echo 'SELECT * FROM SYS.EXA_SCHEMAS;' >> tests/test/enginedb_small/import.sql;
         echo 'COMMIT;' >> tests/test/enginedb_small/import.sql;
         cat  tests/test/enginedb_small/import.sql;
@@ -73,21 +70,12 @@ jobs:
     - name: Spawn EXASOL environemnt
       run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666
       working-directory: ../integration-test-docker-environment
-    
-   
-    - name: Logs
-      run: cat $(find . -name log | grep Populate)
-      working-directory: ../integration-test-docker-environment
-
-    - name: Restart DB to ensure snapshot represents setup
-      run: docker stop -t 180 db_container_test; docker start db_container_test; sleep 120;
-      working-directory: ../integration-test-docker-environment
 
     - name: Prepare odbcinst.ini
       run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini
 
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB" test/test_get_metadata_functions.py
+      run: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB"
       env:
         ODBCSYSINI: "${{ github.workspace }}/odbcconfig"
         TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"

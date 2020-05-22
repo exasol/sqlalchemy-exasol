@@ -76,7 +76,11 @@ jobs:
     
    
     - name: Logs
-      run: cat $(find . -name log | grep Populate); sleep 60
+      run: cat $(find . -name log | grep Populate)
+      working-directory: ../integration-test-docker-environment
+
+    - name: Restart DB to ensure snapshot represents setup
+      run: docker stop db_container_test; docker start db_container_test; sleep 120;
       working-directory: ../integration-test-docker-environment
 
     - name: Prepare odbcinst.ini

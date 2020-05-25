@@ -488,7 +488,8 @@ class EXADialect(default.DefaultDialect):
         else:
             return None
             # raise Exception("Do not know how to get a pyodbc connection, from %s"%(type(connection)))
-        if str(type(odbc_connection)) == "<class 'pyodbc.Connection'>":
+        print("AAAAAAAAAAAAAA",str(type(odbc_connection)))
+        if "pyodbc.Connection" in str(type(odbc_connection)):
             return odbc_connection
         else:
             return None

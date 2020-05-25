@@ -47,12 +47,14 @@ representation (all uppercase).
 """
 
 import six
+
 if six.PY3:
     from six import u as unicode
 from decimal import Decimal
 from sqlalchemy import sql, schema, types as sqltypes, util, event
 from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
-from sqlalchemy.engine import default, reflection
+from sqlalchemy.engine import default, reflection, Engine, Connection
+from sqlalchemy.orm.session import Session
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql.elements import quoted_name
 from datetime import date, datetime
@@ -60,8 +62,8 @@ from .constraints import DistributeByConstraint
 import re
 
 AUTOCOMMIT_REGEXP = re.compile(
-            r'\s*(?:UPDATE|INSERT|CREATE|DELETE|DROP|ALTER|TRUNCATE|MERGE)',
-                re.I | re.UNICODE)
+    r'\s*(?:UPDATE|INSERT|CREATE|DELETE|DROP|ALTER|TRUNCATE|MERGE)',
+    re.I | re.UNICODE)
 
 RESERVED_WORDS = {
     'absolute', 'action', 'add', 'after', 'all', 'allocate', 'alter', 'and', 'any',
@@ -143,7 +145,7 @@ ischema_names = {
     'DATE': sqltypes.DATE,
     'DECIMAL': sqltypes.DECIMAL,
     'DOUBLE': sqltypes.FLOAT,  # EXASOL mapps DOUBLE, DOUBLE PRECISION, FLOAT to DOUBLE PRECISION
-                                 # internally but returns 'DOUBLE' as type when asking the DB catalog
+    # internally but returns 'DOUBLE' as type when asking the DB catalog
     # INTERVAL DAY [(p)] TO SECOND [(fp)] TODO: missing support for EXA Datatype, check Oracle Engine
     # INTERVAL YEAR[(p)] TO MONTH         TODO: missing support for EXA Datatype, check Oracle Engine
     'TIMESTAMP': sqltypes.TIMESTAMP,
@@ -155,17 +157,17 @@ class EXACompiler(compiler.SQLCompiler):
     extract_map = util.update_copy(
         compiler.SQLCompiler.extract_map,
         {
-        'month': '%m',
-        'day': '%d',
-        'year': '%Y',
-        'second': '%S',
-        'hour': '%H',
-        'doy': '%j',
-        'minute': '%M',
-        'epoch': '%s',
-        'dow': '%w',
-        'week': '%W'
-    })
+            'month': '%m',
+            'day': '%d',
+            'year': '%Y',
+            'second': '%S',
+            'hour': '%H',
+            'doy': '%j',
+            'minute': '%M',
+            'epoch': '%s',
+            'dow': '%w',
+            'week': '%W'
+        })
 
     def visit_now_func(self, fn, **kw):
         return "CURRENT_TIMESTAMP"
@@ -203,14 +205,14 @@ class EXADDLCompiler(compiler.DDLCompiler):
         colspec = self.preparer.format_column(column)
         colspec += " " + self.dialect.type_compiler.process(column.type)
         if column is column.table._autoincrement_column and \
-            True and \
-            (
-                column.default is None or \
-                isinstance(column.default, schema.Sequence)
-            ):
+                True and \
+                (
+                        column.default is None or \
+                        isinstance(column.default, schema.Sequence)
+                ):
             colspec += " IDENTITY"
             if isinstance(column.default, schema.Sequence) and \
-                column.default.start > 0:
+                    column.default.start > 0:
                 colspec += " " + str(column.default.start)
         else:
             default = self.get_column_default_string(column)
@@ -235,10 +237,10 @@ class EXADDLCompiler(compiler.DDLCompiler):
 
     def visit_add_constraint(self, create):
         if isinstance(create.element, DistributeByConstraint):
-            return "ALTER TABLE %s %s" %(
-                        self.preparer.format_table(create.element.table),
-                        self.process(create.element)
-                    )
+            return "ALTER TABLE %s %s" % (
+                self.preparer.format_table(create.element.table),
+                self.process(create.element)
+            )
         else:
             return super(EXADDLCompiler, self).visit_add_constraint(create)
 
@@ -273,6 +275,7 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
     converts types decimal scale==0 and 9<precision<=19 back to BIGINT
     https://www.exasol.com/support/browse/EXA-23267
     """
+
     def visit_big_integer(self, type_, **kw):
         return "DECIMAL(19)"
 
@@ -306,8 +309,8 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         if len(autoinc_pk_columns) == 0:
             return None
         elif len(autoinc_pk_columns) > 1:
-            util.warn("Table with more than one autoincrement, primary key"\
-                       " Column!")
+            util.warn("Table with more than one autoincrement, primary key" \
+                      " Column!")
             raise Exception
         else:
             id_col = self.dialect.denormalize_name(autoinc_pk_columns[0])
@@ -315,8 +318,8 @@ class EXAExecutionContext(default.DefaultExecutionContext):
             table = self.compiled.sql_compiler.statement.table.name
             table = self.dialect.denormalize_name(table)
 
-            sql_stmnt = "SELECT column_identity from SYS.EXA_ALL_COLUMNS "\
-                        "WHERE column_object_type = 'TABLE' and column_table "\
+            sql_stmnt = "SELECT column_identity from SYS.EXA_ALL_COLUMNS " \
+                        "WHERE column_object_type = 'TABLE' and column_table " \
                         "= ? AND column_name = ?"
 
             schema = self.compiled.sql_compiler.statement.table.schema
@@ -356,9 +359,12 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                     elif isinstance(value, bool):
                         db_query = db_query.replace(ident, '1' if value else '0', 1)
                     elif isinstance(value, datetime):
-                        db_query = db_query.replace(ident, "to_timestamp('%s', 'YYYY-MM-DD HH24:MI:SS.FF6')" % value.strftime('%Y-%m-%d %H:%M:%S.%f'), 1)
+                        db_query = db_query.replace(ident,
+                                                    "to_timestamp('%s', 'YYYY-MM-DD HH24:MI:SS.FF6')" % value.strftime(
+                                                        '%Y-%m-%d %H:%M:%S.%f'), 1)
                     elif isinstance(value, date):
-                        db_query = db_query.replace(ident, "to_date('%s', 'YYYY-MM-DD')" % value.strftime('%Y-%m-%d'), 1)
+                        db_query = db_query.replace(ident, "to_date('%s', 'YYYY-MM-DD')" % value.strftime('%Y-%m-%d'),
+                                                    1)
                     elif isinstance(value, six.binary_type):
                         db_query = db_query.replace(ident, "'%s'" % value.decode('UTF-8'), 1)
                     elif isinstance(value, six.text_type):
@@ -414,11 +420,15 @@ class EXADialect(default.DefaultDialect):
         or 'SYS'. Tables in 'SYS' are not reflectable!
         """
         schema = None
-        if connection.engine.url is not None:
-            schema = self.normalize_name(
-                    connection.engine.url.translate_connect_args().get('database'))
+        schema = self._get_schema_from_url(connection, schema)
         if schema is None:
             schema = self.normalize_name(u"SYS")
+        return schema
+
+    def _get_schema_from_url(self, connection, schema):
+        if connection.engine.url is not None and connection.engine.url != "":
+            schema = self.normalize_name(
+                connection.engine.url.translate_connect_args().get('database'))
         return schema
 
     def normalize_name(self, name):
@@ -434,7 +444,7 @@ class EXADialect(default.DefaultDialect):
                 name = name.decode(self.encoding)
 
         if name.upper() == name and \
-              not self.identifier_preparer._requires_quotes(name.lower()):
+                not self.identifier_preparer._requires_quotes(name.lower()):
             return name.lower()
         elif name.lower() == name:
             return quoted_name(name, quote=True)
@@ -467,17 +477,75 @@ class EXADialect(default.DefaultDialect):
         # TODO: set isolation level
         pass
 
+    def getODBCConnection(self, connection):
+        if isinstance(connection, Engine):
+            odbc_connection = connection.raw_connection().connection
+        elif isinstance(connection, Session):
+            odbc_connection = connection.connection()
+            return self.getODBCConnection(odbc_connection)
+        elif isinstance(connection, Connection):
+            odbc_connection = connection.connection.connection
+        else:
+            return None
+            # raise Exception("Do not know how to get a pyodbc connection, from %s"%(type(connection)))
+        if "pyodbc.Connection" in str(type(odbc_connection)):
+            return odbc_connection
+        else:
+            return None
+            # raise Exception("Did not find a pyodbc connection, found %s"%(type(odbc_connection)))
+
+    def use_sql_fallback(self, **kw):
+        return "use_sql_fallback" in kw and kw.get("use_sql_fallback") == True
+
     # never called during reflection
     @reflection.cache
     def get_schema_names(self, connection, **kw):
-        sql_stmnt = "select SCHEMA_NAME from SYS.EXA_SCHEMAS"
+        if self.use_sql_fallback(**kw):
+            prefix = "/*snapshot execution*/ "
+        else:
+            prefix = ""
+        sql_stmnt = "%sselect SCHEMA_NAME from SYS.EXA_SCHEMAS" % prefix
         rs = connection.execute(sql.text(sql_stmnt))
         return [self.normalize_name(row[0]) for row in rs]
 
+    def _get_schema_for_input_or_current(self, connection, schema):
+        schema = self._get_schema_for_input(connection, schema)
+        if schema is None:
+            schema = self._get_current_schema(connection)
+        return self.denormalize_name(schema)
+
+    def _get_schema_for_input(self, connection, schema):
+        schema = self.denormalize_name(schema or self._get_schema_from_url(connection, schema))
+        return schema
+
+    def _get_current_schema(self, connection):
+        current_schema_stmnt = "SELECT CURRENT_SCHEMA"
+        current_schema = connection.execute(current_schema_stmnt).fetchone()[0]
+        return current_schema
+
+    def _get_tables_for_schema_odbc(self, connection, odbc_connection, schema, table_type=None, table_name=None):
+        schema = self._get_schema_for_input_or_current(connection, schema)
+        table_name = self.denormalize_name(table_name)
+        with odbc_connection.cursor().tables(schema=schema, tableType=table_type, table=table_name) as table_cursor:
+            rows = [row for row in table_cursor]
+            return rows
+
     @reflection.cache
     def get_table_names(self, connection, schema, **kw):
-        schema = self.denormalize_name(schema or
-                connection.engine.url.database)
+        odbc_connection = self.getODBCConnection(connection)
+        if odbc_connection is not None and not self.use_sql_fallback(**kw):
+            return self.get_table_names_odbc(connection, odbc_connection, schema, **kw)
+        else:
+            return self.get_table_names_sql(connection, schema, **kw)
+
+    def get_table_names_odbc(self, connection, odbc_connection, schema, **kw):
+        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="TABLE")
+        normalized_tables = [self.normalize_name(row.table_name)
+                             for row in tables]
+        return normalized_tables
+
+    def get_table_names_sql(self, connection, schema, **kw):
+        schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "
         if schema is None:
             sql_stmnt += "CURRENT_SCHEMA ORDER BY table_name"
@@ -485,26 +553,53 @@ class EXADialect(default.DefaultDialect):
         else:
             sql_stmnt += ":schema ORDER BY table_name"
             rs = connection.execute(sql.text(sql_stmnt), \
-                schema=self.denormalize_name(schema))
-        return [self.normalize_name(row[0]) for row in rs]
+                                    schema=self.denormalize_name(schema))
+        tables = [self.normalize_name(row[0]) for row in rs]
+        return tables
 
-    def has_table(self, connection, table_name, schema=None):
-        schema = schema or connection.engine.url.database
-        sql_stmnt = "SELECT table_name from SYS.EXA_ALL_TABLES "\
+    def has_table(self, connection, table_name, schema=None, **kw):
+        odbc_connection = self.getODBCConnection(connection)
+        if odbc_connection is not None and not self.use_sql_fallback(**kw):
+            return self.has_table_odbc(connection, odbc_connection, schema=schema, table_name=table_name, **kw)
+        else:
+            return self.has_table_sql(connection, schema=schema, table_name=table_name, **kw)
+
+    def has_table_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
+        tables = self.get_table_names_odbc(connection=connection,
+                                           odbc_connection=odbc_connection,
+                                           schema=schema, table_name=table_name, **kw)
+        result = self.normalize_name(table_name) in tables
+        return result
+
+    def has_table_sql(self, connection, table_name, schema=None, **kw):
+        schema = self._get_schema_for_input(connection, schema)
+        sql_stmnt = "SELECT table_name from SYS.EXA_ALL_TABLES " \
                     "WHERE table_name = :table_name "
         if schema is not None:
             sql_stmnt += "AND table_schema = :schema"
         rp = connection.execute(
-                sql.text(sql_stmnt),
-                table_name=self.denormalize_name(table_name),
-                schema=self.denormalize_name(schema))
+            sql.text(sql_stmnt),
+            table_name=self.denormalize_name(table_name),
+            schema=self.denormalize_name(schema))
         row = rp.fetchone()
 
         return (row is not None)
 
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
-        schema = schema or connection.engine.url.database
+        odbc_connection = self.getODBCConnection(connection)
+        if odbc_connection is not None and not self.use_sql_fallback(**kw):
+            return self.get_view_names_odbc(connection, odbc_connection, schema, **kw)
+        else:
+            return self.get_view_names_sql(connection, schema, **kw)
+
+    def get_view_names_odbc(self, connection, odbc_connection, schema=None, **kw):
+        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="VIEW")
+        return [self.normalize_name(row.table_name)
+                for row in tables]
+
+    def get_view_names_sql(self, connection, schema=None, **kw):
+        schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS WHERE view_schema = "
         if schema is None:
             sql_stmnt += "CURRENT_SCHEMA ORDER BY view_name"
@@ -512,20 +607,52 @@ class EXADialect(default.DefaultDialect):
         else:
             sql_stmnt += ":schema ORDER BY view_name"
             rs = connection.execute(sql.text(sql_stmnt),
-                schema=self.denormalize_name(schema))
+                                    schema=self.denormalize_name(schema))
         return [self.normalize_name(row[0]) for row in rs]
 
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
+        odbc_connection = self.getODBCConnection(connection)
+        if odbc_connection is not None and not self.use_sql_fallback(**kw):
+            return self.get_view_definition_odbc(connection, odbc_connection, view_name, schema, **kw)
+        else:
+            return self.get_view_definition_sql(connection, view_name, schema, **kw)
+
+    def quote_string_value(self, string_value):
+        return "'%s'" % (string_value.replace("'", "''"))
+
+    def get_view_definition_odbc(self, connection, odbc_connection, view_name, schema=None, **kw):
+        if view_name is None:
+            return None
+        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="VIEW",
+                                                  table_name=view_name)
+        if len(tables) == 1:
+            quoted_view_name_string = self.quote_string_value(tables[0][2])
+            quoted_view_schema_string = self.quote_string_value(tables[0][1])
+            sql_stmnt = \
+                "/*snapshot execution*/ SELECT view_text FROM sys.exa_all_views WHERE view_name = {view_name} AND view_schema = {view_schema}".format(
+                    view_name=quoted_view_name_string, view_schema=quoted_view_schema_string)
+            rp = connection.execute(sql.text(sql_stmnt)).scalar()
+            if rp:
+                if six.PY3:
+                    return rp
+                else:
+                    return rp.decode(self.encoding)
+            else:
+                return None
+        elif len(tables) > 1:
+            raise Exception("Should not happen, got more then one table %s" % tables)
+
+    def get_view_definition_sql(self, connection, view_name, schema=None, **kw):
+        schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT view_text FROM sys.exa_all_views WHERE view_name = :view_name AND view_schema = "
         if schema is None:
             sql_stmnt += "CURRENT_SCHEMA"
         else:
             sql_stmnt += ":schema"
         rp = connection.execute(sql.text(sql_stmnt),
-                view_name=self.denormalize_name(view_name),
-                schema=self.denormalize_name(schema)).scalar()
+                                view_name=self.denormalize_name(view_name),
+                                schema=self.denormalize_name(schema)).scalar()
         if rp:
             if six.PY3:
                 return rp
@@ -534,9 +661,34 @@ class EXADialect(default.DefaultDialect):
         else:
             return None
 
+    @reflection.cache
+    def _get_all_columns_odbc(self, connection, odbc_connection, schema, **kw):
+        schema = self._get_schema_for_input_or_current(connection, schema)
+        # We need to check if the schema is valid
+        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema=schema)
+
+        if len(tables) > 0:
+            # get_columns_sql originally returned all columns of all tables if table_name is None,
+            # we follow this behavior here for compatibility. However, the documentation for Dialects
+            # does not mentions this behavior:
+            # https://docs.sqlalchemy.org/en/13/core/internals.html#sqlalchemy.engine.interfaces.Dialect
+            quoted_schema_string = self.quote_string_value(tables[0][1])
+            sql_stmnt = \
+                "/*snapshot execution*/ SELECT " \
+                "column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
+                "column_is_nullable, column_default, column_identity, column_is_distribution_key, column_table " \
+                "FROM sys.exa_all_columns WHERE column_schema = {schema} " \
+                "ORDER BY column_ordinal_position" \
+                    .format(schema=quoted_schema_string)
+            rp = list(connection.execute(sql.text(sql_stmnt)))
+
+            return rp
+        else:
+            return []
 
     @reflection.cache
-    def _get_all_columns(self, connection, schema=None, **kw):
+    def _get_all_columns_sql(self, connection, schema=None, **kw):
+        schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT column_name, column_type, column_maxsize, column_num_prec, column_num_scale, " \
                     "column_is_nullable, column_default, column_identity, column_is_distribution_key, column_table " \
                     "FROM sys.exa_all_columns  WHERE column_object_type IN ('TABLE', 'VIEW') " \
@@ -548,21 +700,25 @@ class EXADialect(default.DefaultDialect):
             sql_stmnt += ":schema "
         sql_stmnt += "ORDER BY column_ordinal_position"
         rp = connection.execute(sql.text(sql_stmnt),
-                schema=self.denormalize_name(schema))
+                                schema=self.denormalize_name(schema))
 
         return list(rp)
 
+    def _get_all_columns(self, connection, schema=None, **kw):
+        odbc_connection = self.getODBCConnection(connection)
+        if odbc_connection is not None and not self.use_sql_fallback():
+            return self._get_all_columns_odbc(connection, odbc_connection, schema, info_cache=kw.get("info_cache"))
+        else:
+            columns = self._get_all_columns_sql(connection, schema, info_cache=kw.get("info_cache"))
+            return columns
 
     @reflection.cache
     def get_columns(self, connection, table_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
-        if schema is None:
-            schema = connection.execute("select CURRENT_SCHEMA from dual").scalar()
-        table_name=self.denormalize_name(table_name)
-        schema=self.denormalize_name(schema)
+        table_name = self.denormalize_name(table_name)
 
         columns = []
-        for row in self._get_all_columns(connection, schema, info_cache=kw.get("info_cache")):
+        rows = self._get_all_columns(connection, table_name=table_name, schema=schema, **kw)
+        for row in rows:
             if row[9] != table_name and table_name is not None:
                 continue
             (colname, coltype, length, precision, scale, nullable, default, identity, is_distribution_key) = \
@@ -585,7 +741,7 @@ class EXADialect(default.DefaultDialect):
                     # and DECIMAL(36,0) back to BIGINT type
                     if scale == 0 and precision <= 18:
                         coltype = sqltypes.INTEGER()
-                    elif scale ==0 and precision == 36:
+                    elif scale == 0 and precision == 36:
                         coltype = sqltypes.BIGINT()
                     else:
                         coltype = sqltypes.DECIMAL(precision, scale)
@@ -607,7 +763,7 @@ class EXADialect(default.DefaultDialect):
                 identity = int(identity)
             # if we have a positive identity value add a sequence
             if identity is not None and identity >= 0:
-                cdict['sequence'] = {'name':''}
+                cdict['sequence'] = {'name': ''}
                 # TODO: we have to possibility to encode the current identity value count
                 # into the column metadata. But the consequence is that it would also be used
                 # as start value in CREATE statements. For now the current value is ignored.
@@ -618,8 +774,8 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def _get_all_constraints(self, connection, schema=None, **kw):
         sql_stmnt = "SELECT constraint_name, column_name, referenced_schema, referenced_table, " \
-                     "referenced_column, constraint_table, constraint_type " \
-                     "FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS where constraint_schema = "
+                    "referenced_column, constraint_table, constraint_type " \
+                    "FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS where constraint_schema = "
 
         if schema is None:
             sql_stmnt += "CURRENT_SCHEMA "
@@ -627,17 +783,28 @@ class EXADialect(default.DefaultDialect):
             sql_stmnt += ":schema "
         sql_stmnt += "ORDER BY ordinal_position"
         rp = connection.execute(sql.text(sql_stmnt),
-                schema=self.denormalize_name(schema))
-
+                                schema=self.denormalize_name(schema))
         return list(rp)
 
+    def get_pk_constraint_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
+        schema = self._get_schema_for_input_or_current(connection, schema)
+        table_name = self.denormalize_name(table_name)
+        with odbc_connection.cursor().primaryKeys(table=table_name, schema=schema) as primaryKeys_cursor:
+            pkeys = []
+            constraint_name = None
+            for row in primaryKeys_cursor:
+                if row[2] != table_name and table_name is not None:
+                    continue
+                pkeys.append(self.normalize_name(row[3]))
+                constraint_name = self.normalize_name(row[5])
+        return {'constrained_columns': pkeys, 'name': constraint_name}
 
     @reflection.cache
-    def get_pk_constraint(self, connection, table_name, schema=None, **kw):
-        schema = schema or connection.engine.url.database
+    def get_pk_constraint_sql(self, connection, table_name, schema=None, **kw):
+        schema = self._get_schema_for_input(connection, schema)
         pkeys = []
         constraint_name = None
-        table_name=self.denormalize_name(table_name)
+        table_name = self.denormalize_name(table_name)
 
         for row in self._get_all_constraints(connection, schema, info_cache=kw.get("info_cache")):
             if (row[5] != table_name and table_name is not None) or row[6] != 'PRIMARY KEY':
@@ -647,11 +814,50 @@ class EXADialect(default.DefaultDialect):
         return {'constrained_columns': pkeys, 'name': constraint_name}
 
     @reflection.cache
+    def get_pk_constraint(self, connection, table_name, schema=None, **kw):
+        odbc_connection = self.getODBCConnection(connection)
+        if odbc_connection is not None and not self.use_sql_fallback(**kw):
+            return self.get_pk_constraint_odbc(connection, odbc_connection, table_name=table_name, schema=schema, **kw)
+        else:
+            return self.get_pk_constraint_sql(connection, table_name=table_name, schema=schema, **kw)
+
+    # @reflection.cache
+    # def _get_foreign_keys_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
+    #    #with odbc_connection.cursor().foreignKeys(table=table_name,schema=schema) as foreignKeys_cursor:
+    #    with odbc_connection.cursor() as foreignKeys_cursor:
+    #        cursor=foreignKeys_cursor.foreignKeys()
+    #        return [(row.fk_name, row.fkcolumn_name, row.pktable_schema, row.pktable_name, row.pkcolumn_name, fktable_name, "FOREIGN KEY") for row in cursor]
+
+    @reflection.cache
+    def _get_foreign_keys_odbc(self, connection, odbc_connection, schema=None, **kw):
+        # Need to use a workaround, because SQLForeignKeys functions doesn't work for an unknown reason
+        tables = self._get_tables_for_schema_odbc(connection=connection, odbc_connection=odbc_connection,
+                                                  schema=schema, table_type="TABLE")
+        if len(tables) > 0:
+            quoted_schema_string = self.quote_string_value(tables[0][1])
+            sql_stmnt = \
+                "/*snapshot execution*/ " \
+                "SELECT constraint_name, column_name, referenced_schema, referenced_table, " \
+                "referenced_column, constraint_table, constraint_type " \
+                "FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS " \
+                "WHERE constraint_schema={schema} and constraint_type='FOREIGN KEY' " \
+                "ORDER BY ordinal_position" \
+                    .format(schema=quoted_schema_string)
+            rp = connection.execute(sql.text(sql_stmnt),
+                                    schema=self.denormalize_name(schema))
+            return list(rp)
+        else:
+            return []
+
+    @reflection.cache
+    def _get_foreign_keys_sql(self, connection, schema=None, **kw):
+        return self._get_all_constraints(connection, schema=schema, info_cache=kw.get("info_cache"))
+
+    @reflection.cache
     def get_foreign_keys(self, connection, table_name, schema=None, **kw):
-        schema_int = schema or connection.engine.url.database
-        if schema_int is None:
-            schema_int = connection.execute("select CURRENT_SCHEMA from dual").scalar()
-        table_name=self.denormalize_name(table_name)
+        schema_int = self._get_schema_for_input_or_current(connection, schema)
+        table_name = self.denormalize_name(table_name)
+
         def fkey_rec():
             return {
                 'name': None,
@@ -662,12 +868,17 @@ class EXADialect(default.DefaultDialect):
             }
 
         fkeys = util.defaultdict(fkey_rec)
-
-        for row in self._get_all_constraints(connection, schema=schema, info_cache=kw.get("info_cache")):
+        odbc_connection = self.getODBCConnection(connection)
+        if odbc_connection is not None and not self.use_sql_fallback(**kw):
+            constraints = self._get_foreign_keys_odbc(connection, odbc_connection, table_name=table_name,
+                                                      schema=schema_int, **kw)
+        else:
+            constraints = self._get_foreign_keys_sql(connection, schema_int, **kw)
+        for row in constraints:
             if (row[5] != table_name and table_name is not None) or row[6] != 'FOREIGN KEY':
                 continue
             (cons_name, local_column, remote_schema, remote_table, remote_column) = \
-                    (row[0], row[1], row[2], row[3], row[4])
+                (row[0], row[1], row[2], row[3], row[4])
             rec = fkeys[self.normalize_name(cons_name)]
             rec['name'] = self.normalize_name(cons_name)
             local_cols, remote_cols = rec['constrained_columns'], rec['referred_columns']

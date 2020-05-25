@@ -12,6 +12,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python: [3.6, 2.7]
         connector:
@@ -57,12 +58,14 @@ jobs:
       run: git clone https://github.com/exasol/integration-test-docker-environment.git
       working-directory: .. 
 
-    - name: Add TEST_SCHEMA to test DDL
-      run: echo "CREATE SCHEMA TEST_SCHEMA;" >> tests/test/enginedb_small/schema.sql
-      working-directory: ../integration-test-docker-environment
-
-    - name: Add TEST_SCHEMA_2 to test DDL
-      run: echo "CREATE SCHEMA TEST_SCHEMA_2;" >> tests/test/enginedb_small/schema.sql
+    - name: Add TEST_SCHEMA and TEST_SCHEMA_" to test DDL
+      run: |
+        echo 'CREATE SCHEMA TEST;' > tests/test/enginedb_small/import.sql;
+        echo 'CREATE SCHEMA TEST_SCHEMA;' >> tests/test/enginedb_small/import.sql;
+        echo 'CREATE SCHEMA TEST_SCHEMA_2;' >> tests/test/enginedb_small/import.sql;
+        echo 'SELECT * FROM SYS.EXA_SCHEMAS;' >> tests/test/enginedb_small/import.sql;
+        echo 'COMMIT;' >> tests/test/enginedb_small/import.sql;
+        cat  tests/test/enginedb_small/import.sql;
       working-directory: ../integration-test-docker-environment
 
     - name: Spawn EXASOL environemnt

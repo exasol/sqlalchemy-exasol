@@ -509,12 +509,9 @@ class EXADialect(default.DefaultDialect):
         return [self.normalize_name(row[0]) for row in rs]
 
     def _get_schema_for_input_or_current(self, connection, schema):
-        print("CCCCCC",schema)
         schema = self._get_schema_for_input(connection, schema)
-        print("DDDDDD",schema)
         if schema is None:
             schema = self._get_current_schema(connection)
-        print("EEEEEE",schema)
         return self.denormalize_name(schema)
 
     def _get_schema_for_input(self, connection, schema):
@@ -529,11 +526,9 @@ class EXADialect(default.DefaultDialect):
     def _get_tables_for_schema_odbc(self, connection, odbc_connection, schema, table_type=None, table_name=None):
         schema = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
-        print()
-        print("AAAAAAAAAA",schema)
-        print("BBBBBBBBBB",table_name)
         with odbc_connection.cursor().tables(schema=schema, tableType=table_type, table=table_name) as table_cursor:
-            return [row for row in table_cursor]
+            rows = [row for row in table_cursor]
+            return rows
 
     @reflection.cache
     def get_table_names(self, connection, schema, **kw):
@@ -545,8 +540,9 @@ class EXADialect(default.DefaultDialect):
 
     def get_table_names_odbc(self, connection, odbc_connection, schema, **kw):
         tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="TABLE")
-        return [self.normalize_name(row.table_name)
-                for row in tables]
+        normalized_tables = [self.normalize_name(row.table_name)
+                             for row in tables]
+        return normalized_tables
 
     def get_table_names_sql(self, connection, schema, **kw):
         schema = self._get_schema_for_input(connection, schema)
@@ -558,7 +554,8 @@ class EXADialect(default.DefaultDialect):
             sql_stmnt += ":schema ORDER BY table_name"
             rs = connection.execute(sql.text(sql_stmnt), \
                                     schema=self.denormalize_name(schema))
-        return [self.normalize_name(row[0]) for row in rs]
+        tables = [self.normalize_name(row[0]) for row in rs]
+        return tables
 
     def has_table(self, connection, table_name, schema=None, **kw):
         odbc_connection = self.getODBCConnection(connection)
@@ -568,9 +565,11 @@ class EXADialect(default.DefaultDialect):
             return self.has_table_sql(connection, schema=schema, table_name=table_name, **kw)
 
     def has_table_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
-        return self.normalize_name(table_name) in self.get_table_names_odbc(connection=connection,
-                                                                            odbc_connection=odbc_connection,
-                                                                            schema=schema, table_name=table_name, **kw)
+        tables = self.get_table_names_odbc(connection=connection,
+                                           odbc_connection=odbc_connection,
+                                           schema=schema, table_name=table_name, **kw)
+        result = self.normalize_name(table_name) in tables
+        return result
 
     def has_table_sql(self, connection, table_name, schema=None, **kw):
         schema = self._get_schema_for_input(connection, schema)
@@ -830,10 +829,10 @@ class EXADialect(default.DefaultDialect):
     #        return [(row.fk_name, row.fkcolumn_name, row.pktable_schema, row.pktable_name, row.pkcolumn_name, fktable_name, "FOREIGN KEY") for row in cursor]
 
     @reflection.cache
-    def _get_foreign_keys_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
+    def _get_foreign_keys_odbc(self, connection, odbc_connection, schema=None, **kw):
         # Need to use a workaround, because SQLForeignKeys functions doesn't work for an unknown reason
         tables = self._get_tables_for_schema_odbc(connection=connection, odbc_connection=odbc_connection,
-                                                  schema=schema, table_name=table_name, table_type="TABLE")
+                                                  schema=schema, table_type="TABLE")
         if len(tables) > 0:
             quoted_schema_string = self.quote_string_value(tables[0][1])
             sql_stmnt = \

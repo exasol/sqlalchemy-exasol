@@ -488,7 +488,6 @@ class EXADialect(default.DefaultDialect):
         else:
             return None
             # raise Exception("Do not know how to get a pyodbc connection, from %s"%(type(connection)))
-        print("AAAAAAAAAAAAAA",str(type(odbc_connection)))
         if "pyodbc.Connection" in str(type(odbc_connection)):
             return odbc_connection
         else:
@@ -510,10 +509,13 @@ class EXADialect(default.DefaultDialect):
         return [self.normalize_name(row[0]) for row in rs]
 
     def _get_schema_for_input_or_current(self, connection, schema):
+        print("CCCCCC",schema)
         schema = self._get_schema_for_input(connection, schema)
+        print("DDDDDD",schema)
         if schema is None:
             schema = self._get_current_schema(connection)
-        return schema
+        print("EEEEEE",schema)
+        return self.denormalize_name(schema)
 
     def _get_schema_for_input(self, connection, schema):
         schema = self.denormalize_name(schema or self._get_schema_from_url(connection, schema))
@@ -527,6 +529,9 @@ class EXADialect(default.DefaultDialect):
     def _get_tables_for_schema_odbc(self, connection, odbc_connection, schema, table_type=None, table_name=None):
         schema = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
+        print()
+        print("AAAAAAAAAA",schema)
+        print("BBBBBBBBBB",table_name)
         with odbc_connection.cursor().tables(schema=schema, tableType=table_type, table=table_name) as table_cursor:
             return [row for row in table_cursor]
 

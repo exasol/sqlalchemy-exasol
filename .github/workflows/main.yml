@@ -23,8 +23,7 @@ jobs:
           - 6.2.5-d1
           - 6.2.4-d1
           - 6.1.6-d1
-          - 6.0.13-d1
-          - 6.0.12-d1
+          - 6.0.16-d1
     steps:
     - uses: actions/checkout@v2
 

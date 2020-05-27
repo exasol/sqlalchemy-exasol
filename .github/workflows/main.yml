@@ -18,6 +18,10 @@ jobs:
         connector:
           - pyodbc          
           - turbodbc
+        exasol_version:
+          - 6.2.6-d1
+          - 6.1.9-d1
+          - 6.0.16-d1
     steps:
     - uses: actions/checkout@v2
 
@@ -69,7 +73,7 @@ jobs:
       working-directory: ../integration-test-docker-environment
 
     - name: Spawn EXASOL environemnt
-      run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666
+      run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666 --docker-db-image-version ${{ matrix.exasol_version }}
       working-directory: ../integration-test-docker-environment
 
     - name: Prepare odbcinst.ini

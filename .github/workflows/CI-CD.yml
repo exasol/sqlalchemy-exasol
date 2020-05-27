@@ -1,0 +1,124 @@
+name: CI-CD
+
+on:
+  push:
+    branches:
+      - 'master'
+    tags:
+      - '**'
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: [3.6, 2.7]
+        connector:
+          - pyodbc       
+          - turbodbc
+        exasol_version:
+          - 6.2.6-d1
+          - 6.1.9-d1
+          - 6.0.16-d1
+    steps:
+
+    - name: Fetch sqlalchemy_exasol code from repository
+      uses: actions/checkout@v2
+
+    - name: Setup Python 3.6 for integration-test-docker-environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+      if: ${{ matrix.python != 3.6 }}
+
+    - name: Setup Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install via apt
+      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
+
+    - name: Install pipenv
+      uses: dschep/install-pipenv-action@v1
+
+    - name: Pip install requirements
+      uses: BSFishy/pip-action@v1
+      with:
+        requirements: requirements.txt
+
+    - name: Pip install test requirements
+      uses: BSFishy/pip-action@v1
+      with:
+        requirements: requirements_test.txt
+
+    - name: Pip install extra requirements
+      uses: BSFishy/pip-action@v1
+      with:
+        requirements: requirements_extras.txt
+      if: ${{ matrix.connector == 'turbodbc' }}
+
+    - name: Checkout test environment
+      run: git clone https://github.com/exasol/integration-test-docker-environment.git
+      working-directory: .. 
+
+    - name: Add TEST_SCHEMA and TEST_SCHEMA_" to test DDL
+      run: |
+        echo 'CREATE SCHEMA TEST;' > tests/test/enginedb_small/import.sql;
+        echo 'CREATE SCHEMA TEST_SCHEMA;' >> tests/test/enginedb_small/import.sql;
+        echo 'CREATE SCHEMA TEST_SCHEMA_2;' >> tests/test/enginedb_small/import.sql;
+        echo 'SELECT * FROM SYS.EXA_SCHEMAS;' >> tests/test/enginedb_small/import.sql;
+        echo 'COMMIT;' >> tests/test/enginedb_small/import.sql;
+        cat  tests/test/enginedb_small/import.sql;
+      working-directory: ../integration-test-docker-environment
+
+    - name: Spawn EXASOL environemnt
+      run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666 --docker-db-image-version ${{ matrix.exasol_version }}
+      working-directory: ../integration-test-docker-environment
+
+    - name: Prepare odbcinst.ini
+      run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini
+
+    - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
+      run: py.test --dropfirst --dburi "$TESTDB"
+      env:
+        ODBCSYSINI: "${{ github.workspace }}/odbcconfig"
+        TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
+
+  upload_to_pypi:
+    runs-on: ubuntu-latest
+    needs: run_tests
+    if: startsWith(github.event.ref, 'refs/tags')
+    strategy:
+      matrix:
+        python: [3.6]
+        connector:
+          - pyodbc
+    steps:
+
+    - name: Fetch sqlalchemy_exasol code from repository
+      uses: actions/checkout@v2
+
+    - name: Fetch all tags
+      run: git fetch origin +refs/tags/*:refs/tags/*
+
+    - name: Setup Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install pipenv
+      uses: dschep/install-pipenv-action@v1
+
+    - name: Install Wheel
+      run: pip install wheel
+        
+    - name: Build sdist and wheel packages
+      run: python setup.py sdist bdist_wheel
+
+    - name: Push package to Test Pypi
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.pypi_password }}

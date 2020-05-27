@@ -42,7 +42,7 @@ setup(
     packages=['sqlalchemy_exasol'],
     install_requires=["SQLAlchemy>=1.0.4, <2", "pyodbc>=3.0.6", "six>=1.5"],
     extras_require={'turbodbc': ['turbodbc>=1.1.0']},
-    tests_require=['pytest', 'pytest-cov', 'mock>=1.0.1'],
+    tests_require=['pytest', 'mock>=1.0.1'],
     test_suite='pytest.main',
     use_scm_version={"write_to": "sqlalchemy_exasol/_version.py"},
     entry_points={

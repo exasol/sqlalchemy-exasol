@@ -1,39 +1,31 @@
 # Integration Test Setup
 
-The travis build is configured to test against an EXASolution database instance hosted by EXASOL. This text describes how to get such a test DB, as well as how to make the right entries in the .travis.yml file.
+Integration testing is done by GitHub Actions contained in this repository, which provide a CI/CD pipeline to test, build, and deploy sqlalchemy_exasol to Pypi.
 
-## 1 - Register with EXASOL
+Two main workflows are used for this purpose:
 
-You need an account on the EXASOL user portal. Sign up here: https://www.exasol.com/portal/display/WEL/Home
+## CI
 
-## 2 - Request a Demo User
+This is meant to be used as the test workflow. It's located under:
 
-In the issue tracker (https://www.exasol.com/support/secure/Dashboard.jspa) create a ticket on Project "Public Demo" with Type "Registration". Fill in whatever fields are required. You will receive an e-mail with an automatically generated user account with test schemata in an EXASolution 4.x and 5.x database cluster (as of January 2015). 
+	sqlalchemy_exasol/.github/workflows/CI.yml
 
-The SQLAlchemy test suite requires the schema 'test_schema' for all tests to pass. So you will have to ask EXASOL to grant your user access to this schema.
+This workflow will be executed anytime there's a commit pushed to any branch that is **not master**, or whenever there's a pull request created where the base branch is **not master**. It runs a Docker Container with an Exasol database for every version specified in *matrix.exasol_version*, and uses those DBs to executes all tests in the repository. If everything went fine, it will create a package distribution using both sdist and wheel.
 
-## 3 - Install Travis Command Line Client
+To run it just commit and push to any non-master branch and watch the workflow run in:
 
-You need to install the Travis command line client. Find installation instructions on the travis-ci-org homepage or try this link https://github.com/travis-ci/travis.rb#installation (January 2015).
+https://github.com/blue-yonder/sqlalchemy_exasol/actions
 
-## 4 - Encrypt the Connection Strings
+## CI-CD
 
-Change into a directory that belongs the to git repository of the sqlalchemy_exasol project. Travis CLI inspects the directory to check for a git repo. For each database version run the following command:
+This is meant to be used as the Production workflow. It's located under:
 
-    travis encrypt TESTDB=exa+pyodbc://<USER>:<PASSWORD>@<IP-RANGE>:<PORT>/<USER> EXA_<MAJOR_VERSION>=nil
+	sqlalchemy_exasol/.github/workflows/CI-CD.yml
 
-e.g.
+This workflow will be executed anytime there's a commit pushed to **master**, or whenever a **tag** (release) is pushed. It does all the same steps than the CI workflow with one additional step at the end: Upload the package to Pypi. This upload step only happens when a tag is pushed, it will not be executed when commits are done in master.
 
-    travis encrypt TESTDB=exa+pyodbc://USER10:SECURE@8.8.8.8..9:1234/USER10 EXA_4=nil
+To run it just commit and push to master (*Optional:* push a tag in case you want Pypi upload) and watch the workflow run in:
 
-The EXA_<MAJOR_VERSION> environment variable is used to make identification of the DB backend easy from the travis build page. From the output copy the line starting with 'secure'
+https://github.com/blue-yonder/sqlalchemy_exasol/actions
 
-## 5 - Update the .travis.yml Config File
-
-Add the generated secure strings to the 'env > matrix' section of the .travis.yml file (replacing previous entries if necessary).
-
-Check the configuration file syntax with:
-
-    travis lint
-
-If everything is fine, commit and push your changes and watch the builds unfold.
+The status of the CI-CD workflow will always be reflected in the badge called "build" in the README.rst and Home Page of this repository

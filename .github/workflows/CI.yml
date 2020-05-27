@@ -2,28 +2,30 @@ name: CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches-ignore:
+      - 'master'
   pull_request:
-    branches: [ "master" ]
-
-
+    branches-ignore:
+      - 'master'
 
 jobs:
-  test:
+  run_tests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python: [3.6, 2.7]
         connector:
-          - pyodbc          
+          - pyodbc       
           - turbodbc
         exasol_version:
           - 6.2.6-d1
           - 6.1.9-d1
           - 6.0.16-d1
     steps:
-    - uses: actions/checkout@v2
+
+    - name: Fetch sqlalchemy_exasol code from repository
+      uses: actions/checkout@v2
 
     - name: Setup Python 3.6 for integration-test-docker-environment
       uses: actions/setup-python@v2
@@ -80,8 +82,37 @@ jobs:
       run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini
 
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: py.test --dropfirst --cov-config=.coveragerc --cov=sqlalchemy_exasol --dburi "$TESTDB"
+      run: py.test --dropfirst --dburi "$TESTDB"
       env:
         ODBCSYSINI: "${{ github.workspace }}/odbcconfig"
         TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
 
+  build_package:
+    runs-on: ubuntu-latest
+    needs: run_tests
+    strategy:
+      matrix:
+        python: [3.6]
+        connector:
+          - pyodbc
+    steps:
+
+    - name: Fetch sqlalchemy_exasol code from repository
+      uses: actions/checkout@v2
+
+    - name: Fetch all tags
+      run: git fetch origin +refs/tags/*:refs/tags/*
+
+    - name: Setup Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install pipenv
+      uses: dschep/install-pipenv-action@v1
+
+    - name: Install Wheel
+      run: pip install wheel
+        
+    - name: Build sdist and wheel packages
+      run: python setup.py sdist bdist_wheel

@@ -2,10 +2,8 @@ SQLAlchemy Dialect for EXASOL DB
 ================================
 
 
-.. image:: https://travis-ci.com/blue-yonder/sqlalchemy_exasol.svg?branch=master
-    :target: https://travis-ci.com/blue-yonder/sqlalchemy_exasol
-.. image:: https://coveralls.io/repos/github/blue-yonder/sqlalchemy_exasol/badge.svg?branch=master
-    :target: https://coveralls.io/github/blue-yonder/sqlalchemy_exasol?branch=master
+.. image:: https://github.com/blue-yonder/sqlalchemy_exasol/workflows/CI-CD/badge.svg?branch=master
+    :target: https://github.com/blue-yonder/sqlalchemy_exasol/actions?query=workflow%3ACI-CD
 .. image:: https://requires.io/github/blue-yonder/sqlalchemy_exasol/requirements.svg?branch=master
      :target: https://requires.io/github/blue-yonder/sqlalchemy_exasol/requirements/?branch=master
      :alt: Requirements Status

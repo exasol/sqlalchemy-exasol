@@ -10,7 +10,7 @@ This is meant to be used as the test workflow. It's located under:
 
 	sqlalchemy_exasol/.github/workflows/CI.yml
 
-This workflow will be executed anytime there's a commit pushed to any branch that is **not master**, or whenever there's a pull request created where the base branch is **not master**. It runs a Docker Container with an Exasol databse for every version specified in *matrix.exasol_version*, and uses those DBs to executes all tests in the repository. If everything went fine, it will create a package distribution using both sdist and wheel.
+This workflow will be executed anytime there's a commit pushed to any branch that is **not master**, or whenever there's a pull request created where the base branch is **not master**. It runs a Docker Container with an Exasol database for every version specified in *matrix.exasol_version*, and uses those DBs to executes all tests in the repository. If everything went fine, it will create a package distribution using both sdist and wheel.
 
 To run it just commit and push to any non-master branch and watch the workflow run in:
 

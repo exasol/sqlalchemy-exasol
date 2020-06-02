@@ -1,3 +1,11 @@
+# 2.1.0
+* Replaced TravisCI with Github Actions
+* Tests now executed against Docker Exasol, multiple versions
+* Replaced metadata queries with ODBC metadata to avoid deadlocks
+* Removed all references to TravisCI and coverage
+* Split Github Actions into CI.yml and CI-CD.yml
+* Updated README.rst and INTEGRATION_TEST.md
+
 # 2.0.10
 * bumped SQLAlchemy to 1.3.16
 * bumped six to 1.14.0

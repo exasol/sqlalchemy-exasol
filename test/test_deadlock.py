@@ -60,13 +60,12 @@ class MetadataTest(fixtures.TablesTest):
 
         self.run_deadlock_for_table(without_fallback)
 
-    def test_deadlock_for_get_pk_constraint_with_fallback(self):
+    def test_no_deadlock_for_get_pk_constraint_with_fallback(self):
         def with_fallback(session2, schema, table):
             dialect = EXADialect()
             dialect.get_pk_constraint(session2, table_name=table, schema=schema, use_sql_fallback=True)
 
-        with pytest.raises(Exception):
-            self.run_deadlock_for_table(with_fallback)
+        self.run_deadlock_for_table(with_fallback)
 
     def test_no_deadlock_for_get_foreign_keys_without_fallback(self):
         def without_fallback(session2, schema, table):
@@ -76,13 +75,12 @@ class MetadataTest(fixtures.TablesTest):
         self.run_deadlock_for_table(without_fallback)
 
 
-    def test_deadlock_for_get_foreign_keys_with_fallback(self):
+    def test_no_deadlock_for_get_foreign_keys_with_fallback(self):
         def with_fallback(session2, schema, table):
             dialect = EXADialect()
             dialect.get_foreign_keys(session2, table_name=table, schema=schema, use_sql_fallback=True)
 
-        with pytest.raises(Exception):
-            self.run_deadlock_for_table(with_fallback)
+        self.run_deadlock_for_table(with_fallback)
 
     def test_no_deadlock_for_get_view_names_without_fallback(self):
         # TODO: think of other scenarios where metadata deadlocks with view could happen

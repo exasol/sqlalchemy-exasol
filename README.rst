@@ -50,7 +50,7 @@ Turbodbc support
 
 - Turbodbc and sqlalchemy_exasol as well do now support python 2.7, 3.4 and 3.6.
 - Multi row update is not supported, see
-  `test/test_update.py <test/test_update.py>`_ for an example.
+  `test/test_update.py <test/test_update.py>`_ for an example
 
 
 Setup you python project and install sqlalchemy-exasol

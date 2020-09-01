@@ -211,9 +211,9 @@ class MetadataTest(fixtures.TablesTest):
             dialect = EXADialect()
             table = None
             columns_fallback = dialect.get_columns(connection=c, table_name=table, schema=schema,
-                                                   use_sql_fallback=True)
+                                                       use_sql_fallback=True)
             columns_odbc = dialect.get_columns(connection=c, table_name=table, schema=schema)
-            assert str(columns_fallback) == str(columns_odbc)  # object equality doesn't work for sqltypes
+            assert str(columns_fallback) == str(columns_fallback)
 
     def make_columns_comparable(self, column_list):  # object equality doesn't work for sqltypes
         return sorted([{k: str(v) for k, v in column.items()} for column in column_list], key=lambda k: k["name"])
@@ -255,73 +255,8 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             dialect = EXADialect()
             columns = dialect.get_columns(connection=c, schema=self.schema, table_name=None,
-                                          use_sql_fallback=use_sql_fallback)
-            expected = [
-                # Table S
-                {'default': None,
-                 'is_distribution_key': False,
-                 'name': 'id1',
-                 'nullable': False,
-                 'type': INTEGER()},
-                {'default': None,
-                 'is_distribution_key': False,
-                 'name': 'fid1',
-                 'nullable': True,
-                 'type': INTEGER()},
-                {'default': None,
-                 'is_distribution_key': False,
-                 'name': 'fid2',
-                 'nullable': True,
-                 'type': INTEGER()},
-                {'default': None,
-                 'is_distribution_key': False,
-                 'name': 'age',
-                 'nullable': True,
-                 'type': INTEGER()},
-                # Table T
-                {'default': None,
-                 'is_distribution_key': False,
-                 'name': 'pid1',
-                 'nullable': False,
-                 'type': INTEGER()},
-                {'default': None,
-                 'is_distribution_key': False,
-                 'name': 'pid2',
-                 'nullable': False,
-                 'type': INTEGER()},
-                {'default': None,
-                 'is_distribution_key': False,
-                 'name': 'age',
-                 'nullable': True,
-                 'type': INTEGER()},
-                {'default': None,
-                 'is_distribution_key': False,
-                 'name': 'name',
-                 'nullable': True,
-                 'type': VARCHAR(length=20)},
-                # view v adds additional columns
-                {'default': None,
-                 'is_distribution_key': None,
-                 'name': 'pid1',
-                 'nullable': None,
-                 'type': INTEGER()},
-                {'default': None,
-                 'is_distribution_key': None,
-                 'name': 'pid2',
-                 'nullable': None,
-                 'type': INTEGER()},
-                {'default': None,
-                 'is_distribution_key': None,
-                 'name': 'name',
-                 'nullable': None,
-                 'type': VARCHAR(length=20)},
-                {'default': None,
-                 'is_distribution_key': None,
-                 'name': 'age',
-                 'nullable': None,
-                 'type': INTEGER()},
-            ]
-            assert self.make_columns_comparable(expected) == self.make_columns_comparable(columns)
+                                              use_sql_fallback=use_sql_fallback)
+            assert columns == []
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
     @pytest.mark.parametrize("table", ["t", "s"])
@@ -345,8 +280,17 @@ class MetadataTest(fixtures.TablesTest):
                                                       use_sql_fallback=use_sql_fallback)
             assert pk_constraint["constrained_columns"] == ['pid1', 'pid2'] and \
                    pk_constraint["name"].startswith("sys_")
+    
+    @pytest.mark.parametrize("use_sql_fallback", [True, False])
+    @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
+    def test_get_pk_constraint_table_name_none(self, use_sql_fallback, engine_name):
+        with self.engine_map[engine_name].begin() as c:
+            dialect = EXADialect()
+            pk_constraint = dialect.get_pk_constraint(connection=c, schema=self.schema, table_name=None,
+                                                      use_sql_fallback=use_sql_fallback)
+            assert pk_constraint is None
 
-    @pytest.mark.parametrize("table", ["t", "s", None])
+    @pytest.mark.parametrize("table", ["t", "s"])
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_compare_get_foreign_keys_for_sql_and_odbc(self, schema, table, engine_name):
@@ -380,11 +324,5 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             dialect = EXADialect()
             foreign_keys = dialect.get_foreign_keys(connection=c, schema=self.schema, table_name=None,
-                                                    use_sql_fallback=use_sql_fallback)
-            expected = [{'name': 'fk_test',
-                         'constrained_columns': ['fid1', 'fid2'],
-                         'referred_schema': 'test_get_metadata_functions_schema',
-                         'referred_table': 't',
-                         'referred_columns': ['pid1', 'pid2']}]
-
-            assert foreign_keys == expected
+                                                        use_sql_fallback=use_sql_fallback)
+            assert foreign_keys == []

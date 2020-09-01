@@ -74,7 +74,7 @@ jobs:
       working-directory: ../integration-test-docker-environment
 
     - name: Spawn EXASOL environemnt
-      run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666 --docker-db-image-version ${{ matrix.exasol_version }}
+      run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666 --docker-db-image-version ${{ matrix.exasol_version }} --db-mem-size 4GB
       working-directory: ../integration-test-docker-environment
 
     - name: Prepare odbcinst.ini

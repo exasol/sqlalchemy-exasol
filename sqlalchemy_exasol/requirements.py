@@ -2,6 +2,7 @@ from sqlalchemy.testing.requirements import SuiteRequirements
 
 from sqlalchemy.testing import exclusions
 
+
 class Requirements(SuiteRequirements):
 
     @property
@@ -23,10 +24,15 @@ class Requirements(SuiteRequirements):
         return exclusions.open()
 
     @property
+    def implicitly_named_constraints(self):
+        """target database must apply names to unnamed constraints."""
+        return exclusions.open()
+
+    @property
     def returning(self):
         """target platform supports RETURNING."""
         return exclusions.closed()
-    
+
     @property
     def empty_strings_varchar(self):
         """target database can persist/return an empty string with a
@@ -35,7 +41,7 @@ class Requirements(SuiteRequirements):
 
     @property
     def text_type(self):
-        """Target database must support an unbounded Text() 
+        """Target database must support an unbounded Text()
         type such as TEXT or CLOB """
         return exclusions.closed()
 
@@ -85,7 +91,7 @@ class Requirements(SuiteRequirements):
         """"target dialect retrieves cursor.lastrowid, or fetches
         from a database-side function after an insert() construct executes,
         within the get_lastrowid() method.
-    
+
         Only dialects that "pre-execute", or need RETURNING to get last
         inserted id, would return closed/fail/skip for this.
         """
@@ -114,3 +120,76 @@ class Requirements(SuiteRequirements):
         """Dialect converts small/large scale decimals into scientific notation
         """
         return exclusions.open()
+
+    @property
+    def temporary_tables(self):
+        """target database supports temporary tables"""
+        return exclusions.closed()
+
+    @property
+    def temp_table_names(self):
+        """target dialect supports listing of temporary table names"""
+        return exclusions.closed()
+
+    @property
+    def temp_table_reflection(self):
+        return exclusions.closed()
+
+    @property
+    def offset(self):
+        """target database can render OFFSET, or an equivalent, in a
+        SELECT.
+        """
+        return exclusions.closed()
+
+    @property
+    def order_by_col_from_union(self):
+        """target database supports ordering by a column from a SELECT
+           inside of a UNION
+           E.g.  (SELECT id, ...) UNION (SELECT id, ...) ORDER BY id """
+        return exclusions.open()
+
+    @property
+    def bound_limit_offset(self):
+        """target database can render LIMIT and/or OFFSET using a bound
+        parameter
+        """
+        return exclusions.closed()
+
+    @property
+    def duplicate_key_raises_integrity_error(self):
+        return exclusions.closed()
+
+    @property
+    def independent_connections(self):
+        return exclusions.open()
+
+    @property
+    def parens_in_union_contained_select_w_limit_offset(self):
+        return exclusions.closed()
+
+    @property
+    def parens_in_union_contained_select_wo_limit_offset(self):
+        return exclusions.closed()
+
+    @property
+    def broken_cx_oracle6_numerics(config):
+        return exclusions.closed()
+
+    @property
+    def cross_schema_fk_reflection(self):
+        return exclusions.closed()
+
+    @property
+    def ctes(self):
+        """Target database supports CTEs"""
+        """Can't be opened as CTE tests require DB support for 'WITH RECURSIVE'
+           not supported by EXASOL"""
+        return exclusions.closed()
+
+    @property
+    def standalone_null_binds_whereclause(self):
+        """target database/driver supports bound parameters with NULL in the
+        WHERE clause, in situations where it has to be typed.
+        """
+        return exclusions.closed()

@@ -6,27 +6,23 @@ Connect string::
 
 """
 
+import re
 import six
+import sys
 from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
-if six.PY3:
-    from string import ascii_uppercase as uppercase
-else:
-    from string import uppercase
 from distutils.version import LooseVersion
 
-class EXADialect_pyodbc(PyODBCConnector, EXADialect):
+
+class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
     execution_ctx_cls = EXAExecutionContext
 
-    pyodbc_driver_name = "EXAODBC"
     driver_version = None
     server_version_info = None
 
     def __init__(self, **kw):
-        # deal with http://code.google.com/p/pyodbc/issues/detail?id=25
-        kw.setdefault('convert_unicode', True)
         super(EXADialect_pyodbc, self).__init__(**kw)
 
     def get_driver_version(self, connection):
@@ -46,10 +42,30 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
                 query = "select PARAM_VALUE from SYS.EXA_METADATA where PARAM_NAME = 'databaseProductVersion'"
                 result = connection.execute(query).fetchone()[0].split('.')
 
-            self.server_version_info = (int(result[0]), int(result[1]), int(result[2]))
+            # last version position can something like: '12-S' for an EXASolo
+            self.server_version_info = (int(result[0]), int(result[1]), int(result[2].split('-')[0]))
 
         # return cached info
         return self.server_version_info
+
+    if sys.platform == 'darwin':
+        def connect(self, *cargs, **cparams):
+            # Get connection
+            conn = super(EXADialect_pyodbc, self).connect(*cargs, **cparams)
+
+            # Set up encodings
+            conn.setdecoding(self.dbapi.SQL_CHAR, encoding='utf-8')
+            conn.setdecoding(self.dbapi.SQL_WCHAR, encoding='utf-8')
+            conn.setdecoding(self.dbapi.SQL_WMETADATA, encoding='utf-8')
+
+            if six.PY2:
+                conn.setencoding(str, encoding='utf-8')
+                conn.setencoding(unicode, encoding='utf-8')
+            else:
+                conn.setencoding(encoding='utf-8')
+
+            # Return connection
+            return conn
 
     def create_connect_args(self, url):
         """
@@ -67,22 +83,23 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
         connect_args = {}
         for param in ('ansi', 'unicode_results', 'autocommit'):
             if param in keys:
-                connect_args[uppercase(param)] = asbool(keys.pop(param))
+                connect_args[param.upper()] = asbool(keys.pop(param))
 
         dsn_connection = 'dsn' in keys or \
                         ('host' in keys and 'port' not in keys)
         if dsn_connection:
-            connectors = ['DSN=%s' % (keys.pop('host', '') or \
-                        keys.pop('dsn', ''))]
+            connectors = ['DSN=%s' % (keys.pop('dsn', '') or \
+                        keys.pop('host', ''))]
         else:
-            port = ''
-            if 'port' in keys and not 'port' in query:
-                port = ':%d' % int(keys.pop('port'))
-
             connectors = ["DRIVER={%s}" %
-                            keys.pop('driver', self.pyodbc_driver_name),
-                          'EXAHOST=%s%s' % (keys.pop('host', ''), port),
-                          'EXASCHEMA=%s' % keys.pop('database', '')]
+                    keys.pop('driver', None)]
+
+        port = ''
+        if 'port' in keys and not 'port' in query:
+            port = ':%d' % int(keys.pop('port'))
+
+        connectors.extend(['EXAHOST=%s%s' % (keys.pop('host', ''), port),
+                          'EXASCHEMA=%s' % keys.pop('database', '')])
 
         user = keys.pop("user", None)
         if user:
@@ -99,7 +116,40 @@ class EXADialect_pyodbc(PyODBCConnector, EXADialect):
             connectors.append("AutoTranslate=%s" %
                                 keys.pop("odbc_autotranslate"))
 
-        connectors.extend(['%s=%s' % (k, v) for k, v in six.iteritems(keys)])
+        connectors.extend(['%s=%s' % (k, v) for k, v in sorted(six.iteritems(keys))])
         return [[";".join(connectors)], connect_args]
+
+    def is_disconnect(self, e, connection, cursor):
+        if isinstance(e, self.dbapi.Error):
+            error_codes = {
+                '40004', # Connection lost.
+                '40009', # Connection lost after internal server error.
+                '40018', # Connection lost after system running out of memory.
+                '40020', # Connection lost after system running out of memory.
+            }
+            exasol_error_codes = {
+                'HY000': (  # Generic Exasol error code
+                    re.compile(six.u(r'operation timed out'), re.IGNORECASE),
+                    re.compile(six.u(r'connection lost'), re.IGNORECASE),
+                    re.compile(six.u(r'Socket closed by peer'), re.IGNORECASE),
+                )
+            }
+
+            error_code, error_msg = e.args[:2]
+
+            # import pdb; pdb.set_trace()
+            if error_code in exasol_error_codes:
+                # Check exasol error
+                for msg_re in exasol_error_codes[error_code]:
+                    if msg_re.search(error_msg):
+                        return True
+
+                return False
+
+            # Check Pyodbc error
+            return error_code in error_codes
+
+        return super(EXADialect_pyodbc, self).is_disconnect(e, connection, cursor)
+
 
 dialect = EXADialect_pyodbc

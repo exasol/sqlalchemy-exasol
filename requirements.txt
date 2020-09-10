@@ -1,0 +1,4 @@
+SQLAlchemy==1.3.19 # rq.filter: >=1.3.0,<2
+pyodbc==4.0.30 # rq.filter: >=4,<5
+# note: pyodbc 4.0.22 has an open issue that can lead to TypeConversion errors: https://github.com/mkleehammer/pyodbc/issues/341 Do not upgrade until this is fixed.
+six==1.15.0

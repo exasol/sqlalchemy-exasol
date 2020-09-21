@@ -1,3 +1,7 @@
+# 2.2.0
+* Solved performance problems for large tables/databases. Full information on this [PR](https://github.com/blue-yonder/sqlalchemy_exasol/pull/101)
+* Bumped dependencies
+
 # 2.1.0
 * Replaced TravisCI with Github Actions
 * Tests now executed against Docker Exasol, multiple versions

@@ -14,14 +14,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [3.6, 2.7]
+        python: [3.6]
         connector:
-          - pyodbc       
+          - pyodbc
           - turbodbc
         exasol_version:
-          - 6.2.6-d1
-          - 6.1.9-d1
-          - 6.0.16-d1
+          - 6.2.15-d1
+          - 7.0.10
     steps:
 
     - name: Fetch sqlalchemy_exasol code from repository
@@ -62,7 +61,7 @@ jobs:
 
     - name: Checkout test environment
       run: git clone https://github.com/exasol/integration-test-docker-environment.git
-      working-directory: .. 
+      working-directory: ..
 
     - name: Add TEST_SCHEMA and TEST_SCHEMA_" to test DDL
       run: |
@@ -113,6 +112,6 @@ jobs:
 
     - name: Install Wheel
       run: pip install wheel
-        
+
     - name: Build sdist and wheel packages
       run: python setup.py sdist bdist_wheel

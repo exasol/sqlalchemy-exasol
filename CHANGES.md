@@ -1,3 +1,6 @@
+# 3.0.0 (unreleased)
+* Drop support of Python 2.7
+
 # 2.2.0
 * Solved performance problems for large tables/databases. Full information on this [PR](https://github.com/blue-yonder/sqlalchemy_exasol/pull/101)
 * Bumped dependencies

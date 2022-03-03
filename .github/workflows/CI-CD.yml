@@ -18,8 +18,8 @@ jobs:
           - pyodbc
           - turbodbc
         exasol_version:
-          - 6.2.15-d1
-          - 7.0.10
+          - 7.1.6
+          - 7.0.16
 
     name: Run Tests (Python-${{ matrix.python }}, Connector-${{ matrix.connector }}, Exasol-${{ matrix.exasol_version }})
 

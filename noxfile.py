@@ -1,8 +1,8 @@
 import os
 from contextlib import contextmanager
-from inspect import cleandoc
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from textwrap import dedent
 
 import nox
 from pyodbc import connect
@@ -10,7 +10,7 @@ from pyodbc import connect
 PROJECT_ROOT = Path(__file__).parent
 
 # default actions to be run if nothing is explicitly specified with the -s option
-nox.options.sessions = ["verify"]
+nox.options.sessions = ["verify(connector='pyodbc')"]
 
 
 class Settings:
@@ -22,8 +22,8 @@ class Settings:
     BUCKETFS_PORT = 6666
 
 
-ODBCINST_INI_TEMPLATE = (
-    cleandoc("""
+ODBCINST_INI_TEMPLATE = dedent(
+    """
     [ODBC]
     #Trace = yes
     #TraceFile =~/odbc.trace
@@ -31,7 +31,8 @@ ODBCINST_INI_TEMPLATE = (
     [EXAODBC]
     #Driver location will be appended in build environment:
     DRIVER={driver}
-    """) + "\n"
+
+    """
 )
 
 
@@ -122,22 +123,24 @@ def start_db(session):
                 "user": "sys",
                 "password": "exasol",
             }
+            connection = connect(
+                "".join(
+                    [
+                        "DRIVER={driver};",
+                        "EXAHOST={server};",
+                        "UID={user};",
+                        "PWD={password}",
+                    ]
+                ).format(**settings)
+            )
             transaction(
-                connect(
-                    "".join(
-                        [
-                            "DRIVER={driver};",
-                            "EXAHOST={server};",
-                            "UID={user};",
-                            "PWD={password}",
-                        ]
-                    ).format(**settings)
-                ),
+                connection,
                 (
                     "CREATE SCHEMA TEST_SCHEMA;",
                     "CREATE SCHEMA TEST_SCHEMA_2;",
                 ),
             )
+            connection.close()
 
     start()
     populate()

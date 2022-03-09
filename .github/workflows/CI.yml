@@ -62,7 +62,7 @@ jobs:
       working-directory: ..
 
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: nox -s \"integration(connector='${{ matrix.connector }}')\"
+      run: nox -s "integration(connector='${{ matrix.connector }}')"
 
   build_package:
     runs-on: ubuntu-latest

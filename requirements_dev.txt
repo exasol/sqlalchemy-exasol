@@ -1,4 +1,4 @@
+-r requirements.txt
+-r requirements_test.txt
 nox>=2022.1.7
-pyodbc==4.0.30 # rq.filter: >=4,<5
-https://github.com/exasol/integration-test-docker-environment/releases/download/0.9.0/exasol_integration_test_docker_environment-0.9.0-py3-none-any.whl
 

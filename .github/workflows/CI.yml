@@ -49,10 +49,7 @@ jobs:
     - name: Pip install requirements
       uses: BSFishy/pip-action@v1
       with:
-        requirements: | 
-          requirements.txt
-          requirements_test.txt
-          requirements_dev.txt
+        requirements: requirements_dev.txt
 
     - name: Pip install extra requirements
       uses: BSFishy/pip-action@v1

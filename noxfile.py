@@ -23,8 +23,7 @@ class Settings:
 
 
 ODBCINST_INI_TEMPLATE = (
-    cleandoc(
-    """
+    cleandoc("""
     [ODBC]
     #Trace = yes
     #TraceFile =~/odbc.trace
@@ -32,8 +31,7 @@ ODBCINST_INI_TEMPLATE = (
     [EXAODBC]
     #Driver location will be appended in build environment:
     DRIVER={driver}
-    """)
-    + "\n"
+    """) + "\n"
 )
 
 
@@ -84,13 +82,13 @@ def odbcconfig():
 
 
 @nox.session
-def verify(session):
+@nox.parametrize("connector", Settings.CONNECTORS)
+def verify(session, connector):
     """Prepare and run all available tests"""
     session.notify(find_session_runner(session, "db-start"))
-    for connector in Settings.CONNECTORS:
-        session.notify(
-            find_session_runner(session, f"integration(connector='{connector}')")
-        )
+    session.notify(
+        find_session_runner(session, f"integration(connector='{connector}')")
+    )
     session.notify(find_session_runner(session, "db-stop"))
 
 
@@ -158,7 +156,6 @@ def integration(session, connector):
     """Run(s) the integration tests for a specific connector. Expects a test database to be available."""
 
     with odbcconfig() as (config, env):
-        connector = (session.posargs or ["pyodbc"])[0]
         uri = "".join(
             [
                 "exa+{connector}:",

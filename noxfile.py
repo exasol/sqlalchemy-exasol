@@ -37,6 +37,7 @@ ODBCINST_INI_TEMPLATE = dedent(
 
 
 def find_session_runner(session, name):
+    """Helper function to find parameterized action by name"""
     for s, _ in session._runner.manifest.list_all_sessions():
         if name in s.signatures:
             return s

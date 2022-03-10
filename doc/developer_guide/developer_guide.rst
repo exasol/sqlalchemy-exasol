@@ -11,7 +11,7 @@ Tools
 * python_ >= 3.6
 * git_
 * Docker_
-* ITDE_
+* integration-test-docker-environment_
     * Prerequisites_
 
 Libraries
@@ -47,7 +47,7 @@ Project Layout
 
 .. attention::
 
-    Currently it is required that the ITDE_  project is checked out in parallel to this
+    Currently it is required that the integration-test-docker-environment_  project is checked out in parallel to this
     project. For more details on this have a look at the `Settings` in `noxfile.py`
 
     Expected Layout:
@@ -98,5 +98,5 @@ Tests
 .. _python: https://www.python.org/
 .. _git: https://git-scm.com/
 .. _Docker: https://www.docker.com/
-.. _ITDE: https://github.com/exasol/integration-test-docker-environment
+.. _integration-test-docker-environment: https://github.com/exasol/integration-test-docker-environment
 .. _Prerequisites: https://github.com/exasol/integration-test-docker-environment#prerequisites>

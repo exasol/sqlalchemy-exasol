@@ -36,7 +36,7 @@ ODBCINST_INI_TEMPLATE = dedent(
 )
 
 
-def find_session_runner(session, name):
+def find_session_runner(session: nox.Session, name: str):
     """Helper function to find parameterized action by name"""
     for s, _ in session._runner.manifest.list_all_sessions():
         if name in s.signatures:
@@ -76,7 +76,7 @@ def temporary_odbc_config(config):
 @contextmanager
 def odbcconfig():
     with temporary_odbc_config(
-        ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
+            ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
         env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
         with environment(env_vars) as env:

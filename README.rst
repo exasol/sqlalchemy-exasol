@@ -100,23 +100,13 @@ Host url  'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
 - Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
 - As of EXASol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
 
-
-Unit tests
-``````````
-
-To run the unit tests you need:
-
-- set the `default` connection string in the `setup.cfg` file, which should contain an existing schema to run tests against.  Note that the tests also use a schema "test_schema";
-- set the `DRIVER` path under the `EXAODBC` section in the `odbcconfig/odbcinst.ini` file;
-- set the `ODBCINSTINI` and `ODBCINST` environment variables to point to the full path of `odbcconfig/odbcinst.ini`
-
-and finally run the unit tests:
-
-    $ py.test test/
-
-
 Troubleshooting
 ```````````````
 
 The unixodbc Stack is not the most friendly for programmers. If you get strange errors from the driver mangager, you might have an issue with the names of the unixodbc libs. Have a look at https://github.com/blue-yonder/sqlalchemy_exasol/blob/master/fix_unixodbc_so.sh to find ideas on how to fix this on Ubuntu. Good luck!
 
+Development & Testing
+`````````````````````
+See `developer guide`_
+
+.. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/doc/developer_guide/developer_guide.rst

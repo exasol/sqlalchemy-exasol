@@ -49,12 +49,7 @@ jobs:
     - name: Pip install requirements
       uses: BSFishy/pip-action@v1
       with:
-        requirements: requirements.txt
-
-    - name: Pip install test requirements
-      uses: BSFishy/pip-action@v1
-      with:
-        requirements: requirements_test.txt
+        requirements: requirements_dev.txt
 
     - name: Pip install extra requirements
       uses: BSFishy/pip-action@v1
@@ -66,28 +61,8 @@ jobs:
       run: git clone https://github.com/exasol/integration-test-docker-environment.git
       working-directory: ..
 
-    - name: Add TEST_SCHEMA and TEST_SCHEMA_" to test DDL
-      run: |
-        echo 'CREATE SCHEMA TEST;' > tests/test/enginedb_small/import.sql;
-        echo 'CREATE SCHEMA TEST_SCHEMA;' >> tests/test/enginedb_small/import.sql;
-        echo 'CREATE SCHEMA TEST_SCHEMA_2;' >> tests/test/enginedb_small/import.sql;
-        echo 'SELECT * FROM SYS.EXA_SCHEMAS;' >> tests/test/enginedb_small/import.sql;
-        echo 'COMMIT;' >> tests/test/enginedb_small/import.sql;
-        cat  tests/test/enginedb_small/import.sql;
-      working-directory: ../integration-test-docker-environment
-
-    - name: Spawn EXASOL environemnt
-      run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666 --docker-db-image-version ${{ matrix.exasol_version }} --db-mem-size 4GB
-      working-directory: ../integration-test-docker-environment
-
-    - name: Prepare odbcinst.ini
-      run: echo DRIVER=$GITHUB_WORKSPACE/driver/libexaodbc-uo2214lv1.so >> odbcconfig/odbcinst.ini
-
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: py.test --dropfirst --dburi "$TESTDB"
-      env:
-        ODBCSYSINI: "${{ github.workspace }}/odbcconfig"
-        TESTDB: "exa+${{ matrix.connector }}://sys:exasol@localhost:8888/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC"
+      run: nox -s "verify(connector='${{ matrix.connector }}')"
 
   build_package:
     runs-on: ubuntu-latest

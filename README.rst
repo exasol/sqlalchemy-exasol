@@ -105,3 +105,8 @@ Troubleshooting
 
 The unixodbc Stack is not the most friendly for programmers. If you get strange errors from the driver mangager, you might have an issue with the names of the unixodbc libs. Have a look at https://github.com/blue-yonder/sqlalchemy_exasol/blob/master/fix_unixodbc_so.sh to find ideas on how to fix this on Ubuntu. Good luck!
 
+Development & Testing
+`````````````````````
+See `developer guide`_
+
+.. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/doc/developer_guide/developer_guide.rst

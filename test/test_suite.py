@@ -1,52 +1,84 @@
 # import all SQLAlchemy tests for this dialect
 import pytest
+from sqlalchemy import create_engine, text
+from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
+from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
+from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
+from sqlalchemy.testing.suite import NumericTest as _NumericTest
+from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
-
-from sqlalchemy.testing.suite import CompoundSelectTest \
-    as _CompoundSelectTest
-from sqlalchemy.testing.suite import ExpandingBoundInTest \
-    as _ExpandingBoundInTest
-from sqlalchemy.testing.suite import NumericTest \
-    as _NumericTest
-from sqlalchemy.testing.suite import QuotedNameArgumentTest \
-    as _QuotedNameArgumentTest
 
 
 class CompoundSelectTest(_CompoundSelectTest):
+    """Skip this test as EXASOL does not allow EXISTS or IN predicates
+    as part of the select list. Skipping is implemented by redefining
+    the method as proposed by SQLAlchemy docs for new dialects."""
 
-    """ Skip this test as EXASOL does not allow EXISTS or IN predicates
-        as part of the select list. Skipping is implemented by redefining
-        the method as proposed by SQLAlchemy docs for new dialects."""
     def test_null_in_empty_set_is_false(self):
         return
 
 
-class ExpandingBoundInTest(_ExpandingBoundInTest):
+class ExceptionTest(_ExceptionTest):
 
-    """ Skip this test as EXASOL does not allow EXISTS or IN predicates
-        as part of the select list. Skipping is implemented by redefining
-        the method as proposed by SQLAlchemy docs for new dialects."""
+    @requirements.duplicate_key_raises_integrity_error
+    def test_integrity_error(self):
+        # Note: autocommit currently is needed to force error evaluation,
+        #       otherwise errors will be swallowed.
+        #       see also https://github.com/exasol/sqlalchemy-exasol/issues/120
+        engine = create_engine(config.db.url, connect_args={'autocommit': True})
+        with engine.connect() as conn:
+            trans = conn.begin()
+            conn.execute(
+                self.tables.manual_pk.insert(), {"id": 1, "data": "d1"}
+            )
+
+            assert_raises(
+                exc.IntegrityError,
+                conn.execute,
+                self.tables.manual_pk.insert(),
+                {"id": 1, "data": "d1"},
+            )
+            trans.rollback()
+
+    @requirements.duplicate_key_raises_integrity_error
+    def test_integrity_error_raw_sql(self):
+        insert = text("INSERT INTO MANUAL_PK VALUES (1, 'd1')")
+        with config.db.connect() as conn:
+            conn.execute(insert)
+
+            assert_raises(
+                exc.IntegrityError,
+                conn.execute,
+                insert
+            )
+
+
+class ExpandingBoundInTest(_ExpandingBoundInTest):
+    """Skip this test as EXASOL does not allow EXISTS or IN predicates
+    as part of the select list. Skipping is implemented by redefining
+    the method as proposed by SQLAlchemy docs for new dialects."""
+
     def test_null_in_empty_set_is_false(self):
         return
 
 
 class NumericTest(_NumericTest):
+    """FIXME: test skipped to allow upgrading to SQLAlchemy 1.3.x due
+    to vulnerability in 1.2.x. Need to understand reason for this.
+    Hypothesis is that the data type is not correctly coerced between
+    EXASOL and pyodbc."""
 
-    """ FIXME: test skipped to allow upgrading to SQLAlchemy 1.3.x due
-        to vulnerability in 1.2.x. Need to understand reason for this.
-        Hypothesis is that the data type is not correctly coerced between
-        EXASOL and pyodbc."""
     def test_decimal_coerce_round_trip(self):
         return
 
 
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):
+    """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
+    issues in other dialects related to object names that contain quotes
+    and double quotes. Since this feature is not relevant to the
+    Exasol dialect, the entire suite will be skipped. More info on fix:
+    https://github.com/sqlalchemy/sqlalchemy/issues/5456"""
 
-    """ This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
-        issues in other dialects related to object names that contain quotes 
-        and double quotes. Since this feature is not relevant to the 
-        Exasol dialect, the entire suite will be skipped. More info on fix:
-        https://github.com/sqlalchemy/sqlalchemy/issues/5456 """
     @pytest.mark.skip()
     def test_get_table_options(self, name):
         return

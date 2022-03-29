@@ -3,7 +3,7 @@ from mock import Mock
 from sqlalchemy import testing
 from sqlalchemy.engine import url as sa_url
 from sqlalchemy.pool import _ConnectionFairy
-from sqlalchemy.testing import eq_, fixtures
+from sqlalchemy.testing import fixtures
 
 from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
 
@@ -18,8 +18,8 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
     def assert_parsed(self, dsn, expected_connector, expected_args):
         url = sa_url.make_url(dsn)
         connector, args = self.dialect.create_connect_args(url)
-        eq_(connector, expected_connector)
-        eq_(args, expected_args)
+        assert connector == expected_connector
+        assert args == expected_args
 
     def test_create_connect_args(self):
         self.assert_parsed(
@@ -109,5 +109,4 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
 
         for error in errors:
             status = self.dialect.is_disconnect(error, connection, cursor)
-
-            eq_(status, True)
+            assert status

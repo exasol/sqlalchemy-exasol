@@ -319,15 +319,15 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         table = self.compiled.sql_compiler.statement.table.name
         table = self.dialect.denormalize_name(table)
 
-        def _schema(sql_compiler, dialect):
+        def _get_schema(sql_compiler, dialect):
             """Get the schema while taking the translation-map and the de-normalization into account"""
             translate_map = sql_compiler.schema_translate_map
-            schema_dispatcher = dict(translate_map.map_) if translate_map else {}
+            schema_dispatcher = translate_map.map_ if translate_map else {}
             schema = sql_compiler.statement.table.schema
             schema = schema_dispatcher[schema] if schema in schema_dispatcher else schema
             return dialect.denormalize_name(schema)
 
-        schema = _schema(
+        schema = _get_schema(
             self.compiled.sql_compiler,
             self.dialect
         )
@@ -335,9 +335,9 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         sql_stmnt = " ".join((
             "SELECT column_identity from SYS.EXA_ALL_COLUMNS",
             "WHERE column_object_type = 'TABLE' and column_table",
-            "= ? AND column_name = ?",
-            "AND column_schema = ?" if schema else ""
+            "= ? AND column_name = ?"
         ))
+        sql_stmnt += " AND column_schema = ?" if schema else ""
         args = (table, id_col, schema) if schema else (table, id_col)
 
         with self.create_cursor() as cursor:

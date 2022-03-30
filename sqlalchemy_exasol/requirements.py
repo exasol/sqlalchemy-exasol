@@ -158,7 +158,9 @@ class Requirements(SuiteRequirements):
 
     @property
     def duplicate_key_raises_integrity_error(self):
-        return exclusions.closed()
+        return exclusions.only_on(
+            [lambda config: config.db.dialect.driver == 'pyodbc']
+        )
 
     @property
     def independent_connections(self):

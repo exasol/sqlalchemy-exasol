@@ -327,6 +327,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
 
             schema = self.compiled.sql_compiler.statement.table.schema
             if schema is not None:
+                schema = self.compiled.sql_compiler.schema_translate_map.map_[schema] if schema in self.compiled.sql_compiler.schema_translate_map.map_ else schema
                 schema = self.dialect.denormalize_name(schema)
                 sql_stmnt += " AND column_schema = ?"
 

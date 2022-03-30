@@ -88,6 +88,12 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         opts.update(url.query)
         # always enable efficient conversion to Python types: see https://www.exasol.com/support/browse/EXASOL-898
         opts["INTTYPESINRESULTSIFPOSSIBLE"] = "y"
+        # Make sure the exasol odbc driver reports the expected error codes.
+        # see also:
+        #   * https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/using_odbc.htm
+        #   * https://github.com/exasol/sqlalchemy-exasol/issues/118
+        opts["SQLSTATEMAPPINGACTIVE"] = "y"
+        opts["SQLSTATEMAPPINGS"] = "42X91:23000,27002:23000"
 
         keys = opts
         query = url.query

@@ -26,6 +26,8 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
             "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?driver=EXAODBC",
             [
                 "DRIVER={EXAODBC};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y"
+                ";SQLSTATEMAPPINGACTIVE=y"
+                ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
             ],
             {},
         )
@@ -35,6 +37,8 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
             "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?driver=FOOBAR",
             [
                 "DRIVER={FOOBAR};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y"
+                ";SQLSTATEMAPPINGACTIVE=y"
+                ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
             ],
             {},
         )
@@ -44,6 +48,8 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
             "exa+pyodbc://scott:tiger@exa_test",
             [
                 "DSN=exa_test;EXAHOST=;EXASCHEMA=;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y"
+                ";SQLSTATEMAPPINGACTIVE=y"
+                ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
             ],
             {},
         )
@@ -53,6 +59,8 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
             "exa+pyodbc://192.168.1.2..8:1234/my_schema",
             [
                 "DRIVER={None};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;Trusted_Connection=Yes;INTTYPESINRESULTSIFPOSSIBLE=y"
+                ";SQLSTATEMAPPINGACTIVE=y"
+                ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
             ],
             {},
         )
@@ -62,6 +70,8 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
             "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?odbc_autotranslate=Yes",
             [
                 "DRIVER={None};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;AutoTranslate=Yes;INTTYPESINRESULTSIFPOSSIBLE=y"
+                ";SQLSTATEMAPPINGACTIVE=y"
+                ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
             ],
             {},
         )
@@ -71,6 +81,8 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
             "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?autocommit=true",
             [
                 "DRIVER={None};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y"
+                ";SQLSTATEMAPPINGACTIVE=y"
+                ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
             ],
             {"AUTOCOMMIT": True},
         )
@@ -80,6 +92,8 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
             "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?autocommit=true&ansi=false&unicode_results=false",
             [
                 "DRIVER={None};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y"
+                ";SQLSTATEMAPPINGACTIVE=y"
+                ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
             ],
             {"AUTOCOMMIT": True, "ANSI": False, "UNICODE_RESULTS": False},
         )
@@ -88,7 +102,10 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
         self.assert_parsed(
             "exa+pyodbc://scott:tiger@192.168.1.2..8:1234/my_schema?clientname=test&querytimeout=10",
             [
-                "DRIVER={None};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y;clientname=test;querytimeout=10"
+                "DRIVER={None};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y"
+                ";SQLSTATEMAPPINGACTIVE=y"
+                 ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
+                ";clientname=test;querytimeout=10"
             ],
             {},
         )

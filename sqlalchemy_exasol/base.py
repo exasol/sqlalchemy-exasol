@@ -307,36 +307,42 @@ class EXAExecutionContext(default.DefaultExecutionContext):
 
     def get_lastrowid(self):
         columns = self.compiled.sql_compiler.statement.table.columns
-        autoinc_pk_columns = \
-            [c.name for c in columns if c.autoincrement and c.primary_key]
-        if len(autoinc_pk_columns) == 0:
+        autoinc_pk_columns = [c.name for c in columns if c.autoincrement and c.primary_key]
+        if not autoinc_pk_columns:
             return None
-        elif len(autoinc_pk_columns) > 1:
-            util.warn("Table with more than one autoincrement, primary key" \
-                      " Column!")
-            raise Exception
-        else:
-            id_col = self.dialect.denormalize_name(autoinc_pk_columns[0])
+        if len(autoinc_pk_columns) > 1:
+            msg = "Table with more than one autoincrement, primary key Column!"
+            util.warn(msg)
+            raise Exception(msg)
 
-            table = self.compiled.sql_compiler.statement.table.name
-            table = self.dialect.denormalize_name(table)
+        id_col = self.dialect.denormalize_name(autoinc_pk_columns[0])
+        table = self.compiled.sql_compiler.statement.table.name
+        table = self.dialect.denormalize_name(table)
 
-            sql_stmnt = "SELECT column_identity from SYS.EXA_ALL_COLUMNS " \
-                        "WHERE column_object_type = 'TABLE' and column_table " \
-                        "= ? AND column_name = ?"
+        def _get_schema(sql_compiler, dialect):
+            """Get the schema while taking the translation-map and the de-normalization into account"""
+            translate_map = sql_compiler.schema_translate_map
+            schema_dispatcher = translate_map.map_ if translate_map else {}
+            schema = sql_compiler.statement.table.schema
+            schema = schema_dispatcher[schema] if schema in schema_dispatcher else schema
+            return dialect.denormalize_name(schema)
 
-            schema = self.compiled.sql_compiler.statement.table.schema
-            if schema is not None:
-                schema = self.dialect.denormalize_name(schema)
-                sql_stmnt += " AND column_schema = ?"
+        schema = _get_schema(
+            self.compiled.sql_compiler,
+            self.dialect
+        )
 
-            cursor = self.create_cursor()
-            if schema:
-                cursor.execute(sql_stmnt, (table, id_col, schema))
-            else:
-                cursor.execute(sql_stmnt, (table, id_col))
+        sql_stmnt = " ".join((
+            "SELECT column_identity from SYS.EXA_ALL_COLUMNS",
+            "WHERE column_object_type = 'TABLE' and column_table",
+            "= ? AND column_name = ?"
+        ))
+        sql_stmnt += " AND column_schema = ?" if schema else ""
+        args = (table, id_col, schema) if schema else (table, id_col)
+
+        with self.create_cursor() as cursor:
+            cursor.execute(sql_stmnt, args)
             result = cursor.fetchone()
-            cursor.close()
             return int(result[0]) - 1
 
     def pre_exec(self):

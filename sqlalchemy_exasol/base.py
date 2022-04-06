@@ -47,6 +47,7 @@ representation (all uppercase).
 """
 
 import six
+import sqlalchemy.exc
 
 if six.PY3:
     from six import u as unicode
@@ -262,12 +263,12 @@ class EXADDLCompiler(compiler.DDLCompiler):
         return preparer.format_table(table, use_schema=True)
 
     def visit_create_index(self, create):
-        """EXASol manages indexes internally"""
-        raise NotImplementedError()
+        """Exasol manages indexes internally"""
+        raise sqlalchemy.exc.CompileError("Not Supported: " + self.visit_create_index.__doc__)
 
     def visit_drop_index(self, drop):
-        """EXASol manages indexes internally"""
-        raise NotImplementedError()
+        """Exasol manages indexes internally"""
+        raise sqlalchemy.exc.CompileError("Not Supported: " + self.visit_drop_index.__doc__)
 
 
 class EXATypeCompiler(compiler.GenericTypeCompiler):

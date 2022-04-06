@@ -7,6 +7,37 @@ from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTe
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
+from sqlalchemy.testing.suite.test_ddl import (
+    LongNameBlowoutTest as _LongNameBlowoutTest,
+)
+
+
+class LongNameBlowoutTest(_LongNameBlowoutTest):
+    @testing.combinations(
+        ("fk",),
+        ("pk",),
+        # Manual indexes are not recommended within the Exasol DB,
+        # (see https://docs.exasol.com/db/latest/performance/best_practices.htm)
+        # therefore they are currently not supported by the sqlalchemy-exasol extension.
+        # ("ix",)
+        ("ck", testing.requires.check_constraint_reflection.as_skips()),
+        ("uq", testing.requires.unique_constraint_reflection.as_skips()),
+        argnames="type_",
+    )
+    @testing.provide_metadata
+    def test_long_convention_name(self, type_, connection):
+        metadata = self.metadata
+
+        actual_name, reflected_name = getattr(self, type_)(metadata, connection)
+
+        assert len(actual_name) > 255
+
+        if reflected_name is not None:
+            overlap = actual_name[0 : len(reflected_name)]
+            if len(overlap) < len(actual_name):
+                eq_(overlap[0:-5], reflected_name[0 : len(overlap) - 5])
+            else:
+                eq_(overlap, reflected_name)
 
 
 class CompoundSelectTest(_CompoundSelectTest):
@@ -19,18 +50,15 @@ class CompoundSelectTest(_CompoundSelectTest):
 
 
 class ExceptionTest(_ExceptionTest):
-
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error(self):
         # Note: autocommit currently is needed to force error evaluation,
         #       otherwise errors will be swallowed.
         #       see also https://github.com/exasol/sqlalchemy-exasol/issues/120
-        engine = create_engine(config.db.url, connect_args={'autocommit': True})
+        engine = create_engine(config.db.url, connect_args={"autocommit": True})
         with engine.connect() as conn:
             trans = conn.begin()
-            conn.execute(
-                self.tables.manual_pk.insert(), {"id": 1, "data": "d1"}
-            )
+            conn.execute(self.tables.manual_pk.insert(), {"id": 1, "data": "d1"})
 
             assert_raises(
                 exc.IntegrityError,
@@ -46,11 +74,7 @@ class ExceptionTest(_ExceptionTest):
         with config.db.connect() as conn:
             conn.execute(insert)
 
-            assert_raises(
-                exc.IntegrityError,
-                conn.execute,
-                insert
-            )
+            assert_raises(exc.IntegrityError, conn.execute, insert)
 
 
 class ExpandingBoundInTest(_ExpandingBoundInTest):

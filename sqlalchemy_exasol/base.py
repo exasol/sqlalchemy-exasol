@@ -390,6 +390,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
 
 class EXADialect(default.DefaultDialect):
     name = 'exasol'
+    max_identifier_length = 128
     supports_native_boolean = True
     supports_native_decimal = True
     supports_alter = True

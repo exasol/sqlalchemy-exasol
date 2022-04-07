@@ -80,7 +80,7 @@ to use turbodbc as driver:
 
 The dialect supports two types of connection urls creating an engine. A DSN (Data Source Name) mode and a host mode:
 
-.. list-table:: Title
+.. list-table::
     :widths: 50 50
     :header-rows: 1
 

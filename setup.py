@@ -23,7 +23,7 @@ setup(
     name="sqlalchemy_exasol",
     setup_requires=["setuptools_scm"],
     license="License :: OSI Approved :: BSD License",
-    url="https://github.com/blue-yonder/sqlalchemy_exasol",
+    url="https://github.com/exasol/sqlalchemy-exasol",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",

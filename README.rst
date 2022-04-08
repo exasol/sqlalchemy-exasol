@@ -27,7 +27,7 @@ Meet the system requirements
 
 On Linux/Unix like systems you need:
 
-- An `Exasol DB <test_drive_>`_
+- An Exasol DB (e.g. `docker-db <test_docker_image_>`_ or a `cloud instance <test_drive_>`_)
 
   - >= 7.1.6
   - >= 7.0.16
@@ -40,7 +40,7 @@ On Linux/Unix like systems you need:
 Turbodbc support
 ````````````````
 
-- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.8.
+- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.6.
 - Multi row update is not supported, see
   `test/test_update.py <test/test_update.py>`_ for an example
 
@@ -112,3 +112,4 @@ See `developer guide`_
 .. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/doc/developer_guide/developer_guide.rst
 .. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
 .. _test_drive: https://www.exasol.com/test-it-now/cloud/
+.. _test_docker_image: https://github.com/exasol/docker-db

@@ -1,12 +1,9 @@
 import urllib.error
-from email import policy
-from email.parser import BytesParser
+import subprocess
 from itertools import repeat
 from pathlib import Path
 from typing import Iterable, Tuple
 from urllib import request
-
-from urlscan import urlchoose, urlscan
 
 
 def documentation(root: Path) -> Iterable[Path]:
@@ -27,14 +24,14 @@ def urls(files: Iterable[Path]) -> Iterable[Tuple[Path, str]]:
         return url.startswith("mailto") or url in _filtered
 
     for file in files:
-        with open(file, "rb") as f:
-            content = BytesParser(policy=policy.default.clone(utf8=True)).parse(f)
-            selector = urlchoose.URLChooser(
-                urlscan.msgurls(content), dedupe=False, reverse=False, shorten=False
-            )
-            yield from zip(
-                repeat(file), filter(lambda url: not should_filter(url), selector.urls)
-            )
+        cmd = ['python', '-m', 'urlscan', '-n', f'{file}']
+        r = subprocess.run(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        r.check_returncode()
+        stdout = r.stdout.decode('utf8').strip()
+        _urls = (url.strip() for url in stdout.split('\n'))
+        yield from zip(
+            repeat(file), filter(lambda url: not should_filter(url), _urls)
+        )
 
 
 def check(url: str) -> Tuple[int, str]:

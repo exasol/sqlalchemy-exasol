@@ -1,11 +1,17 @@
 import os
+import urllib.error
 from contextlib import contextmanager
+from email import policy
+from email.parser import BytesParser
+from itertools import repeat
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from textwrap import dedent
+from urllib import request
 
 import nox
 from pyodbc import connect
+from urlscan import urlchoose, urlscan
 
 PROJECT_ROOT = Path(__file__).parent
 
@@ -76,7 +82,7 @@ def temporary_odbc_config(config):
 @contextmanager
 def odbcconfig():
     with temporary_odbc_config(
-            ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
+        ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
         env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
         with environment(env_vars) as env:
@@ -168,3 +174,65 @@ def integration(session, connector):
             ]
         ).format(connector=connector, db_port=Settings.DB_PORT)
         session.run("pytest", "--dropfirst", "--dburi", uri, external=True, env=env)
+
+
+def _documentation():
+    """Returns an iterator over all documentation files of the project"""
+    docs = PROJECT_ROOT.glob("**/*.rst")
+
+    def _deny_filter(path):
+        return not ("venv" in path.parts)
+
+    return filter(lambda path: _deny_filter(path), docs)
+
+
+def _urls(files):
+    """Returns an iterator over all urls contained in the provided files"""
+
+    def should_filter(url):
+        _filtered = []
+        return url.startswith("mailto") or url in _filtered
+
+    for file in files:
+        with open(file, "rb") as f:
+            content = BytesParser(policy=policy.default.clone(utf8=True)).parse(f)
+            selector = urlchoose.URLChooser(
+                urlscan.msgurls(content), dedupe=False, reverse=False, shorten=False
+            )
+            yield from zip(
+                repeat(file), filter(lambda url: not should_filter(url), selector.urls)
+            )
+
+
+def _check(url):
+    """Checks if an url is still working (can be accessed)"""
+    try:
+        # User-Agent needs to be faked otherwise some webpages will deny access with a 403
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        result = request.urlopen(req)
+        return result.code, f"{result.msg}"
+    except urllib.error.HTTPError as ex:
+        return ex.status, f"{ex}"
+
+
+@nox.session(name="check-links", python=None)
+def check_links(session):
+    """Checks weather or not all links in the documentation can be accessed"""
+    errors = []
+    for path, url in _urls(_documentation()):
+        status, details = _check(url)
+        if status != 200:
+            errors.append((path, url, status, details))
+
+    if errors:
+        session.error(
+            "\n"
+            + "\n".join((f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors))
+        )
+
+
+@nox.session(name="list-links", python=None)
+def list_links(session):
+    """List all links within the documentation"""
+    for path, url in _urls(_documentation()):
+        session.log(f"Url: {url}, File: {path}")

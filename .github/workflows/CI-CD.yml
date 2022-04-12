@@ -60,6 +60,9 @@ jobs:
       run: git clone https://github.com/exasol/integration-test-docker-environment.git
       working-directory: ..
 
+    - name: Check documentation links ${{ matrix.python }} using ${{ matrix.connector }}
+      run: nox -s "check-links"
+
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
       run: nox -s "verify(connector='${{ matrix.connector }}')"
 

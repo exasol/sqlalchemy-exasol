@@ -1,19 +1,18 @@
 import os
-import urllib.error
+import sys
 from contextlib import contextmanager
-from email import policy
-from email.parser import BytesParser
-from itertools import repeat
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from textwrap import dedent
-from urllib import request
-
-import nox
-from pyodbc import connect
-from urlscan import urlchoose, urlscan
 
 PROJECT_ROOT = Path(__file__).parent
+sys.path.append(f'{PROJECT_ROOT / "scripts"}')
+
+import nox
+from links import check as _check
+from links import documentation as _documentation
+from links import urls as _urls
+from pyodbc import connect
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["verify(connector='pyodbc')"]
@@ -176,50 +175,11 @@ def integration(session, connector):
         session.run("pytest", "--dropfirst", "--dburi", uri, external=True, env=env)
 
 
-def _documentation():
-    """Returns an iterator over all documentation files of the project"""
-    docs = PROJECT_ROOT.glob("**/*.rst")
-
-    def _deny_filter(path):
-        return not ("venv" in path.parts)
-
-    return filter(lambda path: _deny_filter(path), docs)
-
-
-def _urls(files):
-    """Returns an iterator over all urls contained in the provided files"""
-
-    def should_filter(url):
-        _filtered = []
-        return url.startswith("mailto") or url in _filtered
-
-    for file in files:
-        with open(file, "rb") as f:
-            content = BytesParser(policy=policy.default.clone(utf8=True)).parse(f)
-            selector = urlchoose.URLChooser(
-                urlscan.msgurls(content), dedupe=False, reverse=False, shorten=False
-            )
-            yield from zip(
-                repeat(file), filter(lambda url: not should_filter(url), selector.urls)
-            )
-
-
-def _check(url):
-    """Checks if an url is still working (can be accessed)"""
-    try:
-        # User-Agent needs to be faked otherwise some webpages will deny access with a 403
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        result = request.urlopen(req)
-        return result.code, f"{result.msg}"
-    except urllib.error.HTTPError as ex:
-        return ex.status, f"{ex}"
-
-
 @nox.session(name="check-links", python=None)
 def check_links(session):
     """Checks weather or not all links in the documentation can be accessed"""
     errors = []
-    for path, url in _urls(_documentation()):
+    for path, url in _urls(_documentation(PROJECT_ROOT)):
         status, details = _check(url)
         if status != 200:
             errors.append((path, url, status, details))
@@ -234,5 +194,5 @@ def check_links(session):
 @nox.session(name="list-links", python=None)
 def list_links(session):
     """List all links within the documentation"""
-    for path, url in _urls(_documentation()):
+    for path, url in _urls(_documentation(PROJECT_ROOT)):
         session.log(f"Url: {url}, File: {path}")

@@ -2,8 +2,8 @@ SQLAlchemy Dialect for EXASOL DB
 ================================
 
 
-.. image:: https://github.com/blue-yonder/sqlalchemy_exasol/workflows/CI-CD/badge.svg?branch=master
-    :target: https://github.com/blue-yonder/sqlalchemy_exasol/actions?query=workflow%3ACI-CD
+.. image:: https://github.com/exasol/sqlalchemy_exasol/workflows/CI-CD/badge.svg?branch=master
+    :target: https://github.com/exasol/sqlalchemy_exasol/actions?query=workflow%3ACI-CD
 .. image:: https://img.shields.io/pypi/v/sqlalchemy_exasol
      :target: https://pypi.org/project/sqlalchemy-exasol/
      :alt: PyPI Version
@@ -109,7 +109,7 @@ Development & Testing
 `````````````````````
 See `developer guide`_
 
-.. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/doc/developer_guide/developer_guide.rst
+.. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
 .. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
 .. _test_drive: https://www.exasol.com/test-it-now/cloud/
 .. _test_docker_image: https://github.com/exasol/docker-db

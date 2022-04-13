@@ -25,9 +25,12 @@ def urls(files: Iterable[Path]) -> Iterable[Tuple[Path, str]]:
 
     for file in files:
         cmd = ['python', '-m', 'urlscan', '-n', f'{file}']
-        r = subprocess.run(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        r.check_returncode()
-        stdout = r.stdout.decode('utf8').strip()
+        result = subprocess.run(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        if result.returncode != 0:
+            stderr = result.stderr.decode('utf8')
+            msg = f"Could not retrieve url's from file: {file}, details: {stderr}"
+            raise Exception(msg)
+        stdout = result.stdout.decode('utf8').strip()
         _urls = (url.strip() for url in stdout.split('\n'))
         yield from zip(
             repeat(file), filter(lambda url: not should_filter(url), _urls)

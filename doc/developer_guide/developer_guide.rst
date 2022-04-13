@@ -94,7 +94,7 @@ Tests
     If something still is not working or unclear, you may want to look into the CI/CD action_ files.
 
 
-.. _action: https://github.com/blue-yonder/sqlalchemy_exasol/actions
+.. _action: https://github.com/exasol/sqlalchemy_exasol/actions
 .. _python: https://www.python.org/
 .. _git: https://git-scm.com/
 .. _Docker: https://www.docker.com/

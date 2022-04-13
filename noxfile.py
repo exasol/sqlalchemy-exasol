@@ -1,13 +1,18 @@
 import os
+import sys
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from textwrap import dedent
 
-import nox
-from pyodbc import connect
-
 PROJECT_ROOT = Path(__file__).parent
+sys.path.append(f'{PROJECT_ROOT / "scripts"}')
+
+import nox
+from links import check as _check
+from links import documentation as _documentation
+from links import urls as _urls
+from pyodbc import connect
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["verify(connector='pyodbc')"]
@@ -76,7 +81,7 @@ def temporary_odbc_config(config):
 @contextmanager
 def odbcconfig():
     with temporary_odbc_config(
-            ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
+        ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
         env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
         with environment(env_vars) as env:
@@ -168,3 +173,26 @@ def integration(session, connector):
             ]
         ).format(connector=connector, db_port=Settings.DB_PORT)
         session.run("pytest", "--dropfirst", "--dburi", uri, external=True, env=env)
+
+
+@nox.session(name="check-links", python=None)
+def check_links(session):
+    """Checks weather or not all links in the documentation can be accessed"""
+    errors = []
+    for path, url in _urls(_documentation(PROJECT_ROOT)):
+        status, details = _check(url)
+        if status != 200:
+            errors.append((path, url, status, details))
+
+    if errors:
+        session.error(
+            "\n"
+            + "\n".join((f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors))
+        )
+
+
+@nox.session(name="list-links", python=None)
+def list_links(session):
+    """List all links within the documentation"""
+    for path, url in _urls(_documentation(PROJECT_ROOT)):
+        session.log(f"Url: {url}, File: {path}")

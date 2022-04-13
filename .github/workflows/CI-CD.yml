@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [3.6]
+        python: [3.6, 3.7, 3.8, 3.9]
         connector:
           - pyodbc
           - turbodbc
@@ -60,6 +60,9 @@ jobs:
       run: git clone https://github.com/exasol/integration-test-docker-environment.git
       working-directory: ..
 
+    - name: Check documentation links ${{ matrix.python }} using ${{ matrix.connector }}
+      run: nox -s "check-links"
+
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
       run: nox -s "verify(connector='${{ matrix.connector }}')"
 
@@ -97,8 +100,8 @@ jobs:
     - name: Build sdist and wheel packages
       run: python setup.py sdist bdist_wheel
 
-    - name: Push package to Test Pypi
-      uses: pypa/gh-action-pypi-publish@master
+    - name: Push package to Pypi
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
-        password: ${{ secrets.pypi_password }}
+        password: ${{ secrets.pypi_token }}

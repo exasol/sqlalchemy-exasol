@@ -1,3 +1,16 @@
+# 2.3.0
+* Update supported versions of EXASOL DB to 7.1.6 and 7.0.16 
+* Update supported python versions to 3.6, 3.7, 3.8, 3.9
+* bumped SQLAlchemy dependency to 1.3.24
+* bumped pyodbc dependency to 4.0.32
+* Fixed bug regarding maximum identifier length
+* Fixed bug with custom translate maps
+* Fixed bug regarding non existent error code mappings for EXASOL specific odbc error codes
+* Updated documentation to reflect the latest version changes etc.
+* Updated maintainer and contact information
+* Removed outdated documentation and resources
+* Removed python 2.7 support
+
 # 2.2.0
 * Solved performance problems for large tables/databases. Full information on this [PR](https://github.com/blue-yonder/sqlalchemy_exasol/pull/101)
 * Bumped dependencies

@@ -2,8 +2,8 @@ SQLAlchemy Dialect for EXASOL DB
 ================================
 
 
-.. image:: https://github.com/blue-yonder/sqlalchemy_exasol/workflows/CI-CD/badge.svg?branch=master
-    :target: https://github.com/blue-yonder/sqlalchemy_exasol/actions?query=workflow%3ACI-CD
+.. image:: https://github.com/exasol/sqlalchemy_exasol/workflows/CI-CD/badge.svg?branch=master
+    :target: https://github.com/exasol/sqlalchemy_exasol/actions?query=workflow%3ACI-CD
 .. image:: https://img.shields.io/pypi/v/sqlalchemy_exasol
      :target: https://pypi.org/project/sqlalchemy-exasol/
      :alt: PyPI Version
@@ -20,93 +20,96 @@ How to get started
 ------------------
 
 We assume you have a good understanding of (unix)ODBC. If not, make sure you
-read their documentation carefully - there are lot's of traps to step into.
-
-Get the EXASolution database
-````````````````````````````
-
-If you do not have access to an EXASolution database, download EXASolo for free
-from EXASOL: http://www.exasol.com/en/test-drive/
-
-The database is a VM image. You will need VirtualBox, VMWare Player, or KVM to
-run the database. Start the database and make sure you can connect to it as
-described in the How-To from EXASOL.
+read their documentation carefully - there are lot's of traps 🪤 to step into.
 
 Meet the system requirements
 ````````````````````````````
 
 On Linux/Unix like systems you need:
 
-- the packages unixODBC and unixODBC-dev >= 2.2.14
-- Python >= 2.7
-- Download and install the ODBC client drivers from EXASOL >= 5
-- configure ODBC.ini and ODBCINST.ini
+- An Exasol DB (e.g. `docker-db <test_docker_image_>`_ or a `cloud instance <test_drive_>`_)
+
+  - >= 7.1.6
+  - >= 7.0.16
+
+- The packages unixODBC and unixODBC-dev >= 2.2.14
+- Python >= 3.6
+- The Exasol `ODBC driver <odbc_driver_>`_
+- The ODBC.ini and ODBCINST.ini configurations files setup
 
 Turbodbc support
 ````````````````
 
-- Turbodbc and sqlalchemy_exasol as well do now support python 2.7, 3.4 and 3.6.
+- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.6.
 - Multi row update is not supported, see
   `test/test_update.py <test/test_update.py>`_ for an example
 
 
-Setup you python project and install sqlalchemy-exasol
-``````````````````````````````````````````````````````
+Setup your python project and install sqlalchemy-exasol
+```````````````````````````````````````````````````````
 
-::
+.. code-block:: shell
 
-	> pip install sqlalchemy-exasol
+    $ pip install sqlalchemy-exasol
 
 for turbodbc support:
 
-::
+.. code-block:: shell
 
-	> pip install sqlalchemy-exasol[turbodbc]
+    $ pip install sqlalchemy-exasol[turbodbc]
 
-Talk to EXASolution using SQLAlchemy
-````````````````````````````````````
+Talk to the EXASOL DB using SQLAlchemy
+``````````````````````````````````````
 
-::
+.. code-block:: python
 
 	from sqlalchemy import create_engine
-	e = create_engine("exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC")
+	url = "exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
+	e = create_engine(url)
 	r = e.execute("select 42 from dual").fetchall()
 
 to use turbodbc as driver:
 
-::
+.. code-block:: python
 
 	from sqlalchemy import create_engine
-	e = create_engine("exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC")
+	url = "exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
+	e = create_engine(url)
 	r = e.execute("select 42 from dual").fetchall()
 
 
-The dialect supports two connection urls for create_engine. A DSN (Data Source Name) mode and a host mode:
+The dialect supports two types of connection urls creating an engine. A DSN (Data Source Name) mode and a host mode:
 
-========  ====================================================================
-DSN url   'exa+pyodbc://USER:PWD@exa_test'
-Host url  'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
-========  ====================================================================
+.. list-table::
+    :widths: 50 50
+    :header-rows: 1
 
-*Features*:
+   * - Type
+     - Example
+   * - DSN URL
+     - 'exa+pyodbc://USER:PWD@exa_test'
+   * - HOST URL
+     - 'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
+
+Features
+++++++++
 
 - SELECT, INSERT, UPDATE, DELETE statements
 - you can even use the MERGE statement (see unit tests for examples)
 
-*Note*:
+Notes
++++++
 
-- Schema name and parameters are optional for the host url string
+- Schema name and parameters are optional for the host url
 - At least on Linux/Unix systems it has proven valuable to pass 'CONNECTIONLCALL=en_US.UTF-8' as a url parameter. This will make sure that the client process (Python) and the EXASOL driver (UTF-8 internal) know how to interpret code pages correctly.
 - Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
-- As of EXASol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
-
-Troubleshooting
-```````````````
-
-The unixodbc Stack is not the most friendly for programmers. If you get strange errors from the driver mangager, you might have an issue with the names of the unixodbc libs. Have a look at https://github.com/blue-yonder/sqlalchemy_exasol/blob/master/fix_unixodbc_so.sh to find ideas on how to fix this on Ubuntu. Good luck!
+- As of Exasol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
 
 Development & Testing
 `````````````````````
 See `developer guide`_
 
-.. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/doc/developer_guide/developer_guide.rst
+.. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
+.. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
+.. _test_drive: https://www.exasol.com/test-it-now/cloud/
+.. _test_docker_image: https://github.com/exasol/docker-db

@@ -9,6 +9,7 @@
 * Updated documentation to reflect the latest version changes etc.
 * Updated maintainer and contact information
 * Removed outdated documentation and resources
+* Removed python 2.7 support
 
 # 2.2.0
 * Solved performance problems for large tables/databases. Full information on this [PR](https://github.com/blue-yonder/sqlalchemy_exasol/pull/101)

@@ -100,8 +100,8 @@ jobs:
     - name: Build sdist and wheel packages
       run: python setup.py sdist bdist_wheel
 
-    - name: Push package to Test Pypi
-      uses: pypa/gh-action-pypi-publish@master
+    - name: Push package to Pypi
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
-        password: ${{ secrets.pypi_password }}
+        password: ${{ secrets.pypi_token }}

@@ -33,14 +33,14 @@ On Linux/Unix like systems you need:
   - >= 7.0.16
 
 - The packages unixODBC and unixODBC-dev >= 2.2.14
-- Python >= 3.6
+- Python >= 3.7
 - The Exasol `ODBC driver <odbc_driver_>`_
 - The ODBC.ini and ODBCINST.ini configurations files setup
 
 Turbodbc support
 ````````````````
 
-- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.6.
+- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.7.
 - Multi row update is not supported, see
   `test/test_update.py <test/test_update.py>`_ for an example
 
@@ -81,8 +81,6 @@ to use turbodbc as driver:
 The dialect supports two types of connection urls creating an engine. A DSN (Data Source Name) mode and a host mode:
 
 .. list-table::
-    :widths: 50 50
-    :header-rows: 1
 
    * - Type
      - Example

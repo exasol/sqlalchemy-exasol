@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [3.6, 3.7, 3.8, 3.9]
+        python: [3.7, 3.8, 3.9]
         connector:
           - pyodbc
           - turbodbc
@@ -28,11 +28,8 @@ jobs:
     - name: Fetch sqlalchemy_exasol code from repository
       uses: actions/checkout@v2
 
-    - name: Setup Python 3.6 for integration-test-docker-environment
+    - name: Setup integration-test-docker-environment
       uses: actions/setup-python@v2
-      with:
-        python-version: 3.6
-      if: ${{ matrix.python != 3.6 }}
 
     - name: Setup Python ${{ matrix.python }}
       uses: actions/setup-python@v2
@@ -72,7 +69,7 @@ jobs:
     if: startsWith(github.event.ref, 'refs/tags')
     strategy:
       matrix:
-        python: [3.6]
+        python: [3.7]
         connector:
           - pyodbc
 

@@ -10,7 +10,6 @@ import re
 import sys
 from distutils.version import LooseVersion
 
-import six
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
 
@@ -25,7 +24,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     server_version_info = None
 
     def __init__(self, **kw):
-        super(EXADialect_pyodbc, self).__init__(**kw)
+        super().__init__(**kw)
 
     def get_driver_version(self, connection):
         # LooseVersion will also work with interim versions like '4.2.7dev1' or '5.0.rc4'
@@ -62,18 +61,14 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
         def connect(self, *cargs, **cparams):
             # Get connection
-            conn = super(EXADialect_pyodbc, self).connect(*cargs, **cparams)
+            conn = super().connect(*cargs, **cparams)
 
             # Set up encodings
             conn.setdecoding(self.dbapi.SQL_CHAR, encoding="utf-8")
             conn.setdecoding(self.dbapi.SQL_WCHAR, encoding="utf-8")
             conn.setdecoding(self.dbapi.SQL_WMETADATA, encoding="utf-8")
 
-            if six.PY2:
-                conn.setencoding(str, encoding="utf-8")
-                conn.setencoding(unicode, encoding="utf-8")
-            else:
-                conn.setencoding(encoding="utf-8")
+            conn.setencoding(encoding="utf-8")
 
             # Return connection
             return conn
@@ -115,7 +110,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
         connectors.extend(
             [
-                "EXAHOST=%s%s" % (keys.pop("host", ""), port),
+                "EXAHOST={}{}".format(keys.pop("host", ""), port),
                 "EXASCHEMA=%s" % keys.pop("database", ""),
             ]
         )
@@ -134,7 +129,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if "odbc_autotranslate" in keys:
             connectors.append("AutoTranslate=%s" % keys.pop("odbc_autotranslate"))
 
-        connectors.extend(["%s=%s" % (k, v) for k, v in sorted(six.iteritems(keys))])
+        connectors.extend(["{}={}".format(k, v) for k, v in sorted(keys.items())])
         return [[";".join(connectors)], connect_args]
 
     def is_disconnect(self, e, connection, cursor):
@@ -147,9 +142,9 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             }
             exasol_error_codes = {
                 "HY000": (  # Generic Exasol error code
-                    re.compile(six.u(r"operation timed out"), re.IGNORECASE),
-                    re.compile(six.u(r"connection lost"), re.IGNORECASE),
-                    re.compile(six.u(r"Socket closed by peer"), re.IGNORECASE),
+                    re.compile(r"operation timed out", re.IGNORECASE),
+                    re.compile(r"connection lost", re.IGNORECASE),
+                    re.compile(r"Socket closed by peer", re.IGNORECASE),
                 )
             }
 
@@ -167,7 +162,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             # Check Pyodbc error
             return error_code in error_codes
 
-        return super(EXADialect_pyodbc, self).is_disconnect(e, connection, cursor)
+        return super().is_disconnect(e, connection, cursor)
 
 
 dialect = EXADialect_pyodbc

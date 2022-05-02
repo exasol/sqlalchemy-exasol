@@ -25,7 +25,7 @@ TURBODBC_TRANSLATED_PARAMS = {
 
 class _ExaDecimal(sqltypes.DECIMAL):
     def bind_processor(self, dialect):
-        return super(_ExaDecimal, self).bind_processor(dialect)
+        return super().bind_processor(dialect)
 
     def result_processor(self, dialect, coltype):
         if self.asdecimal:
@@ -48,7 +48,7 @@ class _ExaDecimal(sqltypes.DECIMAL):
 
 class _ExaInteger(sqltypes.INTEGER):
     def bind_processor(self, dialect):
-        return super(_ExaInteger, self).bind_processor(dialect)
+        return super().bind_processor(dialect)
 
     def result_processor(self, dialect, coltype):
         def to_integer(value):

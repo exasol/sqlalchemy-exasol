@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Support for the EXASOL database.
 
 Auto Increment Behavior
@@ -46,11 +45,8 @@ representation (all uppercase).
 
 """
 
-import six
 import sqlalchemy.exc
 
-if six.PY3:
-    from six import u as unicode
 from decimal import Decimal
 from sqlalchemy import sql, schema, types as sqltypes, util, event
 from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
@@ -237,23 +233,23 @@ class EXADDLCompiler(compiler.DDLCompiler):
         for c in [c for c in table._sorted_constraints if isinstance(c, ForeignKeyConstraint)]:
             c._create_rule = lambda: False
             event.listen(table, "after_create", AddConstraint(c))
-        return super(EXADDLCompiler, self).create_table_constraints(table)
+        return super().create_table_constraints(table)
 
     def visit_add_constraint(self, create):
         if isinstance(create.element, DistributeByConstraint):
-            return "ALTER TABLE %s %s" % (
+            return "ALTER TABLE {} {}".format(
                 self.preparer.format_table(create.element.table),
                 self.process(create.element)
             )
         else:
-            return super(EXADDLCompiler, self).visit_add_constraint(create)
+            return super().visit_add_constraint(create)
 
     def visit_drop_constraint(self, drop):
         if isinstance(drop.element, DistributeByConstraint):
             return "ALTER TABLE %s DROP DISTRIBUTION KEYS" % (
                 self.preparer.format_table(drop.element.table))
         else:
-            return super(EXADDLCompiler, self).visit_drop_constraint(drop)
+            return super().visit_drop_constraint(drop)
 
     def visit_distribute_by_constraint(self, constraint):
         return "DISTRIBUTE BY " + ",".join(c.name for c in constraint.columns)
@@ -304,7 +300,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         if column.default.is_sequence:
             return 'DEFAULT'
         else:
-            return super(EXAExecutionContext, self).get_insert_default(column)
+            return super().get_insert_default(column)
 
     def get_lastrowid(self):
         columns = self.compiled.sql_compiler.statement.table.columns
@@ -362,7 +358,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                     ident = '?'
                     if value is None:
                         db_query = db_query.replace(ident, 'NULL', 1)
-                    elif isinstance(value, six.integer_types):
+                    elif isinstance(value, int):
                         db_query = db_query.replace(ident, str(value), 1)
                     elif isinstance(value, (float, Decimal)):
                         db_query = db_query.replace(ident, str(float(value)), 1)
@@ -375,9 +371,9 @@ class EXAExecutionContext(default.DefaultExecutionContext):
                     elif isinstance(value, date):
                         db_query = db_query.replace(ident, "to_date('%s', 'YYYY-MM-DD')" % value.strftime('%Y-%m-%d'),
                                                     1)
-                    elif isinstance(value, six.binary_type):
+                    elif isinstance(value, bytes):
                         db_query = db_query.replace(ident, "'%s'" % value.decode('UTF-8'), 1)
-                    elif isinstance(value, six.text_type):
+                    elif isinstance(value, str):
                         db_query = db_query.replace(ident, "'%s'" % value, 1)
                     else:
                         raise TypeError('Data type not supported: %s' % type(value))
@@ -433,7 +429,7 @@ class EXADialect(default.DefaultDialect):
         schema = None
         schema = self._get_schema_from_url(connection, schema)
         if schema is None:
-            schema = self.normalize_name(u"SYS")
+            schema = self.normalize_name("SYS")
         return schema
 
     def _get_schema_from_url(self, connection, schema):
@@ -449,13 +445,7 @@ class EXADialect(default.DefaultDialect):
         """
         if name is None:
             return None
-
-        if six.PY2:
-            if isinstance(name, str):
-                name = name.decode(self.encoding)
-
-        if name.upper() == name and \
-                not self.identifier_preparer._requires_quotes(name.lower()):
+        if name.upper() == name and not self.identifier_preparer._requires_quotes(name.lower()):
             return name.lower()
         elif name.lower() == name:
             return quoted_name(name, quote=True)
@@ -472,13 +462,6 @@ class EXADialect(default.DefaultDialect):
         elif name.lower() == name and \
                 not self.identifier_preparer._requires_quotes(name.lower()):
             name = name.upper()
-
-        if six.PY2:
-            if not self.supports_unicode_binds:
-                name = name.encode(self.encoding)
-            else:
-                name = unicode(name)
-
         return name
 
     def get_isolation_level(self, connection):
@@ -652,10 +635,7 @@ class EXADialect(default.DefaultDialect):
                     view_name=quoted_view_name_string, view_schema=quoted_view_schema_string)
             rp = connection.execute(sql.text(sql_stmnt)).scalar()
             if rp:
-                if six.PY3:
-                    return rp
-                else:
-                    return rp.decode(self.encoding)
+                return rp
             else:
                 return None
         else:
@@ -672,10 +652,7 @@ class EXADialect(default.DefaultDialect):
                                 view_name=self.denormalize_name(view_name),
                                 schema=self.denormalize_name(schema)).scalar()
         if rp:
-            if six.PY3:
-                return rp
-            else:
-                return rp.decode(self.encoding)
+            return rp
         else:
             return None
 

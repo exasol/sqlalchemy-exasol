@@ -8,7 +8,7 @@ If you want to engage in development of this project you should have the followi
 
 Tools
 +++++
-* python_ >= 3.6
+* python_ >= 3.7
 * git_
 * Docker_
 * integration-test-docker-environment_

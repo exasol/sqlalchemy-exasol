@@ -7,6 +7,9 @@ on:
   pull_request:
     branches-ignore:
       - 'master'
+  schedule:
+    # “At 00:00 on every 7th day-of-month from 1 through 31.” (https://crontab.guru)
+    - cron: "0 0 1/7 * *"
 
 jobs:
   run_tests:

@@ -81,7 +81,7 @@ def temporary_odbc_config(config):
 @contextmanager
 def odbcconfig():
     with temporary_odbc_config(
-        ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
+            ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
         env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
         with environment(env_vars) as env:
@@ -173,6 +173,27 @@ def integration(session, connector):
             ]
         ).format(connector=connector, db_port=Settings.DB_PORT)
         session.run("pytest", "--dropfirst", "--dburi", uri, external=True, env=env)
+
+
+@nox.session(name='test-report', python=None)
+def test_report(session):
+    """
+    Runs all tests for all supported connectors and creates a json test report for each run test-report-{connector}.json
+
+    Attention: This task expects a running test database (db-start).
+    """
+
+    for connector in Settings.CONNECTORS:
+        with odbcconfig() as (config, env):
+            uri = "".join(
+                [
+                    "exa+{connector}:",
+                    "//sys:exasol@localhost:{db_port}",
+                    "/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC",
+                ]
+            ).format(connector=connector, db_port=Settings.DB_PORT)
+            session.run("pytest", "--dropfirst", "--dburi", uri, '--json-report',
+                        f'--json-report-file=test-report{connector}.json', external=True, env=env)
 
 
 @nox.session(name="check-links", python=None)

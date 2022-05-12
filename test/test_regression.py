@@ -13,26 +13,29 @@ from sqlalchemy.testing import fixtures
 from sqlalchemy.testing.fixtures import config
 
 
-class RegressionTest(fixtures.TestBase):
-    def setUp(self):
-        self.table_name = "my_table"
-        self.tenant_schema_name = "tenant_schema"
+class TranslateMap(fixtures.TestBase):
+
+    @classmethod
+    def setup_class(cls):
+        cls.table_name = "my_table"
+        cls.tenant_schema_name = "tenant_schema"
         engine = config.db
         with config.db.connect() as conn:
-            conn.execute(CreateSchema(self.tenant_schema_name))
+            conn.execute(CreateSchema(cls.tenant_schema_name))
             metadata = MetaData()
             Table(
-                self.table_name,
+                cls.table_name,
                 metadata,
                 Column("id", Integer, primary_key=True),
                 Column("name", String(1000), nullable=False),
-                schema=self.tenant_schema_name,
+                schema=cls.tenant_schema_name,
             )
             metadata.create_all(engine)
 
-    def tearDown(self):
+    @classmethod
+    def teardown_class(cls):
         with config.db.connect() as conn:
-            conn.execute(DropSchema(self.tenant_schema_name, cascade=True))
+            conn.execute(DropSchema(cls.tenant_schema_name, cascade=True))
 
     def test_use_schema_translate_map_in_get_last_row_id(self):
         """See also: https://github.com/exasol/sqlalchemy-exasol/issues/104"""

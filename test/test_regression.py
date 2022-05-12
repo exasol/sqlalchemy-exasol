@@ -14,7 +14,6 @@ from sqlalchemy.testing.fixtures import config
 
 
 class TranslateMap(fixtures.TestBase):
-
     @classmethod
     def setup_class(cls):
         cls.table_name = "my_table"
@@ -100,8 +99,8 @@ class Introspection(fixtures.TestBase):
     def teardown_class(cls):
         engine = config.db
 
-        def _drop_tables(schema, tables):
-            metadata = MetaData(engine, schema=cls.schema)
+        def _drop_tables(schema):
+            metadata = MetaData(engine, schema=schema)
             metadata.reflect()
             to_be_deleted = [metadata.tables[name] for name in metadata.tables]
             metadata.drop_all(engine, to_be_deleted)
@@ -111,7 +110,7 @@ class Introspection(fixtures.TestBase):
                 for name in views:
                     conn.execute(f"DROP VIEW {schema}.{name};")
 
-        _drop_tables(cls.schema, cls.tables)
+        _drop_tables(cls.schema)
         _drop_views(cls.schema, cls.views)
 
     @pytest.mark.parametrize("pool_type", POOL_TYPES)

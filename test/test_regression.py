@@ -114,7 +114,7 @@ class Introspection(fixtures.TestBase):
         _drop_views(cls.schema, cls.views)
 
     @pytest.mark.parametrize("pool_type", POOL_TYPES)
-    def test_introinspection_of_tables_works_with(self, pool_type):
+    def test_introspection_of_tables_works_with(self, pool_type):
         expected = self.tables
         engine = create_engine(config.db.url, poolclass=pool_type)
         inspector = inspect(engine)
@@ -122,7 +122,7 @@ class Introspection(fixtures.TestBase):
         assert expected == tables
 
     @pytest.mark.parametrize("pool_type", POOL_TYPES)
-    def test_introinspection_of_views_works_with(self, pool_type):
+    def test_introspection_of_views_works_with(self, pool_type):
         expected = self.views
         engine = create_engine(config.db.url, poolclass=pool_type)
         inspector = inspect(engine)

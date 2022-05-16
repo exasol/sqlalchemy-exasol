@@ -686,7 +686,7 @@ class EXADialect(default.DefaultDialect):
         table_name_str = ":table"
         sql_statement = self.get_column_sql_query_str().format(schema=schema_str, table=table_name_str)
         response = connection.execute(
-            sql_statement,
+            sql.text(sql_statement),
             schema=self.denormalize_name(schema),
             table=self.denormalize_name(table_name)
         )

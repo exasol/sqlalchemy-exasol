@@ -656,24 +656,27 @@ class EXADialect(default.DefaultDialect):
         else:
             return None
 
-    def get_column_sql_query_str(self):
-        return "SELECT " \
-               "column_name, " \
-               "column_type, " \
-               "column_maxsize, " \
-               "column_num_prec, " \
-               "column_num_scale, " \
-               "column_is_nullable, " \
-               "column_default, " \
-               "column_identity, " \
-               "column_is_distribution_key, " \
-               "column_table " \
-               "FROM sys.exa_all_columns " \
-               "WHERE " \
-               "column_object_type IN ('TABLE', 'VIEW') AND " \
-               "column_schema = {schema} AND " \
-               "column_table = {table} " \
-               "ORDER BY column_ordinal_position"
+    @staticmethod
+    def get_column_sql_query_str():
+        return (
+            "SELECT "
+            "column_name, "
+            "column_type, "
+            "column_maxsize, "
+            "column_num_prec, "
+            "column_num_scale, "
+            "column_is_nullable, "
+            "column_default, "
+            "column_identity, "
+            "column_is_distribution_key, "
+            "column_table "
+            "FROM sys.exa_all_columns "
+            "WHERE "
+            "column_object_type IN ('TABLE', 'VIEW') AND "
+            "column_schema = {schema} AND "
+            "column_table = {table} "
+            "ORDER BY column_ordinal_position"
+        )
 
 
     @reflection.cache

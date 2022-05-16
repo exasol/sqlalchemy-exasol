@@ -560,7 +560,7 @@ class EXADialect(default.DefaultDialect):
         if odbc_connection is not None and not self.use_sql_fallback(**kw):
             result=self.has_table_odbc(connection, odbc_connection, schema=schema, table_name=table_name, **kw)
         else:
-            result=self.has_table_sql(connection, schema=schema, table_name=table_name, **kw) 
+            result=self.has_table_sql(connection, schema=schema, table_name=table_name, **kw)
         return result
 
     def has_table_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
@@ -707,7 +707,7 @@ class EXADialect(default.DefaultDialect):
             self.get_column_sql_query_str() \
                 .format(schema=schema_str, table=table_name_str)
         stmnt = sql.text(sql_stmnt)
-        rp = connection.execute(stmnt, 
+        rp = connection.execute(stmnt,
                 schema=self.denormalize_name(schema),
                 table=self.denormalize_name(table_name))
 
@@ -783,24 +783,24 @@ class EXADialect(default.DefaultDialect):
             columns.append(cdict)
         return columns
 
-    def _get_constraint_sql_str(self, schema, table_name, contraint_type):
-        sql_stmnt = \
-            "SELECT " \
-            "constraint_name, " \
-            "column_name, " \
-            "referenced_schema, " \
-            "referenced_table, " \
-            "referenced_column, " \
-            "constraint_table, " \
-            "constraint_type " \
-            "FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS " \
-            "WHERE " \
-            "constraint_schema={schema} AND " \
-            "constraint_table={table_name} AND " \
-            "constraint_type='{contraint_type}' " \
-            "ORDER BY ordinal_position" \
-                .format(schema=schema, table_name=table_name, contraint_type=contraint_type)
-        return sql_stmnt
+    @staticmethod
+    def _get_constraint_sql_str(schema, table_name, contraint_type):
+        return (
+            "SELECT "
+            "constraint_name, "
+            "column_name, "
+            "referenced_schema, "
+            "referenced_table, "
+            "referenced_column, "
+            "constraint_table, "
+            "constraint_type "
+            "FROM SYS.EXA_ALL_CONSTRAINT_COLUMNS "
+            "WHERE "
+            f"constraint_schema={schema} AND "
+            f"constraint_table={table_name} AND "
+            f"constraint_type='{contraint_type}' "
+            "ORDER BY ordinal_position"
+        )
 
 
     @reflection.cache

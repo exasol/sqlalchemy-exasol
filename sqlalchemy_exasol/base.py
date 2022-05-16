@@ -802,22 +802,9 @@ class EXADialect(default.DefaultDialect):
                 .format(schema=schema, table_name=table_name, contraint_type=contraint_type)
         return sql_stmnt
 
-    @reflection.cache
-    def get_pk_constraint_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
-        schema = self._get_schema_for_input_or_current(connection, schema)
-        table_name = self.denormalize_name(table_name)
-        with odbc_connection.cursor().primaryKeys(table=table_name, schema=schema) as primaryKeys_cursor:
-            pkeys = []
-            constraint_name = None
-            for row in primaryKeys_cursor:
-                if row[2] != table_name and table_name is not None:
-                    continue
-                pkeys.append(self.normalize_name(row[3]))
-                constraint_name = self.normalize_name(row[5])
-        return {'constrained_columns': pkeys, 'name': constraint_name}
 
     @reflection.cache
-    def get_pk_constraint_sql(self, connection, table_name, schema=None, **kw):
+    def _get_pk_constraint(self, connection, table_name, schema, **kw):
         schema = self._get_schema_for_input(connection, schema)
         table_name = self.denormalize_name(table_name)
         table_name_string = ":table"
@@ -843,11 +830,7 @@ class EXADialect(default.DefaultDialect):
     def get_pk_constraint(self, connection, table_name, schema=None, **kw):
         if table_name is None:
             return None
-        odbc_connection = self.getODBCConnection(connection)
-        if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            return self.get_pk_constraint_odbc(connection, odbc_connection, table_name=table_name, schema=schema, **kw)
-        else:
-            return self.get_pk_constraint_sql(connection, table_name=table_name, schema=schema, **kw)
+        return self._get_pk_constraint(connection, table_name, schema=schema, **kw)
 
 
     @reflection.cache

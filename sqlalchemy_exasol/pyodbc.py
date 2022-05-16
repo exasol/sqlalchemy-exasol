@@ -173,6 +173,24 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             logger.warning("Using sql fallback instead of odbc functions")
         return is_fallback_requested
 
+    @reflection.cache
+    def _get_pk_constraint(self, connection, table_name, schema=None, **kw):
+        if self._is_sql_fallback_requested():
+            return super()._get_pk_constraint(connection, table_name, schema, **kw)
+
+        odbc_connection = self.getODBCConnection(connection)
+        schema = self._get_schema_for_input_or_current(connection, schema)
+        table_name = self.denormalize_name(table_name)
+        with odbc_connection.cursor().primaryKeys(table=table_name, schema=schema) as cursor:
+            pkeys = []
+            constraint_name = None
+            for row in cursor:
+                table, primary_key, constraint = row[2], row[3], row[5]
+                if table != table_name and table_name is not None:
+                    continue
+                pkeys.append(self.normalize_name(primary_key))
+                constraint_name = self.normalize_name(constraint)
+        return {'constrained_columns': pkeys, 'name': constraint_name}
 
     @reflection.cache
     def _get_foreign_keys(self, connection, table_name, schema=None, **kw):

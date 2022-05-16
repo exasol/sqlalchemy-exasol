@@ -8,16 +8,19 @@ Connect string::
 
 import re
 import sys
+import logging
 from distutils.version import LooseVersion
 
+from sqlalchemy.engine import reflection
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
 
 from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
 
+logger = logging.getLogger("sqlalchemy_exasol")
+
 
 class EXADialect_pyodbc(EXADialect, PyODBCConnector):
-
     execution_ctx_cls = EXAExecutionContext
 
     driver_version = None
@@ -58,7 +61,6 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         return self.server_version_info
 
     if sys.platform == "darwin":
-
         def connect(self, *cargs, **cparams):
             # Get connection
             conn = super().connect(*cargs, **cparams)
@@ -163,6 +165,38 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             return error_code in error_codes
 
         return super().is_disconnect(e, connection, cursor)
+
+    @staticmethod
+    def _is_sql_fallback_requested(**kwargs):
+        is_fallback_requested = kwargs.get("use_sql_fallback", False)
+        if is_fallback_requested:
+            logger.warning("Using sql fallback instead of odbc functions")
+        return is_fallback_requested
+
+
+    @reflection.cache
+    def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
+        if self._is_sql_fallback_requested():
+            return super().get_foreign_keys(connection, table_name, schema, **kw)
+
+        odbc_connection = self.getODBCConnection(connection)
+        # Need to use a workaround, because SQLForeignKeys functions doesn't work for an unknown reason
+        tables = self._get_tables_for_schema_odbc(connection=connection, odbc_connection=odbc_connection,
+                                                  schema=schema, table_name=table_name, table_type="TABLE", **kw)
+        if len(tables) == 0:
+            return []
+
+        quoted_schema_string = self.quote_string_value(tables[0].table_schem)
+        quoted_table_string = self.quote_string_value(tables[0].table_name)
+        sql_statement = "/*snapshot execution*/ {query}".format(
+            query=self._get_constraint_sql_str(
+                quoted_schema_string,
+                quoted_table_string,
+                "FOREIGN KEY"
+            )
+        )
+        response = connection.execute(sql_statement)
+        return list(response)
 
 
 dialect = EXADialect_pyodbc

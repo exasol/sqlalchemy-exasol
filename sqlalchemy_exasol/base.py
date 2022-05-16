@@ -849,35 +849,19 @@ class EXADialect(default.DefaultDialect):
         else:
             return self.get_pk_constraint_sql(connection, table_name=table_name, schema=schema, **kw)
 
-    @reflection.cache
-    def _get_foreign_keys_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
-        # Need to use a workaround, because SQLForeignKeys functions doesn't work for an unknown reason
-        tables = self._get_tables_for_schema_odbc(connection=connection, odbc_connection=odbc_connection,
-                                                  schema=schema, table_name=table_name, table_type="TABLE", **kw)
-        if len(tables) > 0:
-            quoted_schema_string = self.quote_string_value(tables[0].table_schem)
-            quoted_table_string = self.quote_string_value(tables[0].table_name)
-            sql_stmnt = \
-                "/*snapshot execution*/ " + \
-                self._get_constraint_sql_str(quoted_schema_string,quoted_table_string,"FOREIGN KEY")
-            rp = connection.execute(sql.text(sql_stmnt))
-            return list(rp)
-        else:
-            return []
 
     @reflection.cache
-    def _get_foreign_keys_sql(self, connection, table_name, schema=None, **kw):
+    def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
         table_name_string = ":table"
-        if schema is None:
-            schema_string = "CURRENT_SCHEMA "
-        else:
-            schema_string = ":schema "
-        sql_stmnt = \
-            self._get_constraint_sql_str(schema_string, table_name_string, "FOREIGN KEY")
-        rp = connection.execute(sql.text(sql_stmnt),
-                                schema=self.denormalize_name(schema),
-                                table=self.denormalize_name(table_name))
-        return list(rp)
+        schema_string = "CURRENT_SCHEMA " if schema is None else ":schema "
+        sql_statement = self._get_constraint_sql_str(schema_string, table_name_string, "FOREIGN KEY")
+        response = connection.execute(
+            sql.text(sql_statement),
+            schema=self.denormalize_name(schema),
+            table=self.denormalize_name(table_name)
+        )
+        return list(response)
+
 
     @reflection.cache
     def get_foreign_keys(self, connection, table_name, schema=None, **kw):
@@ -895,12 +879,7 @@ class EXADialect(default.DefaultDialect):
             }
 
         fkeys = util.defaultdict(fkey_rec)
-        odbc_connection = self.getODBCConnection(connection)
-        if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            constraints = self._get_foreign_keys_odbc(connection, odbc_connection, table_name=table_name,
-                                                      schema=schema_int, **kw)
-        else:
-            constraints = self._get_foreign_keys_sql(connection, table_name=table_name, schema=schema_int, **kw)
+        constraints = self._get_foreign_keys(connection, table_name=table_name, schema=schema_int, **kw)
         table_name = self.denormalize_name(table_name)
         for row in constraints:
             (cons_name, local_column, remote_schema, remote_table, remote_column) = \

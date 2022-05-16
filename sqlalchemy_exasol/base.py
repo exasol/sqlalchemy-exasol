@@ -492,15 +492,14 @@ class EXADialect(default.DefaultDialect):
             logger.warning("Using sql fallback instead of odbc functions")
         return result
 
+    def _get_schema_names_query(self, connection, **kw):
+        return "select SCHEMA_NAME from SYS.EXA_SCHEMAS"
+
     # never called during reflection
     @reflection.cache
     def get_schema_names(self, connection, **kw):
-        if self.use_sql_fallback(**kw):
-            prefix = "/*snapshot execution*/ "
-        else:
-            prefix = ""
-        sql_stmnt = "%sselect SCHEMA_NAME from SYS.EXA_SCHEMAS" % prefix
-        rs = connection.execute(sql.text(sql_stmnt))
+        sql_statement = self._get_schema_names_query(connection, **kw)
+        rs = connection.execute(sql.text(sql_statement))
         return [self.normalize_name(row[0]) for row in rs]
 
     def _get_schema_for_input_or_current(self, connection, schema):

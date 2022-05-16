@@ -675,52 +675,19 @@ class EXADialect(default.DefaultDialect):
                "column_table = {table} " \
                "ORDER BY column_ordinal_position"
 
-    @reflection.cache
-    def _get_columns_odbc(self, connection, odbc_connection, table_name, schema, **kw):
-        tables = self._get_tables_for_schema_odbc(connection, odbc_connection,
-                                                  schema=schema, table_name=table_name, **kw)
-        if len(tables) == 1:
-            # get_columns_sql originally returned all columns of all tables if table_name is None,
-            # we follow this behavior here for compatibility. However, the documentation for Dialects
-            # does not mentions this behavior:
-            # https://docs.sqlalchemy.org/en/13/core/internals.html#sqlalchemy.engine.interfaces.Dialect
-            quoted_schema_string = self.quote_string_value(tables[0].table_schem)
-            quoted_table_string = self.quote_string_value(tables[0].table_name)
-            sql_stmnt = \
-                "/*snapshot execution*/ " + \
-                self.get_column_sql_query_str() \
-                    .format(schema=quoted_schema_string, table=quoted_table_string)
-            rp = connection.execute(sql.text(sql_stmnt))
-            return list(rp)
-        else:
-            return []
-
-    @reflection.cache
-    def _get_columns_sql(self, connection, table_name, schema=None, **kw):
-        schema = self._get_schema_for_input(connection, schema)
-        if schema is None:
-            schema_str = "CURRENT_SCHEMA"
-        else:
-            schema_str = ":schema"
-        table_name_str = ":table"
-        sql_stmnt = \
-            self.get_column_sql_query_str() \
-                .format(schema=schema_str, table=table_name_str)
-        stmnt = sql.text(sql_stmnt)
-        rp = connection.execute(stmnt,
-                schema=self.denormalize_name(schema),
-                table=self.denormalize_name(table_name))
-
-        return list(rp)
 
     @reflection.cache
     def _get_columns(self, connection, table_name, schema=None, **kw):
-        odbc_connection = self.getODBCConnection(connection)
-        if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            columns = self._get_columns_odbc(connection, odbc_connection, table_name, schema, **kw)
-        else:
-            columns = self._get_columns_sql(connection, table_name, schema, **kw)
-        return columns
+        schema = self._get_schema_for_input(connection, schema)
+        schema_str = "CURRENT_SCHEMA" if schema is None else ":schema"
+        table_name_str = ":table"
+        sql_statement = self.get_column_sql_query_str().format(schema=schema_str, table=table_name_str)
+        response = connection.execute(
+            sql_statement,
+            schema=self.denormalize_name(schema),
+            table=self.denormalize_name(table_name)
+        )
+        return list(response)
 
     @reflection.cache
     def get_columns(self, connection, table_name, schema=None, **kw):

@@ -174,6 +174,34 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         return is_fallback_requested
 
     @reflection.cache
+    def _get_columns(self, connection, table_name, schema=None, **kw):
+        if self._is_sql_fallback_requested():
+            return super()._get_columns(connection, table_name, schema, **kw)
+
+        odbc_connection = self.getODBCConnection(connection)
+        tables = self._get_tables_for_schema_odbc(
+            connection, odbc_connection,
+            schema=schema,
+            table_name=table_name,
+            **kw
+        )
+
+        if len(tables) != 1:
+            return []
+
+        # get_columns_sql originally returned all columns of all tables if table_name is None,
+        # we follow this behavior here for compatibility. However, the documentation for Dialects
+        # does not mention this behavior:
+        # https://docs.sqlalchemy.org/en/13/core/internals.html#sqlalchemy.engine.interfaces.Dialect
+        quoted_schema_string = self.quote_string_value(tables[0].table_schem)
+        quoted_table_string = self.quote_string_value(tables[0].table_name)
+        sql_statement = "/*snapshot execution*/ {query}".format(query=self.get_column_sql_query_str())
+        sql_statement = sql_statement.format(schema=quoted_schema_string, table=quoted_table_string)
+        response = connection.execute(sql_statement)
+
+        return list(response)
+
+    @reflection.cache
     def _get_pk_constraint(self, connection, table_name, schema=None, **kw):
         if self._is_sql_fallback_requested():
             return super()._get_pk_constraint(connection, table_name, schema, **kw)

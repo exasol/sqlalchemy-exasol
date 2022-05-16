@@ -177,7 +177,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     @reflection.cache
     def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
         if self._is_sql_fallback_requested():
-            return super().get_foreign_keys(connection, table_name, schema, **kw)
+            return super()._get_foreign_keys(connection, table_name, schema, **kw)
 
         odbc_connection = self.getODBCConnection(connection)
         # Need to use a workaround, because SQLForeignKeys functions doesn't work for an unknown reason

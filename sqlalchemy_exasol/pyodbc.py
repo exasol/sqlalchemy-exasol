@@ -175,7 +175,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
     @reflection.cache
     def _get_columns(self, connection, table_name, schema=None, **kw):
-        if self._is_sql_fallback_requested():
+        if self._is_sql_fallback_requested(**kw):
             return super()._get_columns(connection, table_name, schema, **kw)
 
         odbc_connection = self.getODBCConnection(connection)
@@ -203,7 +203,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
     @reflection.cache
     def _get_pk_constraint(self, connection, table_name, schema=None, **kw):
-        if self._is_sql_fallback_requested():
+        if self._is_sql_fallback_requested(**kw):
             return super()._get_pk_constraint(connection, table_name, schema, **kw)
 
         odbc_connection = self.getODBCConnection(connection)
@@ -222,7 +222,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
 
     @reflection.cache
     def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
-        if self._is_sql_fallback_requested():
+        if self._is_sql_fallback_requested(**kw):
             return super()._get_foreign_keys(connection, table_name, schema, **kw)
 
         odbc_connection = self.getODBCConnection(connection)

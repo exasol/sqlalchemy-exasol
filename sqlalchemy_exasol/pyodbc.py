@@ -11,6 +11,7 @@ import sys
 import logging
 from distutils.version import LooseVersion
 
+from sqlalchemy import sql
 from sqlalchemy.engine import reflection
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
@@ -172,6 +173,29 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if is_fallback_requested:
             logger.warning("Using sql fallback instead of odbc functions")
         return is_fallback_requested
+
+    @reflection.cache
+    def get_view_definition(self, connection, view_name, schema=None, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super().get_view_definition(connection, view_name, schema, **kw)
+        if view_name is None:
+            return None
+
+        odbc_connection = self.getODBCConnection(connection)
+        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="VIEW",
+                                                  table_name=view_name, **kw)
+        if len(tables) != 1:
+            return None
+
+        quoted_view_name_string = self.quote_string_value(tables[0][2])
+        quoted_view_schema_string = self.quote_string_value(tables[0][1])
+        sql_stmnt = \
+            "/*snapshot execution*/ SELECT view_text FROM sys.exa_all_views WHERE view_name = {view_name} AND view_schema = {view_schema}".format(
+                view_name=quoted_view_name_string, view_schema=quoted_view_schema_string)
+        rp = connection.execute(sql.text(sql_stmnt)).scalar()
+        if not rp:
+            return None
+        return rp
 
     def get_table_names(self, connection, schema, **kw):
         if self._is_sql_fallback_requested(**kw):

@@ -567,36 +567,6 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):
-        odbc_connection = self.getODBCConnection(connection)
-        if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            return self.get_view_definition_odbc(connection, odbc_connection, view_name, schema, **kw)
-        else:
-            return self.get_view_definition_sql(connection, view_name, schema, **kw)
-
-    def quote_string_value(self, string_value):
-        return "'%s'" % (string_value.replace("'", "''"))
-
-    @reflection.cache
-    def get_view_definition_odbc(self, connection, odbc_connection, view_name, schema=None, **kw):
-        if view_name is None:
-            return None
-        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="VIEW",
-                                                  table_name=view_name, **kw)
-        if len(tables) == 1:
-            quoted_view_name_string = self.quote_string_value(tables[0][2])
-            quoted_view_schema_string = self.quote_string_value(tables[0][1])
-            sql_stmnt = \
-                "/*snapshot execution*/ SELECT view_text FROM sys.exa_all_views WHERE view_name = {view_name} AND view_schema = {view_schema}".format(
-                    view_name=quoted_view_name_string, view_schema=quoted_view_schema_string)
-            rp = connection.execute(sql.text(sql_stmnt)).scalar()
-            if rp:
-                return rp
-            else:
-                return None
-        else:
-            return None
-
-    def get_view_definition_sql(self, connection, view_name, schema=None, **kw):
         schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT view_text FROM sys.exa_all_views WHERE view_name = :view_name AND view_schema = "
         if schema is None:
@@ -606,10 +576,12 @@ class EXADialect(default.DefaultDialect):
         rp = connection.execute(sql.text(sql_stmnt),
                                 view_name=self.denormalize_name(view_name),
                                 schema=self.denormalize_name(schema)).scalar()
-        if rp:
-            return rp
-        else:
+        if not rp:
             return None
+        return rp
+
+    def quote_string_value(self, string_value):
+        return "'%s'" % (string_value.replace("'", "''"))
 
     @staticmethod
     def get_column_sql_query_str():

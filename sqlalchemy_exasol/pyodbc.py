@@ -181,6 +181,20 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         normalized_tables = [self.normalize_name(row.table_name) for row in tables]
         return normalized_tables
 
+    @reflection.cache
+    def get_view_names(self, connection, schema=None, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super().get_view_names(connection, schema, **kw)
+        odbc_connection = self.getODBCConnection(connection)
+        tables = self._get_tables_for_schema_odbc(
+            connection,
+            odbc_connection,
+            schema,
+            table_type="VIEW",
+            **kw
+        )
+        return [self.normalize_name(row.table_name) for row in tables]
+
     def has_table(self, connection, table_name, schema=None, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super().has_table(connection, table_name, schema, **kw)

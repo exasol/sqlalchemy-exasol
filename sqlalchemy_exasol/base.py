@@ -554,19 +554,6 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
-        odbc_connection = self.getODBCConnection(connection)
-        if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            return self.get_view_names_odbc(connection, odbc_connection, schema, **kw)
-        else:
-            return self.get_view_names_sql(connection, schema, **kw)
-
-    @reflection.cache
-    def get_view_names_odbc(self, connection, odbc_connection, schema=None, **kw):
-        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="VIEW", **kw)
-        return [self.normalize_name(row.table_name)
-                for row in tables]
-
-    def get_view_names_sql(self, connection, schema=None, **kw):
         schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS WHERE view_schema = "
         if schema is None:

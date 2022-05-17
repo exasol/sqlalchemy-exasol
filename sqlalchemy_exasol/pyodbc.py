@@ -12,8 +12,7 @@ import logging
 from distutils.version import LooseVersion
 
 from sqlalchemy import sql
-from sqlalchemy.engine import reflection, Engine, Connection
-from sqlalchemy.orm.session import Session
+from sqlalchemy.engine import reflection
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
 
@@ -176,7 +175,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         return is_fallback_requested
 
     @reflection.cache
-    def _get_tables_for_schema_odbc(self, connection, schema, table_type=None, table_name=None, **kw):
+    def _tables_for_schema(self, connection, schema, table_type=None, table_name=None):
         schema = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
         conn = connection.engine.raw_connection()
@@ -190,12 +189,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if view_name is None:
             return None
 
-        tables = self._get_tables_for_schema_odbc(
-            connection, schema,
-            table_type="VIEW",
-            table_name=view_name,
-            **kw
-        )
+        tables = self._tables_for_schema(connection, schema, table_type="VIEW", table_name=view_name)
         if len(tables) != 1:
             return None
 
@@ -213,24 +207,14 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     def get_table_names(self, connection, schema, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super().get_table_names(connection, schema, **kw)
-        tables = self._get_tables_for_schema_odbc(
-            connection,
-
-            schema, table_type="TABLE",
-            **kw
-        )
+        tables = self._tables_for_schema(connection, schema, table_type="TABLE")
         return [self.normalize_name(row.table_name) for row in tables]
 
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super().get_view_names(connection, schema, **kw)
-        tables = self._get_tables_for_schema_odbc(
-            connection,
-            schema,
-            table_type="VIEW",
-            **kw
-        )
+        tables = self._tables_for_schema(connection, schema, table_type="VIEW")
         return [self.normalize_name(row.table_name) for row in tables]
 
     def has_table(self, connection, table_name, schema=None, **kw):
@@ -254,13 +238,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if self._is_sql_fallback_requested(**kw):
             return super()._get_columns(connection, table_name, schema, **kw)
 
-        tables = self._get_tables_for_schema_odbc(
-            connection,
-            schema=schema,
-            table_name=table_name,
-            **kw
-        )
-
+        tables = self._tables_for_schema(connection, schema=schema, table_name=table_name)
         if len(tables) != 1:
             return []
 
@@ -301,12 +279,11 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             return super()._get_foreign_keys(connection, table_name, schema, **kw)
 
         # Need to use a workaround, because SQLForeignKeys functions doesn't work for an unknown reason
-        tables = self._get_tables_for_schema_odbc(
+        tables = self._tables_for_schema(
             connection=connection,
             schema=schema,
             table_name=table_name,
-            table_type="TABLE",
-            **kw
+            table_type="TABLE"
         )
         if len(tables) == 0:
             return []

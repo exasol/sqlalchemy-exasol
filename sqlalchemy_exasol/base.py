@@ -612,7 +612,6 @@ class EXADialect(default.DefaultDialect):
             schema=schema,
             **kw
         )
-        table_name = self.denormalize_name(table_name)
         for row in rows:
             (colname, coltype, length, precision, scale, nullable, default, identity, is_distribution_key) = \
                 (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
@@ -746,7 +745,6 @@ class EXADialect(default.DefaultDialect):
 
         fkeys = util.defaultdict(fkey_rec)
         constraints = self._get_foreign_keys(connection, table_name=table_name, schema=schema_int, **kw)
-        table_name = self.denormalize_name(table_name)
         for row in constraints:
             (cons_name, local_column, remote_schema, remote_table, remote_column) = \
                 (row[0], row[1], row[2], row[3], row[4])

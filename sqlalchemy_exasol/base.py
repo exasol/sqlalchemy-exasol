@@ -486,12 +486,6 @@ class EXADialect(default.DefaultDialect):
         else:
             return None
 
-    def use_sql_fallback(self, **kw):
-        result = "use_sql_fallback" in kw and kw.get("use_sql_fallback") == True
-        if result:
-            logger.warning("Using sql fallback instead of odbc functions")
-        return result
-
     def _get_schema_names_query(self, connection, **kw):
         return "select SCHEMA_NAME from SYS.EXA_SCHEMAS"
 

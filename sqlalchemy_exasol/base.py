@@ -527,21 +527,6 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_table_names(self, connection, schema, **kw):
-        odbc_connection = self.getODBCConnection(connection)
-        if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            return self.get_table_names_odbc(connection, odbc_connection, schema, **kw)
-        else:
-            return self.get_table_names_sql(connection, schema, **kw)
-
-    @reflection.cache
-    def get_table_names_odbc(self, connection, odbc_connection, schema, **kw):
-        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="TABLE", **kw)
-        normalized_tables = [self.normalize_name(row.table_name)
-                             for row in tables]
-        return normalized_tables
-
-    @reflection.cache
-    def get_table_names_sql(self, connection, schema, **kw):
         schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "
         if schema is None:
@@ -555,21 +540,6 @@ class EXADialect(default.DefaultDialect):
         return tables
 
     def has_table(self, connection, table_name, schema=None, **kw):
-        odbc_connection = self.getODBCConnection(connection)
-        if odbc_connection is not None and not self.use_sql_fallback(**kw):
-            result=self.has_table_odbc(connection, odbc_connection, schema=schema, table_name=table_name, **kw)
-        else:
-            result=self.has_table_sql(connection, schema=schema, table_name=table_name, **kw)
-        return result
-
-    def has_table_odbc(self, connection, odbc_connection, table_name, schema=None, **kw):
-        tables = self.get_table_names_odbc(connection=connection,
-                                           odbc_connection=odbc_connection,
-                                           schema=schema, table_name=table_name, **kw)
-        result = self.normalize_name(table_name) in tables
-        return result
-
-    def has_table_sql(self, connection, table_name, schema=None, **kw):
         schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT table_name from SYS.EXA_ALL_TABLES " \
                     "WHERE table_name = :table_name "
@@ -580,8 +550,7 @@ class EXADialect(default.DefaultDialect):
             table_name=self.denormalize_name(table_name),
             schema=self.denormalize_name(schema))
         row = rp.fetchone()
-
-        return (row is not None)
+        return row is not None
 
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):

@@ -173,6 +173,26 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             logger.warning("Using sql fallback instead of odbc functions")
         return is_fallback_requested
 
+    def get_table_names(self, connection, schema, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super().get_table_names(connection, schema, **kw)
+        odbc_connection = self.getODBCConnection(connection)
+        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="TABLE", **kw)
+        normalized_tables = [self.normalize_name(row.table_name) for row in tables]
+        return normalized_tables
+
+    def has_table(self, connection, table_name, schema=None, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super().has_table(connection, table_name, schema, **kw)
+        tables = self.get_table_names(
+            connection=connection,
+            schema=schema,
+            table_name=table_name,
+            **kw
+        )
+        result = self.normalize_name(table_name) in tables
+        return result
+
     def _get_schema_names_query(self, connection, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super()._get_schema_names_query(connection, **kw)

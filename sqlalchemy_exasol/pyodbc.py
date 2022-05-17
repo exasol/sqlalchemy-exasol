@@ -225,6 +225,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         result = connection.execute(sql.text(sql_statement)).scalar()
         return result if result else None
 
+    @reflection.cache
     def get_table_names(self, connection, schema, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super().get_table_names(connection, schema, **kw)

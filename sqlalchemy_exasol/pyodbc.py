@@ -191,6 +191,14 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             return None
 
     @reflection.cache
+    def _get_tables_for_schema_odbc(self, connection, odbc_connection, schema, table_type=None, table_name=None, **kw):
+        schema = self._get_schema_for_input_or_current(connection, schema)
+        table_name = self.denormalize_name(table_name)
+        with odbc_connection.cursor().tables(schema=schema, tableType=table_type, table=table_name) as table_cursor:
+            rows = [row for row in table_cursor]
+            return rows
+
+    @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super().get_view_definition(connection, view_name, schema, **kw)

@@ -496,14 +496,6 @@ class EXADialect(default.DefaultDialect):
         return current_schema
 
     @reflection.cache
-    def _get_tables_for_schema_odbc(self, connection, odbc_connection, schema, table_type=None, table_name=None, **kw):
-        schema = self._get_schema_for_input_or_current(connection, schema)
-        table_name = self.denormalize_name(table_name)
-        with odbc_connection.cursor().tables(schema=schema, tableType=table_type, table=table_name) as table_cursor:
-            rows = [row for row in table_cursor]
-            return rows
-
-    @reflection.cache
     def get_table_names(self, connection, schema, **kw):
         schema = self._get_schema_for_input(connection, schema)
         sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "

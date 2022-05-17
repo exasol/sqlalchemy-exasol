@@ -175,12 +175,12 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             logger.warning("Using sql fallback instead of odbc functions")
         return is_fallback_requested
 
-    def getODBCConnection(self, connection):
+    def _get_odbc_connection(self, connection):
         if isinstance(connection, Engine):
             odbc_connection = connection.raw_connection().connection
         elif isinstance(connection, Session):
             odbc_connection = connection.connection()
-            return self.getODBCConnection(odbc_connection)
+            return self._get_odbc_connection(odbc_connection)
         elif isinstance(connection, Connection):
             odbc_connection = connection.connection.connection
         else:
@@ -205,35 +205,43 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if view_name is None:
             return None
 
-        odbc_connection = self.getODBCConnection(connection)
-        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="VIEW",
-                                                  table_name=view_name, **kw)
+        odbc_connection = self._get_odbc_connection(connection)
+        tables = self._get_tables_for_schema_odbc(
+            connection, odbc_connection, schema,
+            table_type="VIEW",
+            table_name=view_name,
+            **kw
+        )
         if len(tables) != 1:
             return None
 
         quoted_view_name_string = self.quote_string_value(tables[0][2])
         quoted_view_schema_string = self.quote_string_value(tables[0][1])
-        sql_stmnt = \
-            "/*snapshot execution*/ SELECT view_text FROM sys.exa_all_views WHERE view_name = {view_name} AND view_schema = {view_schema}".format(
-                view_name=quoted_view_name_string, view_schema=quoted_view_schema_string)
-        rp = connection.execute(sql.text(sql_stmnt)).scalar()
-        if not rp:
-            return None
-        return rp
+        sql_statement = (
+            "/*snapshot execution*/ SELECT view_text "
+            f"FROM sys.exa_all_views WHERE view_name = {quoted_view_name_string} "
+            f"AND view_schema = {quoted_view_schema_string}"
+        )
+        result = connection.execute(sql.text(sql_statement)).scalar()
+        return result if result else None
 
     def get_table_names(self, connection, schema, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super().get_table_names(connection, schema, **kw)
-        odbc_connection = self.getODBCConnection(connection)
-        tables = self._get_tables_for_schema_odbc(connection, odbc_connection, schema, table_type="TABLE", **kw)
-        normalized_tables = [self.normalize_name(row.table_name) for row in tables]
-        return normalized_tables
+        odbc_connection = self._get_odbc_connection(connection)
+        tables = self._get_tables_for_schema_odbc(
+            connection,
+            odbc_connection,
+            schema, table_type="TABLE",
+            **kw
+        )
+        return [self.normalize_name(row.table_name) for row in tables]
 
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super().get_view_names(connection, schema, **kw)
-        odbc_connection = self.getODBCConnection(connection)
+        odbc_connection = self._get_odbc_connection(connection)
         tables = self._get_tables_for_schema_odbc(
             connection,
             odbc_connection,
@@ -252,8 +260,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             table_name=table_name,
             **kw
         )
-        result = self.normalize_name(table_name) in tables
-        return result
+        return self.normalize_name(table_name) in tables
 
     def _get_schema_names_query(self, connection, **kw):
         if self._is_sql_fallback_requested(**kw):
@@ -265,7 +272,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if self._is_sql_fallback_requested(**kw):
             return super()._get_columns(connection, table_name, schema, **kw)
 
-        odbc_connection = self.getODBCConnection(connection)
+        odbc_connection = self._get_odbc_connection(connection)
         tables = self._get_tables_for_schema_odbc(
             connection, odbc_connection,
             schema=schema,
@@ -293,7 +300,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if self._is_sql_fallback_requested(**kw):
             return super()._get_pk_constraint(connection, table_name, schema, **kw)
 
-        odbc_connection = self.getODBCConnection(connection)
+        odbc_connection = self._get_odbc_connection(connection)
         schema = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
         with odbc_connection.cursor().primaryKeys(table=table_name, schema=schema) as cursor:
@@ -312,10 +319,16 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if self._is_sql_fallback_requested(**kw):
             return super()._get_foreign_keys(connection, table_name, schema, **kw)
 
-        odbc_connection = self.getODBCConnection(connection)
+        odbc_connection = self._get_odbc_connection(connection)
         # Need to use a workaround, because SQLForeignKeys functions doesn't work for an unknown reason
-        tables = self._get_tables_for_schema_odbc(connection=connection, odbc_connection=odbc_connection,
-                                                  schema=schema, table_name=table_name, table_type="TABLE", **kw)
+        tables = self._get_tables_for_schema_odbc(
+            connection=connection,
+            odbc_connection=odbc_connection,
+            schema=schema,
+            table_name=table_name,
+            table_type="TABLE",
+            **kw
+        )
         if len(tables) == 0:
             return []
 
@@ -329,6 +342,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             )
         )
         response = connection.execute(sql_statement)
+
         return list(response)
 
 

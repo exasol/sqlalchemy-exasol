@@ -434,7 +434,8 @@ class EXADialect(default.DefaultDialect):
     def _get_schema_from_url(self, connection, schema):
         if connection.engine.url is not None and connection.engine.url != "":
             schema = self.normalize_name(
-                connection.engine.url.translate_connect_args().get('database'))
+                connection.engine.url.translate_connect_args().get('database')
+            )
         return schema
 
     def normalize_name(self, name):
@@ -458,8 +459,7 @@ class EXADialect(default.DefaultDialect):
         """
         if name is None or len(name) == 0:
             return None
-        elif name.lower() == name and \
-                not self.identifier_preparer._requires_quotes(name.lower()):
+        elif name.lower() == name and not self.identifier_preparer._requires_quotes(name.lower()):
             name = name.upper()
         return name
 
@@ -477,8 +477,8 @@ class EXADialect(default.DefaultDialect):
     @reflection.cache
     def get_schema_names(self, connection, **kw):
         sql_statement = self._get_schema_names_query(connection, **kw)
-        rs = connection.execute(sql.text(sql_statement))
-        return [self.normalize_name(row[0]) for row in rs]
+        result = connection.execute(sql.text(sql_statement))
+        return [self.normalize_name(row[0]) for row in result]
 
     def _get_schema_for_input_or_current(self, connection, schema):
         schema = self._get_schema_for_input(connection, schema)
@@ -487,53 +487,63 @@ class EXADialect(default.DefaultDialect):
         return self.denormalize_name(schema)
 
     def _get_schema_for_input(self, connection, schema):
-        schema = self.denormalize_name(schema or self._get_schema_from_url(connection, schema))
-        return schema
+        return self.denormalize_name(
+            schema or self._get_schema_from_url(connection, schema)
+        )
 
-    def _get_current_schema(self, connection):
-        current_schema_stmnt = "SELECT CURRENT_SCHEMA"
-        current_schema = connection.execute(current_schema_stmnt).fetchone()[0]
+    @staticmethod
+    def _get_current_schema(connection):
+        sql_statement = "SELECT CURRENT_SCHEMA"
+        current_schema = connection.execute(sql_statement).fetchone()[0]
         return current_schema
 
     @reflection.cache
     def get_table_names(self, connection, schema, **kw):
         schema = self._get_schema_for_input(connection, schema)
-        sql_stmnt = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "
+        sql_statement = "SELECT table_name FROM  SYS.EXA_ALL_TABLES WHERE table_schema = "
         if schema is None:
-            sql_stmnt += "CURRENT_SCHEMA ORDER BY table_name"
-            rs = connection.execute(sql_stmnt)
+            sql_statement += "CURRENT_SCHEMA ORDER BY table_name"
+            result = connection.execute(sql_statement)
         else:
-            sql_stmnt += ":schema ORDER BY table_name"
-            rs = connection.execute(sql.text(sql_stmnt),
-                                    schema=self.denormalize_name(schema))
-        tables = [self.normalize_name(row[0]) for row in rs]
+            sql_statement += ":schema ORDER BY table_name"
+            result = connection.execute(
+                sql.text(sql_statement),
+                schema=self.denormalize_name(schema)
+            )
+        tables = [self.normalize_name(row[0]) for row in result]
         return tables
 
     def has_table(self, connection, table_name, schema=None, **kw):
         schema = self._get_schema_for_input(connection, schema)
-        sql_stmnt = "SELECT table_name from SYS.EXA_ALL_TABLES " \
-                    "WHERE table_name = :table_name "
+        sql_statement = (
+            "SELECT table_name from SYS.EXA_ALL_TABLES " 
+            "WHERE table_name = :table_name "
+        )
         if schema is not None:
-            sql_stmnt += "AND table_schema = :schema"
-        rp = connection.execute(
-            sql.text(sql_stmnt),
+            sql_statement += "AND table_schema = :schema"
+
+        result = connection.execute(
+            sql.text(sql_statement),
             table_name=self.denormalize_name(table_name),
-            schema=self.denormalize_name(schema))
-        row = rp.fetchone()
+            schema=self.denormalize_name(schema)
+        )
+        row = result.fetchone()
         return row is not None
 
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
         schema = self._get_schema_for_input(connection, schema)
-        sql_stmnt = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS WHERE view_schema = "
+        sql_statement = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS WHERE view_schema = "
         if schema is None:
-            sql_stmnt += "CURRENT_SCHEMA ORDER BY view_name"
-            rs = connection.execute(sql.text(sql_stmnt))
+            sql_statement += "CURRENT_SCHEMA ORDER BY view_name"
+            result = connection.execute(sql.text(sql_statement))
         else:
-            sql_stmnt += ":schema ORDER BY view_name"
-            rs = connection.execute(sql.text(sql_stmnt),
-                                    schema=self.denormalize_name(schema))
-        return [self.normalize_name(row[0]) for row in rs]
+            sql_statement += ":schema ORDER BY view_name"
+            result = connection.execute(
+                sql.text(sql_statement),
+                schema=self.denormalize_name(schema)
+            )
+        return [self.normalize_name(row[0]) for row in result]
 
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):
@@ -543,14 +553,15 @@ class EXADialect(default.DefaultDialect):
             sql_stmnt += "CURRENT_SCHEMA"
         else:
             sql_stmnt += ":schema"
-        rp = connection.execute(sql.text(sql_stmnt),
-                                view_name=self.denormalize_name(view_name),
-                                schema=self.denormalize_name(schema)).scalar()
-        if not rp:
-            return None
-        return rp
+        result = connection.execute(
+            sql.text(sql_stmnt),
+            view_name=self.denormalize_name(view_name),
+            schema=self.denormalize_name(schema)
+        ).scalar()
+        return result if result else None
 
-    def quote_string_value(self, string_value):
+    @staticmethod
+    def quote_string_value(string_value):
         return "'%s'" % (string_value.replace("'", "''"))
 
     @staticmethod
@@ -582,12 +593,12 @@ class EXADialect(default.DefaultDialect):
         schema_str = "CURRENT_SCHEMA" if schema is None else ":schema"
         table_name_str = ":table"
         sql_statement = self.get_column_sql_query_str().format(schema=schema_str, table=table_name_str)
-        response = connection.execute(
+        result = connection.execute(
             sql.text(sql_statement),
             schema=self.denormalize_name(schema),
             table=self.denormalize_name(table_name)
         )
-        return list(response)
+        return list(result)
 
     @reflection.cache
     def get_columns(self, connection, table_name, schema=None, **kw):
@@ -595,9 +606,12 @@ class EXADialect(default.DefaultDialect):
             return []
 
         columns = []
-        rows = self._get_columns(connection,
-                                 table_name=table_name,
-                                 schema=schema, **kw)
+        rows = self._get_columns(
+            connection,
+            table_name=table_name,
+            schema=schema,
+            **kw
+        )
         table_name = self.denormalize_name(table_name)
         for row in rows:
             (colname, coltype, length, precision, scale, nullable, default, identity, is_distribution_key) = \
@@ -679,13 +693,15 @@ class EXADialect(default.DefaultDialect):
             schema_string = "CURRENT_SCHEMA "
         else:
             schema_string = ":schema "
-        sql_stmnt=self._get_constraint_sql_str(schema_string, table_name_string, "PRIMARY KEY")
-        rp = connection.execute(sql.text(sql_stmnt),
-                                schema=self.denormalize_name(schema),
-                                table=table_name)
+        sql_statement = self._get_constraint_sql_str(schema_string, table_name_string, "PRIMARY KEY")
+        result = connection.execute(
+            sql.text(sql_statement),
+            schema=self.denormalize_name(schema),
+            table=table_name
+        )
         pkeys = []
         constraint_name = None
-        for row in list(rp):
+        for row in list(result):
             if (row[5] != table_name and table_name is not None) or row[6] != 'PRIMARY KEY':
                 continue
             pkeys.append(self.normalize_name(row[1]))
@@ -705,12 +721,12 @@ class EXADialect(default.DefaultDialect):
         table_name_string = ":table"
         schema_string = "CURRENT_SCHEMA " if schema is None else ":schema "
         sql_statement = self._get_constraint_sql_str(schema_string, table_name_string, "FOREIGN KEY")
-        response = connection.execute(
+        result = connection.execute(
             sql.text(sql_statement),
             schema=self.denormalize_name(schema),
             table=self.denormalize_name(table_name)
         )
-        return list(response)
+        return list(result)
 
 
     @reflection.cache
@@ -755,5 +771,5 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):
-        # EXASolution has no explicit indexes
+        """ EXASolution has no explicit indexes"""
         return []

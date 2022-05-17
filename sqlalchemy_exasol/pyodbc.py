@@ -12,7 +12,8 @@ import logging
 from distutils.version import LooseVersion
 
 from sqlalchemy import sql
-from sqlalchemy.engine import reflection
+from sqlalchemy.engine import reflection, Engine, Connection
+from sqlalchemy.orm.session import Session
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
 
@@ -173,6 +174,21 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if is_fallback_requested:
             logger.warning("Using sql fallback instead of odbc functions")
         return is_fallback_requested
+
+    def getODBCConnection(self, connection):
+        if isinstance(connection, Engine):
+            odbc_connection = connection.raw_connection().connection
+        elif isinstance(connection, Session):
+            odbc_connection = connection.connection()
+            return self.getODBCConnection(odbc_connection)
+        elif isinstance(connection, Connection):
+            odbc_connection = connection.connection.connection
+        else:
+            return None
+        if "pyodbc.Connection" in str(type(odbc_connection)):
+            return odbc_connection
+        else:
+            return None
 
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):

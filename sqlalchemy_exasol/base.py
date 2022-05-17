@@ -50,8 +50,7 @@ import sqlalchemy.exc
 from decimal import Decimal
 from sqlalchemy import sql, schema, types as sqltypes, util, event
 from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
-from sqlalchemy.engine import default, reflection, Engine, Connection
-from sqlalchemy.orm.session import Session
+from sqlalchemy.engine import default, reflection
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql.elements import quoted_name
 from datetime import date, datetime
@@ -470,21 +469,6 @@ class EXADialect(default.DefaultDialect):
     def on_connect(self):
         # TODO: set isolation level
         pass
-
-    def getODBCConnection(self, connection):
-        if isinstance(connection, Engine):
-            odbc_connection = connection.raw_connection().connection
-        elif isinstance(connection, Session):
-            odbc_connection = connection.connection()
-            return self.getODBCConnection(odbc_connection)
-        elif isinstance(connection, Connection):
-            odbc_connection = connection.connection.connection
-        else:
-            return None
-        if "pyodbc.Connection" in str(type(odbc_connection)):
-            return odbc_connection
-        else:
-            return None
 
     def _get_schema_names_query(self, connection, **kw):
         return "select SCHEMA_NAME from SYS.EXA_SCHEMAS"

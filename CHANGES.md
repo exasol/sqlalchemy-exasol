@@ -3,7 +3,7 @@
   (Note: this addresses the superset [issue-20105](https://github.com/apache/superset/issues/20105))
 * Removed odbc specific functionality from base dialect and moved it to the pyodbc dialect
 * Removed remaining python2 compatibility artifacts and switches 
-* Bump support of base python version to 3.7
+* Bumped support of base python version to 3.7
 
 # 2.3.0
 * Update supported versions of EXASOL DB to 7.1.6 and 7.0.16 

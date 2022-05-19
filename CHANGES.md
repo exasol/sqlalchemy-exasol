@@ -1,3 +1,10 @@
+# 2.4.0
+* Fixed bug when accessing underlying odbc connection while using NullPool based engine
+  (Note: this addresses the superset [issue-20105](https://github.com/apache/superset/issues/20105))
+* Remove odbc specific functionality from base dialect
+* Removed remaining python2 compatibility artifacts and switches 
+* Bump support of base python version to 3.7
+
 # 2.3.0
 * Update supported versions of EXASOL DB to 7.1.6 and 7.0.16 
 * Update supported python versions to 3.6, 3.7, 3.8, 3.9

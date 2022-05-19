@@ -1,7 +1,7 @@
 # 2.4.0
 * Fixed bug when accessing underlying odbc connection while using NullPool based engine
   (Note: this addresses the superset [issue-20105](https://github.com/apache/superset/issues/20105))
-* Remove odbc specific functionality from base dialect
+* Removed odbc specific functionality from base dialect and moved it to the pyodbc dialect
 * Removed remaining python2 compatibility artifacts and switches 
 * Bump support of base python version to 3.7
 

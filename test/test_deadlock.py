@@ -10,8 +10,11 @@ import sqlalchemy.testing as testing
 from sqlalchemy_exasol.base import EXADialect
 
 
-#TODO get_schema_names, get_view_names and get_view_definition didn't cause deadlocks in this scenario
-@pytest.mark.skipif("turbodbc" in str(testing.db.url), reason="We currently don't support snapshot metadata requests for turbodbc")
+# TODO: get_schema_names, get_view_names and get_view_definition didn't cause deadlocks in this scenario
+@pytest.mark.skipif(
+    "pyodbc" not in str(testing.db.url),
+    reason="We currently only support snapshot metadata requests in the pyodbc based dialect"
+)
 class MetadataTest(fixtures.TablesTest):
     __backend__ = True
 

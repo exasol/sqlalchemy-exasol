@@ -1,3 +1,4 @@
+import pytest
 from sqlalchemy import testing
 from sqlalchemy.engine import url as sa_url
 from sqlalchemy.testing import fixtures
@@ -7,8 +8,11 @@ from sqlalchemy_exasol.turbodbc import (EXADialect_turbodbc, DEFAULT_CONNECTION_
                                         DEFAULT_TURBODBC_PARAMS)
 
 
+@pytest.mark.skipif(
+    "turbodbc" not in testing.db.dialect.driver,
+    reason="This tests are only relevant for the dialect Exasol turbodbc dialect"
+)
 class EXADialectTurbodbcTest(fixtures.TestBase):
-    __skip_if__ = (lambda: testing.db.dialect.driver != 'turbodbc',)
 
     dialect = None
     default_host_args = {

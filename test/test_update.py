@@ -63,11 +63,10 @@ class _UpdateTestBase(object):
 class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
     __backend__ = True
 
-    @unittest.skipIf(testing.db.dialect.driver == 'turbodbc',
-                     'not supported by turbodbc')
+    @unittest.skipIf(testing.db.dialect.driver == 'turbodbc', 'not supported by turbodbc')
     def test_update_simple(self):
         """test simple update and assert that exasol returns the right rowcount"""
-        users =  self.tables.users
+        users = self.tables.users
         result = testing.db.execute(users.update().values(name="peter").where(users.c.id == 10))
         expected = [
                 (7, 'jack'),
@@ -75,11 +74,10 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
                 (9, 'fred'),
                 (10, 'peter')
                 ]
-        assert result.rowcount ==  1
+        assert result.rowcount == 1
         self._assert_users(users, expected)
 
-    @unittest.skipIf(testing.db.dialect.driver == 'turbodbc',
-                     'not supported by turbodbc')
+    @unittest.skipIf(testing.db.dialect.driver == 'turbodbc', 'not supported by turbodbc')
     def test_update_simple_multiple_rows_rowcount(self):
         """test simple update and assert that exasol returns the right rowcount"""
         users =  self.tables.users
@@ -93,8 +91,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
         assert result.rowcount == 2 
         self._assert_users(users, expected)
 
-    @unittest.skipIf(testing.db.dialect.driver == 'turbodbc',
-                     'not supported by turbodbc')
+    @unittest.skipIf(testing.db.dialect.driver == 'turbodbc', 'not supported by turbodbc')
     def test_update_executemany(self):
         """test that update with executemany work as well, but rowcount
         is undefined for executemany updates"""
@@ -114,7 +111,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
                 (9, 'fred2'),
                 (10, 'chuck')
                 ]  
-        assert result.rowcount ==  -1
+        assert result.rowcount == -1
         self._assert_users(users, expected)
 
     def _assert_addresses(self, addresses, expected):

@@ -1,32 +1,8 @@
-import sys
-import json
 import argparse
+import csv
+import json
+import sys
 from collections import namedtuple
-
-LEGIT_TESTS_TO_SKIP = {
-    "pyodbc": [
-        "test/test_exadialect_turbodbc.py::EXADialectTurbodbcTest::test_create_connect_args",
-        "test/test_exadialect_turbodbc.py::EXADialectTurbodbcTest::test_create_connect_args_dsn",
-        "test/test_exadialect_turbodbc.py::EXADialectTurbodbcTest::test_create_connect_args_dsn_without_user",
-        "test/test_exadialect_turbodbc.py::EXADialectTurbodbcTest::test_create_connect_args_overrides_default",
-        "test/test_exadialect_turbodbc.py::EXADialectTurbodbcTest::test_create_connect_args_trusted",
-        "test/test_exadialect_turbodbc.py::EXADialectTurbodbcTest::test_create_connect_args_with_custom_parameter",
-        "test/test_exadialect_turbodbc.py::EXADialectTurbodbcTest::test_create_connect_args_with_driver",
-        "test/test_exadialect_turbodbc.py::EXADialectTurbodbcTest::test_create_connect_args_with_parameter_set_to_none",
-        "test/test_exadialect_turbodbc.py::EXADialectTurbodbcTest::test_create_connect_args_with_turbodbc_args",
-    ],
-    "turbodbc": [
-        "test/test_exadialect_pyodbc.py::EXADialect_pyodbcTest::test_create_connect_args",
-        "test/test_exadialect_pyodbc.py::EXADialect_pyodbcTest::test_create_connect_args_autotranslate",
-        "test/test_exadialect_pyodbc.py::EXADialect_pyodbcTest::test_create_connect_args_dsn",
-        "test/test_exadialect_pyodbc.py::EXADialect_pyodbcTest::test_create_connect_args_trusted",
-        "test/test_exadialect_pyodbc.py::EXADialect_pyodbcTest::test_create_connect_args_with_driver",
-        "test/test_exadialect_pyodbc.py::EXADialect_pyodbcTest::test_create_connect_args_with_param",
-        "test/test_exadialect_pyodbc.py::EXADialect_pyodbcTest::test_create_connect_args_with_param_multiple",
-        "test/test_exadialect_pyodbc.py::EXADialect_pyodbcTest::test_create_connect_args_with_unknown_params",
-        "test/test_exadialect_pyodbc.py::EXADialect_pyodbcTest::test_is_disconnect",
-    ],
-}
 
 Test = namedtuple(
     "Test",
@@ -59,12 +35,13 @@ def skipped_test_from(obj):
 
 
 def _create_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "connector", choices=["pyodbc", "turbodbc"]
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
+    parser.add_argument("connector", choices=["pyodbc", "turbodbc"])
     parser.add_argument("test_results")
-    parser.add_argument("--action", choices=["list-skipped"], default="list-skipped")
+    parser.add_argument("-o", "--output", type=argparse.FileType("w"), default="-")
+    parser.add_argument("-f", "--format", choices=["human", "csv"], default="csv")
     parser.add_argument(
         "--debug", type=bool, action=argparse.BooleanOptionalAction, default=False
     )
@@ -79,13 +56,34 @@ def all_skipped_tests(path):
                 yield skipped_test_from(test)
 
 
-def main(test_results, connector, action, debug=False):
+def _human(tests, output):
+    for t in tests:
+        print(
+            f"ID: {t.nodeid}, Details: {t.details}, Filename: {t.filename}, Line: {t.lineno}",
+            file=output,
+        )
+
+
+def _csv(tests, output):
+    fields = ("test-case", "status", "details")
+
+    def test_to_entry(t):
+        return {
+            "test-case": t.nodeid,
+            "status": t.outcome,
+            "details": t.details,
+        }
+
+    writer = csv.DictWriter(output, fieldnames=fields)
+    writer.writeheader()
+    for test in tests:
+        writer.writerow(test_to_entry(test))
+
+
+def main(test_results, output, format, **kwargs):
     skipped_tests = all_skipped_tests(test_results)
-    skipped_tests = filter(
-        lambda test: test.nodeid not in LEGIT_TESTS_TO_SKIP[connector], skipped_tests
-    )
-    for t in skipped_tests:
-        print(f"{t.nodeid}: {t.details}")
+    dispatcher = {"human": _human, "csv": _csv}
+    dispatcher[format](skipped_tests, output)
     return 0
 
 

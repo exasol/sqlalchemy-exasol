@@ -1,9 +1,7 @@
 import unittest
 from sqlalchemy import *
 from sqlalchemy import testing
-from sqlalchemy.dialects import mysql
-from sqlalchemy.engine import default
-from sqlalchemy.testing import AssertsCompiledSQL, eq_, fixtures
+from sqlalchemy.testing import eq_, fixtures
 from sqlalchemy.testing.schema import Table, Column
 
 

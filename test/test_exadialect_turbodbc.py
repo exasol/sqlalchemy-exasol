@@ -4,8 +4,7 @@ from sqlalchemy.engine import url as sa_url
 from sqlalchemy.testing import fixtures
 from sqlalchemy.testing import eq_
 
-from sqlalchemy_exasol.turbodbc import (EXADialect_turbodbc, DEFAULT_CONNECTION_PARAMS,
-                                        DEFAULT_TURBODBC_PARAMS)
+from sqlalchemy_exasol.turbodbc import (EXADialect_turbodbc, DEFAULT_CONNECTION_PARAMS)
 
 
 @pytest.mark.skipif(

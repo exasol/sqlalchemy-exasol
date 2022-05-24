@@ -15,8 +15,6 @@ from sqlalchemy_exasol.util import raw_sql
 
 class MergeTest(fixtures.TablesTest):
 
-    #run_deletes = 'each'
-
     __backend__ = True
 
     __engine_options__ = {"implicit_returning": False}

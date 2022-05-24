@@ -14,8 +14,6 @@ from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
     reason="This tests are only relevant for the dialect Exasol pyodbc dialect"
 )
 class EXADialect_pyodbcTest(fixtures.TestBase):
-    __skip_if__ = (lambda: testing.db.dialect.driver != "pyodbc",)
-    #__only_on__ = 'pyodbc'
 
     def setup(self):
         self.dialect = EXADialect_pyodbc()

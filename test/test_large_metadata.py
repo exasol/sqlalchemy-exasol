@@ -1,9 +1,8 @@
 # -*- coding: UTF-8 -*-
 import time
 
-import pytest
 from sqlalchemy.testing import fixtures, config
-from sqlalchemy import MetaData, Table, Column, Integer
+from sqlalchemy import MetaData, Table
 
 
 table_counts = [1,50,100]

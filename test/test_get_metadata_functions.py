@@ -5,8 +5,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from sqlalchemy.sql.sqltypes import INTEGER, VARCHAR
 from sqlalchemy.testing import fixtures, config
+from sqlalchemy.engine.reflection import Inspector
 
 from sqlalchemy_exasol.base import EXADialect
+from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
 
 TEST_GET_METADATA_FUNCTIONS_SCHEMA = "test_get_metadata_functions_schema"
 ENGINE_NONE_DATABASE = "ENGINE_NONE_DATABASE"
@@ -74,14 +76,14 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_schema_names(self, engine_name, use_sql_fallback):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             schema_names = dialect.get_schema_names(connection=c, use_sql_fallback=use_sql_fallback)
             assert self.schema in schema_names and self.schema_2 in schema_names
 
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_compare_get_schema_names_for_sql_and_odbc(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             schema_names_fallback = dialect.get_schema_names(connection=c, use_sql_fallback=True)
             schema_names_odbc = dialect.get_schema_names(connection=c)
             assert sorted(schema_names_fallback) == sorted(schema_names_odbc)
@@ -90,7 +92,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_table_names(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             table_names = dialect.get_table_names(connection=c, schema=self.schema, use_sql_fallback=use_sql_fallback)
             assert "t" in table_names and "s" in table_names
 
@@ -100,7 +102,7 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             table_names_fallback = dialect.get_table_names(connection=c, schema=schema, use_sql_fallback=True)
             table_names_odbc = dialect.get_table_names(connection=c, schema=schema)
             assert table_names_fallback == table_names_odbc
@@ -109,7 +111,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_has_table_table_exists(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             has_table = dialect.has_table(connection=c, schema=self.schema, table_name="t",
                                           use_sql_fallback=use_sql_fallback)
             assert has_table, "Table %s.T was not found, but should exist" % self.schema
@@ -118,7 +120,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_has_table_table_exists_not(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             has_table = dialect.has_table(connection=c, schema=self.schema, table_name="not_exist",
                                           use_sql_fallback=use_sql_fallback)
             assert not has_table, "Table %s.not_exist was found, but should not exist" % self.schema
@@ -127,7 +129,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_compare_has_table_for_sql_and_odbc(self, schema, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             has_table_fallback = dialect.has_table(connection=c, schema=schema, use_sql_fallback=True, table_name="t")
             has_table_odbc = dialect.has_table(connection=c, schema=schema, table_name="t")
             assert has_table_fallback == has_table_odbc, "Expected table %s.t with odbc and fallback" % schema
@@ -136,7 +138,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_view_names(self, use_sql_fallback,engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             view_names = dialect.get_view_names(connection=c, schema=self.schema, use_sql_fallback=use_sql_fallback)
             assert "v" in view_names
 
@@ -144,7 +146,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_view_names_for_sys(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             view_names = dialect.get_view_names(connection=c, schema="sys", use_sql_fallback=use_sql_fallback)
             assert len(view_names) == 0
 
@@ -152,7 +154,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_view_definition(self, use_sql_fallback,engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             view_definition = dialect.get_view_definition(connection=c, schema=self.schema, view_name="v",
                                                           use_sql_fallback=use_sql_fallback)
             assert self.view_defintion == view_definition
@@ -161,7 +163,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_view_definition_view_name_none(self, use_sql_fallback,engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             view_definition = dialect.get_view_definition(connection=c, schema=self.schema, view_name=None,
                                                           use_sql_fallback=use_sql_fallback)
             assert view_definition is None
@@ -170,7 +172,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_compare_get_view_names_for_sql_and_odbc(self, schema,engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             c.execute("OPEN SCHEMA %s" % self.schema)
             view_names_fallback = dialect.get_view_names(connection=c, schema=schema, use_sql_fallback=True)
             view_names_odbc = dialect.get_view_names(connection=c, schema=schema)
@@ -183,7 +185,7 @@ class MetadataTest(fixtures.TablesTest):
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
             view_name = "v"
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             view_definition_fallback = dialect.get_view_definition(
                 connection=c, view_name=view_name, schema=schema, use_sql_fallback=True)
             view_definition_odbc = dialect.get_view_definition(
@@ -195,9 +197,9 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_compare_get_columns_for_sql_and_odbc(self, schema, table, engine_name):
         with self.engine_map[engine_name].begin() as c:
+            dialect = Inspector(c).dialect
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
-            dialect = EXADialect()
             columns_fallback = dialect.get_columns(connection=c, table_name=table, schema=schema, use_sql_fallback=True)
             columns_odbc = dialect.get_columns(connection=c, table_name=table, schema=schema)
             assert str(columns_fallback) == str(columns_odbc)  # object equality doesn't work for sqltypes
@@ -208,7 +210,7 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             table = None
             columns_fallback = dialect.get_columns(connection=c, table_name=table, schema=schema,
                                                        use_sql_fallback=True)
@@ -222,7 +224,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_columns(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             columns = dialect.get_columns(connection=c, schema=self.schema, table_name="t",
                                           use_sql_fallback=use_sql_fallback)
             expected = [{'default': None,
@@ -253,7 +255,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_columns_table_name_none(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             columns = dialect.get_columns(connection=c, schema=self.schema, table_name=None,
                                               use_sql_fallback=use_sql_fallback)
             assert columns == []
@@ -265,7 +267,7 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             pk_constraint_fallback = dialect.get_pk_constraint(connection=c, table_name=table, schema=schema,
                                                                use_sql_fallback=True)
             pk_constraint_odbc = dialect.get_pk_constraint(connection=c, table_name=table, schema=schema)
@@ -275,7 +277,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_pk_constraint(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             pk_constraint = dialect.get_pk_constraint(connection=c, schema=self.schema, table_name="t",
                                                       use_sql_fallback=use_sql_fallback)
             assert pk_constraint["constrained_columns"] == ['pid1', 'pid2'] and \
@@ -285,7 +287,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_pk_constraint_table_name_none(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             pk_constraint = dialect.get_pk_constraint(connection=c, schema=self.schema, table_name=None,
                                                       use_sql_fallback=use_sql_fallback)
             assert pk_constraint is None
@@ -297,7 +299,7 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema_2)
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             foreign_keys_fallback = dialect.get_foreign_keys(connection=c, table_name=table, schema=schema,
                                                              use_sql_fallback=True)
             foreign_keys_odbc = dialect.get_foreign_keys(connection=c, table_name=table, schema=schema)
@@ -307,7 +309,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_foreign_keys(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             foreign_keys = dialect.get_foreign_keys(connection=c, schema=self.schema, table_name="s",
                                                     use_sql_fallback=use_sql_fallback)
             expected = [{'name': 'fk_test',
@@ -322,7 +324,7 @@ class MetadataTest(fixtures.TablesTest):
     @pytest.mark.parametrize("engine_name", [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE])
     def test_get_foreign_keys_table_name_none(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = EXADialect()
+            dialect = Inspector(c).dialect
             foreign_keys = dialect.get_foreign_keys(connection=c, schema=self.schema, table_name=None,
                                                         use_sql_fallback=use_sql_fallback)
             assert foreign_keys == []

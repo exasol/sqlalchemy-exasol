@@ -6,8 +6,8 @@ from threading import Thread
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.testing import fixtures, config
+from sqlalchemy.engine.reflection import Inspector
 import sqlalchemy.testing as testing
-from sqlalchemy_exasol.base import EXADialect
 
 
 # TODO: get_schema_names, get_view_names and get_view_definition didn't cause deadlocks in this scenario
@@ -28,14 +28,14 @@ class MetadataTest(fixtures.TablesTest):
 
     def test_no_deadlock_for_get_table_names_without_fallback(self):
         def without_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_table_names(session2, schema=schema, use_sql_fallback=False)
 
         self.run_deadlock_for_table(without_fallback)
 
     def test_deadlock_for_get_table_names_with_fallback(self):
         def with_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_table_names(session2, schema=schema, use_sql_fallback=True)
 
         with pytest.raises(Exception):
@@ -43,7 +43,7 @@ class MetadataTest(fixtures.TablesTest):
     
     def test_no_deadlock_for_get_columns_without_fallback(self):
         def without_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_columns(session2, schema=schema, table_name=table, use_sql_fallback=False)
 
         self.run_deadlock_for_table(without_fallback)
@@ -51,36 +51,35 @@ class MetadataTest(fixtures.TablesTest):
     def test_no_deadlock_for_get_columns_with_fallback(self):
         # TODO: Doesnt produce a deadlock anymore since last commit?
         def with_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_columns(session2, schema=schema, table_name=table, use_sql_fallback=True)
 
         self.run_deadlock_for_table(with_fallback)
 
     def test_no_deadlock_for_get_pk_constraint_without_fallback(self):
         def without_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_pk_constraint(session2, table_name=table, schema=schema, use_sql_fallback=False)
 
         self.run_deadlock_for_table(without_fallback)
 
     def test_no_deadlock_for_get_pk_constraint_with_fallback(self):
         def with_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_pk_constraint(session2, table_name=table, schema=schema, use_sql_fallback=True)
 
         self.run_deadlock_for_table(with_fallback)
 
     def test_no_deadlock_for_get_foreign_keys_without_fallback(self):
         def without_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_foreign_keys(session2, table_name=table, schema=schema, use_sql_fallback=False)
 
         self.run_deadlock_for_table(without_fallback)
 
-
     def test_no_deadlock_for_get_foreign_keys_with_fallback(self):
         def with_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_foreign_keys(session2, table_name=table, schema=schema, use_sql_fallback=True)
 
         self.run_deadlock_for_table(with_fallback)
@@ -88,7 +87,7 @@ class MetadataTest(fixtures.TablesTest):
     def test_no_deadlock_for_get_view_names_without_fallback(self):
         # TODO: think of other scenarios where metadata deadlocks with view could happen
         def without_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_view_names(session2, table_name=table, schema=schema, use_sql_fallback=False)
 
         self.run_deadlock_for_table(without_fallback)
@@ -96,7 +95,7 @@ class MetadataTest(fixtures.TablesTest):
     def test_no_deadlock_for_get_view_names_with_fallback(self):
         # TODO: think of other scenarios where metadata deadlocks with view could happen
         def with_fallback(session2, schema, table):
-            dialect = EXADialect()
+            dialect = Inspector(session2).dialect
             dialect.get_view_names(session2, table_name=table, schema=schema, use_sql_fallback=True)
 
         self.run_deadlock_for_table(with_fallback)

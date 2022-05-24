@@ -8,16 +8,20 @@ Connect string::
 
 import re
 import sys
+import logging
 from distutils.version import LooseVersion
 
+from sqlalchemy import sql
+from sqlalchemy.engine import reflection
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.util.langhelpers import asbool
 
 from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
 
+logger = logging.getLogger("sqlalchemy_exasol")
+
 
 class EXADialect_pyodbc(EXADialect, PyODBCConnector):
-
     execution_ctx_cls = EXAExecutionContext
 
     driver_version = None
@@ -58,7 +62,6 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         return self.server_version_info
 
     if sys.platform == "darwin":
-
         def connect(self, *cargs, **cparams):
             # Get connection
             conn = super().connect(*cargs, **cparams)
@@ -163,6 +166,140 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             return error_code in error_codes
 
         return super().is_disconnect(e, connection, cursor)
+
+    @staticmethod
+    def _is_sql_fallback_requested(**kwargs):
+        is_fallback_requested = kwargs.get("use_sql_fallback", False)
+        if is_fallback_requested:
+            logger.warning("Using sql fallback instead of odbc functions")
+        return is_fallback_requested
+
+    @reflection.cache
+    def _tables_for_schema(self, connection, schema, table_type=None, table_name=None):
+        schema = self._get_schema_for_input_or_current(connection, schema)
+        table_name = self.denormalize_name(table_name)
+        conn = connection.engine.raw_connection()
+        with conn.cursor().tables(schema=schema, tableType=table_type, table=table_name) as table_cursor:
+            return [row for row in table_cursor]
+
+    @reflection.cache
+    def get_view_definition(self, connection, view_name, schema=None, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super().get_view_definition(connection, view_name, schema, **kw)
+        if view_name is None:
+            return None
+
+        tables = self._tables_for_schema(connection, schema, table_type="VIEW", table_name=view_name)
+        if len(tables) != 1:
+            return None
+
+        quoted_view_name_string = self.quote_string_value(tables[0][2])
+        quoted_view_schema_string = self.quote_string_value(tables[0][1])
+        sql_statement = (
+            "/*snapshot execution*/ SELECT view_text "
+            f"FROM sys.exa_all_views WHERE view_name = {quoted_view_name_string} "
+            f"AND view_schema = {quoted_view_schema_string}"
+        )
+        result = connection.execute(sql.text(sql_statement)).scalar()
+        return result if result else None
+
+    @reflection.cache
+    def get_table_names(self, connection, schema, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super().get_table_names(connection, schema, **kw)
+        tables = self._tables_for_schema(connection, schema, table_type="TABLE")
+        return [self.normalize_name(row.table_name) for row in tables]
+
+    @reflection.cache
+    def get_view_names(self, connection, schema=None, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super().get_view_names(connection, schema, **kw)
+        tables = self._tables_for_schema(connection, schema, table_type="VIEW")
+        return [self.normalize_name(row.table_name) for row in tables]
+
+    def has_table(self, connection, table_name, schema=None, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super().has_table(connection, table_name, schema, **kw)
+        tables = self.get_table_names(
+            connection=connection,
+            schema=schema,
+            table_name=table_name,
+            **kw
+        )
+        return self.normalize_name(table_name) in tables
+
+    def _get_schema_names_query(self, connection, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super()._get_schema_names_query(connection, **kw)
+        return "/*snapshot execution*/ " + super()._get_schema_names_query(connection, **kw)
+
+    @reflection.cache
+    def _get_columns(self, connection, table_name, schema=None, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super()._get_columns(connection, table_name, schema, **kw)
+
+        tables = self._tables_for_schema(connection, schema=schema, table_name=table_name)
+        if len(tables) != 1:
+            return []
+
+        # get_columns_sql originally returned all columns of all tables if table_name is None,
+        # we follow this behavior here for compatibility. However, the documentation for Dialects
+        # does not mention this behavior:
+        # https://docs.sqlalchemy.org/en/13/core/internals.html#sqlalchemy.engine.interfaces.Dialect
+        quoted_schema_string = self.quote_string_value(tables[0].table_schem)
+        quoted_table_string = self.quote_string_value(tables[0].table_name)
+        sql_statement = "/*snapshot execution*/ {query}".format(query=self.get_column_sql_query_str())
+        sql_statement = sql_statement.format(schema=quoted_schema_string, table=quoted_table_string)
+        response = connection.execute(sql_statement)
+
+        return list(response)
+
+    @reflection.cache
+    def _get_pk_constraint(self, connection, table_name, schema=None, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super()._get_pk_constraint(connection, table_name, schema, **kw)
+
+        conn = connection.engine.raw_connection()
+        schema = self._get_schema_for_input_or_current(connection, schema)
+        table_name = self.denormalize_name(table_name)
+        with conn.cursor().primaryKeys(table=table_name, schema=schema) as cursor:
+            pkeys = []
+            constraint_name = None
+            for row in cursor:
+                table, primary_key, constraint = row[2], row[3], row[5]
+                if table != table_name and table_name is not None:
+                    continue
+                pkeys.append(self.normalize_name(primary_key))
+                constraint_name = self.normalize_name(constraint)
+        return {'constrained_columns': pkeys, 'name': constraint_name}
+
+    @reflection.cache
+    def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
+        if self._is_sql_fallback_requested(**kw):
+            return super()._get_foreign_keys(connection, table_name, schema, **kw)
+
+        # Need to use a workaround, because SQLForeignKeys functions doesn't work for an unknown reason
+        tables = self._tables_for_schema(
+            connection=connection,
+            schema=schema,
+            table_name=table_name,
+            table_type="TABLE"
+        )
+        if len(tables) == 0:
+            return []
+
+        quoted_schema_string = self.quote_string_value(tables[0].table_schem)
+        quoted_table_string = self.quote_string_value(tables[0].table_name)
+        sql_statement = "/*snapshot execution*/ {query}".format(
+            query=self._get_constraint_sql_str(
+                quoted_schema_string,
+                quoted_table_string,
+                "FOREIGN KEY"
+            )
+        )
+        response = connection.execute(sql_statement)
+
+        return list(response)
 
 
 dialect = EXADialect_pyodbc

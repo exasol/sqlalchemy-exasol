@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 from textwrap import dedent
 
 PROJECT_ROOT = Path(__file__).parent
+# scripts path also contains administrative code/modules which are used by some nox targets
 SCRIPTS = PROJECT_ROOT / "scripts"
 sys.path.append(f"{SCRIPTS}")
 

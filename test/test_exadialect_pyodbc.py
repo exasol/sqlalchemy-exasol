@@ -1,4 +1,5 @@
 import pyodbc
+import pytest
 from mock import Mock
 from sqlalchemy import testing
 from sqlalchemy.engine import url as sa_url
@@ -8,8 +9,11 @@ from sqlalchemy.testing import fixtures
 from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
 
 
+@pytest.mark.skipif(
+    "pyodbc" not in testing.db.dialect.driver,
+    reason="This tests are only relevant for the dialect Exasol pyodbc dialect"
+)
 class EXADialect_pyodbcTest(fixtures.TestBase):
-    __skip_if__ = (lambda: testing.db.dialect.driver != "pyodbc",)
 
     def setup(self):
         self.dialect = EXADialect_pyodbc()

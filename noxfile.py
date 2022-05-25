@@ -6,7 +6,9 @@ from tempfile import TemporaryDirectory
 from textwrap import dedent
 
 PROJECT_ROOT = Path(__file__).parent
-sys.path.append(f'{PROJECT_ROOT / "scripts"}')
+# scripts path also contains administrative code/modules which are used by some nox targets
+SCRIPTS = PROJECT_ROOT / "scripts"
+sys.path.append(f"{SCRIPTS}")
 
 import nox
 from links import check as _check
@@ -173,6 +175,48 @@ def integration(session, connector):
             ]
         ).format(connector=connector, db_port=Settings.DB_PORT)
         session.run("pytest", "--dropfirst", "--dburi", uri, external=True, env=env)
+
+
+@nox.session(name="report-skipped", python=None)
+def report_skipped(session):
+    """
+    Runs all tests for all supported connectors and creates a csv report of skipped tests for each connector.
+
+    Attention: This task expects a running test database (db-start).
+    """
+
+    with TemporaryDirectory() as tmp_dir:
+        for connector in Settings.CONNECTORS:
+            report = Path(tmp_dir) / f"test-report{connector}.json"
+            with odbcconfig() as (config, env):
+                uri = "".join(
+                    [
+                        "exa+{connector}:",
+                        "//sys:exasol@localhost:{db_port}",
+                        "/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC",
+                    ]
+                ).format(connector=connector, db_port=Settings.DB_PORT)
+                session.run(
+                    "pytest",
+                    "--dropfirst",
+                    "--dburi",
+                    uri,
+                    "--json-report",
+                    f"--json-report-file={report}",
+                    external=True,
+                    env=env,
+                )
+
+                session.run(
+                    "python",
+                    f"{SCRIPTS / 'report.py'}",
+                    "-f",
+                    "csv",
+                    "--output",
+                    f"skipped-tests-{connector}.csv",
+                    f"{connector}",
+                    f"{report}",
+                )
 
 
 @nox.session(name="check-links", python=None)

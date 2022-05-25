@@ -1,4 +1,5 @@
 from sqlalchemy.testing.requirements import SuiteRequirements
+from sqlalchemy.testing.exclusions import BooleanPredicate, skip_if
 
 from sqlalchemy.testing import exclusions
 
@@ -159,7 +160,8 @@ class Requirements(SuiteRequirements):
     @property
     def duplicate_key_raises_integrity_error(self):
         return exclusions.only_on(
-            [lambda config: config.db.dialect.driver == 'pyodbc']
+            [lambda config: config.db.dialect.driver == 'pyodbc'],
+            reason="Currently this is only supported by pyodbc based dialects"
         )
 
     @property
@@ -185,9 +187,10 @@ class Requirements(SuiteRequirements):
     @property
     def ctes(self):
         """Target database supports CTEs"""
-        """Can't be opened as CTE tests require DB support for 'WITH RECURSIVE'
-           not supported by EXASOL"""
-        return exclusions.closed()
+        return skip_if(BooleanPredicate(
+            True,
+            "Can't be opened as CTE tests require DB support for 'WITH RECURSIVE' not supported by EXASOL")
+        )
 
     @property
     def standalone_null_binds_whereclause(self):

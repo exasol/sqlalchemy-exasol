@@ -7,9 +7,6 @@ from sqlalchemy.sql.sqltypes import INTEGER, VARCHAR
 from sqlalchemy.testing import fixtures, config
 from sqlalchemy.engine.reflection import Inspector
 
-from sqlalchemy_exasol.base import EXADialect
-from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
-
 TEST_GET_METADATA_FUNCTIONS_SCHEMA = "test_get_metadata_functions_schema"
 ENGINE_NONE_DATABASE = "ENGINE_NONE_DATABASE"
 ENGINE_SCHEMA_DATABASE = "ENGINE_SCHEMA_DATABASE"

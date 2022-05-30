@@ -1,0 +1,49 @@
+[build-system]
+requires = [
+    "poetry>=1.0.0",
+]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "sqlalchemy_exasol"
+version = "2.4.0"
+description= "EXASOL dialect for SQLAlchemy"
+readme = "README.rst"
+license = "License :: OSI Approved :: BSD License"
+authors = [
+    "Exasol AG <opensource@exasol.com>",
+    "Blue Yonder GmbH",
+]
+classifiers=[
+    "Development Status :: 5 - Production/Stable",
+
+    "Operating System :: POSIX :: Linux",
+
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Information Technology",
+
+    "License :: OSI Approved :: BSD License",
+
+    "Programming Language :: SQL",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+
+    "Topic :: Database",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+keywords = [
+    "exasol",
+    "sql",
+    "sqlalchemy",
+    "data science",
+    "database",
+]
+repository = "https://github.com/exasol/sqlalchemy-exasol"
+homepage = "https://www.exasol.com/"

@@ -70,3 +70,6 @@ pytest-cov = ">=2.7.0"
 [tool.poetry.extras]
 turbodbc = ["turbodbc"]
 
+[tool.poetry.plugins."sqlalchemy.dialects"]
+"exa.pyodbc" = "sqlalchemy_exasol.pyodbc:EXADialect_pyodbc"
+"exa.turbodbc" = "sqlalchemy_exasol.turbodbc:EXADialect_turbodbc"

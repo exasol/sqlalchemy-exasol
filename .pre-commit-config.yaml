@@ -1,0 +1,11 @@
+default_stages: [commit]
+repos:
+- repo: local
+  hooks:
+
+    - id: version-check
+      name: Check if version(s) are in sync
+      always_run: true
+      verbose: true
+      language: system
+      entry: python scripts/version_check.py sqlalchemy_exasol/version.py

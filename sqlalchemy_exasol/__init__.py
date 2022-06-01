@@ -1,5 +1,6 @@
-from version import VERSION
+from sqlalchemy_exasol.version import VERSION
 from sqlalchemy_exasol import base, pyodbc
+
 __version__ = VERSION
 
 # default dialect

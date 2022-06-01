@@ -83,17 +83,28 @@ def temporary_odbc_config(config):
 @contextmanager
 def odbcconfig():
     with temporary_odbc_config(
-        ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
+            ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
         env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
         with environment(env_vars) as env:
             yield cfg, env
 
 
+@nox.session(name="check-version", reuse_venv=True)
+def check_version(session):
+    session.run(
+        "python",
+        f"{SCRIPTS / 'version_check.py'}",
+        "--check",
+        f"{PROJECT_ROOT / 'sqlalchemy_exasol' / 'version.py'}",
+    )
+
+
 @nox.session
 @nox.parametrize("connector", Settings.CONNECTORS)
 def verify(session, connector):
     """Prepare and run all available tests"""
+    session.notify(find_session_runner(session, "check-version"))
     session.notify(find_session_runner(session, "db-start"))
     session.notify(
         find_session_runner(session, f"integration(connector='{connector}')")

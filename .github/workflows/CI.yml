@@ -40,22 +40,20 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
 
+    - name: Install poetry
+      uses: abatilo/actions-poetry@v2.0.0
+      with:
+        poetry-version: 1.1.13
+
+    - name: Install python project dependencies
+      run: poetry install
+
+    - name: Install python project dependencies including trubodbc
+      run: poetry install --extras "turbodbc"
+      if: ${{ matrix.connector == 'turbodbc' }}
+
     - name: Install via apt
       run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
-
-    - name: Install pipenv
-      uses: dschep/install-pipenv-action@v1
-
-    - name: Pip install requirements
-      uses: BSFishy/pip-action@v1
-      with:
-        requirements: requirements_dev.txt
-
-    - name: Pip install extra requirements
-      uses: BSFishy/pip-action@v1
-      with:
-        requirements: requirements_extras.txt
-      if: ${{ matrix.connector == 'turbodbc' }}
 
     - name: Checkout test environment
       run: git clone --depth 1 --branch ${ITDE_TAG} ${ITDE_URL}
@@ -76,10 +74,8 @@ jobs:
     strategy:
       matrix:
         python: [3.7]
-        connector:
-          - pyodbc
 
-    name: Build Package (Python-${{ matrix.python }}, Connector-${{ matrix.connector }})
+    name: Build Package Python-${{ matrix.python }}
 
     steps:
 
@@ -94,11 +90,13 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
 
-    - name: Install pipenv
-      uses: dschep/install-pipenv-action@v1
+    - name: Install poetry
+      uses: abatilo/actions-poetry@v2.0.0
+      with:
+        poetry-version: 1.1.13
 
-    - name: Install Wheel
-      run: pip install wheel
+    - name: Install python project dependencies
+      run: poetry install --extras "turbodbc"
 
     - name: Build sdist and wheel packages
-      run: python setup.py sdist bdist_wheel
+      run: poetry build

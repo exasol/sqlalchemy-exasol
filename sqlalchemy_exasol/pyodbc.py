@@ -9,7 +9,7 @@ Connect string::
 import re
 import sys
 import logging
-from distutils.version import LooseVersion
+from packaging import version
 
 from sqlalchemy import sql
 from sqlalchemy.engine import reflection
@@ -33,7 +33,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     def get_driver_version(self, connection):
         # LooseVersion will also work with interim versions like '4.2.7dev1' or '5.0.rc4'
         if self.driver_version is None:
-            self.driver_version = LooseVersion(
+            self.driver_version = version.parse(
                 connection.connection.getinfo(self.dbapi.SQL_DRIVER_VER) or "2.0.0"
             )
         return self.driver_version
@@ -41,7 +41,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     def _get_server_version_info(self, connection):
         if self.server_version_info is None:
             # need to check if current version of EXAODBC returns proper server version
-            if self.get_driver_version(connection) >= LooseVersion("4.2.1"):
+            if self.get_driver_version(connection) >= version.parse("4.2.1"):
                 # v4.2.1 and above should deliver usable SQL_DBMS_VER
                 result = connection.connection.getinfo(self.dbapi.SQL_DBMS_VER).split(
                     "."

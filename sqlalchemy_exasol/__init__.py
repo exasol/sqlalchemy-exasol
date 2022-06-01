@@ -1,9 +1,6 @@
-try:
-    from ._version import version as __version__
-except ImportError:  # pragma: no cover
-    __version__ = "unknown"
-
+from version import VERSION
 from sqlalchemy_exasol import base, pyodbc
+__version__ = VERSION
 
 # default dialect
 base.dialect = pyodbc.dialect

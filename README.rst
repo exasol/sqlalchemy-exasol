@@ -7,9 +7,6 @@ SQLAlchemy Dialect for EXASOL DB
 .. image:: https://img.shields.io/pypi/v/sqlalchemy_exasol
      :target: https://pypi.org/project/sqlalchemy-exasol/
      :alt: PyPI Version
-.. image:: https://img.shields.io/conda/vn/conda-forge/sqlalchemy_exasol.svg
-     :target: https://anaconda.org/conda-forge/sqlalchemy_exasol
-     :alt: Conda Version
 
 This is an SQLAlchemy dialect for the EXASOL database.
 

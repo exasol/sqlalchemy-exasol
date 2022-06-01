@@ -1,5 +1,0 @@
--r requirements_test.txt
-nox>=2022.1.7
-urlscan>=0.9.9
-pytest-json-report>=1.5.0
-

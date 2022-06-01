@@ -1,1 +1,0 @@
-turbodbc==3.3.0 # 4.0.0 introduced some breaking change (e.g. drops Python 2.7 support)

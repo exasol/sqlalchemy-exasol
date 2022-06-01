@@ -1,6 +1,6 @@
 import pyodbc
 import pytest
-from mock import Mock
+from unittest.mock import Mock
 from sqlalchemy import testing
 from sqlalchemy.engine import url as sa_url
 from sqlalchemy.pool import _ConnectionFairy

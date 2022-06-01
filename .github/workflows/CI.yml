@@ -63,10 +63,10 @@ jobs:
         ITDE_TAG: "0.10.0"
 
     - name: Check documentation links ${{ matrix.python }} using ${{ matrix.connector }}
-      run: nox -s "check-links"
+      run: poetry run nox -s "check-links"
 
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: nox -s "verify(connector='${{ matrix.connector }}')"
+      run: poetry run nox -s "verify(connector='${{ matrix.connector }}')"
 
   build_package:
     runs-on: ubuntu-latest

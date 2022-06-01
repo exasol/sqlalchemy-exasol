@@ -35,6 +35,9 @@ jobs:
     - name: Setup integration-test-docker-environment
       uses: actions/setup-python@v2
 
+    - name: Install via apt
+      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
+
     - name: Setup Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
@@ -51,9 +54,6 @@ jobs:
     - name: Install python project dependencies including trubodbc
       run: poetry install --extras "turbodbc"
       if: ${{ matrix.connector == 'turbodbc' }}
-
-    - name: Install via apt
-      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
 
     - name: Checkout test environment
       run: git clone --depth 1 --branch ${ITDE_TAG} ${ITDE_URL}
@@ -96,7 +96,7 @@ jobs:
         poetry-version: 1.1.13
 
     - name: Install python project dependencies
-      run: poetry install --extras "turbodbc"
+      run: poetry install
 
     - name: Build sdist and wheel packages
       run: poetry build

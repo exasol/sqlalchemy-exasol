@@ -35,7 +35,7 @@ jobs:
           cache: 'poetry'
 
       - name: Install python project dependencies
-        run: poetry install --dev-only
+        run: poetry install --no-root
 
       - name: Check documentation links ${{ matrix.python }} using ${{ matrix.connector }}
         run: poetry run nox -s "check-links"

@@ -166,7 +166,7 @@ tox_to_nox = ["jinja2", "tox"]
 name = "packaging"
 version = "21.3"
 description = "Core utilities for Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -247,7 +247,7 @@ python-versions = "*"
 name = "pyparsing"
 version = "3.0.9"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.8"
 
@@ -455,7 +455,7 @@ turbodbc = ["turbodbc"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "fde39bfa9f47038eec3cedef28d4fcad8c722e31865f1a4ecae9026d1b843b52"
+content-hash = "009bb8a94d9a18e6a37f79dc3080d6fefe88ef348e100bd5021eefbe34949c05"
 
 [metadata.files]
 argcomplete = [

@@ -61,9 +61,6 @@ jobs:
         ITDE_URL: "https://github.com/exasol/integration-test-docker-environment.git"
         ITDE_TAG: "0.10.0"
 
-    - name: Check documentation links ${{ matrix.python }} using ${{ matrix.connector }}
-      run: poetry run nox -s "check-links"
-
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
       run: poetry run nox -s "verify(connector='${{ matrix.connector }}')"
 

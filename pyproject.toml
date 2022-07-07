@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sqlalchemy_exasol"
-version = "2.4.0"
+version = "3.0.0"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
 license = "License :: OSI Approved :: BSD License"
@@ -55,8 +55,8 @@ exclude = []
 python = ">=3.8,<4.0"
 SQLAlchemy = ">=1.3.24,<1.4"
 pyodbc = ">=4.0.32"
-turbodbc = { version = ">=3.3.0,<4", optional = true }
 packaging = "^21.3"
+turbodbc = {path = "../../Downloads/turbodbc-4.5.3.tar.gz"}
 
 [tool.poetry.dev-dependencies]
 nox = ">=2022.1.7"
@@ -67,6 +67,7 @@ pytest-json-report = ">=1.5.0"
 pytest = ">=3.1.0,!=3.9.1,!=3.9.2,<6"
 pytest-cov = ">=2.7.0"
 pre-commit = "^2.19.0"
+wheel = "^0.37.1"
 
 [tool.poetry.extras]
 turbodbc = ["turbodbc"]

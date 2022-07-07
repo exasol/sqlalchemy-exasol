@@ -37,7 +37,7 @@ On Linux/Unix like systems you need:
 Turbodbc support
 ````````````````
 
-- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.7.
+- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.8.
 - Multi row update is not supported, see
   `test/test_update.py <test/test_update.py>`_ for an example
 

@@ -92,8 +92,5 @@ jobs:
       with:
         poetry-version: 1.1.13
 
-    - name: Build sdist and wheel packages
-      run: poetry build
-
-    - name: Push package to PYPI
-      run: poetry publish --username=__token__ --password=${{ secrets.pypi_token }}
+    - name: Build and push package to PYPI
+      run: poetry run nox -s release -- --username=__token__ --password=${{ secrets.pypi_token }}

@@ -1,5 +1,6 @@
 import os
 import sys
+from argparse import ArgumentParser
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -11,10 +12,12 @@ SCRIPTS = PROJECT_ROOT / "scripts"
 sys.path.append(f"{SCRIPTS}")
 
 import nox
+from git import tags
 from links import check as _check
 from links import documentation as _documentation
 from links import urls as _urls
 from pyodbc import connect
+from version_check import version_from_poetry, version_from_python_module, version_from_string
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["verify(connector='pyodbc')"]
@@ -83,20 +86,57 @@ def temporary_odbc_config(config):
 @contextmanager
 def odbcconfig():
     with temporary_odbc_config(
-            ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
+        ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
         env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
         with environment(env_vars) as env:
             yield cfg, env
 
 
-@nox.session(name="check-version", reuse_venv=True)
-def check_version(session):
+@nox.session(python=False)
+def release(session: nox.Session):
+    def create_parser():
+        p = ArgumentParser(
+            "Release a pypi package",
+            usage="nox -s release -- [-h] [-d] [-l LOGIN] [-p PASSWORD]",
+        )
+        p.add_argument("-d", "--dry-run", action="store_true", help="just do a dry run")
+        p.add_argument("-u", "--username", help="pypi login/username")
+        p.add_argument("-p", "--password", help="password/token for the pypi account")
+        return p
+
+    args = []
+    parser = create_parser()
+    cli_args = parser.parse_args(session.posargs)
+    if cli_args.dry_run:
+        args.append("--dry-run")
+    if cli_args.username:
+        args.append("--username")
+        args.append(cli_args.username)
+    if cli_args.password:
+        args.append("--password")
+        args.append(cli_args.password)
+
+    version_file = version_from_python_module(PROJECT_ROOT / 'sqlalchemy_exasol' / 'version.py')
+    module_version = version_from_poetry()
+    git_version = version_from_string(tags()[-1])
+
+    if not (module_version == git_version == version_file):
+        session.error(
+            f"Versions out of sync, version file: {version_file}, poetry: {module_version}, tag: {git_version}."
+        )
+
     session.run(
-        "python",
-        f"{SCRIPTS / 'version_check.py'}",
-        "--check",
-        f"{PROJECT_ROOT / 'sqlalchemy_exasol' / 'version.py'}",
+        "poetry",
+        "build",
+        external=True,
+    )
+
+    session.run(
+        "poetry",
+        "publish",
+        *args,
+        external=True,
     )
 
 
@@ -242,7 +282,7 @@ def check_links(session):
     if errors:
         session.error(
             "\n"
-            + "\n".join((f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors))
+            + "\n".join(f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors)
         )
 
 

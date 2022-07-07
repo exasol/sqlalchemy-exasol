@@ -57,8 +57,7 @@ def version_from_poetry():
     if not poetry:
         raise CommitHookError("Couldn't find poetry executable")
 
-    result = subprocess.run(
-        [poetry, "version"], capture_output=True)
+    result = subprocess.run([poetry, "version"], capture_output=True)
     version = result.stdout.decode().split()[1]
     return version_from_string(version)
 
@@ -101,20 +100,17 @@ def _main_debug(args):
     module_version = version_from_python_module(args.version_module)
     poetry_version = version_from_poetry()
 
-    def are_versions_equal(lhs, rhs):
-        return (
-                lhs.major == rhs.major and lhs.minor == rhs.minor and lhs.patch == rhs.patch
-        )
-
     if args.fix:
         write_version_module(poetry_version, args.version_module)
 
-    if not are_versions_equal(module_version, poetry_version):
+    if not module_version == poetry_version:
         print(
             f"Version in pyproject.toml {poetry_version} and {args.version_module} {module_version} do not match!"
         )
         if args.fix:
-            print(f"Updating version in file ({args.version_module}) from {module_version} to {poetry_version}")
+            print(
+                f"Updating version in file ({args.version_module}) from {module_version} to {poetry_version}"
+            )
         return _FAILURE
 
     return _SUCCESS

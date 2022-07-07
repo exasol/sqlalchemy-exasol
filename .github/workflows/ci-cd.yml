@@ -31,26 +31,24 @@ jobs:
     - name: Setup integration-test-docker-environment
       uses: actions/setup-python@v2
 
+    - name: Install via apt
+      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
+
     - name: Setup Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
 
-    - name: Install via apt
-      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
-
-    - name: Install pipenv
-      uses: dschep/install-pipenv-action@v1
-
-    - name: Pip install test requirements
-      uses: BSFishy/pip-action@v1
+    - name: Install poetry
+      uses: abatilo/actions-poetry@v2.0.0
       with:
-        requirements: requirements_dev.txt
+        poetry-version: 1.1.13
 
-    - name: Pip install extra requirements
-      uses: BSFishy/pip-action@v1
-      with:
-        requirements: requirements_extras.txt
+    - name: Install python project dependencies
+      run: poetry install
+
+    - name: Install python project dependencies including trubodbc
+      run: poetry install --extras "turbodbc"
       if: ${{ matrix.connector == 'turbodbc' }}
 
     - name: Checkout test environment
@@ -61,10 +59,10 @@ jobs:
         ITDE_TAG: "0.10.0"
 
     - name: Check documentation links ${{ matrix.python }} using ${{ matrix.connector }}
-      run: nox -s "check-links"
+      run: poetry run nox -s "check-links"
 
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: nox -s "verify(connector='${{ matrix.connector }}')"
+      run: poetry run nox -s "verify(connector='${{ matrix.connector }}')"
 
   upload_to_pypi:
     runs-on: ubuntu-latest
@@ -73,10 +71,8 @@ jobs:
     strategy:
       matrix:
         python: [3.7]
-        connector:
-          - pyodbc
 
-    name: Upload to PyPI (Python-${{ matrix.python }}, Connector-${{ matrix.connector }})
+    name: Build & Upload Package [PYPI]
 
     steps:
 
@@ -91,17 +87,13 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
 
-    - name: Install pipenv
-      uses: dschep/install-pipenv-action@v1
-
-    - name: Install Wheel
-      run: pip install wheel
+    - name: Install poetry
+      uses: abatilo/actions-poetry@v2.0.0
+      with:
+        poetry-version: 1.1.13
 
     - name: Build sdist and wheel packages
-      run: python setup.py sdist bdist_wheel
+      run: poetry build
 
-    - name: Push package to Pypi
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.pypi_token }}
+    - name: Push package to PYPI
+      run: poetry publish --username=__token__ --password=${{ secrets.pypi_token }}

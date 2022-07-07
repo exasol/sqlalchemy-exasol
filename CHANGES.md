@@ -1,3 +1,11 @@
+# 3.0.0
+* Dropped python 3.7 support
+  * If you still depend on python 3.7 use the 2.x version line
+* Updated dependencies, most noticeably
+  * turbodbc to 4.x.y
+* Update project setup/structure to pyproject.toml based project setup (poetry)
+* Removed conda forge support
+
 # 2.4.0
 * Fixed bug when accessing underlying odbc connection while using NullPool based engine
   (Note: this addresses the superset [issue-20105](https://github.com/apache/superset/issues/20105))

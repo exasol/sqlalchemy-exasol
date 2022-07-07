@@ -23,12 +23,14 @@ PATCH = {patch}
 
 VERSION = f"{{MAJOR}}.{{MINOR}}.{{PATCH}}"
 ''') + "\n"
+
+
 # fmt: on
 
 
 def version_from_string(s):
     """Converts a version string of the following format major.minor.patch to a version object"""
-    major, minor, patch = [int(number, base=0) for number in s.split(".")]
+    major, minor, patch = (int(number, base=0) for number in s.split("."))
     return Version(major, minor, patch)
 
 
@@ -38,7 +40,7 @@ class CommitHookError(Exception):
 
 def version_from_python_module(path):
     """Retrieve version information from the `version` module"""
-    with open(path, "r") as file:
+    with open(path) as file:
         _locals, _globals = {}, {}
         exec(file.read(), _locals, _globals)
 
@@ -56,8 +58,7 @@ def version_from_poetry():
         raise CommitHookError("Couldn't find poetry executable")
 
     result = subprocess.run(
-        [poetry, "version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
+        [poetry, "version"], capture_output=True)
     version = result.stdout.decode().split()[1]
     return version_from_string(version)
 
@@ -87,11 +88,11 @@ def _create_parser():
         help="enabled debug mode for execution.",
     )
     parser.add_argument(
-        "-c",
-        "--check",
+        "-f",
+        "--fix",
         action="store_true",
         default=False,
-        help="check instead of update/fix.",
+        help="fix instead of check.",
     )
     return parser
 
@@ -102,16 +103,20 @@ def _main_debug(args):
 
     def are_versions_equal(lhs, rhs):
         return (
-            lhs.major == rhs.major and lhs.minor == rhs.minor and lhs.patch == rhs.patch
+                lhs.major == rhs.major and lhs.minor == rhs.minor and lhs.patch == rhs.patch
         )
+
+    if args.fix:
+        write_version_module(poetry_version, args.version_module)
 
     if not are_versions_equal(module_version, poetry_version):
         print(
             f"Version in pyproject.toml {poetry_version} and {args.version_module} {module_version} do not match!"
         )
-        if not args.check:
-            write_version_module(poetry_version, args.version_module)
+        if args.fix:
+            print(f"Updating version in file ({args.version_module}) from {module_version} to {poetry_version}")
         return _FAILURE
+
     return _SUCCESS
 
 

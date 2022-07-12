@@ -17,7 +17,11 @@ from links import check as _check
 from links import documentation as _documentation
 from links import urls as _urls
 from pyodbc import connect
-from version_check import version_from_poetry, version_from_python_module, version_from_string
+from version_check import (
+    version_from_poetry,
+    version_from_python_module,
+    version_from_string,
+)
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["verify(connector='pyodbc')"]
@@ -30,6 +34,7 @@ class Settings:
     ENVIRONMENT_NAME = "test"
     DB_PORT = 8888
     BUCKETFS_PORT = 6666
+    VERSION_FILE = PROJECT_ROOT / "sqlalchemy_exasol" / "version.py"
 
 
 ODBCINST_INI_TEMPLATE = dedent(
@@ -93,58 +98,22 @@ def odbcconfig():
             yield cfg, env
 
 
-@nox.session(python=False)
-def release(session: nox.Session):
-    def create_parser():
-        p = ArgumentParser(
-            "Release a pypi package",
-            usage="nox -s release -- [-h] [-d] [-l LOGIN] [-p PASSWORD]",
-        )
-        p.add_argument("-d", "--dry-run", action="store_true", help="just do a dry run")
-        p.add_argument("-u", "--username", help="pypi login/username")
-        p.add_argument("-p", "--password", help="password/token for the pypi account")
-        return p
-
-    args = []
-    parser = create_parser()
-    cli_args = parser.parse_args(session.posargs)
-    if cli_args.dry_run:
-        args.append("--dry-run")
-    if cli_args.username:
-        args.append("--username")
-        args.append(cli_args.username)
-    if cli_args.password:
-        args.append("--password")
-        args.append(cli_args.password)
-
-    version_file = version_from_python_module(PROJECT_ROOT / 'sqlalchemy_exasol' / 'version.py')
-    module_version = version_from_poetry()
-    git_version = version_from_string(tags()[-1])
-
-    if not (module_version == git_version == version_file):
-        session.error(
-            f"Versions out of sync, version file: {version_file}, poetry: {module_version}, tag: {git_version}."
-        )
-
-    session.run(
-        "poetry",
-        "build",
-        external=True,
-    )
-
-    session.run(
-        "poetry",
-        "publish",
-        *args,
-        external=True,
-    )
-
-
 @nox.session
 @nox.parametrize("connector", Settings.CONNECTORS)
 def verify(session, connector):
     """Prepare and run all available tests"""
-    session.notify(find_session_runner(session, "check-version"))
+
+    def is_version_in_sync():
+        return (
+            version_from_python_module(Settings.VERSION_FILE) == version_from_poetry()
+        )
+
+    if not is_version_in_sync():
+        session.error(
+            "Versions out of sync, version file:"
+            f"{version_from_python_module(Settings.VERSION_FILE)},"
+            f"poetry: {version_from_poetry()}."
+        )
     session.notify(find_session_runner(session, "db-start"))
     session.notify(
         find_session_runner(session, f"integration(connector='{connector}')")
@@ -291,3 +260,50 @@ def list_links(session):
     """List all links within the documentation"""
     for path, url in _urls(_documentation(PROJECT_ROOT)):
         session.log(f"Url: {url}, File: {path}")
+
+
+@nox.session(python=False)
+def release(session: nox.Session):
+    def create_parser():
+        p = ArgumentParser(
+            "Release a pypi package",
+            usage="nox -s release -- [-h] [-d] [-l LOGIN] [-p PASSWORD]",
+        )
+        p.add_argument("-d", "--dry-run", action="store_true", help="just do a dry run")
+        p.add_argument("-u", "--username", help="pypi login/username")
+        p.add_argument("-p", "--password", help="password/token for the pypi account")
+        return p
+
+    args = []
+    parser = create_parser()
+    cli_args = parser.parse_args(session.posargs)
+    if cli_args.dry_run:
+        args.append("--dry-run")
+    if cli_args.username:
+        args.append("--username")
+        args.append(cli_args.username)
+    if cli_args.password:
+        args.append("--password")
+        args.append(cli_args.password)
+
+    version_file = version_from_python_module(Settings.VERSION_FILE)
+    module_version = version_from_poetry()
+    git_version = version_from_string(tags()[-1])
+
+    if not (module_version == git_version == version_file):
+        session.error(
+            f"Versions out of sync, version file: {version_file}, poetry: {module_version}, tag: {git_version}."
+        )
+
+    session.run(
+        "poetry",
+        "build",
+        external=True,
+    )
+
+    session.run(
+        "poetry",
+        "publish",
+        *args,
+        external=True,
+    )

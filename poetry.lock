@@ -11,7 +11,7 @@ test = ["coverage", "flake8", "pexpect", "wheel"]
 
 [[package]]
 name = "atomicwrites"
-version = "1.4.0"
+version = "1.4.1"
 description = "Atomic file writes."
 category = "dev"
 optional = false
@@ -176,7 +176,7 @@ dev = ["pre-commit", "tox"]
 
 [[package]]
 name = "pre-commit"
-version = "2.19.0"
+version = "2.20.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 category = "dev"
 optional = false
@@ -330,22 +330,6 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
-name = "turbodbc"
-version = "4.5.3"
-description = "turbodbc is a Python DB API 2.0 compatible ODBC driver"
-category = "main"
-optional = false
-python-versions = ">=3.8"
-
-[package.extras]
-arrow = ["pyarrow (>=1.0,<7.1.0)"]
-numpy = ["numpy (>=1.19.0)"]
-
-[package.source]
-type = "file"
-url = "../../Downloads/turbodbc-4.5.3.tar.gz"
-
-[[package]]
 name = "urlscan"
 version = "0.9.9"
 description = "View/select the URLs in an email message or file"
@@ -391,22 +375,19 @@ optional = false
 python-versions = "*"
 
 [extras]
-turbodbc = ["turbodbc"]
+turbodbc = []
 
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "bbe001e6f23ed11f269f8b7b9a0f79353016a662a7fec78095b27f14dab55192"
+content-hash = "af943c60ce6120fc8df504dc8b20d0e3632ecfc2d781adb1a7656c5b9cac6a81"
 
 [metadata.files]
 argcomplete = [
     {file = "argcomplete-1.12.3-py2.py3-none-any.whl", hash = "sha256:291f0beca7fd49ce285d2f10e4c1c77e9460cf823eef2de54df0c0fec88b0d81"},
     {file = "argcomplete-1.12.3.tar.gz", hash = "sha256:2c7dbffd8c045ea534921e63b0be6fe65e88599990d8dc408ac8c542b72a5445"},
 ]
-atomicwrites = [
-    {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
-    {file = "atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a"},
-]
+atomicwrites = []
 attrs = [
     {file = "attrs-21.4.0-py2.py3-none-any.whl", hash = "sha256:2d27e3784d7a565d36ab851fe94887c5eccd6a463168875832a1be79c82828b4"},
     {file = "attrs-21.4.0.tar.gz", hash = "sha256:626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd"},
@@ -502,10 +483,7 @@ pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
     {file = "pluggy-0.13.1.tar.gz", hash = "sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0"},
 ]
-pre-commit = [
-    {file = "pre_commit-2.19.0-py2.py3-none-any.whl", hash = "sha256:10c62741aa5704faea2ad69cb550ca78082efe5697d6f04e5710c3c229afdd10"},
-    {file = "pre_commit-2.19.0.tar.gz", hash = "sha256:4233a1e38621c87d9dda9808c6606d7e7ba0e087cd56d3fe03202a01d2919615"},
-]
+pre-commit = []
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
     {file = "py-1.11.0.tar.gz", hash = "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719"},
@@ -627,9 +605,6 @@ toml = [
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
-]
-turbodbc = [
-    {file = "turbodbc-4.5.3.tar.gz", hash = "sha256:72b78689bfa9f34c22bae6c7795b801da134c6fcb329101b3b690c0a79beb439"},
 ]
 urlscan = [
     {file = "urlscan-0.9.9-py3-none-any.whl", hash = "sha256:864f5332520f4fafe67d68e023aefc5636993cedb69145e4d9bb3a2884ee34ed"},

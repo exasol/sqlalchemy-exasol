@@ -98,7 +98,7 @@ def odbcconfig():
             yield cfg, env
 
 
-@nox.session
+@nox.session(python=False)
 @nox.parametrize("connector", Settings.CONNECTORS)
 def verify(session, connector):
     """Prepare and run all available tests"""
@@ -121,7 +121,7 @@ def verify(session, connector):
     session.notify(find_session_runner(session, "db-stop"))
 
 
-@nox.session(name="db-start", reuse_venv=True)
+@nox.session(name="db-start", python=False)
 def start_db(session):
     """Start the test database"""
 
@@ -174,14 +174,14 @@ def start_db(session):
     populate()
 
 
-@nox.session(name="db-stop", reuse_venv=True)
+@nox.session(name="db-stop", python=False)
 def stop_db(session):
     """Stop the test database"""
     session.run("docker", "kill", "db_container_test", external=True)
     session.run("docker", "kill", "test_container_test", external=True)
 
 
-@nox.session
+@nox.session(python=False)
 @nox.parametrize("connector", Settings.CONNECTORS)
 def integration(session, connector):
     """Run(s) the integration tests for a specific connector. Expects a test database to be available."""
@@ -197,7 +197,7 @@ def integration(session, connector):
         session.run("pytest", "--dropfirst", "--dburi", uri, external=True, env=env)
 
 
-@nox.session(name="report-skipped", python=None)
+@nox.session(name="report-skipped", python=False)
 def report_skipped(session):
     """
     Runs all tests for all supported connectors and creates a csv report of skipped tests for each connector.
@@ -239,7 +239,7 @@ def report_skipped(session):
                 )
 
 
-@nox.session(name="check-links", python=None)
+@nox.session(name="check-links", python=False)
 def check_links(session):
     """Checks weather or not all links in the documentation can be accessed"""
     errors = []
@@ -255,7 +255,7 @@ def check_links(session):
         )
 
 
-@nox.session(name="list-links", python=None)
+@nox.session(name="list-links", python=False)
 def list_links(session):
     """List all links within the documentation"""
     for path, url in _urls(_documentation(PROJECT_ROOT)):

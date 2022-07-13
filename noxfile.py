@@ -267,11 +267,10 @@ def release(session: nox.Session):
     def create_parser():
         p = ArgumentParser(
             "Release a pypi package",
-            usage="nox -s release -- [-h] [-d] [-l LOGIN] [-p PASSWORD]",
+            usage="nox -s release -- [-h] [-d] [-l LOGIN]",
         )
         p.add_argument("-d", "--dry-run", action="store_true", help="just do a dry run")
         p.add_argument("-u", "--username", help="pypi login/username")
-        p.add_argument("-p", "--password", help="password/token for the pypi account")
         return p
 
     args = []
@@ -282,9 +281,6 @@ def release(session: nox.Session):
     if cli_args.username:
         args.append("--username")
         args.append(cli_args.username)
-    if cli_args.password:
-        args.append("--password")
-        args.append(cli_args.password)
 
     version_file = version_from_python_module(Settings.VERSION_FILE)
     module_version = version_from_poetry()

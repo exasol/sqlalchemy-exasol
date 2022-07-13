@@ -1,3 +1,5 @@
+odbcconfig/odbcinst.ini
+
 *.py[cod]
 
 .build_output

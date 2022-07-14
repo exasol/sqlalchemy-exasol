@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sqlalchemy_exasol"
-version = "3.0.0"
+version = "3.0.1"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
 license = "License :: OSI Approved :: BSD License"

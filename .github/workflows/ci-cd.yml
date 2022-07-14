@@ -34,7 +34,7 @@ jobs:
     steps:
 
     - name: Fetch sqlalchemy_exasol code from repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup integration-test-docker-environment
       uses: actions/setup-python@v2
@@ -82,7 +82,7 @@ jobs:
     steps:
 
     - name: Fetch sqlalchemy_exasol code from repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Fetch all tags
       run: git fetch origin +refs/tags/*:refs/tags/*

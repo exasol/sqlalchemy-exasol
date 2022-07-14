@@ -38,7 +38,7 @@ jobs:
     steps:
 
     - name: Fetch sqlalchemy_exasol code from repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install via apt
       run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
@@ -82,7 +82,7 @@ jobs:
     steps:
 
     - name: Fetch sqlalchemy_exasol code from repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Fetch all tags
       run: git fetch origin +refs/tags/*:refs/tags/*

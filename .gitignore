@@ -1,3 +1,5 @@
+odbcconfig/odbcinst.ini
+
 *.py[cod]
 
 .build_output
@@ -24,7 +26,6 @@ develop-eggs
 .installed.cfg
 lib
 lib64
-sqlalchemy_exasol/_version.py
 
 # Installer logs
 pip-log.txt

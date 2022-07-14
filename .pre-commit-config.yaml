@@ -1,0 +1,17 @@
+default_stages: [commit]
+repos:
+- repo: local
+  hooks:
+
+    - id: version-check
+      name: Check if version(s) are in sync
+      always_run: true
+      language: system
+      entry: python scripts/version_check.py --fix sqlalchemy_exasol/version.py
+
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v2.34.0
+    hooks:
+      -   id: pyupgrade
+          args: ['--py38-plus']
+          types: [python]

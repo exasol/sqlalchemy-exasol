@@ -3,13 +3,10 @@ SQLAlchemy Dialect for EXASOL DB
 
 
 .. image:: https://github.com/exasol/sqlalchemy_exasol/workflows/CI-CD/badge.svg?branch=master
-    :target: https://github.com/exasol/sqlalchemy_exasol/actions?query=workflow%3ACI-CD
+    :target: https://github.com/exasol/sqlalchemy_exasol/actions?query=workflow%3ACI
 .. image:: https://img.shields.io/pypi/v/sqlalchemy_exasol
      :target: https://pypi.org/project/sqlalchemy-exasol/
      :alt: PyPI Version
-.. image:: https://img.shields.io/conda/vn/conda-forge/sqlalchemy_exasol.svg
-     :target: https://anaconda.org/conda-forge/sqlalchemy_exasol
-     :alt: Conda Version
 
 This is an SQLAlchemy dialect for the EXASOL database.
 
@@ -40,7 +37,7 @@ On Linux/Unix like systems you need:
 Turbodbc support
 ````````````````
 
-- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.7.
+- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.8.
 - Multi row update is not supported, see
   `test/test_update.py <test/test_update.py>`_ for an example
 

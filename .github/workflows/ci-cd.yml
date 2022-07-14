@@ -13,10 +13,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [3.7, 3.8, 3.9]
+        python:
+          - "3.8"
+          - "3.9"
+          - "3.10"
         connector:
           - pyodbc
-          - turbodbc
+          # TODO: Reenable once the issue(s) below have been fixed.
+          # Turbodbc can't be supported using poetry until:
+          #  - https://github.com/blue-yonder/turbodbc/issues/358
+          #  - https://github.com/exasol/sqlalchemy-exasol/issues/146
+          # are fixed.
+          # - turbodbc
         exasol_version:
           - 7.1.6
           - 7.0.16
@@ -31,26 +39,24 @@ jobs:
     - name: Setup integration-test-docker-environment
       uses: actions/setup-python@v2
 
+    - name: Install via apt
+      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
+
     - name: Setup Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
 
-    - name: Install via apt
-      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
-
-    - name: Install pipenv
-      uses: dschep/install-pipenv-action@v1
-
-    - name: Pip install test requirements
-      uses: BSFishy/pip-action@v1
+    - name: Install poetry
+      uses: abatilo/actions-poetry@v2.0.0
       with:
-        requirements: requirements_dev.txt
+        poetry-version: 1.1.13
 
-    - name: Pip install extra requirements
-      uses: BSFishy/pip-action@v1
-      with:
-        requirements: requirements_extras.txt
+    - name: Install python project dependencies
+      run: poetry install
+
+    - name: Install python project dependencies including trubodbc
+      run: poetry install --extras "turbodbc"
       if: ${{ matrix.connector == 'turbodbc' }}
 
     - name: Checkout test environment
@@ -60,11 +66,8 @@ jobs:
         ITDE_URL: "https://github.com/exasol/integration-test-docker-environment.git"
         ITDE_TAG: "0.10.0"
 
-    - name: Check documentation links ${{ matrix.python }} using ${{ matrix.connector }}
-      run: nox -s "check-links"
-
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: nox -s "verify(connector='${{ matrix.connector }}')"
+      run: poetry run nox -s "verify(connector='${{ matrix.connector }}')"
 
   upload_to_pypi:
     runs-on: ubuntu-latest
@@ -72,11 +75,9 @@ jobs:
     if: startsWith(github.event.ref, 'refs/tags')
     strategy:
       matrix:
-        python: [3.7]
-        connector:
-          - pyodbc
+        python: [3.8]
 
-    name: Upload to PyPI (Python-${{ matrix.python }}, Connector-${{ matrix.connector }})
+    name: Build & Upload Package [PYPI]
 
     steps:
 
@@ -91,17 +92,13 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
 
-    - name: Install pipenv
-      uses: dschep/install-pipenv-action@v1
-
-    - name: Install Wheel
-      run: pip install wheel
-
-    - name: Build sdist and wheel packages
-      run: python setup.py sdist bdist_wheel
-
-    - name: Push package to Pypi
-      uses: pypa/gh-action-pypi-publish@release/v1
+    - name: Install poetry
+      uses: abatilo/actions-poetry@v2.0.0
       with:
-        user: __token__
-        password: ${{ secrets.pypi_token }}
+        poetry-version: 1.1.13
+
+    - name: Build and push package to PYPI
+      env:
+        POETRY_HTTP_BASIC_TEST_USERNAME: "__token__"
+        POETRY_HTTP_BASIC_TEST_PASSWORD: "${{ secrets.pypi_token }}"
+      run: poetry run nox -s release

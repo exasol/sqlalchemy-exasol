@@ -1,5 +1,6 @@
 import os
 import sys
+from argparse import ArgumentParser
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -11,10 +12,16 @@ SCRIPTS = PROJECT_ROOT / "scripts"
 sys.path.append(f"{SCRIPTS}")
 
 import nox
+from git import tags
 from links import check as _check
 from links import documentation as _documentation
 from links import urls as _urls
 from pyodbc import connect
+from version_check import (
+    version_from_poetry,
+    version_from_python_module,
+    version_from_string,
+)
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["verify(connector='pyodbc')"]
@@ -27,6 +34,7 @@ class Settings:
     ENVIRONMENT_NAME = "test"
     DB_PORT = 8888
     BUCKETFS_PORT = 6666
+    VERSION_FILE = PROJECT_ROOT / "sqlalchemy_exasol" / "version.py"
 
 
 ODBCINST_INI_TEMPLATE = dedent(
@@ -90,10 +98,22 @@ def odbcconfig():
             yield cfg, env
 
 
-@nox.session
+@nox.session(python=False)
 @nox.parametrize("connector", Settings.CONNECTORS)
 def verify(session, connector):
     """Prepare and run all available tests"""
+
+    def is_version_in_sync():
+        return (
+            version_from_python_module(Settings.VERSION_FILE) == version_from_poetry()
+        )
+
+    if not is_version_in_sync():
+        session.error(
+            "Versions out of sync, version file:"
+            f"{version_from_python_module(Settings.VERSION_FILE)},"
+            f"poetry: {version_from_poetry()}."
+        )
     session.notify(find_session_runner(session, "db-start"))
     session.notify(
         find_session_runner(session, f"integration(connector='{connector}')")
@@ -101,7 +121,7 @@ def verify(session, connector):
     session.notify(find_session_runner(session, "db-stop"))
 
 
-@nox.session(name="db-start", reuse_venv=True)
+@nox.session(name="db-start", python=False)
 def start_db(session):
     """Start the test database"""
 
@@ -154,14 +174,14 @@ def start_db(session):
     populate()
 
 
-@nox.session(name="db-stop", reuse_venv=True)
+@nox.session(name="db-stop", python=False)
 def stop_db(session):
     """Stop the test database"""
     session.run("docker", "kill", "db_container_test", external=True)
     session.run("docker", "kill", "test_container_test", external=True)
 
 
-@nox.session
+@nox.session(python=False)
 @nox.parametrize("connector", Settings.CONNECTORS)
 def integration(session, connector):
     """Run(s) the integration tests for a specific connector. Expects a test database to be available."""
@@ -177,7 +197,7 @@ def integration(session, connector):
         session.run("pytest", "--dropfirst", "--dburi", uri, external=True, env=env)
 
 
-@nox.session(name="report-skipped", python=None)
+@nox.session(name="report-skipped", python=False)
 def report_skipped(session):
     """
     Runs all tests for all supported connectors and creates a csv report of skipped tests for each connector.
@@ -219,7 +239,7 @@ def report_skipped(session):
                 )
 
 
-@nox.session(name="check-links", python=None)
+@nox.session(name="check-links", python=False)
 def check_links(session):
     """Checks weather or not all links in the documentation can be accessed"""
     errors = []
@@ -231,12 +251,51 @@ def check_links(session):
     if errors:
         session.error(
             "\n"
-            + "\n".join((f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors))
+            + "\n".join(f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors)
         )
 
 
-@nox.session(name="list-links", python=None)
+@nox.session(name="list-links", python=False)
 def list_links(session):
     """List all links within the documentation"""
     for path, url in _urls(_documentation(PROJECT_ROOT)):
         session.log(f"Url: {url}, File: {path}")
+
+
+@nox.session(python=False)
+def release(session: nox.Session):
+    def create_parser():
+        p = ArgumentParser(
+            "Release a pypi package",
+            usage="nox -s release -- [-h] [-d]",
+        )
+        p.add_argument("-d", "--dry-run", action="store_true", help="just do a dry run")
+        return p
+
+    args = []
+    parser = create_parser()
+    cli_args = parser.parse_args(session.posargs)
+    if cli_args.dry_run:
+        args.append("--dry-run")
+
+    version_file = version_from_python_module(Settings.VERSION_FILE)
+    module_version = version_from_poetry()
+    git_version = version_from_string(tags()[-1])
+
+    if not (module_version == git_version == version_file):
+        session.error(
+            f"Versions out of sync, version file: {version_file}, poetry: {module_version}, tag: {git_version}."
+        )
+
+    session.run(
+        "poetry",
+        "build",
+        external=True,
+    )
+
+    session.run(
+        "poetry",
+        "publish",
+        *args,
+        external=True,
+    )

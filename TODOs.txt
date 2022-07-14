@@ -1,0 +1,7 @@
+FINAL TASKS:
+------------
+* ATTENTION: Update turbodbc driver to latest including installation fix!
+* make sure automated publish via GH action still works  with poetry
+* CLOSE: https://github.com/exasol/sqlalchemy-exasol/issues/135
+* CLOSE: https://github.com/exasol/sqlalchemy-exasol/issues/146
+* CLOSE: https://github.com/exasol/sqlalchemy-exasol/issues/128

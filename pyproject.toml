@@ -1,0 +1,88 @@
+[build-system]
+requires = [
+    "poetry>=1.0.0",
+]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "sqlalchemy_exasol"
+version = "3.0.0"
+description = "EXASOL dialect for SQLAlchemy"
+readme = "README.rst"
+license = "License :: OSI Approved :: BSD License"
+authors = [
+    "Exasol AG <opensource@exasol.com>",
+    "Blue Yonder GmbH",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: SQL",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Database",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+keywords = [
+    "exasol",
+    "sql",
+    "sqlalchemy",
+    "data science",
+    "database",
+]
+repository = "https://github.com/exasol/sqlalchemy-exasol"
+homepage = "https://www.exasol.com/"
+
+include = [
+    "README.rst",
+    "CHANGES.md",
+    "LICENSE",
+]
+exclude = []
+
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+SQLAlchemy = ">=1.3.24,<1.4"
+pyodbc = ">=4.0.32"
+packaging = "^21.3"
+# TODO: Reenable once the causing issues got fixed:
+#  - https://github.com/blue-yonder/turbodbc/issues/358
+#  - https://github.com/exasol/sqlalchemy-exasol/issues/146
+# turbodbc = { version = ">4.5.3", optional = true }
+
+[tool.poetry.dev-dependencies]
+nox = ">=2022.1.7"
+urlscan = ">=0.9.9"
+pytest-json-report = ">=1.5.0"
+# The excluded versions mirror the excluded versions of sqla 1.3.X.
+# The limitation/issue pytest <6 is tracked in https://github.com/exasol/sqlalchemy-exasol/issues/144
+pytest = ">=6,<7"
+pytest-cov = ">=2.7.0"
+pre-commit = "^2.19.0"
+wheel = "^0.37.1"
+
+[tool.poetry.extras]
+turbodbc = ["turbodbc"]
+
+[tool.poetry.plugins."sqlalchemy.dialects"]
+"exa.pyodbc" = "sqlalchemy_exasol.pyodbc:EXADialect_pyodbc"
+"exa.turbodbc" = "sqlalchemy_exasol.turbodbc:EXADialect_turbodbc"
+
+[tool.pytest.ini_options]
+addopts= "--tb native -v -r fxX"
+python_files= "test/*test_*.py"
+filterwarnings = [
+    "error::DeprecationWarning",
+    "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",
+]

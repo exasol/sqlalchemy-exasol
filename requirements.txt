@@ -1,2 +1,0 @@
-SQLAlchemy==1.3.24 # rq.filter: >=1.3.0,<1.4
-pyodbc==4.0.32 # rq.filter: >=4,<5

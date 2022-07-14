@@ -1,4 +1,0 @@
--r requirements.txt
-pytest>=3.1.0,<5.4 #TODO: test run fails with 5.4
-pytest-cov>=2.7.0  #avoid https://github.com/z4r/python-coveralls/issues/66
-mock>=2.0.0

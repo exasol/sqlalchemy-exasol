@@ -44,7 +44,7 @@ jobs:
       run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
 
     - name: Setup Python ${{ matrix.python }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
 
@@ -88,7 +88,7 @@ jobs:
       run: git fetch origin +refs/tags/*:refs/tags/*
 
     - name: Setup Python ${{ matrix.python }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
 

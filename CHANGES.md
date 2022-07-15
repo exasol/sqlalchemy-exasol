@@ -1,3 +1,6 @@
+# 3.0.1
+* Fix CI/CD build and publish target
+
 # 3.0.0
 ⚠️ ATTENTION ⚠️
   * The support of the turbodbc feature have been suspended, until the following issues have been addressed

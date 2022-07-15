@@ -97,8 +97,11 @@ jobs:
       with:
         poetry-version: 1.1.13
 
+    - name: Install python project dependencies
+      run: poetry install
+
     - name: Build and push package to PYPI
       env:
-        POETRY_HTTP_BASIC_TEST_USERNAME: "__token__"
-        POETRY_HTTP_BASIC_TEST_PASSWORD: "${{ secrets.pypi_token }}"
+        POETRY_HTTP_BASIC_PYPI_USERNAME: "__token__"
+        POETRY_HTTP_BASIC_PYPI_PASSWORD: "${{ secrets.pypi_token }}"
       run: poetry run nox -s release

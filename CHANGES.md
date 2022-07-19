@@ -1,5 +1,6 @@
-# 3.0.1
+# 3.0.2 (Not Released)
 * Fix CI/CD build and publish target
+* Bump pyodbc from 4.0.32 to 4.0.34
 
 # 3.0.0
 ⚠️ ATTENTION ⚠️

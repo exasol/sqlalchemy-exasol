@@ -204,8 +204,7 @@ class MetadataTest(fixtures.TablesTest):
 
             session1.execute("SELECT * FROM %s.deadlock_test_view_1" % schema)
             session1.execute(
-                "CREATE OR REPLACE VIEW {}.deadlock_test_view_2 AS SELECT * FROM {}.deadlock_test_table".format(
-                    schema, schema))
+                f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_2 AS SELECT * FROM {schema}.deadlock_test_table"
 
             engine3, session3 = self.create_transaction(url, "transaction3")
             session3.execute("SELECT 1")

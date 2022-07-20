@@ -2,11 +2,30 @@ SQLAlchemy Dialect for EXASOL DB
 ================================
 
 
-.. image:: https://github.com/exasol/sqlalchemy_exasol/workflows/CI-CD/badge.svg?branch=master
+.. image:: https://github.com/exasol/sqlalchemy_exasol/workflows/CI/badge.svg?branch=master
     :target: https://github.com/exasol/sqlalchemy_exasol/actions?query=workflow%3ACI
+     :alt: CI Status
+
 .. image:: https://img.shields.io/pypi/v/sqlalchemy_exasol
      :target: https://pypi.org/project/sqlalchemy-exasol/
      :alt: PyPI Version
+
+.. image:: https://img.shields.io/pypi/pyversions/sqlalchemy-exasol
+    :target: https://pypi.org/project/sqlalchemy-exasol
+    :alt: PyPI - Python Version
+
+.. image:: https://img.shields.io/badge/exasol-7.1.x%20%7C%207.0.x-green
+    :target: https://pypi.org/project/sqlalchemy-exasol
+    :alt: Exasol - Supported Version(s)
+
+.. image:: https://img.shields.io/github/last-commit/exasol/sqlalchemy-exasol
+     :target: https://pypi.org/project/sqlalchemy-exasol/
+     :alt: Last Commit
+
+.. image:: https://img.shields.io/pypi/dm/sqlalchemy-exasol
+    :target: https://pypi.org/project/sqlalchemy-exasol
+    :alt: PyPI - Downloads
+
 
 This is an SQLAlchemy dialect for the EXASOL database.
 
@@ -36,6 +55,15 @@ On Linux/Unix like systems you need:
 
 Turbodbc support
 ````````````````
+
+.. attention::
+
+    This feature currently is disabled/unsupported, see:
+
+    * `sqlalchemy-exasol/#146 <https://github.com/exasol/sqlalchemy-exasol/issues/146>`_
+    * `turbodbc/#358 <https://github.com/blue-yonder/turbodbc/issues/358>`_
+
+
 
 - You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.8.
 - Multi row update is not supported, see

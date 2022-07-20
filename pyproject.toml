@@ -9,18 +9,18 @@ name = "sqlalchemy_exasol"
 version = "3.0.3"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
-license = "License :: OSI Approved :: BSD License"
 authors = [
     "Exasol AG <opensource@exasol.com>",
     "Blue Yonder GmbH",
 ]
+license = "BSD"
+
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Operating System :: POSIX :: Linux",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
     "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: BSD License",
     "Programming Language :: SQL",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",

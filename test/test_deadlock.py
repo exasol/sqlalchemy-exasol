@@ -148,8 +148,7 @@ class MetadataTest(fixtures.TablesTest):
         session0.execute("CREATE SCHEMA %s" % schema)
         session0.execute("CREATE OR REPLACE TABLE %s.deadlock_test1 (id int PRIMARY KEY)" % schema)
         session0.execute(
-            "CREATE OR REPLACE TABLE {}.deadlock_test2 (id int PRIMARY KEY, fk int REFERENCES {}.deadlock_test1(id))".format(
-                schema, schema))
+            f"CREATE OR REPLACE TABLE {schema}.deadlock_test2 (id int PRIMARY KEY, fk int REFERENCES {schema}.deadlock_test1(id))"
         session0.execute("INSERT INTO %s.deadlock_test1 VALUES 1" % schema)
         session0.execute("INSERT INTO %s.deadlock_test2 VALUES (1,1)" % schema)
         session0.execute("commit")

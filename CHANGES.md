@@ -1,6 +1,7 @@
-# 3.0.2 (Not Released)
+# 3.0.3 (Not Released)
 * Fix CI/CD build and publish target
 * Bump pyodbc from 4.0.32 to 4.0.34
+* Add new exasol odbc driver 7.1.11
 
 # 3.0.0
 ⚠️ ATTENTION ⚠️

@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 import time
 from threading import Thread
 
@@ -33,6 +31,11 @@ class MetadataTest(fixtures.TablesTest):
 
         self.run_deadlock_for_table(without_fallback)
 
+    # NOTE: If a DB >= 7.1.0 still deadlocks here, it may due to the usage of an old ODBC driver version
+    @pytest.mark.skipif(
+        testing.db.dialect.server_version_info >= (7, 1, 0),
+        reason="DB version(s) after 7.1.0 should not deadlock here"
+    )
     def test_deadlock_for_get_table_names_with_fallback(self):
         def with_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
@@ -40,7 +43,18 @@ class MetadataTest(fixtures.TablesTest):
 
         with pytest.raises(Exception):
             self.run_deadlock_for_table(with_fallback)
-    
+
+    @pytest.mark.skipif(
+        testing.db.dialect.server_version_info <= (7, 1, 0),
+        reason="DB version(s) before 7.1.0 are expected to deadlock here"
+    )
+    def test_no_deadlock_for_get_table_names_with_fallback(self):
+        def with_fallback(session2, schema, table):
+            dialect = Inspector(session2).dialect
+            dialect.get_table_names(session2, schema=schema, use_sql_fallback=True)
+
+        self.run_deadlock_for_table(with_fallback)
+
     def test_no_deadlock_for_get_columns_without_fallback(self):
         def without_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
@@ -119,7 +133,7 @@ class MetadataTest(fixtures.TablesTest):
             if self.WATCHDOG_ECHO:
                 print("===========================================")
                 print()
-            time.sleep(10) # Only change with care, lower values might make tests unreliable
+            time.sleep(10)  # Only change with care, lower values might make tests unreliable
 
     def run_deadlock_for_table(self, function):
         c1 = config.db.connect()
@@ -134,7 +148,7 @@ class MetadataTest(fixtures.TablesTest):
         session0.execute("CREATE SCHEMA %s" % schema)
         session0.execute("CREATE OR REPLACE TABLE %s.deadlock_test1 (id int PRIMARY KEY)" % schema)
         session0.execute(
-            "CREATE OR REPLACE TABLE %s.deadlock_test2 (id int PRIMARY KEY, fk int REFERENCES %s.deadlock_test1(id))" % (
+            "CREATE OR REPLACE TABLE {}.deadlock_test2 (id int PRIMARY KEY, fk int REFERENCES {}.deadlock_test1(id))".format(
                 schema, schema))
         session0.execute("INSERT INTO %s.deadlock_test1 VALUES 1" % schema)
         session0.execute("INSERT INTO %s.deadlock_test2 VALUES (1,1)" % schema)
@@ -180,7 +194,7 @@ class MetadataTest(fixtures.TablesTest):
         session0.execute("CREATE SCHEMA %s" % schema)
         session0.execute("CREATE OR REPLACE TABLE %s.deadlock_test_table (id int)" % schema)
         session0.execute(
-            "CREATE OR REPLACE VIEW %s.deadlock_test_view_1 AS SELECT * FROM %s.deadlock_test_table" % (schema, schema))
+            f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_1 AS SELECT * FROM {schema}.deadlock_test_table")
         session0.execute("commit")
         self.watchdog_run = True
         t1 = Thread(target=self.watchdog, args=(session0, schema))
@@ -191,7 +205,7 @@ class MetadataTest(fixtures.TablesTest):
 
             session1.execute("SELECT * FROM %s.deadlock_test_view_1" % schema)
             session1.execute(
-                "CREATE OR REPLACE VIEW %s.deadlock_test_view_2 AS SELECT * FROM %s.deadlock_test_table" % (
+                "CREATE OR REPLACE VIEW {}.deadlock_test_view_2 AS SELECT * FROM {}.deadlock_test_table".format(
                     schema, schema))
 
             engine3, session3 = self.create_transaction(url, "transaction3")

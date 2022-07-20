@@ -29,7 +29,7 @@ nox.options.sessions = ["verify(connector='pyodbc')"]
 
 class Settings:
     ITDE = PROJECT_ROOT / ".." / "integration-test-docker-environment"
-    ODBC_DRIVER = PROJECT_ROOT / "driver" / "libexaodbc-uo2214lv1.so"
+    ODBC_DRIVER = PROJECT_ROOT / "driver" / "libexaodbc-uo2214lv2.so"
     CONNECTORS = ("pyodbc", "turbodbc")
     ENVIRONMENT_NAME = "test"
     DB_PORT = 8888
@@ -150,14 +150,16 @@ def start_db(session):
                 "server": "localhost:8888",
                 "user": "sys",
                 "password": "exasol",
+                "ssl_certificate": "SSL_VERIFY_NONE"
             }
             connection = connect(
-                "".join(
+                ";".join(
                     [
-                        "DRIVER={driver};",
-                        "EXAHOST={server};",
-                        "UID={user};",
+                        "DRIVER={driver}",
+                        "EXAHOST={server}",
+                        "UID={user}",
                         "PWD={password}",
+                        "SSLCertificate={ssl_certificate}"
                     ]
                 ).format(**settings)
             )
@@ -191,7 +193,7 @@ def integration(session, connector):
             [
                 "exa+{connector}:",
                 "//sys:exasol@localhost:{db_port}",
-                "/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC",
+                "/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC&SSLCertificate=SSL_VERIFY_NONE",
             ]
         ).format(connector=connector, db_port=Settings.DB_PORT)
         session.run("pytest", "--dropfirst", "--dburi", uri, external=True, env=env)
@@ -213,7 +215,7 @@ def report_skipped(session):
                     [
                         "exa+{connector}:",
                         "//sys:exasol@localhost:{db_port}",
-                        "/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC",
+                        "/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC&SSLCertificate=SSL_VERIFY_NONE",
                     ]
                 ).format(connector=connector, db_port=Settings.DB_PORT)
                 session.run(

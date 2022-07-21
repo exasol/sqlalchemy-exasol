@@ -118,7 +118,7 @@ def verify(session, connector, db_version):
         )
     session.notify(find_session_runner(session, f"db-start(db_version='{db_version}')"))
     session.notify(
-        find_session_runner(session, f"integration(connector='{connector}', db_version='{db_version}')")
+        find_session_runner(session, f"integration(connector='{connector}')")
     )
     session.notify(find_session_runner(session, "db-stop"))
 

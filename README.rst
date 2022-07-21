@@ -15,7 +15,7 @@ SQLAlchemy Dialect for EXASOL DB
     :alt: PyPI - Python Version
 
 .. image:: https://img.shields.io/badge/exasol-7.1.9%20%7C%207.0.18-green
-    :target: https://pypi.org/project/sqlalchemy-exasol
+    :target: https://www.exasol.com/
     :alt: Exasol - Supported Version(s)
 
 .. image:: https://img.shields.io/github/last-commit/exasol/sqlalchemy-exasol
@@ -25,12 +25,6 @@ SQLAlchemy Dialect for EXASOL DB
 .. image:: https://img.shields.io/pypi/dm/sqlalchemy-exasol
     :target: https://pypi.org/project/sqlalchemy-exasol
     :alt: PyPI - Downloads
-
-
-This is an SQLAlchemy dialect for the EXASOL database.
-
-- EXASOL: http://www.exasol.com
-- SQLAlchemy: http://www.sqlalchemy.org
 
 How to get started
 ------------------

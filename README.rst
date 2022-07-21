@@ -14,8 +14,8 @@ SQLAlchemy Dialect for EXASOL DB
     :target: https://pypi.org/project/sqlalchemy-exasol
     :alt: PyPI - Python Version
 
-.. image:: https://img.shields.io/badge/exasol-7.1.x%20%7C%207.0.x-green
-    :target: https://pypi.org/project/sqlalchemy-exasol
+.. image:: https://img.shields.io/badge/exasol-7.1.9%20%7C%207.0.18-green
+    :target: https://www.exasol.com/
     :alt: Exasol - Supported Version(s)
 
 .. image:: https://img.shields.io/github/last-commit/exasol/sqlalchemy-exasol
@@ -25,12 +25,6 @@ SQLAlchemy Dialect for EXASOL DB
 .. image:: https://img.shields.io/pypi/dm/sqlalchemy-exasol
     :target: https://pypi.org/project/sqlalchemy-exasol
     :alt: PyPI - Downloads
-
-
-This is an SQLAlchemy dialect for the EXASOL database.
-
-- EXASOL: http://www.exasol.com
-- SQLAlchemy: http://www.sqlalchemy.org
 
 How to get started
 ------------------
@@ -43,13 +37,9 @@ Meet the system requirements
 
 On Linux/Unix like systems you need:
 
+- Python
 - An Exasol DB (e.g. `docker-db <test_docker_image_>`_ or a `cloud instance <test_drive_>`_)
-
-  - >= 7.1.6
-  - >= 7.0.16
-
 - The packages unixODBC and unixODBC-dev >= 2.2.14
-- Python >= 3.7
 - The Exasol `ODBC driver <odbc_driver_>`_
 - The ODBC.ini and ODBCINST.ini configurations files setup
 

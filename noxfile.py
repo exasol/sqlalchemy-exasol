@@ -23,9 +23,6 @@ from version_check import (
     version_from_string,
 )
 
-# default actions to be run if nothing is explicitly specified with the -s option
-nox.options.sessions = ["verify(connector='pyodbc')"]
-
 
 class Settings:
     ITDE = PROJECT_ROOT / ".." / "integration-test-docker-environment"
@@ -35,7 +32,11 @@ class Settings:
     DB_PORT = 8888
     BUCKETFS_PORT = 6666
     VERSION_FILE = PROJECT_ROOT / "sqlalchemy_exasol" / "version.py"
+    DB_VERSIONS = ('7.1.9', '7.0.18')
 
+
+# default actions to be run if nothing is explicitly specified with the -s option
+nox.options.sessions = [f"verify(connector='{Settings.CONNECTORS[0]}', db_version='{Settings.DB_VERSIONS[0]}')"]
 
 ODBCINST_INI_TEMPLATE = dedent(
     """
@@ -91,7 +92,7 @@ def temporary_odbc_config(config):
 @contextmanager
 def odbcconfig():
     with temporary_odbc_config(
-        ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
+            ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
         env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
         with environment(env_vars) as env:
@@ -99,13 +100,14 @@ def odbcconfig():
 
 
 @nox.session(python=False)
+@nox.parametrize("db_version", Settings.DB_VERSIONS)
 @nox.parametrize("connector", Settings.CONNECTORS)
-def verify(session, connector):
+def verify(session, connector, db_version):
     """Prepare and run all available tests"""
 
     def is_version_in_sync():
         return (
-            version_from_python_module(Settings.VERSION_FILE) == version_from_poetry()
+                version_from_python_module(Settings.VERSION_FILE) == version_from_poetry()
         )
 
     if not is_version_in_sync():
@@ -114,7 +116,7 @@ def verify(session, connector):
             f"{version_from_python_module(Settings.VERSION_FILE)},"
             f"poetry: {version_from_poetry()}."
         )
-    session.notify(find_session_runner(session, "db-start"))
+    session.notify(find_session_runner(session, f"db-start(db_version='{db_version}')"))
     session.notify(
         find_session_runner(session, f"integration(connector='{connector}')")
     )
@@ -122,7 +124,8 @@ def verify(session, connector):
 
 
 @nox.session(name="db-start", python=False)
-def start_db(session):
+@nox.parametrize("db_version", Settings.DB_VERSIONS)
+def start_db(session, db_version=Settings.DB_VERSIONS[0]):
     """Start the test database"""
 
     def start():
@@ -138,6 +141,8 @@ def start_db(session):
                 f"{Settings.DB_PORT}",
                 "--bucketfs-port-forward",
                 f"{Settings.BUCKETFS_PORT}",
+                "--docker-db-image-version",
+                db_version,
                 "--db-mem-size",
                 "4GB",
                 external=True,

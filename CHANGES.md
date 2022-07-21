@@ -1,4 +1,4 @@
-# 3.1.0 (Not Released)
+# 3.1.1
 * Fixed CI/CD build and publish target
 * Fixed CI/CD to run tests against all configured databases
 * Updated databases for testing to 7.1.9 and 7.0.18 

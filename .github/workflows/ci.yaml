@@ -30,8 +30,8 @@ jobs:
           # are fixed.
           # - turbodbc
         exasol_version:
-          - 7.1.6
-          - 7.0.16
+          - 7.1.9
+          - 7.0.18
 
     name: Run Tests (Python-${{ matrix.python }}, Connector-${{ matrix.connector }}, Exasol-${{ matrix.exasol_version }})
 
@@ -65,10 +65,10 @@ jobs:
       working-directory: ..
       env:
         ITDE_URL: "https://github.com/exasol/integration-test-docker-environment.git"
-        ITDE_TAG: "0.10.0"
+        ITDE_TAG: "0.11.0"
 
     - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: poetry run nox -s "verify(connector='${{ matrix.connector }}')"
+      run: poetry run nox -s "verify(connector='${{ matrix.connector }}', db_version='${{ matrix.exasol_version }}')"
 
   build_package:
     runs-on: ubuntu-latest

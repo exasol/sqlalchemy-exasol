@@ -116,7 +116,7 @@ def verify(session, connector, db_version):
             f"{version_from_python_module(Settings.VERSION_FILE)},"
             f"poetry: {version_from_poetry()}."
         )
-    session.notify(find_session_runner(session, f"db-start(db_version='{db_version}'"))
+    session.notify(find_session_runner(session, f"db-start(db_version='{db_version}')"))
     session.notify(
         find_session_runner(session, f"integration(connector='{connector}', db_version='{db_version}')")
     )

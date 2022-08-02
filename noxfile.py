@@ -32,11 +32,13 @@ class Settings:
     DB_PORT = 8888
     BUCKETFS_PORT = 6666
     VERSION_FILE = PROJECT_ROOT / "sqlalchemy_exasol" / "version.py"
-    DB_VERSIONS = ('7.1.9', '7.0.18')
+    DB_VERSIONS = ("7.1.9", "7.0.18")
 
 
 # default actions to be run if nothing is explicitly specified with the -s option
-nox.options.sessions = [f"verify(connector='{Settings.CONNECTORS[0]}', db_version='{Settings.DB_VERSIONS[0]}')"]
+nox.options.sessions = [
+    f"verify(connector='{Settings.CONNECTORS[0]}', db_version='{Settings.DB_VERSIONS[0]}')"
+]
 
 ODBCINST_INI_TEMPLATE = dedent(
     """
@@ -92,7 +94,7 @@ def temporary_odbc_config(config):
 @contextmanager
 def odbcconfig():
     with temporary_odbc_config(
-            ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
+        ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
         env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
         with environment(env_vars) as env:
@@ -100,8 +102,23 @@ def odbcconfig():
 
 
 @nox.session(python=False)
-def code_format(session) -> None:
+def fix(session):
     session.run("poetry", "run", "python", "-m", "black", f"{PROJECT_ROOT}")
+
+
+@nox.session(name="code-format", python=False)
+def code_format(session):
+    session.run(
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "black",
+        "--check",
+        "--diff",
+        "--color",
+        f"{PROJECT_ROOT}",
+    )
 
 
 @nox.session(python=False)
@@ -112,7 +129,7 @@ def verify(session, connector, db_version):
 
     def is_version_in_sync():
         return (
-                version_from_python_module(Settings.VERSION_FILE) == version_from_poetry()
+            version_from_python_module(Settings.VERSION_FILE) == version_from_poetry()
         )
 
     if not is_version_in_sync():
@@ -121,6 +138,7 @@ def verify(session, connector, db_version):
             f"{version_from_python_module(Settings.VERSION_FILE)},"
             f"poetry: {version_from_poetry()}."
         )
+    session.notify("code-format")
     session.notify(find_session_runner(session, f"db-start(db_version='{db_version}')"))
     session.notify(
         find_session_runner(session, f"integration(connector='{connector}')")
@@ -160,7 +178,7 @@ def start_db(session, db_version=Settings.DB_VERSIONS[0]):
                 "server": "localhost:8888",
                 "user": "sys",
                 "password": "exasol",
-                "ssl_certificate": "SSL_VERIFY_NONE"
+                "ssl_certificate": "SSL_VERIFY_NONE",
             }
             connection = connect(
                 ";".join(
@@ -169,7 +187,7 @@ def start_db(session, db_version=Settings.DB_VERSIONS[0]):
                         "EXAHOST={server}",
                         "UID={user}",
                         "PWD={password}",
-                        "SSLCertificate={ssl_certificate}"
+                        "SSLCertificate={ssl_certificate}",
                     ]
                 ).format(**settings)
             )

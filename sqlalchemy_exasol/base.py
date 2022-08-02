@@ -1057,9 +1057,7 @@ class EXADialect(default.DefaultDialect):
                 else:
                     coltype = self.ischema_names[coltype]
             except KeyError:
-                util.warn(
-                    f"Did not recognize type '{coltype}' of column '{colname}'"
-                )
+                util.warn(f"Did not recognize type '{coltype}' of column '{colname}'")
                 coltype = sqltypes.NULLTYPE
 
             cdict = {

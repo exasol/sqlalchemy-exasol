@@ -42,11 +42,12 @@ class LongNameBlowoutTest(_LongNameBlowoutTest):
 
 
 class CompoundSelectTest(_CompoundSelectTest):
-
-    @pytest.mark.skip(reason=cleandoc(
-        """Skip this test as EXASOL does not allow EXISTS or IN predicates
+    @pytest.mark.skip(
+        reason=cleandoc(
+            """Skip this test as EXASOL does not allow EXISTS or IN predicates
         as part of the select list. Skipping is implemented by redefining
-        the method as proposed by SQLAlchemy docs for new dialects.""")
+        the method as proposed by SQLAlchemy docs for new dialects."""
+        )
     )
     def test_null_in_empty_set_is_false(self):
         return
@@ -81,23 +82,25 @@ class ExceptionTest(_ExceptionTest):
 
 
 class ExpandingBoundInTest(_ExpandingBoundInTest):
-
-    @pytest.mark.skip(reason=cleandoc(
-        """Skip this test as EXASOL does not allow EXISTS or IN predicates
+    @pytest.mark.skip(
+        reason=cleandoc(
+            """Skip this test as EXASOL does not allow EXISTS or IN predicates
         as part of the select list. Skipping is implemented by redefining
-        the method as proposed by SQLAlchemy docs for new dialects.""")
+        the method as proposed by SQLAlchemy docs for new dialects."""
+        )
     )
     def test_null_in_empty_set_is_false(self):
         return
 
 
 class NumericTest(_NumericTest):
-
-    @pytest.mark.skip(reason=cleandoc(
-        """FIXME: test skipped to allow upgrading to SQLAlchemy 1.3.x due
+    @pytest.mark.skip(
+        reason=cleandoc(
+            """FIXME: test skipped to allow upgrading to SQLAlchemy 1.3.x due
         to vulnerability in 1.2.x. Need to understand reason for this.
         Hypothesis is that the data type is not correctly coerced between
-        EXASOL and pyodbc.""")
+        EXASOL and pyodbc."""
+        )
     )
     def test_decimal_coerce_round_trip(self):
         return

@@ -62,6 +62,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         return self.server_version_info
 
     if sys.platform == "darwin":
+
         def connect(self, *cargs, **cparams):
             # Get connection
             conn = super().connect(*cargs, **cparams)
@@ -179,7 +180,9 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         schema = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
         conn = connection.engine.raw_connection()
-        with conn.cursor().tables(schema=schema, tableType=table_type, table=table_name) as table_cursor:
+        with conn.cursor().tables(
+            schema=schema, tableType=table_type, table=table_name
+        ) as table_cursor:
             return [row for row in table_cursor]
 
     @reflection.cache
@@ -189,7 +192,9 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if view_name is None:
             return None
 
-        tables = self._tables_for_schema(connection, schema, table_type="VIEW", table_name=view_name)
+        tables = self._tables_for_schema(
+            connection, schema, table_type="VIEW", table_name=view_name
+        )
         if len(tables) != 1:
             return None
 
@@ -221,24 +226,25 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if self._is_sql_fallback_requested(**kw):
             return super().has_table(connection, table_name, schema, **kw)
         tables = self.get_table_names(
-            connection=connection,
-            schema=schema,
-            table_name=table_name,
-            **kw
+            connection=connection, schema=schema, table_name=table_name, **kw
         )
         return self.normalize_name(table_name) in tables
 
     def _get_schema_names_query(self, connection, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super()._get_schema_names_query(connection, **kw)
-        return "/*snapshot execution*/ " + super()._get_schema_names_query(connection, **kw)
+        return "/*snapshot execution*/ " + super()._get_schema_names_query(
+            connection, **kw
+        )
 
     @reflection.cache
     def _get_columns(self, connection, table_name, schema=None, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super()._get_columns(connection, table_name, schema, **kw)
 
-        tables = self._tables_for_schema(connection, schema=schema, table_name=table_name)
+        tables = self._tables_for_schema(
+            connection, schema=schema, table_name=table_name
+        )
         if len(tables) != 1:
             return []
 
@@ -248,8 +254,12 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         # https://docs.sqlalchemy.org/en/13/core/internals.html#sqlalchemy.engine.interfaces.Dialect
         quoted_schema_string = self.quote_string_value(tables[0].table_schem)
         quoted_table_string = self.quote_string_value(tables[0].table_name)
-        sql_statement = "/*snapshot execution*/ {query}".format(query=self.get_column_sql_query_str())
-        sql_statement = sql_statement.format(schema=quoted_schema_string, table=quoted_table_string)
+        sql_statement = "/*snapshot execution*/ {query}".format(
+            query=self.get_column_sql_query_str()
+        )
+        sql_statement = sql_statement.format(
+            schema=quoted_schema_string, table=quoted_table_string
+        )
         response = connection.execute(sql_statement)
 
         return list(response)
@@ -271,7 +281,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
                     continue
                 pkeys.append(self.normalize_name(primary_key))
                 constraint_name = self.normalize_name(constraint)
-        return {'constrained_columns': pkeys, 'name': constraint_name}
+        return {"constrained_columns": pkeys, "name": constraint_name}
 
     @reflection.cache
     def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
@@ -283,7 +293,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             connection=connection,
             schema=schema,
             table_name=table_name,
-            table_type="TABLE"
+            table_type="TABLE",
         )
         if len(tables) == 0:
             return []
@@ -292,9 +302,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         quoted_table_string = self.quote_string_value(tables[0].table_name)
         sql_statement = "/*snapshot execution*/ {query}".format(
             query=self._get_constraint_sql_str(
-                quoted_schema_string,
-                quoted_table_string,
-                "FOREIGN KEY"
+                quoted_schema_string, quoted_table_string, "FOREIGN KEY"
             )
         )
         response = connection.execute(sql_statement)

@@ -11,10 +11,9 @@ from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
 
 @pytest.mark.skipif(
     "pyodbc" not in testing.db.dialect.driver,
-    reason="This tests are only relevant for the dialect Exasol pyodbc dialect"
+    reason="This tests are only relevant for the dialect Exasol pyodbc dialect",
 )
 class EXADialect_pyodbcTest(fixtures.TestBase):
-
     def setup(self):
         self.dialect = EXADialect_pyodbc()
         self.dialect.dbapi = pyodbc
@@ -108,7 +107,7 @@ class EXADialect_pyodbcTest(fixtures.TestBase):
             [
                 "DRIVER={None};EXAHOST=192.168.1.2..8:1234;EXASCHEMA=my_schema;UID=scott;PWD=tiger;INTTYPESINRESULTSIFPOSSIBLE=y"
                 ";SQLSTATEMAPPINGACTIVE=y"
-                 ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
+                ";SQLSTATEMAPPINGS=42X91:23000,27002:23000"
                 ";clientname=test;querytimeout=10"
             ],
             {},

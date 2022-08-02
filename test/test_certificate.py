@@ -6,11 +6,12 @@ from sqlalchemy.testing.fixtures import config, TestBase
 
 
 class CertificateTest(TestBase):
-
-    def test_db_connection_fails_with_default_settings_for_self_signed_certificates(self):
+    def test_db_connection_fails_with_default_settings_for_self_signed_certificates(
+        self,
+    ):
         url = copy.deepcopy(config.db.url)
-        if 'SSLCertificate' in url.query:
-            del url.query['SSLCertificate']
+        if "SSLCertificate" in url.query:
+            del url.query["SSLCertificate"]
 
         engine = create_engine(url)
         with pytest.raises(sqlalchemy.exc.DBAPIError) as exec_info:
@@ -18,4 +19,4 @@ class CertificateTest(TestBase):
             with engine.connect() as conn:
                 pass
 
-        assert "self signed certificate" in f'{exec_info.value}'
+        assert "self signed certificate" in f"{exec_info.value}"

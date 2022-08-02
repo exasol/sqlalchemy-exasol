@@ -103,6 +103,14 @@ def odbcconfig():
 
 @nox.session(python=False)
 def fix(session):
+    session.run(
+        "poetry",
+        "run",
+        "python",
+        f"{SCRIPTS / 'version_check.py'}",
+        "--fix",
+        f"{Settings.VERSION_FILE}",
+    )
     session.run("poetry", "run", "python", "-m", "black", f"{PROJECT_ROOT}")
 
 

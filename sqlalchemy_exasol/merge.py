@@ -7,7 +7,7 @@ from sqlalchemy.sql.expression import ValuesBase, and_, UpdateBase, ColumnClause
 
 class Merge(UpdateBase):
 
-    __visit_name__ = 'merge'
+    __visit_name__ = "merge"
 
     def __init__(self, target_table, source_expr, on):
         self._target_table = target_table
@@ -87,18 +87,16 @@ def merge(target_table, source_expr, on):
     return Merge(target_table, source_expr, on)
 
 
-@compiles(Merge, 'exasol')
+@compiles(Merge, "exasol")
 def visit_merge(element, compiler, **kw):
-    msql = "MERGE INTO %s " % compiler.process(element._target_table,
-                                              asfrom=True)
-    msql += "USING %s " % compiler.process(element._source_expr,
-                                           asfrom=True)
+    msql = "MERGE INTO %s " % compiler.process(element._target_table, asfrom=True)
+    msql += "USING %s " % compiler.process(element._source_expr, asfrom=True)
     msql += "ON ( %s ) " % compiler.process(element._on)
 
     if element._merge_update_values is not None:
         cols = crud._get_crud_params(compiler, element._merge_update_values)
         msql += "\nWHEN MATCHED THEN UPDATE SET "
-        msql += ', '.join(compiler.visit_column(c[0]) + '=' + c[1] for c in cols)
+        msql += ", ".join(compiler.visit_column(c[0]) + "=" + c[1] for c in cols)
         if element._merge_delete:
             msql += "\nDELETE "
             if element._delete_where is not None:

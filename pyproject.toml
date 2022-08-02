@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sqlalchemy_exasol"
-version = "3.1.2"
+version = "3.1.3"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
 authors = [
@@ -71,6 +71,7 @@ pytest = ">=6,<7"
 pytest-cov = ">=2.7.0"
 pre-commit = "^2.19.0"
 wheel = "^0.37.1"
+black = "^22.6.0"
 
 [tool.poetry.extras]
 turbodbc = ["turbodbc"]
@@ -86,3 +87,8 @@ filterwarnings = [
     "error::DeprecationWarning",
     "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",
 ]
+
+[tool.black]
+line-length = 88
+verbose = false
+include = "\\.pyi?$"

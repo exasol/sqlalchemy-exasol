@@ -17,26 +17,31 @@ def raw_sql(query):
     dialect = EXADialect_pyodbc()
 
     class LiteralCompiler(base.EXACompiler):
-        def visit_bindparam(self, bindparam,
-                            within_columns_clause=False,
-                            literal_binds=False, **kwargs):
+        def visit_bindparam(
+            self, bindparam, within_columns_clause=False, literal_binds=False, **kwargs
+        ):
             return super().render_literal_bindparam(
-                bindparam, within_columns_clause=within_columns_clause,
-                literal_binds=literal_binds, **kwargs)
+                bindparam,
+                within_columns_clause=within_columns_clause,
+                literal_binds=literal_binds,
+                **kwargs,
+            )
 
         def render_literal_value(self, value, type_):
             if value is None:
-                return 'NULL'
+                return "NULL"
             elif isinstance(value, bytes):
-                return "'{value}'".format(value=value.decode('utf-8'))
+                return "'{value}'".format(value=value.decode("utf-8"))
             elif isinstance(value, str):
                 return f"'{value}'"
             elif type(value) is datetime.date:
-                return "to_date('{value}', 'YYYY-MM-DD')"\
-                    .format(value=value.strftime('%Y-%m-%d'))
+                return "to_date('{value}', 'YYYY-MM-DD')".format(
+                    value=value.strftime("%Y-%m-%d")
+                )
             elif type(value) is datetime.datetime:
-                return "to_timestamp('{value}', 'YYYY-MM-DD HH24:MI:SS.FF6')"\
-                    .format(value=value.strftime('%Y-%m-%d %H:%M:%S.%f'))
+                return "to_timestamp('{value}', 'YYYY-MM-DD HH24:MI:SS.FF6')".format(
+                    value=value.strftime("%Y-%m-%d %H:%M:%S.%f")
+                )
             else:
                 return f"{value}"
 

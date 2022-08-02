@@ -24,17 +24,15 @@ def urls(files: Iterable[Path]) -> Iterable[Tuple[Path, str]]:
         return url.startswith("mailto") or url in _filtered
 
     for file in files:
-        cmd = ['python', '-m', 'urlscan', '-n', f'{file}']
-        result = subprocess.run(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        cmd = ["python", "-m", "urlscan", "-n", f"{file}"]
+        result = subprocess.run(cmd, capture_output=True)
         if result.returncode != 0:
-            stderr = result.stderr.decode('utf8')
+            stderr = result.stderr.decode("utf8")
             msg = f"Could not retrieve url's from file: {file}, details: {stderr}"
             raise Exception(msg)
-        stdout = result.stdout.decode('utf8').strip()
-        _urls = (url.strip() for url in stdout.split('\n'))
-        yield from zip(
-            repeat(file), filter(lambda url: not should_filter(url), _urls)
-        )
+        stdout = result.stdout.decode("utf8").strip()
+        _urls = (url.strip() for url in stdout.split("\n"))
+        yield from zip(repeat(file), filter(lambda url: not should_filter(url), _urls))
 
 
 def check(url: str) -> Tuple[int, str]:

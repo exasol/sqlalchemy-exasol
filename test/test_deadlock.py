@@ -11,7 +11,7 @@ import sqlalchemy.testing as testing
 # TODO: get_schema_names, get_view_names and get_view_definition didn't cause deadlocks in this scenario
 @pytest.mark.skipif(
     "pyodbc" not in str(testing.db.url),
-    reason="We currently only support snapshot metadata requests in the pyodbc based dialect"
+    reason="We currently only support snapshot metadata requests in the pyodbc based dialect",
 )
 class MetadataTest(fixtures.TablesTest):
     __backend__ = True
@@ -20,7 +20,9 @@ class MetadataTest(fixtures.TablesTest):
     WATCHDOG_ECHO = False
 
     def create_transaction(self, url, con_name):
-        engine = create_engine(config.db.url, echo=self.CONNECTION_ECHO, logging_name="engine" + con_name)
+        engine = create_engine(
+            config.db.url, echo=self.CONNECTION_ECHO, logging_name="engine" + con_name
+        )
         session = engine.connect().execution_options(autocommit=False)
         return engine, session
 
@@ -34,7 +36,7 @@ class MetadataTest(fixtures.TablesTest):
     # NOTE: If a DB >= 7.1.0 still deadlocks here, it may due to the usage of an old ODBC driver version
     @pytest.mark.skipif(
         testing.db.dialect.server_version_info >= (7, 1, 0),
-        reason="DB version(s) after 7.1.0 should not deadlock here"
+        reason="DB version(s) after 7.1.0 should not deadlock here",
     )
     def test_deadlock_for_get_table_names_with_fallback(self):
         def with_fallback(session2, schema, table):
@@ -46,7 +48,7 @@ class MetadataTest(fixtures.TablesTest):
 
     @pytest.mark.skipif(
         testing.db.dialect.server_version_info <= (7, 1, 0),
-        reason="DB version(s) before 7.1.0 are expected to deadlock here"
+        reason="DB version(s) before 7.1.0 are expected to deadlock here",
     )
     def test_no_deadlock_for_get_table_names_with_fallback(self):
         def with_fallback(session2, schema, table):
@@ -58,7 +60,9 @@ class MetadataTest(fixtures.TablesTest):
     def test_no_deadlock_for_get_columns_without_fallback(self):
         def without_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
-            dialect.get_columns(session2, schema=schema, table_name=table, use_sql_fallback=False)
+            dialect.get_columns(
+                session2, schema=schema, table_name=table, use_sql_fallback=False
+            )
 
         self.run_deadlock_for_table(without_fallback)
 
@@ -66,35 +70,45 @@ class MetadataTest(fixtures.TablesTest):
         # TODO: Doesnt produce a deadlock anymore since last commit?
         def with_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
-            dialect.get_columns(session2, schema=schema, table_name=table, use_sql_fallback=True)
+            dialect.get_columns(
+                session2, schema=schema, table_name=table, use_sql_fallback=True
+            )
 
         self.run_deadlock_for_table(with_fallback)
 
     def test_no_deadlock_for_get_pk_constraint_without_fallback(self):
         def without_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
-            dialect.get_pk_constraint(session2, table_name=table, schema=schema, use_sql_fallback=False)
+            dialect.get_pk_constraint(
+                session2, table_name=table, schema=schema, use_sql_fallback=False
+            )
 
         self.run_deadlock_for_table(without_fallback)
 
     def test_no_deadlock_for_get_pk_constraint_with_fallback(self):
         def with_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
-            dialect.get_pk_constraint(session2, table_name=table, schema=schema, use_sql_fallback=True)
+            dialect.get_pk_constraint(
+                session2, table_name=table, schema=schema, use_sql_fallback=True
+            )
 
         self.run_deadlock_for_table(with_fallback)
 
     def test_no_deadlock_for_get_foreign_keys_without_fallback(self):
         def without_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
-            dialect.get_foreign_keys(session2, table_name=table, schema=schema, use_sql_fallback=False)
+            dialect.get_foreign_keys(
+                session2, table_name=table, schema=schema, use_sql_fallback=False
+            )
 
         self.run_deadlock_for_table(without_fallback)
 
     def test_no_deadlock_for_get_foreign_keys_with_fallback(self):
         def with_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
-            dialect.get_foreign_keys(session2, table_name=table, schema=schema, use_sql_fallback=True)
+            dialect.get_foreign_keys(
+                session2, table_name=table, schema=schema, use_sql_fallback=True
+            )
 
         self.run_deadlock_for_table(with_fallback)
 
@@ -102,7 +116,9 @@ class MetadataTest(fixtures.TablesTest):
         # TODO: think of other scenarios where metadata deadlocks with view could happen
         def without_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
-            dialect.get_view_names(session2, table_name=table, schema=schema, use_sql_fallback=False)
+            dialect.get_view_names(
+                session2, table_name=table, schema=schema, use_sql_fallback=False
+            )
 
         self.run_deadlock_for_table(without_fallback)
 
@@ -110,7 +126,9 @@ class MetadataTest(fixtures.TablesTest):
         # TODO: think of other scenarios where metadata deadlocks with view could happen
         def with_fallback(session2, schema, table):
             dialect = Inspector(session2).dialect
-            dialect.get_view_names(session2, table_name=table, schema=schema, use_sql_fallback=True)
+            dialect.get_view_names(
+                session2, table_name=table, schema=schema, use_sql_fallback=True
+            )
 
         self.run_deadlock_for_table(with_fallback)
 
@@ -133,7 +151,9 @@ class MetadataTest(fixtures.TablesTest):
             if self.WATCHDOG_ECHO:
                 print("===========================================")
                 print()
-            time.sleep(10)  # Only change with care, lower values might make tests unreliable
+            time.sleep(
+                10
+            )  # Only change with care, lower values might make tests unreliable
 
     def run_deadlock_for_table(self, function):
         c1 = config.db.connect()
@@ -146,7 +166,9 @@ class MetadataTest(fixtures.TablesTest):
         except:
             pass
         session0.execute(f"CREATE SCHEMA {schema}")
-        session0.execute(f"CREATE OR REPLACE TABLE {schema}.deadlock_test1 (id int PRIMARY KEY)")
+        session0.execute(
+            f"CREATE OR REPLACE TABLE {schema}.deadlock_test1 (id int PRIMARY KEY)"
+        )
         session0.execute(
             f"CREATE OR REPLACE TABLE {schema}.deadlock_test2 (id int PRIMARY KEY, fk int REFERENCES {schema}.deadlock_test1(id))"
         )
@@ -192,7 +214,9 @@ class MetadataTest(fixtures.TablesTest):
         except:
             pass
         session0.execute(f"CREATE SCHEMA {schema}")
-        session0.execute(f"CREATE OR REPLACE TABLE {schema}.deadlock_test_table (id int)")
+        session0.execute(
+            f"CREATE OR REPLACE TABLE {schema}.deadlock_test_table (id int)"
+        )
         session0.execute(
             f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_1 AS SELECT * FROM {schema}.deadlock_test_table"
         )

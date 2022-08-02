@@ -87,3 +87,8 @@ filterwarnings = [
     "error::DeprecationWarning",
     "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",
 ]
+
+[tool.black]
+line-length = 88
+verbose = false
+include = "\\.pyi?$"

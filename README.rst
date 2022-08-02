@@ -18,6 +18,10 @@ SQLAlchemy Dialect for EXASOL DB
     :target: https://www.exasol.com/
     :alt: Exasol - Supported Version(s)
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
+   :alt: Formatter - Black
+
 .. image:: https://img.shields.io/pypi/l/sqlalchemy-exasol
      :target: https://opensource.org/licenses/BSD-2-Clause
      :alt: License
@@ -29,6 +33,7 @@ SQLAlchemy Dialect for EXASOL DB
 .. image:: https://img.shields.io/pypi/dm/sqlalchemy-exasol
     :target: https://pypi.org/project/sqlalchemy-exasol
     :alt: PyPI - Downloads
+
 
 How to get started
 ------------------

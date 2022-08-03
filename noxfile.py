@@ -370,7 +370,7 @@ def release(session: Session) -> None:
 
     version_file = version_from_python_module(Settings.VERSION_FILE)
     module_version = version_from_poetry()
-    git_version = version_from_string(tags()[-1])
+    git_version = version_from_string(list(tags())[-1])
 
     if not (module_version == git_version == version_file):
         session.error(

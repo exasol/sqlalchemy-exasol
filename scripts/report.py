@@ -4,7 +4,6 @@ import sys
 from argparse import (
     ArgumentDefaultsHelpFormatter,
     ArgumentParser,
-    BooleanOptionalAction,
     FileType,
 )
 from collections import namedtuple

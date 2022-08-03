@@ -98,3 +98,10 @@ include = "\\.pyi?$"
 [tool.isort]
 profile = "black"
 force_grid_wrap = 2
+
+[tool.pylint.master]
+fail-under = 5.8
+
+[tool.pylint.format]
+max-line-length = 88
+max-module-lines = 800

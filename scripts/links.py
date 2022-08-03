@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import (
     Iterable,
     Tuple,
+    Container,
+    Optional
 )
 from urllib import request
 
@@ -13,7 +15,7 @@ def documentation(root: Path) -> Iterable[Path]:
     """Returns an iterator over all documentation files of the project"""
     docs = Path(root).glob("**/*.rst")
 
-    def _deny_filter(path):
+    def _deny_filter(path: Path) -> bool:
         return not ("venv" in path.parts)
 
     return filter(lambda path: _deny_filter(path), docs)
@@ -22,8 +24,8 @@ def documentation(root: Path) -> Iterable[Path]:
 def urls(files: Iterable[Path]) -> Iterable[Tuple[Path, str]]:
     """Returns an iterable over all urls contained in the provided files"""
 
-    def should_filter(url):
-        _filtered = []
+    def should_filter(url: str) -> bool:
+        _filtered: Container[str] = []
         return url.startswith("mailto") or url in _filtered
 
     for file in files:
@@ -38,7 +40,7 @@ def urls(files: Iterable[Path]) -> Iterable[Tuple[Path, str]]:
         yield from zip(repeat(file), filter(lambda url: not should_filter(url), _urls))
 
 
-def check(url: str) -> Tuple[int, str]:
+def check(url: str) -> Tuple[Optional[int], str]:
     """Checks if an url is still working (can be accessed)"""
     try:
         # User-Agent needs to be faked otherwise some webpages will deny access with a 403

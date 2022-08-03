@@ -93,3 +93,7 @@ filterwarnings = [
 line-length = 88
 verbose = false
 include = "\\.pyi?$"
+
+[tool.isort]
+profile = "black"
+force_grid_wrap = 2

@@ -22,6 +22,10 @@ SQLAlchemy Dialect for EXASOL DB
    :target: https://github.com/psf/black
    :alt: Formatter - Black
 
+.. image:: https://img.shields.io/badge/imports-isort-ef8336.svg
+   :target: https://pycqa.github.io/isort/
+   :alt: Formatter - Isort
+
 .. image:: https://img.shields.io/pypi/l/sqlalchemy-exasol
      :target: https://opensource.org/licenses/BSD-2-Clause
      :alt: License

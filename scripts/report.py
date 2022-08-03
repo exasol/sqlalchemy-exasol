@@ -1,10 +1,11 @@
-import argparse
 import csv
 import json
 import sys
 from argparse import (
     ArgumentDefaultsHelpFormatter,
     ArgumentParser,
+    BooleanOptionalAction,
+    FileType,
 )
 from collections import namedtuple
 from typing import (
@@ -49,11 +50,9 @@ def _create_parser() -> ArgumentParser:
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("connector", choices=["pyodbc", "turbodbc"])
     parser.add_argument("test_results")
-    parser.add_argument("-o", "--output", type=argparse.FileType("w"), default="-")
+    parser.add_argument("-o", "--output", type=FileType("w"), default="-")
     parser.add_argument("-f", "--format", choices=["human", "csv"], default="csv")
-    parser.add_argument(
-        "--debug", type=bool, action=argparse.BooleanOptionalAction, default=False
-    )
+    parser.add_argument("--debug", type=bool, action="store_true", default=False)
     return parser
 
 

@@ -111,7 +111,7 @@ max-module-lines = 800
 files = [
     'noxfile.py',
     'scripts/**/*.py',
-    # Incrementaly add ad fix files and paths until entire project is checked
+    # Incrementaly add files and paths to fix until the entire project is checked
 ]
 mypy_path = [
     'typeshed'

@@ -48,4 +48,4 @@ def check(url: str) -> Tuple[Optional[int], str]:
         result = request.urlopen(req)
         return result.code, f"{result.msg}"
     except urllib.error.HTTPError as ex:
-        return ex.status, f"{ex}"
+        return ex.code, f"{ex}"

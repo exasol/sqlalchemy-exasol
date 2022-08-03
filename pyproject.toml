@@ -74,6 +74,7 @@ wheel = "^0.37.1"
 black = "^22.6.0"
 isort = "^5.10.1"
 pylint = "^2.14.5"
+mypy = "^0.971"
 
 [tool.poetry.extras]
 turbodbc = ["turbodbc"]

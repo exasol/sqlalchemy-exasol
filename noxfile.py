@@ -111,6 +111,7 @@ def fix(session):
         "--fix",
         f"{Settings.VERSION_FILE}",
     )
+    session.run("poetry", "run", "python", "-m", "isort", "-v", f"{PROJECT_ROOT}")
     session.run("poetry", "run", "python", "-m", "black", f"{PROJECT_ROOT}")
 
 
@@ -126,6 +127,13 @@ def code_format(session):
         "--diff",
         "--color",
         f"{PROJECT_ROOT}",
+    )
+
+
+@nox.session(python=False)
+def isort(session):
+    session.run(
+        "poetry", "run", "python", "-m", "isort", "-v", "--check", f"{PROJECT_ROOT}"
     )
 
 
@@ -146,6 +154,7 @@ def verify(session, connector, db_version):
             f"{version_from_python_module(Settings.VERSION_FILE)},"
             f"poetry: {version_from_poetry()}."
         )
+    session.notify("isort")
     session.notify("code-format")
     session.notify(find_session_runner(session, f"db-start(db_version='{db_version}')"))
     session.notify(

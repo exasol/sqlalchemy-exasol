@@ -1,8 +1,13 @@
 import time
 
-from sqlalchemy.testing import fixtures, config
-from sqlalchemy import MetaData, Table
-
+from sqlalchemy import (
+    MetaData,
+    Table,
+)
+from sqlalchemy.testing import (
+    config,
+    fixtures,
+)
 
 table_counts = [1, 50, 100]
 column_counts = [3, 30, 300]

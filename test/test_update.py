@@ -1,8 +1,15 @@
 import unittest
+
 from sqlalchemy import *
 from sqlalchemy import testing
-from sqlalchemy.testing import eq_, fixtures
-from sqlalchemy.testing.schema import Table, Column
+from sqlalchemy.testing import (
+    eq_,
+    fixtures,
+)
+from sqlalchemy.testing.schema import (
+    Column,
+    Table,
+)
 
 
 class _UpdateTestBase:

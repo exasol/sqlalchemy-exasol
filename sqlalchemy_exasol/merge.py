@@ -2,7 +2,12 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.schema import Column
 from sqlalchemy.sql import crud
 from sqlalchemy.sql.base import _generative
-from sqlalchemy.sql.expression import ValuesBase, and_, UpdateBase, ColumnClause
+from sqlalchemy.sql.expression import (
+    ColumnClause,
+    UpdateBase,
+    ValuesBase,
+    and_,
+)
 
 
 class Merge(UpdateBase):

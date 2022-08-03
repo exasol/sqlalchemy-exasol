@@ -1,10 +1,15 @@
 import pytest
 from sqlalchemy import testing
 from sqlalchemy.engine import url as sa_url
-from sqlalchemy.testing import fixtures
-from sqlalchemy.testing import eq_
+from sqlalchemy.testing import (
+    eq_,
+    fixtures,
+)
 
-from sqlalchemy_exasol.turbodbc import EXADialect_turbodbc, DEFAULT_CONNECTION_PARAMS
+from sqlalchemy_exasol.turbodbc import (
+    DEFAULT_CONNECTION_PARAMS,
+    EXADialect_turbodbc,
+)
 
 
 @pytest.mark.skipif(

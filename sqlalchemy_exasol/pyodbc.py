@@ -6,17 +6,20 @@ Connect string::
 
 """
 
+import logging
 import re
 import sys
-import logging
-from packaging import version
 
+from packaging import version
 from sqlalchemy import sql
-from sqlalchemy.engine import reflection
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
+from sqlalchemy.engine import reflection
 from sqlalchemy.util.langhelpers import asbool
 
-from sqlalchemy_exasol.base import EXADialect, EXAExecutionContext
+from sqlalchemy_exasol.base import (
+    EXADialect,
+    EXAExecutionContext,
+)
 
 logger = logging.getLogger("sqlalchemy_exasol")
 

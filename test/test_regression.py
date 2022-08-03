@@ -1,6 +1,14 @@
 """This module contains various regression test for issues which have been fixed in the past"""
 import pytest
-from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine, inspect
+from sqlalchemy import (
+    Column,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    create_engine,
+    inspect,
+)
 from sqlalchemy.pool import (
     AssertionPool,
     NullPool,
@@ -8,7 +16,10 @@ from sqlalchemy.pool import (
     SingletonThreadPool,
     StaticPool,
 )
-from sqlalchemy.schema import CreateSchema, DropSchema
+from sqlalchemy.schema import (
+    CreateSchema,
+    DropSchema,
+)
 from sqlalchemy.testing import fixtures
 from sqlalchemy.testing.fixtures import config
 

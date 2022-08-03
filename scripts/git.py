@@ -1,4 +1,7 @@
-from subprocess import PIPE, run
+from subprocess import (
+    PIPE,
+    run,
+)
 
 
 def tags():

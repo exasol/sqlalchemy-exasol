@@ -45,18 +45,34 @@ representation (all uppercase).
 
 """
 
-import sqlalchemy.exc
-
+import logging
+import re
+from datetime import (
+    date,
+    datetime,
+)
 from decimal import Decimal
-from sqlalchemy import sql, schema, types as sqltypes, util, event
-from sqlalchemy.schema import AddConstraint, ForeignKeyConstraint
-from sqlalchemy.engine import default, reflection
+
+import sqlalchemy.exc
+from sqlalchemy import (
+    event,
+    schema,
+    sql,
+)
+from sqlalchemy import types as sqltypes
+from sqlalchemy import util
+from sqlalchemy.engine import (
+    default,
+    reflection,
+)
+from sqlalchemy.schema import (
+    AddConstraint,
+    ForeignKeyConstraint,
+)
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql.elements import quoted_name
-from datetime import date, datetime
+
 from .constraints import DistributeByConstraint
-import re
-import logging
 
 logger = logging.getLogger("sqlalchemy_exasol")
 

@@ -1,8 +1,12 @@
 import copy
+
 import pytest
 import sqlalchemy.exc
 from sqlalchemy import create_engine
-from sqlalchemy.testing.fixtures import config, TestBase
+from sqlalchemy.testing.fixtures import (
+    TestBase,
+    config,
+)
 
 
 class CertificateTest(TestBase):

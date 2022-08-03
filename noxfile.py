@@ -138,6 +138,19 @@ def isort(session):
 
 
 @nox.session(python=False)
+def lint(session):
+    session.run(
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "pylint",
+        f'{PROJECT_ROOT / "scripts"}',
+        f'{PROJECT_ROOT / "sqlalchemy_exasol"}',
+    )
+
+
+@nox.session(python=False)
 @nox.parametrize("db_version", Settings.DB_VERSIONS)
 @nox.parametrize("connector", Settings.CONNECTORS)
 def verify(session, connector, db_version):
@@ -156,6 +169,7 @@ def verify(session, connector, db_version):
         )
     session.notify("isort")
     session.notify("code-format")
+    session.notify("lint")
     session.notify(find_session_runner(session, f"db-start(db_version='{db_version}')"))
     session.notify(
         find_session_runner(session, f"integration(connector='{connector}')")

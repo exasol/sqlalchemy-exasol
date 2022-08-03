@@ -1,9 +1,9 @@
 import decimal
 
-from sqlalchemy import types as sqltypes, util
+from sqlalchemy import types as sqltypes
+from sqlalchemy import util
 
 from sqlalchemy_exasol.base import EXADialect
-
 
 DEFAULT_CONNECTION_PARAMS = {
     # always enable efficient conversion to Python types:

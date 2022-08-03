@@ -1,6 +1,7 @@
 # import all SQLAlchemy tests for this dialect
-import pytest
 from inspect import cleandoc
+
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest

@@ -2,10 +2,13 @@ import time
 from threading import Thread
 
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.testing import fixtures, config
-from sqlalchemy.engine.reflection import Inspector
 import sqlalchemy.testing as testing
+from sqlalchemy import create_engine
+from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.testing import (
+    config,
+    fixtures,
+)
 
 
 # TODO: get_schema_names, get_view_names and get_view_definition didn't cause deadlocks in this scenario

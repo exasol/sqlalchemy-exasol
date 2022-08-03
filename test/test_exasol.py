@@ -1,10 +1,27 @@
 import datetime
 
-from sqlalchemy import MetaData, Table, Column, Integer, String, Date, DateTime
-from sqlalchemy import or_, select, literal_column
-from sqlalchemy import testing, inspect
-from sqlalchemy.schema import DropConstraint, AddConstraint
-from sqlalchemy.testing import fixtures, config
+from sqlalchemy import (
+    Column,
+    Date,
+    DateTime,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    inspect,
+    literal_column,
+    or_,
+    select,
+    testing,
+)
+from sqlalchemy.schema import (
+    AddConstraint,
+    DropConstraint,
+)
+from sqlalchemy.testing import (
+    config,
+    fixtures,
+)
 
 from sqlalchemy_exasol.base import EXAExecutionContext
 from sqlalchemy_exasol.constraints import DistributeByConstraint

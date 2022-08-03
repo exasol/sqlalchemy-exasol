@@ -1,8 +1,11 @@
-import urllib.error
 import subprocess
+import urllib.error
 from itertools import repeat
 from pathlib import Path
-from typing import Iterable, Tuple
+from typing import (
+    Iterable,
+    Tuple,
+)
 from urllib import request
 
 

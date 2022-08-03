@@ -1,7 +1,7 @@
 import datetime
 
-from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
 from sqlalchemy_exasol import base
+from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
 
 
 def raw_sql(query):

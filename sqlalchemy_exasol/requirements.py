@@ -1,7 +1,9 @@
-from sqlalchemy.testing.requirements import SuiteRequirements
-from sqlalchemy.testing.exclusions import BooleanPredicate, skip_if
-
 from sqlalchemy.testing import exclusions
+from sqlalchemy.testing.exclusions import (
+    BooleanPredicate,
+    skip_if,
+)
+from sqlalchemy.testing.requirements import SuiteRequirements
 
 
 class Requirements(SuiteRequirements):

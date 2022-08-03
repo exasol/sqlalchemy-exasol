@@ -1,6 +1,6 @@
 # Attention:
-# This file can be removed once https://github.com/mkleehammer/pyodbc/issues/925
-# gets resolved.
+# This file is a copy of: https://github.com/mkleehammer/pyodbc/blob/master/src/pyodbc.pyi
+# it can be removed once https://github.com/mkleehammer/pyodbc/issues/925  gets resolved.
 from __future__ import annotations
 
 from typing import (

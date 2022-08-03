@@ -3,10 +3,10 @@ import urllib.error
 from itertools import repeat
 from pathlib import Path
 from typing import (
-    Iterable,
-    Tuple,
     Container,
-    Optional
+    Iterable,
+    Optional,
+    Tuple,
 )
 from urllib import request
 

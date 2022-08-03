@@ -1,8 +1,8 @@
 from subprocess import run
-from typing import Iterable
+from typing import Sequence
 
 
-def tags() -> Iterable[str]:
+def tags() -> Sequence[str]:
     """
     Returns a list of all tags, sorted from [0] oldest to [-1] newest.
     PreConditions:

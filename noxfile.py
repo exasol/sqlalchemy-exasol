@@ -11,12 +11,25 @@ PROJECT_ROOT = Path(__file__).parent
 SCRIPTS = PROJECT_ROOT / "scripts"
 sys.path.append(f"{SCRIPTS}")
 
+from typing import (
+    Dict,
+    Iterable,
+    Iterator,
+    MutableMapping,
+    Tuple,
+)
+
 import nox
 from git import tags
 from links import check as _check
 from links import documentation as _documentation
 from links import urls as _urls
-from pyodbc import connect
+from nox import Session
+from nox.sessions import SessionRunner
+from pyodbc import (
+    Connection,
+    connect,
+)
 from version_check import (
     version_from_poetry,
     version_from_python_module,
@@ -54,7 +67,7 @@ ODBCINST_INI_TEMPLATE = dedent(
 )
 
 
-def find_session_runner(session: nox.Session, name: str):
+def find_session_runner(session: Session, name: str) -> SessionRunner:
     """Helper function to find parameterized action by name"""
     for s, _ in session._runner.manifest.list_all_sessions():
         if name in s.signatures:
@@ -62,7 +75,7 @@ def find_session_runner(session: nox.Session, name: str):
     session.error(f"Could not find a nox session by the name {name!r}")
 
 
-def transaction(connection, sql_statements):
+def transaction(connection: Connection, sql_statements: Iterable[str]) -> None:
     cur = connection.cursor()
     for statement in sql_statements:
         cur.execute(statement)
@@ -71,7 +84,7 @@ def transaction(connection, sql_statements):
 
 
 @contextmanager
-def environment(env_vars):
+def environment(env_vars: Dict[str, str]) -> Iterator[MutableMapping[str, str]]:
     _env = os.environ.copy()
     os.environ.update(env_vars)
     yield os.environ
@@ -80,10 +93,9 @@ def environment(env_vars):
 
 
 @contextmanager
-def temporary_odbc_config(config):
+def temporary_odbc_config(config: str) -> Iterator[Path]:
     with TemporaryDirectory() as tmp_dir:
-        tmp_dir = Path(tmp_dir)
-        config_dir = tmp_dir / "odbcconfig"
+        config_dir = Path(tmp_dir) / "odbcconfig"
         config_dir.mkdir(exist_ok=True)
         config_file = config_dir / "odbcinst.ini"
         with open(config_file, "w") as f:
@@ -92,7 +104,7 @@ def temporary_odbc_config(config):
 
 
 @contextmanager
-def odbcconfig():
+def odbcconfig() -> Iterator[Tuple[Path, MutableMapping[str, str]]]:
     with temporary_odbc_config(
         ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
@@ -102,7 +114,7 @@ def odbcconfig():
 
 
 @nox.session(python=False)
-def fix(session):
+def fix(session: Session) -> None:
     session.run(
         "poetry",
         "run",
@@ -116,7 +128,7 @@ def fix(session):
 
 
 @nox.session(name="code-format", python=False)
-def code_format(session):
+def code_format(session: Session) -> None:
     session.run(
         "poetry",
         "run",
@@ -131,14 +143,14 @@ def code_format(session):
 
 
 @nox.session(python=False)
-def isort(session):
+def isort(session: Session) -> None:
     session.run(
         "poetry", "run", "python", "-m", "isort", "-v", "--check", f"{PROJECT_ROOT}"
     )
 
 
 @nox.session(python=False)
-def lint(session):
+def lint(session: Session) -> None:
     session.run(
         "poetry",
         "run",
@@ -151,7 +163,7 @@ def lint(session):
 
 
 @nox.session(name="type-check", python=False)
-def type_check(session):
+def type_check(session: Session) -> None:
     session.run(
         "poetry",
         "run",
@@ -168,10 +180,10 @@ def type_check(session):
 @nox.session(python=False)
 @nox.parametrize("db_version", Settings.DB_VERSIONS)
 @nox.parametrize("connector", Settings.CONNECTORS)
-def verify(session, connector, db_version):
+def verify(session: Session, connector: str, db_version: str) -> None:
     """Prepare and run all available tests"""
 
-    def is_version_in_sync():
+    def is_version_in_sync() -> bool:
         return (
             version_from_python_module(Settings.VERSION_FILE) == version_from_poetry()
         )
@@ -186,6 +198,7 @@ def verify(session, connector, db_version):
     session.notify("code-format")
     session.notify("type-check")
     session.notify("lint")
+    session.notify("type-check")
     session.notify(find_session_runner(session, f"db-start(db_version='{db_version}')"))
     session.notify(
         find_session_runner(session, f"integration(connector='{connector}')")
@@ -195,10 +208,10 @@ def verify(session, connector, db_version):
 
 @nox.session(name="db-start", python=False)
 @nox.parametrize("db_version", Settings.DB_VERSIONS)
-def start_db(session, db_version=Settings.DB_VERSIONS[0]):
+def start_db(session: Session, db_version: str = Settings.DB_VERSIONS[0]) -> None:
     """Start the test database"""
 
-    def start():
+    def start() -> None:
         # Consider adding ITDE as dev dependency once ITDE is packaged properly
         with session.chdir(Settings.ITDE):
             session.run(
@@ -218,7 +231,7 @@ def start_db(session, db_version=Settings.DB_VERSIONS[0]):
                 external=True,
             )
 
-    def populate():
+    def populate() -> None:
         with odbcconfig():
             settings = {
                 "driver": "EXAODBC",
@@ -252,7 +265,7 @@ def start_db(session, db_version=Settings.DB_VERSIONS[0]):
 
 
 @nox.session(name="db-stop", python=False)
-def stop_db(session):
+def stop_db(session: Session) -> None:
     """Stop the test database"""
     session.run("docker", "kill", "db_container_test", external=True)
     session.run("docker", "kill", "test_container_test", external=True)
@@ -260,7 +273,7 @@ def stop_db(session):
 
 @nox.session(python=False)
 @nox.parametrize("connector", Settings.CONNECTORS)
-def integration(session, connector):
+def integration(session: Session, connector: str) -> None:
     """Run(s) the integration tests for a specific connector. Expects a test database to be available."""
 
     with odbcconfig() as (config, env):
@@ -275,7 +288,7 @@ def integration(session, connector):
 
 
 @nox.session(name="report-skipped", python=False)
-def report_skipped(session):
+def report_skipped(session: Session) -> None:
     """
     Runs all tests for all supported connectors and creates a csv report of skipped tests for each connector.
 
@@ -317,7 +330,7 @@ def report_skipped(session):
 
 
 @nox.session(name="check-links", python=False)
-def check_links(session):
+def check_links(session: Session) -> None:
     """Checks weather or not all links in the documentation can be accessed"""
     errors = []
     for path, url in _urls(_documentation(PROJECT_ROOT)):
@@ -333,15 +346,15 @@ def check_links(session):
 
 
 @nox.session(name="list-links", python=False)
-def list_links(session):
+def list_links(session: Session) -> None:
     """List all links within the documentation"""
     for path, url in _urls(_documentation(PROJECT_ROOT)):
         session.log(f"Url: {url}, File: {path}")
 
 
 @nox.session(python=False)
-def release(session: nox.Session):
-    def create_parser():
+def release(session: Session) -> None:
+    def create_parser() -> ArgumentParser:
         p = ArgumentParser(
             "Release a pypi package",
             usage="nox -s release -- [-h] [-d]",

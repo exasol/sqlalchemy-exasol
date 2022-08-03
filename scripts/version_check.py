@@ -1,11 +1,19 @@
 import subprocess
 import sys
-from argparse import ArgumentParser, Namespace
+from argparse import (
+    ArgumentParser,
+    Namespace,
+)
 from collections import namedtuple
 from inspect import cleandoc
 from pathlib import Path
 from shutil import which
-from typing import Iterable, Dict, Any, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Union,
+)
 
 Version = namedtuple("Version", ["major", "minor", "patch"])
 
@@ -39,7 +47,7 @@ class CommitHookError(Exception):
     """Indicates that this commit hook encountered an error"""
 
 
-def version_from_python_module(path: str) -> Version:
+def version_from_python_module(path: Path) -> Version:
     """Retrieve version information from the `version` module"""
     with open(path) as file:
         _locals: Dict[str, Any] = {}

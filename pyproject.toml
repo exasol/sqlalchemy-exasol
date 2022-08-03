@@ -113,3 +113,6 @@ files = [
     'scripts/**/*.py',
     # Incrementaly add ad fix files and paths until entire project is checked
 ]
+mypy_path = [
+    'typeshed'
+]

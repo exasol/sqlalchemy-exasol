@@ -2,7 +2,18 @@ import argparse
 import csv
 import json
 import sys
+from argparse import (
+    ArgumentDefaultsHelpFormatter,
+    ArgumentParser,
+)
 from collections import namedtuple
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    Iterable,
+    TextIO,
+)
 
 Test = namedtuple(
     "Test",
@@ -16,7 +27,7 @@ Test = namedtuple(
 )
 
 
-def skipped_test_from(obj):
+def skipped_test_from(obj: Dict[str, Any]) -> Test:
     for stage in ("setup", "call", "teardown"):
         try:
             filename, _, details = eval(obj[stage]["longrepr"])
@@ -34,10 +45,8 @@ def skipped_test_from(obj):
     assert False
 
 
-def _create_parser():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
+def _create_parser() -> ArgumentParser:
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("connector", choices=["pyodbc", "turbodbc"])
     parser.add_argument("test_results")
     parser.add_argument("-o", "--output", type=argparse.FileType("w"), default="-")
@@ -48,15 +57,15 @@ def _create_parser():
     return parser
 
 
-def all_skipped_tests(path):
-    with open(path, "r") as f:
+def all_skipped_tests(path: str) -> Generator[Test, None, None]:
+    with open(path) as f:
         data = json.load(f)
         for test in data["tests"]:
             if test["outcome"] == "skipped":
                 yield skipped_test_from(test)
 
 
-def _human(tests, output):
+def _human(tests: Iterable[Test], output: TextIO) -> None:
     for t in tests:
         print(
             f"ID: {t.nodeid}, Details: {t.details}, Filename: {t.filename}, Line: {t.lineno}",
@@ -64,10 +73,10 @@ def _human(tests, output):
         )
 
 
-def _csv(tests, output):
+def _csv(tests: Iterable[Test], output: TextIO) -> None:
     fields = ("test-case", "status", "details")
 
-    def test_to_entry(t):
+    def test_to_entry(t: Test) -> Dict[str, Any]:
         return {
             "test-case": t.nodeid,
             "status": t.outcome,
@@ -80,19 +89,21 @@ def _csv(tests, output):
         writer.writerow(test_to_entry(test))
 
 
-def main(test_results, output, format, **kwargs):
+def main(
+    test_results: str, output: TextIO, format: str, **kwargs: Dict[str, Any]
+) -> int:
     skipped_tests = all_skipped_tests(test_results)
     dispatcher = {"human": _human, "csv": _csv}
     dispatcher[format](skipped_tests, output)
     return 0
 
 
-def cli_main():
+def cli_main() -> None:
     parser = _create_parser()
     cli_args = parser.parse_args()
     kwargs = vars(cli_args)
 
-    def default():
+    def default() -> None:
         try:
             sys.exit(main(**kwargs))
         except Exception as ex:
@@ -102,7 +113,7 @@ def cli_main():
             )
             sys.exit(-1)
 
-    def debug():
+    def debug() -> None:
         sys.exit(main(**kwargs))
 
     _main = default if not cli_args.debug else debug

@@ -150,6 +150,21 @@ def lint(session):
     )
 
 
+@nox.session(name="type-check", python=False)
+def type_check(session):
+    session.run(
+        "poetry",
+        "run",
+        "mypy",
+        "--strict",
+        "--show-error-codes",
+        "--pretty",
+        "--show-column-numbers",
+        "--show-error-context",
+        "--scripts-are-modules",
+    )
+
+
 @nox.session(python=False)
 @nox.parametrize("db_version", Settings.DB_VERSIONS)
 @nox.parametrize("connector", Settings.CONNECTORS)
@@ -169,6 +184,7 @@ def verify(session, connector, db_version):
         )
     session.notify("isort")
     session.notify("code-format")
+    session.notify("type-check")
     session.notify("lint")
     session.notify(find_session_runner(session, f"db-start(db_version='{db_version}')"))
     session.notify(

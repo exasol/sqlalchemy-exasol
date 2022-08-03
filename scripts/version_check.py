@@ -111,6 +111,8 @@ def _main_debug(args):
             print(
                 f"Updating version in file ({args.version_module}) from {module_version} to {poetry_version}"
             )
+            return _SUCCESS
+
         return _FAILURE
 
     return _SUCCESS

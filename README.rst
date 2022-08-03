@@ -19,12 +19,16 @@ SQLAlchemy Dialect for EXASOL DB
     :alt: Exasol - Supported Version(s)
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://github.com/psf/black
-   :alt: Formatter - Black
+    :target: https://github.com/psf/black
+    :alt: Formatter - Black
 
 .. image:: https://img.shields.io/badge/imports-isort-ef8336.svg
-   :target: https://pycqa.github.io/isort/
-   :alt: Formatter - Isort
+    :target: https://pycqa.github.io/isort/
+    :alt: Formatter - Isort
+
+.. image:: https://img.shields.io/badge/pylint-5.8-yellow
+    :target: https://github.com/PyCQA/pylint
+    :alt: Pylint
 
 .. image:: https://img.shields.io/pypi/l/sqlalchemy-exasol
      :target: https://opensource.org/licenses/BSD-2-Clause

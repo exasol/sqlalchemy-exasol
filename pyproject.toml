@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sqlalchemy_exasol"
-version = "3.1.4"
+version = "3.1.6"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
 authors = [
@@ -73,6 +73,7 @@ pre-commit = "^2.19.0"
 wheel = "^0.37.1"
 black = "^22.6.0"
 isort = "^5.10.1"
+pylint = "^2.14.5"
 
 [tool.poetry.extras]
 turbodbc = ["turbodbc"]
@@ -97,3 +98,10 @@ include = "\\.pyi?$"
 [tool.isort]
 profile = "black"
 force_grid_wrap = 2
+
+[tool.pylint.master]
+fail-under = 5.6
+
+[tool.pylint.format]
+max-line-length = 88
+max-module-lines = 800

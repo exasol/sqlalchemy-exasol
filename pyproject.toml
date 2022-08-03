@@ -72,6 +72,7 @@ pytest-cov = ">=2.7.0"
 pre-commit = "^2.19.0"
 wheel = "^0.37.1"
 black = "^22.6.0"
+isort = "^5.10.1"
 
 [tool.poetry.extras]
 turbodbc = ["turbodbc"]

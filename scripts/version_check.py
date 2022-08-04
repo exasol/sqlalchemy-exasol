@@ -1,10 +1,19 @@
-import argparse
 import subprocess
 import sys
+from argparse import (
+    ArgumentParser,
+    Namespace,
+)
 from collections import namedtuple
 from inspect import cleandoc
 from pathlib import Path
 from shutil import which
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Union,
+)
 
 Version = namedtuple("Version", ["major", "minor", "patch"])
 
@@ -28,7 +37,7 @@ VERSION = f"{{MAJOR}}.{{MINOR}}.{{PATCH}}"
 # fmt: on
 
 
-def version_from_string(s):
+def version_from_string(s: str) -> Version:
     """Converts a version string of the following format major.minor.patch to a version object"""
     major, minor, patch = (int(number, base=0) for number in s.split("."))
     return Version(major, minor, patch)
@@ -38,10 +47,11 @@ class CommitHookError(Exception):
     """Indicates that this commit hook encountered an error"""
 
 
-def version_from_python_module(path):
+def version_from_python_module(path: Path) -> Version:
     """Retrieve version information from the `version` module"""
     with open(path) as file:
-        _locals, _globals = {}, {}
+        _locals: Dict[str, Any] = {}
+        _globals: Dict[str, Any] = {}
         exec(file.read(), _locals, _globals)
 
         try:
@@ -52,7 +62,7 @@ def version_from_python_module(path):
         return version_from_string(version)
 
 
-def version_from_poetry():
+def version_from_poetry() -> Version:
     poetry = which("poetry")
     if not poetry:
         raise CommitHookError("Couldn't find poetry executable")
@@ -62,7 +72,7 @@ def version_from_poetry():
     return version_from_string(version)
 
 
-def write_version_module(version, path, exists_ok=True):
+def write_version_module(version: Version, path: str, exists_ok: bool = True) -> None:
     version_file = Path(path)
     if version_file.exists() and not exists_ok:
         raise CommitHookError(f"Version file [{version_file}] already exists.")
@@ -75,8 +85,8 @@ def write_version_module(version, path, exists_ok=True):
         )
 
 
-def _create_parser():
-    parser = argparse.ArgumentParser()
+def _create_parser() -> ArgumentParser:
+    parser = ArgumentParser()
     parser.add_argument("version_module", help="Path to version module")
     parser.add_argument("files", nargs="*")
     parser.add_argument(
@@ -96,7 +106,7 @@ def _create_parser():
     return parser
 
 
-def _main_debug(args):
+def _main_debug(args: Namespace) -> int:
     module_version = version_from_python_module(args.version_module)
     poetry_version = version_from_poetry()
 
@@ -118,7 +128,7 @@ def _main_debug(args):
     return _SUCCESS
 
 
-def _main(args):
+def _main(args: Namespace) -> int:
     try:
         return _main_debug(args)
     except Exception as ex:
@@ -126,7 +136,7 @@ def _main(args):
         return _FAILURE
 
 
-def main(argv=None):
+def main(argv: Union[Iterable[str], None] = None) -> int:
     parser = _create_parser()
     args = parser.parse_args()
     entry_point = _main if not args.debug else _main_debug

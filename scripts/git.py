@@ -1,10 +1,8 @@
-from subprocess import (
-    PIPE,
-    run,
-)
+from subprocess import run
+from typing import Iterable
 
 
-def tags():
+def tags() -> Iterable[str]:
     """
     Returns a list of all tags, sorted from [0] oldest to [-1] newest.
     PreConditions:
@@ -14,5 +12,4 @@ def tags():
     """
     command = ["git", "tag", "--sort=committerdate"]
     result = run(command, capture_output=True, check=True)
-    tags = (tag.strip() for tag in result.stdout.decode("utf-8").splitlines())
-    return list(tags)
+    return [tag.strip() for tag in result.stdout.decode("utf-8").splitlines()]

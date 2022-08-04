@@ -12,11 +12,9 @@ SCRIPTS = PROJECT_ROOT / "scripts"
 sys.path.append(f"{SCRIPTS}")
 
 from typing import (
-    Dict,
     Iterable,
     Iterator,
     MutableMapping,
-    Tuple,
 )
 
 import nox
@@ -84,7 +82,7 @@ def transaction(connection: Connection, sql_statements: Iterable[str]) -> None:
 
 
 @contextmanager
-def environment(env_vars: Dict[str, str]) -> Iterator[MutableMapping[str, str]]:
+def environment(env_vars: dict[str, str]) -> Iterator[MutableMapping[str, str]]:
     _env = os.environ.copy()
     os.environ.update(env_vars)
     yield os.environ
@@ -104,13 +102,21 @@ def temporary_odbc_config(config: str) -> Iterator[Path]:
 
 
 @contextmanager
-def odbcconfig() -> Iterator[Tuple[Path, MutableMapping[str, str]]]:
+def odbcconfig() -> Iterator[tuple[Path, MutableMapping[str, str]]]:
     with temporary_odbc_config(
         ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
     ) as cfg:
         env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
         with environment(env_vars) as env:
             yield cfg, env
+
+
+def _python_files(path: Path) -> Iterator[Path]:
+    files = PROJECT_ROOT.glob("**/*.py")
+    files = filter(lambda path: "dist" not in path.parts, files)
+    files = filter(lambda path: ".eggs" not in path.parts, files)
+    files = filter(lambda path: "venv" not in path.parts, files)
+    return files
 
 
 @nox.session(python=False)
@@ -123,8 +129,25 @@ def fix(session: Session) -> None:
         "--fix",
         f"{Settings.VERSION_FILE}",
     )
+    files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
+    session.run(
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "pyupgrade",
+        "--py38-plus",
+        "--exit-zero-even-if-changed",
+        *files,
+    )
     session.run("poetry", "run", "python", "-m", "isort", "-v", f"{PROJECT_ROOT}")
     session.run("poetry", "run", "python", "-m", "black", f"{PROJECT_ROOT}")
+
+
+@nox.session(python=False)
+def pyupgrade(session: Session) -> None:
+    files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
+    session.run("poetry", "run", "python", "-m", "pyupgrade", "--py38-plus", *files)
 
 
 @nox.session(name="code-format", python=False)

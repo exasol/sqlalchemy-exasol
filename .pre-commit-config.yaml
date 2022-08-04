@@ -9,9 +9,47 @@ repos:
       language: system
       entry: python scripts/version_check.py --fix sqlalchemy_exasol/version.py
 
--   repo: https://github.com/asottile/pyupgrade
-    rev: v2.34.0
+-   repo: local
+    hooks:
+      -   id: isort
+          name: isort
+          types: [python]
+          pass_filenames: false
+          language: system
+          entry: poetry run python -m nox -s isort
+
+-   repo: local
     hooks:
       -   id: pyupgrade
-          args: ['--py38-plus']
+          name: pyupgrade
           types: [python]
+          pass_filenames: false
+          language: system
+          entry: poetry run python -m nox -s pyupgrade
+
+-   repo: local
+    hooks:
+      -   id: code-format
+          name: code-format
+          types: [python]
+          pass_filenames: false
+          language: system
+          entry: poetry run python -m nox -s code-format
+
+-   repo: local
+    hooks:
+      -   id: type-check
+          name: type-check
+          types: [python]
+          pass_filenames: false
+          language: system
+          entry: poetry run python -m nox -s type-check
+
+-   repo: local
+    hooks:
+      -   id: lint
+          name:  lint
+          types: [python]
+          pass_filenames: false
+          language: system
+          entry: poetry run python -m nox -s lint

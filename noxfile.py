@@ -12,6 +12,7 @@ SCRIPTS = PROJECT_ROOT / "scripts"
 sys.path.append(f"{SCRIPTS}")
 
 from typing import (
+    Generator,
     Iterable,
     Iterator,
     MutableMapping,
@@ -112,8 +113,7 @@ def odbcconfig() -> Iterator[tuple[Path, MutableMapping[str, str]]]:
 
 
 def _python_files(path: Path) -> Iterator[Path]:
-    files = PROJECT_ROOT.glob("**/*.py")
-    files = filter(lambda path: "dist" not in path.parts, files)
+    files = filter(lambda path: "dist" not in path.parts, PROJECT_ROOT.glob("**/*.py"))
     files = filter(lambda path: ".eggs" not in path.parts, files)
     files = filter(lambda path: "venv" not in path.parts, files)
     return files

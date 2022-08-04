@@ -12,7 +12,6 @@ SCRIPTS = PROJECT_ROOT / "scripts"
 sys.path.append(f"{SCRIPTS}")
 
 from typing import (
-    Generator,
     Iterable,
     Iterator,
     MutableMapping,
@@ -218,6 +217,7 @@ def verify(session: Session, connector: str, db_version: str) -> None:
             f"poetry: {version_from_poetry()}."
         )
     session.notify("isort")
+    session.notify("pyupgrade")
     session.notify("code-format")
     session.notify("type-check")
     session.notify("lint")

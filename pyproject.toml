@@ -118,3 +118,7 @@ files = [
 mypy_path = [
     'typeshed'
 ]
+
+[tool.scriv]
+new_fragment_template = "file: templates/fragment-template.rst"
+version = "literal: pyproject.toml: tool.poetry.version"

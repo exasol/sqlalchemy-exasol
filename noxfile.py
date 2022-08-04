@@ -122,6 +122,19 @@ def _python_files(path: Path) -> Iterator[Path]:
 
 @nox.session(python=False)
 def fix(session: Session) -> None:
+    def apply_pyupgrade_fixes(session: Session) -> None:
+        files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
+        session.run(
+            "poetry",
+            "run",
+            "python",
+            "-m",
+            "pyupgrade",
+            "--py38-plus",
+            "--exit-zero-even-if-changed",
+            *files,
+        )
+
     session.run(
         "poetry",
         "run",
@@ -130,17 +143,7 @@ def fix(session: Session) -> None:
         "--fix",
         f"{Settings.VERSION_FILE}",
     )
-    files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
-    session.run(
-        "poetry",
-        "run",
-        "python",
-        "-m",
-        "pyupgrade",
-        "--py38-plus",
-        "--exit-zero-even-if-changed",
-        *files,
-    )
+    apply_pyupgrade_fixes(session)
     session.run("poetry", "run", "python", "-m", "isort", "-v", f"{PROJECT_ROOT}")
     session.run("poetry", "run", "python", "-m", "black", f"{PROJECT_ROOT}")
 

@@ -42,6 +42,7 @@ keywords = [
 ]
 repository = "https://github.com/exasol/sqlalchemy-exasol"
 homepage = "https://www.exasol.com/"
+documentation = "https://github.io/exasol/sqlalchemy-exaso/"
 
 include = [
     "README.rst",

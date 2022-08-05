@@ -1,0 +1,3 @@
+🔧 Changed
+----------
+- Restructured documentation

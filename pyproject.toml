@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sqlalchemy_exasol"
-version = "3.1.8"
+version = "3.1.9"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
 authors = [
@@ -76,6 +76,7 @@ isort = "^5.10.1"
 pylint = "^2.14.5"
 mypy = "^0.971"
 pyupgrade = "^2.37.3"
+scriv = "^0.16.0"
 
 [tool.poetry.extras]
 turbodbc = ["turbodbc"]
@@ -117,3 +118,7 @@ files = [
 mypy_path = [
     'typeshed'
 ]
+
+[tool.scriv]
+new_fragment_template = "file: templates/fragment-template.rst"
+version = "literal: pyproject.toml: tool.poetry.version"

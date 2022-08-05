@@ -37,6 +37,7 @@ def urls(files: Iterable[Path]) -> Iterable[Tuple[Path, str]]:
             raise Exception(msg)
         stdout = result.stdout.decode("utf8").strip()
         _urls = (url.strip() for url in stdout.split("\n"))
+        _urls = (url for url in _urls if url)  # filter empty strings and none
         yield from zip(repeat(file), filter(lambda url: not should_filter(url), _urls))
 
 

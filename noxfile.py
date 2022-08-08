@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import sys
+import webbrowser
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from pathlib import Path
@@ -446,6 +447,5 @@ def open_docs(session: Session) -> None:
         session.error(
             f"File {index_page} does not exist." "Please run `nox -s build-docs` first"
         )
-    session.run(
-        "python", "-m", "webbrowser", "-t", f"{index_page.resolve()}", external=True
-    )
+
+    webbrowser.open_new_tab(index_page.resolve().as_uri())

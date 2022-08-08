@@ -1,9 +1,8 @@
-Developer Guide
-===============
+.. include:: developer_guide.rst
 
 .. toctree::
    :maxdepth: 1
+   :hidden:
 
-   developer_guide
    integration_tests
 

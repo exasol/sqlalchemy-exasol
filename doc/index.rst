@@ -37,6 +37,8 @@ For more details on SQLAlchemy consult it's `documenation <https://docs.sqlalche
    :maxdepth: 3
    :hidden:
 
+   readme
+   changelog
    developer_guide/index
 
 * :ref:`genindex`

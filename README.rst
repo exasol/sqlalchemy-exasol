@@ -135,11 +135,12 @@ Notes
 - Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
 - As of Exasol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
 
-Development & Testing
-`````````````````````
-See `developer guide`_
-
 .. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
 .. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
 .. _test_drive: https://www.exasol.com/test-it-now/cloud/
 .. _test_docker_image: https://github.com/exasol/docker-db
+
+Development & Testing
+`````````````````````
+See `developer guide`_
+

@@ -2,15 +2,19 @@ from __future__ import annotations
 
 import os
 import sys
+import webbrowser
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from pathlib import Path
+from shutil import rmtree
 from tempfile import TemporaryDirectory
 from textwrap import dedent
 
 PROJECT_ROOT = Path(__file__).parent
 # scripts path also contains administrative code/modules which are used by some nox targets
 SCRIPTS = PROJECT_ROOT / "scripts"
+DOC = PROJECT_ROOT / "doc"
+DOC_BUILD = DOC / "build"
 sys.path.append(f"{SCRIPTS}")
 
 from typing import (
@@ -417,3 +421,31 @@ def release(session: Session) -> None:
         *args,
         external=True,
     )
+
+
+@nox.session(python=False, name="clean-docs")
+def clean(session: Session) -> None:
+    """Remove all documentation artifacts"""
+    if DOC_BUILD.exists():
+        rmtree(DOC_BUILD.resolve())
+        session.log(f"Removed {DOC_BUILD}")
+
+
+@nox.session(python=False, name="build-docs")
+def build(session: Session) -> None:
+    """Build the documentation"""
+    session.run(
+        "sphinx-build", "-b", "html", "-W", f"{DOC}", f"{DOC_BUILD}", external=True
+    )
+
+
+@nox.session(python=False, name="open-docs")
+def open_docs(session: Session) -> None:
+    """Open the documentation in the browser"""
+    index_page = DOC_BUILD / "index.html"
+    if not index_page.exists():
+        session.error(
+            f"File {index_page} does not exist." "Please run `nox -s build-docs` first"
+        )
+
+    webbrowser.open_new_tab(index_page.resolve().as_uri())

@@ -1,0 +1,37 @@
+name: GH-Pages
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install Dependencies
+        run: |
+          poetry install
+      - name: Build Documenations
+        run: |
+          poetry run python -m nox -s build-docs
+          touch doc/build/html/.nojekyll
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4.3.0
+        with:
+          branch: gh-pages
+          folder: ./doc/build/html
+          git-config-name: Github Action
+          git-config-email: opensource@exasol.com
+

@@ -14,7 +14,7 @@
 ..
 🔧 Changed
 ----------
- - Updated the developer documents to reflect the latest changelog management 
+- Reworked project documenation
 ..
 .. 🚧 Deprecated
 .. -------------

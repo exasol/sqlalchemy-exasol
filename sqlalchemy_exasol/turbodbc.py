@@ -67,6 +67,7 @@ class EXADialect_turbodbc(EXADialect):
     driver = "turbodbc"
     driver_version = None
     server_version_info = None
+    supports_statement_cache = False
     supports_native_decimal = False
     supports_sane_multi_rowcount = False
 

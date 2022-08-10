@@ -1,0 +1,10 @@
+🔧 Changed
+----------
+- Update SQLAlchemy dependency to >= 1.4
+
+    .. warning::
+
+        This may impact the performance (see also `SQLAlchemy docs <https://docs.sqlalchemy.org/en/14/faq/performance.html#why-is-my-application-slow-after-upgrading-to-1-4-and-or-2-x>`_).
+        If you are not willing or able to pay those potentional performance hits, you should wait until the `tracking-issue <https://github.com/exasol/sqlalchemy-exasol/issues/190>`_
+        is resolved.
+

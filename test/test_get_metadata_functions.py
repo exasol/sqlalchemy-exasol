@@ -1,6 +1,8 @@
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy import (
+    create_engine,
+    inspect,
+)
 from sqlalchemy.engine.url import URL
 from sqlalchemy.sql.sqltypes import (
     INTEGER,
@@ -100,7 +102,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_schema_names(self, engine_name, use_sql_fallback):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             schema_names = dialect.get_schema_names(
                 connection=c, use_sql_fallback=use_sql_fallback
             )
@@ -112,7 +114,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_compare_get_schema_names_for_sql_and_odbc(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             schema_names_fallback = dialect.get_schema_names(
                 connection=c, use_sql_fallback=True
             )
@@ -126,7 +128,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_table_names(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             table_names = dialect.get_table_names(
                 connection=c, schema=self.schema, use_sql_fallback=use_sql_fallback
             )
@@ -141,7 +143,7 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             table_names_fallback = dialect.get_table_names(
                 connection=c, schema=schema, use_sql_fallback=True
             )
@@ -155,7 +157,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_has_table_table_exists(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             has_table = dialect.has_table(
                 connection=c,
                 schema=self.schema,
@@ -171,7 +173,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_has_table_table_exists_not(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             has_table = dialect.has_table(
                 connection=c,
                 schema=self.schema,
@@ -189,7 +191,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_compare_has_table_for_sql_and_odbc(self, schema, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             has_table_fallback = dialect.has_table(
                 connection=c, schema=schema, use_sql_fallback=True, table_name="t"
             )
@@ -207,7 +209,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_view_names(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             view_names = dialect.get_view_names(
                 connection=c, schema=self.schema, use_sql_fallback=use_sql_fallback
             )
@@ -220,7 +222,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_view_names_for_sys(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             view_names = dialect.get_view_names(
                 connection=c, schema="sys", use_sql_fallback=use_sql_fallback
             )
@@ -233,7 +235,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_view_definition(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             view_definition = dialect.get_view_definition(
                 connection=c,
                 schema=self.schema,
@@ -249,7 +251,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_view_definition_view_name_none(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             view_definition = dialect.get_view_definition(
                 connection=c,
                 schema=self.schema,
@@ -265,7 +267,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_compare_get_view_names_for_sql_and_odbc(self, schema, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             c.execute("OPEN SCHEMA %s" % self.schema)
             view_names_fallback = dialect.get_view_names(
                 connection=c, schema=schema, use_sql_fallback=True
@@ -283,7 +285,7 @@ class MetadataTest(fixtures.TablesTest):
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
             view_name = "v"
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             view_definition_fallback = dialect.get_view_definition(
                 connection=c, view_name=view_name, schema=schema, use_sql_fallback=True
             )
@@ -300,7 +302,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_compare_get_columns_for_sql_and_odbc(self, schema, table, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
             columns_fallback = dialect.get_columns(
@@ -322,7 +324,7 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             table = None
             columns_fallback = dialect.get_columns(
                 connection=c, table_name=table, schema=schema, use_sql_fallback=True
@@ -347,7 +349,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_columns(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             columns = dialect.get_columns(
                 connection=c,
                 schema=self.schema,
@@ -396,7 +398,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_columns_table_name_none(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             columns = dialect.get_columns(
                 connection=c,
                 schema=self.schema,
@@ -417,7 +419,7 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema)
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             pk_constraint_fallback = dialect.get_pk_constraint(
                 connection=c, table_name=table, schema=schema, use_sql_fallback=True
             )
@@ -433,7 +435,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_pk_constraint(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             pk_constraint = dialect.get_pk_constraint(
                 connection=c,
                 schema=self.schema,
@@ -452,7 +454,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_pk_constraint_table_name_none(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             pk_constraint = dialect.get_pk_constraint(
                 connection=c,
                 schema=self.schema,
@@ -473,7 +475,7 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
                 c.execute("OPEN SCHEMA %s" % self.schema_2)
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             foreign_keys_fallback = dialect.get_foreign_keys(
                 connection=c, table_name=table, schema=schema, use_sql_fallback=True
             )
@@ -489,7 +491,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_foreign_keys(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             foreign_keys = dialect.get_foreign_keys(
                 connection=c,
                 schema=self.schema,
@@ -515,7 +517,7 @@ class MetadataTest(fixtures.TablesTest):
     )
     def test_get_foreign_keys_table_name_none(self, use_sql_fallback, engine_name):
         with self.engine_map[engine_name].begin() as c:
-            dialect = Inspector(c).dialect
+            dialect = inspect(c).dialect
             foreign_keys = dialect.get_foreign_keys(
                 connection=c,
                 schema=self.schema,

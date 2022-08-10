@@ -16,34 +16,17 @@ class CertificateTest(TestBase):
     @staticmethod
     def remove_ssl_settings(url):
         """Create an equivalent url without the ssl/tls settings."""
-
-        def sqla_1_4_and_above(url):
-            query = dict(url.query)
-            try:
-                del query["SSLCertificate"]
-            except KeyError:
-                # nothing to do
-                pass
-            return url.set(query=query)
-
-        def sqla_1_3_and_below(url):
-            try:
-                del url.query["SSLCertificate"]
-            except KeyError:
-                # nothing to do
-                pass
-            return url
-
-        # Note: keep patching the URL backwards compatible
-        # see also: https://docs.sqlalchemy.org/en/14/changelog/migration_14.html#the-url-object-is-now-immutable
-        action = (
-            sqla_1_4_and_above
-            if hasattr(url, "update_query_dict")
-            else sqla_1_3_and_below
-        )
-        url = action(url)
-
-        return url
+        # Note:
+        # This implementation is not backwards compatible with SQLA < 1.4, if you are looking for a
+        # backwards compatible solution see:
+        # * https://docs.sqlalchemy.org/en/14/changelog/migration_14.html#the-url-object-is-now-immutable
+        query = dict(url.query)
+        try:
+            del query["SSLCertificate"]
+        except KeyError:
+            # nothing to do
+            pass
+        return url.set(query=query)
 
     @pytest.mark.skipif(
         testing.db.dialect.server_version_info < (7, 1, 0),

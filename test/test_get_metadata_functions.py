@@ -84,7 +84,7 @@ class MetadataTest(fixtures.TablesTest):
         database_url = config.db_url
         new_args = database_url.translate_connect_args()
         new_args["database"] = new_database_name
-        new_database_url = URL(
+        new_database_url = URL.create(
             drivername=database_url.drivername, query=database_url.query, **new_args
         )
         return new_database_url

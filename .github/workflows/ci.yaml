@@ -23,12 +23,7 @@ jobs:
           - "3.10"
         connector:
           - pyodbc
-          # TODO: Reenable once the issue(s) below have been fixed.
-          # Turbodbc can't be supported using poetry until:
-          #  - https://github.com/blue-yonder/turbodbc/issues/358
-          #  - https://github.com/exasol/sqlalchemy-exasol/issues/146
-          # are fixed.
-          # - turbodbc
+          - turbodbc
         exasol_version:
           - 7.1.9
           - 7.0.18

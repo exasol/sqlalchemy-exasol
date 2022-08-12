@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sqlalchemy_exasol"
-version = "3.1.10"
+version = "3.2.0"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
 authors = [
@@ -57,10 +57,7 @@ python = ">=3.8,<4.0"
 SQLAlchemy = ">=1.3.24,<1.4"
 pyodbc = ">=4.0.34"
 packaging = "^21.3"
-# TODO: Reenable once the causing issues got fixed:
-#  - https://github.com/blue-yonder/turbodbc/issues/358
-#  - https://github.com/exasol/sqlalchemy-exasol/issues/146
-# turbodbc = { version = ">4.5.3", optional = true }
+turbodbc = {version = ">=4.5.4", optional = true}
 
 [tool.poetry.dev-dependencies]
 nox = ">=2022.1.7"

@@ -6,7 +6,7 @@
 
 ✨ Added
 -------
-- Added trubodbc support 
+- Added turbodbc support 
     * Re-enabled with new minimum base version 4.5.4
 - Added additional information to README
     * License information (badge)

@@ -40,7 +40,3 @@ For more details on SQLAlchemy consult it's `documenation <https://docs.sqlalche
    readme
    changelog
    developer_guide/index
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

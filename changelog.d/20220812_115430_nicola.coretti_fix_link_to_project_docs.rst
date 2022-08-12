@@ -1,0 +1,3 @@
+🐞 Fixed
+---------
+- Fix link to project documentation

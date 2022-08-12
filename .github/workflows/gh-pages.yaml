@@ -23,7 +23,7 @@ jobs:
       - name: Install Dependencies
         run: |
           poetry install
-      - name: Build Documenations
+      - name: Build Documentations
         run: |
           poetry run python -m nox -s build-docs
           touch doc/build/.nojekyll

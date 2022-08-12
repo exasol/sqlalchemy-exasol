@@ -1,4 +1,0 @@
-🔧 Changed
-----------
-- Reenabled trubodbc support
-- Bumped turbodbc support from 3.3.0 to 4.5.4

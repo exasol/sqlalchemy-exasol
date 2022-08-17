@@ -86,49 +86,55 @@ class Merge(UpdateBase):
             return addition
         return and_(where, addition)
 
-    @property
-    def is_merge_update(self):
+    def _is_merge_update(self):
         return self._merge_update_values is not None
 
-    @property
-    def is_merge_delete(self):
-        return not self.is_merge_update and self._merge_delete
+    def _is_merge_delete(self):
+        return not self._is_merge_update() and self._merge_delete
 
-    @property
-    def is_merge_insert(self):
+    def _is_merge_insert(self):
         return self._merge_insert_values is not None
 
-    def visit(self, compiler, **kw):
-        msql = "MERGE INTO %s " % compiler.process(self._target_table, asfrom=True)
-        msql += "USING %s " % compiler.process(self._source_expr, asfrom=True)
-        msql += "ON ( %s ) " % compiler.process(self._on)
-
-        if self.is_merge_update:
-            columns = crud._get_crud_params(compiler, self._merge_update_values)
-            msql += "\nWHEN MATCHED THEN UPDATE SET "
-            msql += ", ".join(compiler.visit_column(c[0]) + "=" + c[1] for c in columns)
-            if self._merge_delete:
-                msql += "\nDELETE "
-                if self._delete_where is not None:
-                    msql += " WHERE %s" % compiler.process(self._delete_where)
-            else:
-                if self._update_where is not None:
-                    msql += " WHERE %s" % compiler.process(self._update_where)
-
-        if self.is_merge_delete:
-            msql += "\nWHEN MATCHED THEN DELETE "
+    def _compile_update(self, compiler):
+        columns = crud._get_crud_params(compiler, self._merge_update_values)
+        sql = ""
+        sql += "\nWHEN MATCHED THEN UPDATE SET "
+        sql += ", ".join(compiler.visit_column(c[0]) + "=" + c[1] for c in columns)
+        if self._merge_delete:
+            sql += "\nDELETE "
             if self._delete_where is not None:
-                msql += "WHERE %s" % compiler.process(self._delete_where)
+                sql += " WHERE %s" % compiler.process(self._delete_where)
+        else:
+            if self._update_where is not None:
+                sql += " WHERE %s" % compiler.process(self._update_where)
+        return sql
 
-        if self.is_merge_insert:
-            columns = crud._get_crud_params(compiler, self._merge_insert_values)
-            msql += "\nWHEN NOT MATCHED THEN INSERT "
-            msql += "(%s) " % ", ".join(compiler.visit_column(c[0]) for c in columns)
-            msql += "VALUES (%s) " % ", ".join(c[1] for c in columns)
-            if self._insert_where is not None:
-                msql += "WHERE %s" % compiler.process(self._insert_where)
+    def _compile_delete(self, compiler):
+        sql = "\nWHEN MATCHED THEN DELETE "
+        if self._delete_where is not None:
+            sql += "WHERE %s" % compiler.process(self._delete_where)
+        return sql
 
-        return msql
+    def _compile_insert(self, compiler):
+        columns = crud._get_crud_params(compiler, self._merge_insert_values)
+        sql = "\nWHEN NOT MATCHED THEN INSERT "
+        sql += "(%s) " % ", ".join(compiler.visit_column(c[0]) for c in columns)
+        sql += "VALUES (%s) " % ", ".join(c[1] for c in columns)
+        if self._insert_where is not None:
+            sql += "WHERE %s" % compiler.process(self._insert_where)
+        return sql
+
+    def visit(self, compiler):
+        sql = "MERGE INTO %s " % compiler.process(self._target_table, asfrom=True)
+        sql += "USING %s " % compiler.process(self._source_expr, asfrom=True)
+        sql += "ON ( %s ) " % compiler.process(self._on)
+        if self._is_merge_update():
+            sql += self._compile_update(compiler)
+        if self._is_merge_delete():
+            sql += self._compile_delete(compiler)
+        if self._is_merge_insert():
+            sql += self._compile_insert(compiler)
+        return sql
 
 
 def merge(target_table, source_expr, on):
@@ -136,5 +142,5 @@ def merge(target_table, source_expr, on):
 
 
 @compiles(Merge, "exasol")
-def visit_merge(merge_node, compiler, **kw):
-    return merge_node.visit(compiler, **kw)
+def visit_merge(node, compiler, **_):
+    return node.visit(compiler)

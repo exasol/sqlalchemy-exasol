@@ -29,13 +29,13 @@ class Merge(UpdateBase):
         self._merge_delete = False
         self._delete_where = None
 
-    def _get_source_cols(self):
-        source_cols = {}
-        elements_to_check = list(self._source_expr.get_children())
-        for e in elements_to_check:
-            if isinstance(e, ColumnClause):
-                source_cols[e.name] = e
-        return source_cols
+    def _source_columns(self):
+        elements = list(
+            element
+            for element in self._source_expr.get_children()
+            if isinstance(element, ColumnClause)
+        )
+        return {element.name: element for element in elements}
 
     @_generative
     def update(self, values=None, where=None):
@@ -43,11 +43,14 @@ class Merge(UpdateBase):
         # present in the source expression but exclude columns part
         # of the MERGE ON condition
         if values is None:
-            source_cols = self._get_source_cols()
             values = {}
-            for c in self._target_table.c:
-                if c not in self._on_columns and c.name in source_cols:
-                    values[c] = source_cols[c.name]
+            src_columns = self._source_columns()
+            columns = (
+                column
+                for column in self._target_table.c
+                if column not in self._on_columns and column.name in src_columns
+            )
+            [values.update({column: src_columns[column.name]}) for column in columns]
         self._merge_update_values = ValuesBase(self._target_table, values, [])
         if where is not None:
             if self._merge_delete:
@@ -61,11 +64,12 @@ class Merge(UpdateBase):
         # present in the source expression but exclude columns part
         # of the MERGE ON condition
         if values is None:
-            source_cols = self._get_source_cols()
             values = {}
-            for c in self._target_table.c:
-                if c.name in source_cols:
-                    values[c] = source_cols[c.name]
+            src_columns = self._source_columns()
+            columns = (
+                column for column in self._target_table.c if column.name in src_columns
+            )
+            [values.update({column: src_columns[column.name]}) for column in columns]
         self._merge_insert_values = ValuesBase(self._target_table, values, [])
         if where is not None:
             self._insert_where = self._append_where(self._insert_where, where)

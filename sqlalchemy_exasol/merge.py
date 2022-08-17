@@ -54,9 +54,9 @@ class Merge(UpdateBase):
         self._merge_update_values = ValuesBase(self._target_table, values, [])
         if where is not None:
             if self._merge_delete:
-                self._delete_where = self._append_where(self._delete_where, where)
+                self._delete_where = Merge._append_where(self._delete_where, where)
             else:
-                self._update_where = self._append_where(self._update_where, where)
+                self._update_where = Merge._append_where(self._update_where, where)
 
     @_generative
     def insert(self, values=None, where=None):
@@ -72,20 +72,19 @@ class Merge(UpdateBase):
             [values.update({column: src_columns[column.name]}) for column in columns]
         self._merge_insert_values = ValuesBase(self._target_table, values, [])
         if where is not None:
-            self._insert_where = self._append_where(self._insert_where, where)
+            self._insert_where = Merge._append_where(self._insert_where, where)
 
     @_generative
     def delete(self, where=None):
         self._merge_delete = True
         if self._merge_update_values is None and where is not None:
-            self._delete_where = self._append_where(self._delete_where, where)
+            self._delete_where = Merge._append_where(self._delete_where, where)
 
-    def _append_where(self, where, addition):
-        if where is not None:
-            where = and_(where, addition)
-        else:
-            where = addition
-        return where
+    @staticmethod
+    def _append_where(where, addition):
+        if where is None:
+            return addition
+        return and_(where, addition)
 
 
 def merge(target_table, source_expr, on):

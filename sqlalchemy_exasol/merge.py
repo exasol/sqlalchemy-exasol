@@ -24,8 +24,6 @@ class Merge(UpdateBase):
             if isinstance(e, Column):
                 if e.table == self._target_table:
                     self._on_columns.append(e)
-            else:
-                elements_to_check.extend(e.get_children())
         self._merge_update_values = None
         self._update_where = None
         self._merge_insert_values = None

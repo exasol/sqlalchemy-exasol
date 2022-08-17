@@ -11,19 +11,17 @@ from sqlalchemy.sql.expression import (
 
 
 class Merge(UpdateBase):
-
     __visit_name__ = "merge"
 
     def __init__(self, target_table, source_expr, on):
         self._target_table = target_table
         self._source_expr = source_expr
         self._on = on
-        self._on_columns = []
-        elements_to_check = list(on.get_children())
-        for e in elements_to_check:
-            if isinstance(e, Column):
-                if e.table == self._target_table:
-                    self._on_columns.append(e)
+        self._on_columns = list(
+            element
+            for element in on.get_children()
+            if isinstance(element, Column) and element.table == self._target_table
+        )
         self._merge_update_values = None
         self._update_where = None
         self._merge_insert_values = None

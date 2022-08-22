@@ -13,6 +13,10 @@ from sqlalchemy.sql.expression import (
 class Merge(UpdateBase):
     __visit_name__ = "merge"
 
+    class Delete(UpdateBase):
+        def __init__(self, where=None):
+            self.where = where
+
     def __init__(self, target_table, source_expr, on):
         self.table = target_table
         self._source_expr = source_expr
@@ -28,6 +32,7 @@ class Merge(UpdateBase):
         self._insert_where = None
         self._merge_delete = False
         self._delete_where = None
+        self._delete = None
 
     def _source_columns(self):
         elements = list(
@@ -75,8 +80,7 @@ class Merge(UpdateBase):
     @_generative
     def delete(self, where=None):
         self._merge_delete = True
-        if self._merge_update_values is None and where is not None:
-            self._delete_where = Merge._append_where(self._delete_where, where)
+        self.delete_clause = Merge.Delete(where)
 
     @staticmethod
     def _append_where(where, addition):
@@ -107,12 +111,6 @@ class Merge(UpdateBase):
                 sql += " WHERE %s" % compiler.process(self._update_where)
         return sql
 
-    def _compile_delete(self, compiler):
-        sql = "\nWHEN MATCHED THEN DELETE "
-        if self._delete_where is not None:
-            sql += "WHERE %s" % compiler.process(self._delete_where)
-        return sql
-
     def _compile_insert(self, compiler):
         columns = crud._get_crud_params(compiler, self._merge_insert_values)
         sql = "\nWHEN NOT MATCHED THEN INSERT "
@@ -129,7 +127,7 @@ class Merge(UpdateBase):
         if self._is_merge_update():
             sql += self._compile_update(compiler)
         if self._is_merge_delete():
-            sql += self._compile_delete(compiler)
+            sql += compiler.process(self.delete_clause)
         if self._is_merge_insert():
             sql += self._compile_insert(compiler)
         return sql
@@ -142,3 +140,11 @@ def merge(target_table, source_expr, on):
 @compiles(Merge, "exasol")
 def visit_merge(node, compiler, **_):
     return node.visit(compiler)
+
+
+@compiles(Merge.Delete, "exasol")
+def visit_merge_delete(node, compiler, **_):
+    sql = "\nWHEN MATCHED THEN DELETE "
+    if node.where is not None:
+        sql += "WHERE %s" % compiler.process(node.where)
+    return sql

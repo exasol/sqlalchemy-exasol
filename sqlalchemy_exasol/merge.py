@@ -14,13 +14,13 @@ class Merge(UpdateBase):
     __visit_name__ = "merge"
 
     def __init__(self, target_table, source_expr, on):
-        self._target_table = target_table
+        self.table = target_table
         self._source_expr = source_expr
         self._on = on
         self._on_columns = list(
             element
             for element in on.get_children()
-            if isinstance(element, Column) and element.table == self._target_table
+            if isinstance(element, Column) and element.table == self.table
         )
         self._merge_update_values = None
         self._update_where = None
@@ -47,11 +47,11 @@ class Merge(UpdateBase):
             src_columns = self._source_columns()
             columns = (
                 column
-                for column in self._target_table.c
+                for column in self.table.c
                 if column not in self._on_columns and column.name in src_columns
             )
             [values.update({column: src_columns[column.name]}) for column in columns]
-        self._merge_update_values = ValuesBase(self._target_table, values, [])
+        self._merge_update_values = ValuesBase(self.table, values, [])
         if where is not None:
             if self._merge_delete:
                 self._delete_where = Merge._append_where(self._delete_where, where)
@@ -66,11 +66,9 @@ class Merge(UpdateBase):
         if values is None:
             values = {}
             src_columns = self._source_columns()
-            columns = (
-                column for column in self._target_table.c if column.name in src_columns
-            )
+            columns = (column for column in self.table.c if column.name in src_columns)
             [values.update({column: src_columns[column.name]}) for column in columns]
-        self._merge_insert_values = ValuesBase(self._target_table, values, [])
+        self._merge_insert_values = ValuesBase(self.table, values, [])
         if where is not None:
             self._insert_where = Merge._append_where(self._insert_where, where)
 
@@ -125,7 +123,7 @@ class Merge(UpdateBase):
         return sql
 
     def visit(self, compiler):
-        sql = "MERGE INTO %s " % compiler.process(self._target_table, asfrom=True)
+        sql = "MERGE INTO %s " % compiler.process(self.table, asfrom=True)
         sql += "USING %s " % compiler.process(self._source_expr, asfrom=True)
         sql += "ON ( %s ) " % compiler.process(self._on)
         if self._is_merge_update():

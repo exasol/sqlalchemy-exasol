@@ -731,7 +731,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         def _get_schema(sql_compiler, dialect):
             """Get the schema while taking the translation-map and the de-normalization into account"""
             translate_map = sql_compiler.schema_translate_map
-            schema_dispatcher = translate_map.map_ if translate_map else {}
+            schema_dispatcher = translate_map if translate_map else {}
             schema = sql_compiler.statement.table.schema
             schema = (
                 schema_dispatcher[schema] if schema in schema_dispatcher else schema

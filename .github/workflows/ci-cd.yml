@@ -56,9 +56,6 @@ jobs:
     - name: Fetch sqlalchemy_exasol code from repository
       uses: actions/checkout@v3
 
-    - name: Setup integration-test-docker-environment
-      uses: actions/setup-python@v4
-
     - name: Install via apt
       run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
 

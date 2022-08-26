@@ -1,3 +1,8 @@
+# Refactoring notes
+# * Replace with list comprehension https://github.com/exasol/sqlalchemy-exasol/pull/191#discussion_r948769723
+# * Replace with dict comprehension https://github.com/exasol/sqlalchemy-exasol/pull/191#discussion_r948792860
+# * Replace with dict comprehension https://github.com/exasol/sqlalchemy-exasol/pull/191#discussion_r948796627
+# * Reconsider collecting tree elements https://github.com/exasol/sqlalchemy-exasol/pull/191#discussion_r948793529
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.schema import Column
 from sqlalchemy.sql import crud

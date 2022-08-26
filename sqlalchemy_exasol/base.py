@@ -763,6 +763,8 @@ class EXAExecutionContext(default.DefaultExecutionContext):
               in case a delete query is executed.
         """
         server_version = self.root_connection.dialect.server_version_info
+        # FIXME: drop exasol verison support < 4.1.0
+        # see https://github.com/exasol/sqlalchemy-exasol/pull/191#discussion_r942595818
         skip_pre_exec = (
             not self.isdelete and server_version is None or server_version >= (4, 1, 8)
         )

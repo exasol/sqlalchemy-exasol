@@ -71,7 +71,7 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
-    needs: docs
+    needs: [docs, checks]
     strategy:
       fail-fast: false
       matrix:

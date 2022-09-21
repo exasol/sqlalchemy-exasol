@@ -87,8 +87,7 @@ turbodbc = ["turbodbc"]
 "exa.turbodbc" = "sqlalchemy_exasol.turbodbc:EXADialect_turbodbc"
 
 [tool.pytest.ini_options]
-addopts= "--tb native -v -r fxX"
-python_files= "test/*test_*.py"
+addopts= "--tb native -v -r fxX --log-debug=sqlalchemy.engine --log-debug=sqlalchemy.pool"
 filterwarnings = [
     "error::DeprecationWarning",
     "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",

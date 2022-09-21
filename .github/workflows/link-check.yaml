@@ -37,4 +37,4 @@ jobs:
         run: poetry install --no-root
 
       - name: Check documentation links ${{ matrix.python }} using ${{ matrix.connector }}
-        run: poetry run nox -s "check-links"
+        run: poetry run nox -s check-links

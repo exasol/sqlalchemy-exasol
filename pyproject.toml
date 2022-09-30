@@ -76,7 +76,7 @@ mypy = "^0.971"
 pyupgrade = "^2.37.3"
 scriv = "^0.16.0"
 Sphinx = "^5.1.1"
-furo = "^2022.6.21"
+furo = "^2022.9.29"
 sphinx-copybutton = "^0.5.0"
 
 [tool.poetry.extras]

@@ -75,7 +75,7 @@ pylint = "^2.14.5"
 mypy = "^0.971"
 pyupgrade = "^2.37.3"
 scriv = "^0.16.0"
-Sphinx = "^5.1.1"
+Sphinx = "^5.2.3"
 furo = "^2022.6.21"
 sphinx-copybutton = "^0.5.0"
 

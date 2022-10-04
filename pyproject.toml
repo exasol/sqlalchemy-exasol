@@ -115,9 +115,10 @@ files = [
     'scripts/**/*.py',
     # Incrementaly add files and paths to fix until the entire project is checked
 ]
-mypy_path = [
-    'typeshed'
-]
+
+[[tool.mypy.overrides]]
+module = "pyodbc"
+ignore_missing_imports = true
 
 [tool.scriv]
 new_fragment_template = "file: templates/fragment-template.rst"

@@ -357,11 +357,11 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "mypy"
-version = "0.971"
+version = "0.982"
 description = "Optional static typing for Python"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 mypy-extensions = ">=0.4.3"
@@ -956,7 +956,7 @@ turbodbc = ["turbodbc"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "0ab33eae88008e22369216f90bd731c80f7741d29df42645f86459fd075841df"
+content-hash = "2ba43cfdbbfec086b8864ad381fbea23d50df3bfd43b795b2ff79ca0c4c71538"
 
 [metadata.files]
 alabaster = []

@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-import os
+import argparse
 import sys
 import webbrowser
 from argparse import ArgumentParser
-from contextlib import contextmanager
 from pathlib import Path
 from shutil import rmtree
 from tempfile import TemporaryDirectory
-from textwrap import dedent
 
 PROJECT_ROOT = Path(__file__).parent
 # scripts path also contains administrative code/modules which are used by some nox targets
@@ -17,11 +15,7 @@ DOC = PROJECT_ROOT / "doc"
 DOC_BUILD = DOC / "build"
 sys.path.append(f"{SCRIPTS}")
 
-from typing import (
-    Iterable,
-    Iterator,
-    MutableMapping,
-)
+from typing import Iterator
 
 import nox
 from git import tags
@@ -30,15 +24,19 @@ from links import documentation as _documentation
 from links import urls as _urls
 from nox import Session
 from nox.sessions import SessionRunner
-from pyodbc import (
-    Connection,
-    connect,
+from odbc import (
+    odbcconfig,
+    transaction,
 )
+from pyodbc import connect
 from version_check import (
     version_from_poetry,
     version_from_python_module,
     version_from_string,
 )
+
+# default actions to be run if nothing is explicitly specified with the -s option
+nox.options.sessions = ["fix"]
 
 
 class Settings:
@@ -52,69 +50,12 @@ class Settings:
     DB_VERSIONS = ("7.1.9", "7.0.18")
 
 
-# default actions to be run if nothing is explicitly specified with the -s option
-nox.options.sessions = [
-    f"verify(connector='{Settings.CONNECTORS[0]}', db_version='{Settings.DB_VERSIONS[0]}')"
-]
-
-ODBCINST_INI_TEMPLATE = dedent(
-    """
-    [ODBC]
-    #Trace = yes
-    #TraceFile =~/odbc.trace
-
-    [EXAODBC]
-    #Driver location will be appended in build environment:
-    DRIVER={driver}
-
-    """
-)
-
-
 def find_session_runner(session: Session, name: str) -> SessionRunner:
     """Helper function to find parameterized action by name"""
     for s, _ in session._runner.manifest.list_all_sessions():
         if name in s.signatures:
             return s
     session.error(f"Could not find a nox session by the name {name!r}")
-
-
-def transaction(connection: Connection, sql_statements: Iterable[str]) -> None:
-    cur = connection.cursor()
-    for statement in sql_statements:
-        cur.execute(statement)
-    cur.commit()
-    cur.close()
-
-
-@contextmanager
-def environment(env_vars: dict[str, str]) -> Iterator[MutableMapping[str, str]]:
-    _env = os.environ.copy()
-    os.environ.update(env_vars)
-    yield os.environ
-    os.environ.clear()
-    os.environ.update(_env)
-
-
-@contextmanager
-def temporary_odbc_config(config: str) -> Iterator[Path]:
-    with TemporaryDirectory() as tmp_dir:
-        config_dir = Path(tmp_dir) / "odbcconfig"
-        config_dir.mkdir(exist_ok=True)
-        config_file = config_dir / "odbcinst.ini"
-        with open(config_file, "w") as f:
-            f.write(config)
-        yield config_file
-
-
-@contextmanager
-def odbcconfig() -> Iterator[tuple[Path, MutableMapping[str, str]]]:
-    with temporary_odbc_config(
-        ODBCINST_INI_TEMPLATE.format(driver=Settings.ODBC_DRIVER)
-    ) as cfg:
-        env_vars = {"ODBCSYSINI": f"{cfg.parent.resolve()}"}
-        with environment(env_vars) as env:
-            yield cfg, env
 
 
 def _python_files(path: Path) -> Iterator[Path]:
@@ -126,6 +67,8 @@ def _python_files(path: Path) -> Iterator[Path]:
 
 @nox.session(python=False)
 def fix(session: Session) -> None:
+    """Run all available formatters and code upgrade tools against the code base"""
+
     def apply_pyupgrade_fixes(session: Session) -> None:
         files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
         session.run(
@@ -153,66 +96,8 @@ def fix(session: Session) -> None:
 
 
 @nox.session(python=False)
-def pyupgrade(session: Session) -> None:
-    files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
-    session.run("poetry", "run", "python", "-m", "pyupgrade", "--py38-plus", *files)
-
-
-@nox.session(name="code-format", python=False)
-def code_format(session: Session) -> None:
-    session.run(
-        "poetry",
-        "run",
-        "python",
-        "-m",
-        "black",
-        "--check",
-        "--diff",
-        "--color",
-        f"{PROJECT_ROOT}",
-    )
-
-
-@nox.session(python=False)
-def isort(session: Session) -> None:
-    session.run(
-        "poetry", "run", "python", "-m", "isort", "-v", "--check", f"{PROJECT_ROOT}"
-    )
-
-
-@nox.session(python=False)
-def lint(session: Session) -> None:
-    session.run(
-        "poetry",
-        "run",
-        "python",
-        "-m",
-        "pylint",
-        f'{PROJECT_ROOT / "scripts"}',
-        f'{PROJECT_ROOT / "sqlalchemy_exasol"}',
-    )
-
-
-@nox.session(name="type-check", python=False)
-def type_check(session: Session) -> None:
-    session.run(
-        "poetry",
-        "run",
-        "mypy",
-        "--strict",
-        "--show-error-codes",
-        "--pretty",
-        "--show-column-numbers",
-        "--show-error-context",
-        "--scripts-are-modules",
-    )
-
-
-@nox.session(python=False)
-@nox.parametrize("db_version", Settings.DB_VERSIONS)
-@nox.parametrize("connector", Settings.CONNECTORS)
-def verify(session: Session, connector: str, db_version: str) -> None:
-    """Prepare and run all available tests"""
+def check(session: Session) -> None:
+    """Run all available source code checks against the code base (typecheck, linters, formatters, etc.)"""
 
     def is_version_in_sync() -> bool:
         return (
@@ -230,20 +115,26 @@ def verify(session: Session, connector: str, db_version: str) -> None:
     session.notify("code-format")
     session.notify("type-check")
     session.notify("lint")
-    session.notify("type-check")
-    session.notify(find_session_runner(session, f"db-start(db_version='{db_version}')"))
-    session.notify(
-        find_session_runner(session, f"integration(connector='{connector}')")
-    )
-    session.notify(find_session_runner(session, "db-stop"))
 
 
 @nox.session(name="db-start", python=False)
-@nox.parametrize("db_version", Settings.DB_VERSIONS)
-def start_db(session: Session, db_version: str = Settings.DB_VERSIONS[0]) -> None:
-    """Start the test database"""
+def start_db(session: Session) -> None:
+    """Start a test database. For more details append '-- -h'"""
 
-    def start() -> None:
+    def parser() -> ArgumentParser:
+        p = ArgumentParser(
+            usage="nox -s start-db -- [-h] [--db-version]",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+        p.add_argument(
+            "--db-version",
+            choices=Settings.DB_VERSIONS,
+            default=Settings.DB_VERSIONS[0],
+            help="which will be used",
+        )
+        return p
+
+    def start(db_version: str) -> None:
         # Consider adding ITDE as dev dependency once ITDE is packaged properly
         with session.chdir(Settings.ITDE):
             session.run(
@@ -263,8 +154,9 @@ def start_db(session: Session, db_version: str = Settings.DB_VERSIONS[0]) -> Non
                 external=True,
             )
 
+    # TODO/FIXME: setup to populate in confest.py
     def populate() -> None:
-        with odbcconfig():
+        with odbcconfig(Settings.ODBC_DRIVER):
             settings = {
                 "driver": "EXAODBC",
                 "server": "localhost:8888",
@@ -287,12 +179,13 @@ def start_db(session: Session, db_version: str = Settings.DB_VERSIONS[0]) -> Non
                 connection,
                 (
                     "CREATE SCHEMA TEST_SCHEMA;",
-                    "CREATE SCHEMA TEST_SCHEMA_2;",
+                    # "CREATE SCHEMA TEST_SCHEMA_2;",
                 ),
             )
             connection.close()
 
-    start()
+    args = parser().parse_args(session.posargs)
+    start(args.db_version)
     populate()
 
 
@@ -303,89 +196,148 @@ def stop_db(session: Session) -> None:
     session.run("docker", "kill", "test_container_test", external=True)
 
 
-@nox.session(python=False)
-@nox.parametrize("connector", Settings.CONNECTORS)
-def integration(session: Session, connector: str) -> None:
-    """Run(s) the integration tests for a specific connector. Expects a test database to be available."""
-
-    with odbcconfig() as (config, env):
-        uri = "".join(
-            [
-                "exa+{connector}:",
-                "//sys:exasol@localhost:{db_port}",
-                "/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC&SSLCertificate=SSL_VERIFY_NONE",
-            ]
-        ).format(connector=connector, db_port=Settings.DB_PORT)
-        session.run("pytest", "--dropfirst", "--dburi", uri, external=True, env=env)
-
-
-@nox.session(name="report-skipped", python=False)
-def report_skipped(session: Session) -> None:
+@nox.session(name="sqla-tests", python=False)
+def sqlalchemy_tests(session: Session) -> None:
     """
-    Runs all tests for all supported connectors and creates a csv report of skipped tests for each connector.
+    Run the sqlalchemy integration tests suite. For more details append '-- -h'
 
-    Attention: This task expects a running test database (db-start).
+    Attention:
+
+        Make sure the sqla compliance suite is run in isolation, to avoid side effects from custom tests
+        e.g. because of unintended implicit schema open/closes.
+
+        Expects a running test db
     """
 
-    with TemporaryDirectory() as tmp_dir:
-        for connector in Settings.CONNECTORS:
-            report = Path(tmp_dir) / f"test-report{connector}.json"
-            with odbcconfig() as (config, env):
-                uri = "".join(
-                    [
-                        "exa+{connector}:",
-                        "//sys:exasol@localhost:{db_port}",
-                        "/TEST?CONNECTIONLCALL=en_US.UTF-8&DRIVER=EXAODBC&SSLCertificate=SSL_VERIFY_NONE",
-                    ]
-                ).format(connector=connector, db_port=Settings.DB_PORT)
-                session.run(
-                    "pytest",
-                    "--dropfirst",
-                    "--dburi",
-                    uri,
-                    "--json-report",
-                    f"--json-report-file={report}",
-                    external=True,
-                    env=env,
-                )
+    def parser() -> ArgumentParser:
+        p = ArgumentParser(
+            usage="nox -s sqla-tests -- [-h] [--connector]",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+        p.add_argument(
+            "--connector",
+            choices=Settings.CONNECTORS,
+            default=Settings.CONNECTORS[0],
+            help="which will be used",
+        )
+        return p
 
-                session.run(
-                    "python",
-                    f"{SCRIPTS / 'report.py'}",
-                    "-f",
-                    "csv",
-                    "--output",
-                    f"skipped-tests-{connector}.csv",
-                    f"{connector}",
-                    f"{report}",
-                )
-
-
-@nox.session(name="check-links", python=False)
-def check_links(session: Session) -> None:
-    """Checks weather or not all links in the documentation can be accessed"""
-    errors = []
-    for path, url in _urls(_documentation(PROJECT_ROOT)):
-        status, details = _check(url)
-        if status != 200:
-            errors.append((path, url, status, details))
-
-    if errors:
-        session.error(
-            "\n"
-            + "\n".join(f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors)
+    with odbcconfig(Settings.ODBC_DRIVER) as (config, env):
+        args = parser().parse_args(session.posargs)
+        connector = args.connector
+        session.run(
+            "pytest",
+            "--dropfirst",
+            "--db",
+            f"exasol-{connector}",
+            f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
+            external=True,
+            env=env,
         )
 
 
-@nox.session(name="list-links", python=False)
-def list_links(session: Session) -> None:
-    """List all links within the documentation"""
-    for path, url in _urls(_documentation(PROJECT_ROOT)):
-        session.log(f"Url: {url}, File: {path}")
+@nox.session(name="exasol-tests", python=False)
+def exasol_tests(session: Session) -> None:
+    """Run the integration tests with a specific connector. For more details append '-- -h'"""
+
+    def parser() -> ArgumentParser:
+        p = ArgumentParser(
+            usage="nox -s exasol-tests -- [-h] [--connector]",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+        p.add_argument(
+            "--connector",
+            choices=Settings.CONNECTORS,
+            default=Settings.CONNECTORS[0],
+            help="which will be used",
+        )
+        return p
+
+    with odbcconfig(Settings.ODBC_DRIVER) as (config, env):
+        args = parser().parse_args(session.posargs)
+        connector = args.connector
+        session.run(
+            "pytest",
+            "--dropfirst",
+            "--db",
+            f"exasol-{connector}",
+            f"{PROJECT_ROOT / 'test' / 'integration' / 'exasol'}",
+            external=True,
+            env=env,
+        )
+
+
+@nox.session(name="integration-tests", python=False)
+def integration_tests(session: Session) -> None:
+    """Run integration tests with a specific configuration. For more details append '-- -h'"""
+
+    def parser() -> ArgumentParser:
+        p = ArgumentParser(
+            usage="nox -s integration-tests -- [-h] [--connector] [--db-version]",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+        p.add_argument(
+            "--connector",
+            choices=Settings.CONNECTORS,
+            default=Settings.CONNECTORS[0],
+            help="which will be used",
+        )
+        p.add_argument(
+            "--db-version",
+            choices=Settings.DB_VERSIONS,
+            default=Settings.DB_VERSIONS[0],
+            help="which will be used",
+        )
+        return p
+
+    args = parser().parse_args(session.posargs)
+    session.notify(
+        find_session_runner(session, "db-start"),
+        posargs=["--db-version", f"{args.db_version}"],
+    )
+    session.notify(
+        find_session_runner(session, f"sqla-tests"),
+        posargs=["--connector", f"{args.connector}"],
+    )
+    session.notify(
+        find_session_runner(session, f"exasol-tests"),
+        posargs=["--connector", f"{args.connector}"],
+    )
+    session.notify(find_session_runner(session, "db-stop"))
+
+
+@nox.session(python=False, name="clean-docs")
+def clean(session: Session) -> None:
+    """Remove all documentation artifacts"""
+    if DOC_BUILD.exists():
+        rmtree(DOC_BUILD.resolve())
+        session.log(f"Removed {DOC_BUILD}")
+
+
+@nox.session(python=False, name="build-docs")
+def build(session: Session) -> None:
+    """Build the documentation"""
+    session.run(
+        "sphinx-build", "-b", "html", "-W", f"{DOC}", f"{DOC_BUILD}", external=True
+    )
+
+
+@nox.session(python=False, name="open-docs")
+def open_docs(session: Session) -> None:
+    """Open the documentation in the browser"""
+    index_page = DOC_BUILD / "index.html"
+    if not index_page.exists():
+        session.error(
+            f"File {index_page} does not exist." "Please run `nox -s build-docs` first"
+        )
+
+    webbrowser.open_new_tab(index_page.resolve().as_uri())
 
 
 @nox.session(python=False)
 def release(session: Session) -> None:
+    """Release a sqlalchemy-exasol package. For more details append '-- -h'"""
+
     def create_parser() -> ArgumentParser:
         p = ArgumentParser(
             "Release a pypi package",
@@ -423,29 +375,119 @@ def release(session: Session) -> None:
     )
 
 
-@nox.session(python=False, name="clean-docs")
-def clean(session: Session) -> None:
-    """Remove all documentation artifacts"""
-    if DOC_BUILD.exists():
-        rmtree(DOC_BUILD.resolve())
-        session.log(f"Removed {DOC_BUILD}")
+@nox.session(python=False)
+def pyupgrade(session: Session) -> None:
+    """Run pyupgrade against the code base"""
+    files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
+    session.run("poetry", "run", "python", "-m", "pyupgrade", "--py38-plus", *files)
 
 
-@nox.session(python=False, name="build-docs")
-def build(session: Session) -> None:
-    """Build the documentation"""
+@nox.session(name="code-format", python=False)
+def code_format(session: Session) -> None:
+    """Run the code formatter against the codebase"""
     session.run(
-        "sphinx-build", "-b", "html", "-W", f"{DOC}", f"{DOC_BUILD}", external=True
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "black",
+        "--check",
+        "--diff",
+        "--color",
+        f"{PROJECT_ROOT}",
     )
 
 
-@nox.session(python=False, name="open-docs")
-def open_docs(session: Session) -> None:
-    """Open the documentation in the browser"""
-    index_page = DOC_BUILD / "index.html"
-    if not index_page.exists():
+@nox.session(python=False)
+def isort(session: Session) -> None:
+    """Run isort against the codebase"""
+    session.run(
+        "poetry", "run", "python", "-m", "isort", "-v", "--check", f"{PROJECT_ROOT}"
+    )
+
+
+@nox.session(python=False)
+def lint(session: Session) -> None:
+    """Run the linter against the codebase"""
+    session.run(
+        "poetry",
+        "run",
+        "python",
+        "-m",
+        "pylint",
+        f'{PROJECT_ROOT / "scripts"}',
+        f'{PROJECT_ROOT / "sqlalchemy_exasol"}',
+    )
+
+
+@nox.session(name="type-check", python=False)
+def type_check(session: Session) -> None:
+    """Run the type checker against the codebase"""
+    session.run(
+        "poetry",
+        "run",
+        "mypy",
+        "--strict",
+        "--show-error-codes",
+        "--pretty",
+        "--show-column-numbers",
+        "--show-error-context",
+        "--scripts-are-modules",
+    )
+
+
+@nox.session(name="report-skipped", python=False)
+def report_skipped(session: Session) -> None:
+    """
+    Runs all tests for all supported connectors and creates a csv report of skipped tests for each connector.
+
+    Attention: This task expects a running test database (db-start).
+    """
+    with TemporaryDirectory() as tmp_dir:
+        for connector in Settings.CONNECTORS:
+            report = Path(tmp_dir) / f"test-report{connector}.json"
+            with odbcconfig(Settings.ODBC_DRIVER) as (config, env):
+                session.run(
+                    "pytest",
+                    "--dropfirst",
+                    "--db",
+                    f"exasol-{connector}",
+                    f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
+                    "--json-report",
+                    f"--json-report-file={report}",
+                    external=True,
+                    env=env,
+                )
+                session.run(
+                    "python",
+                    f"{SCRIPTS / 'report.py'}",
+                    "-f",
+                    "csv",
+                    "--output",
+                    f"skipped-tests-{connector}.csv",
+                    f"{connector}",
+                    f"{report}",
+                )
+
+
+@nox.session(name="check-links", python=False)
+def check_links(session: Session) -> None:
+    """Checks weather or not all links in the documentation can be accessed"""
+    errors = []
+    for path, url in _urls(_documentation(PROJECT_ROOT)):
+        status, details = _check(url)
+        if status != 200:
+            errors.append((path, url, status, details))
+
+    if errors:
         session.error(
-            f"File {index_page} does not exist." "Please run `nox -s build-docs` first"
+            "\n"
+            + "\n".join(f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors)
         )
 
-    webbrowser.open_new_tab(index_page.resolve().as_uri())
+
+@nox.session(name="list-links", python=False)
+def list_links(session: Session) -> None:
+    """List all links within the documentation"""
+    for path, url in _urls(_documentation(PROJECT_ROOT)):
+        session.log(f"Url: {url}, File: {path}")

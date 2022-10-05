@@ -25,6 +25,7 @@ logger = logging.getLogger("sqlalchemy_exasol")
 
 
 class EXADialect_pyodbc(EXADialect, PyODBCConnector):
+    supports_statement_cache = False
     execution_ctx_cls = EXAExecutionContext
 
     driver_version = None

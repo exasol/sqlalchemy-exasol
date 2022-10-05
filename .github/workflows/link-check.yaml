@@ -31,10 +31,10 @@ jobs:
       - name: Install poetry
         uses: abatilo/actions-poetry@v2.1.5
         with:
-          poetry-version: 1.1.13
+          poetry-version: 1.2.1
 
       - name: Install python project dependencies
         run: poetry install --no-root
 
       - name: Check documentation links ${{ matrix.python }} using ${{ matrix.connector }}
-        run: poetry run nox -s "check-links"
+        run: poetry run nox -s check-links

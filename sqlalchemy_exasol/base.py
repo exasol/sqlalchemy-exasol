@@ -731,7 +731,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         def _get_schema(sql_compiler, dialect):
             """Get the schema while taking the translation-map and the de-normalization into account"""
             translate_map = sql_compiler.schema_translate_map
-            schema_dispatcher = translate_map.map_ if translate_map else {}
+            schema_dispatcher = translate_map if translate_map else {}
             schema = sql_compiler.statement.table.schema
             schema = (
                 schema_dispatcher[schema] if schema in schema_dispatcher else schema
@@ -762,48 +762,52 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         Note: Parameter replacement is done for server versions < 4.1.8 or
               in case a delete query is executed.
         """
-        if self.isdelete or self.root_connection.dialect.server_version_info < (
-            4,
-            1,
-            8,
-        ):
-            db_query = self.unicode_statement
-            for i in range(1, len(self.parameters)):
-                db_query += ", (" + ", ".join(["?"] * len(self.parameters[i])) + ")"
-            for db_para in self.parameters:
-                for value in db_para:
-                    ident = "?"
-                    if value is None:
-                        db_query = db_query.replace(ident, "NULL", 1)
-                    elif isinstance(value, int):
-                        db_query = db_query.replace(ident, str(value), 1)
-                    elif isinstance(value, (float, Decimal)):
-                        db_query = db_query.replace(ident, str(float(value)), 1)
-                    elif isinstance(value, bool):
-                        db_query = db_query.replace(ident, "1" if value else "0", 1)
-                    elif isinstance(value, datetime):
-                        db_query = db_query.replace(
-                            ident,
-                            "to_timestamp('%s', 'YYYY-MM-DD HH24:MI:SS.FF6')"
-                            % value.strftime("%Y-%m-%d %H:%M:%S.%f"),
-                            1,
-                        )
-                    elif isinstance(value, date):
-                        db_query = db_query.replace(
-                            ident,
-                            "to_date('%s', 'YYYY-MM-DD')" % value.strftime("%Y-%m-%d"),
-                            1,
-                        )
-                    elif isinstance(value, bytes):
-                        db_query = db_query.replace(
-                            ident, "'%s'" % value.decode("UTF-8"), 1
-                        )
-                    elif isinstance(value, str):
-                        db_query = db_query.replace(ident, "'%s'" % value, 1)
-                    else:
-                        raise TypeError("Data type not supported: %s" % type(value))
-            self.statement = db_query
-            self.parameters = [[]]
+        server_version = self.root_connection.dialect.server_version_info
+        # FIXME: drop exasol verison support < 4.1.0
+        # see https://github.com/exasol/sqlalchemy-exasol/pull/191#discussion_r942595818
+        skip_pre_exec = (
+            not self.isdelete and server_version is None or server_version >= (4, 1, 8)
+        )
+        if skip_pre_exec:
+            return
+
+        db_query = self.unicode_statement
+        for i in range(1, len(self.parameters)):
+            db_query += ", (" + ", ".join(["?"] * len(self.parameters[i])) + ")"
+        for db_para in self.parameters:
+            for value in db_para:
+                ident = "?"
+                if value is None:
+                    db_query = db_query.replace(ident, "NULL", 1)
+                elif isinstance(value, int):
+                    db_query = db_query.replace(ident, str(value), 1)
+                elif isinstance(value, (float, Decimal)):
+                    db_query = db_query.replace(ident, str(float(value)), 1)
+                elif isinstance(value, bool):
+                    db_query = db_query.replace(ident, "1" if value else "0", 1)
+                elif isinstance(value, datetime):
+                    db_query = db_query.replace(
+                        ident,
+                        "to_timestamp('%s', 'YYYY-MM-DD HH24:MI:SS.FF6')"
+                        % value.strftime("%Y-%m-%d %H:%M:%S.%f"),
+                        1,
+                    )
+                elif isinstance(value, date):
+                    db_query = db_query.replace(
+                        ident,
+                        "to_date('%s', 'YYYY-MM-DD')" % value.strftime("%Y-%m-%d"),
+                        1,
+                    )
+                elif isinstance(value, bytes):
+                    db_query = db_query.replace(
+                        ident, "'%s'" % value.decode("UTF-8"), 1
+                    )
+                elif isinstance(value, str):
+                    db_query = db_query.replace(ident, "'%s'" % value, 1)
+                else:
+                    raise TypeError("Data type not supported: %s" % type(value))
+        self.statement = db_query
+        self.parameters = [[]]
 
     def should_autocommit_text(self, statement):
         return AUTOCOMMIT_REGEXP.match(statement)

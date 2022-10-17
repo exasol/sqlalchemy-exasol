@@ -2,7 +2,10 @@
 from inspect import cleandoc
 
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import (
+    create_engine,
+    testing,
+)
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest

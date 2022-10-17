@@ -6,15 +6,36 @@ from sqlalchemy import (
     create_engine,
     testing,
 )
+from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
+from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
+
+
+class ComponentReflectionTest(_ComponentReflectionTest):
+    @pytest.mark.skip(reason="EXASOL has no explicit indexes")
+    def test_get_indexes(self, connection, use_schema):
+        super().test_get_indexes()
+
+
+class HasIndexTest(_HasIndexTest):
+    RATIONAL = """EXASOL does not support no explicit indexes"""
+
+    @pytest.mark.skip(reason=RATIONAL)
+    def test_has_index(self):
+        super().test_has_index()
+
+    @pytest.mark.skip(reason=RATIONAL)
+    @testing.requires.schemas
+    def test_has_index_schema(self):
+        super().test_has_index_schema()
 
 
 class LongNameBlowoutTest(_LongNameBlowoutTest):

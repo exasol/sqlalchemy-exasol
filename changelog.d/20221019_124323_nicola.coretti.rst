@@ -1,0 +1,40 @@
+.. A new scriv changelog fragment.
+..
+.. Uncomment the header that is right (remove the leading dots).
+..
+.. 🗑️ Removed
+.. ----------
+..
+.. - A bullet item for the Removed category.
+..
+.. ✨ Added
+.. ---------
+..
+.. - A bullet item for the Added category.
+..
+.. 🔧 Changed
+.. -----------
+..
+.. - A bullet item for the Changed category.
+..
+.. 🚧 Deprecated
+.. --------------
+..
+.. - A bullet item for the Deprecated category.
+..
+.. 🐞 Fixed
+.. ---------
+..
+.. - A bullet item for the Fixed category.
+..
+🔐 Security
+-----------
+- Evaluated CVE-2022-42969
+     - CVE will be silienced
+     - The affected code is not used used by our project itself, nor by the dependencies pulling in the vulnerable library.
+        Checked dependencies:
+        * Nox (Code search)
+        * Pytest (Code search + `Tracking-Issue <https://github.com/pytest-dev/pytest/issues/10392>`_
+..
+.. - A bullet item for the Security category.
+..

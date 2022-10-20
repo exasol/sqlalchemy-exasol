@@ -178,8 +178,9 @@ def start_db(session: Session) -> None:
             transaction(
                 connection,
                 (
-                    "CREATE SCHEMA TEST_SCHEMA;",
-                    # "CREATE SCHEMA TEST_SCHEMA_2;",
+                    "CREATE SCHEMA IF NOT EXISTS TEST",
+                    "CREATE SCHEMA IF NOT EXISTS TEST_SCHEMA;",
+                    "CREATE SCHEMA IF NOT EXISTS TEST_SCHEMA_2;",
                 ),
             )
             connection.close()

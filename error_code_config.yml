@@ -1,0 +1,3 @@
+error-tags:
+  SQLA:
+    highest-index: 0

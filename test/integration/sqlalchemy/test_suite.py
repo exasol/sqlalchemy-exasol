@@ -132,7 +132,6 @@ class NumericTest(_NumericTest):
 
 
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):
-
     RATIONAL = cleandoc(
         """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
         issues in other dialects related to object names that contain quotes

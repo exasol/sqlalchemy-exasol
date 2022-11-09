@@ -8,6 +8,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
+from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
@@ -17,6 +18,28 @@ from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
+
+
+class DifficultParametersTest(_DifficultParametersTest):
+    @pytest.mark.xfail(reason="https://github.com/exasol/sqlalchemy-exasol/issues/232")
+    @testing.combinations(
+        ("boring",),
+        ("per cent",),
+        ("per % cent",),
+        ("%percent",),
+        ("par(ens)",),
+        ("percent%(ens)yah",),
+        ("col:ons",),
+        ("more :: %colons%",),
+        ("/slashes/",),
+        ("more/slashes",),
+        ("q?marks",),
+        ("1param",),
+        ("1col:on",),
+        argnames="name",
+    )
+    def test_round_trip(self, name, connection, metadata):
+        super().test_round_trip(name, connection, metadata)
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):

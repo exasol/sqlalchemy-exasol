@@ -319,7 +319,14 @@ def clean(session: Session) -> None:
 def build(session: Session) -> None:
     """Build the documentation"""
     session.run(
-        "sphinx-build", "-b", "html", "-W", f"{DOC}", f"{DOC_BUILD}", external=True
+        "poetry",
+        "run" "sphinx-build",
+        "-b",
+        "html",
+        "-W",
+        f"{DOC}",
+        f"{DOC_BUILD}",
+        external=True,
     )
 
 

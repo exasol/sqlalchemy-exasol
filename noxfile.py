@@ -320,7 +320,8 @@ def build(session: Session) -> None:
     """Build the documentation"""
     session.run(
         "poetry",
-        "run" "sphinx-build",
+        "run",
+        "sphinx-build",
         "-b",
         "html",
         "-W",

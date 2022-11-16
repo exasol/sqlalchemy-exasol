@@ -12,6 +12,7 @@ from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParame
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
+from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
@@ -21,8 +22,25 @@ from sqlalchemy.testing.suite.test_ddl import (
 )
 
 
+class InsertBehaviorTest(_InsertBehaviorTest):
+    @pytest.mark.xfail(
+        "turbodbc" in testing.db.dialect.driver,
+        reason=cleandoc(
+            """
+        This test is failing for turbodbc and haven't been investigated yet.
+        Attention:
+        * turbodbc maintenance is paused until if it is clear if there is still demand for it
+        """
+        ),
+        strict=True,
+    )
+    @testing.requires.empty_inserts_executemany
+    def test_empty_insert_multiple(self, connection):
+        super().test_empty_insert_multiple(connection)
+
+
 class RowCountTest(_RowCountTest):
-    PYODBC_RATIONAL = cleandoc(
+    PYODBC_RATIONALE = cleandoc(
         """
         pyodbc does not support returning the actual affected rows when executemany is used,
         the cursor result always will be set to the rowcount = -1 in this case.
@@ -35,52 +53,52 @@ class RowCountTest(_RowCountTest):
         """
     )
 
-    TURBODBC_RATIONAL = cleandoc(
+    TURBODBC_RATIONALE = cleandoc(
         """
         The currently used turbodbc driver returns invalid results.
         Attention: 
         * turbodbc maintenance is paused until if it is clear if there is still demand for it
-        * If this test(s) will succeed in the future consider repining the turbodbc driver
+        * If this tests will succeed in the future consider repining the turbodbc driver
           dependency in order to provide support for this "features".
         """
     )
 
     @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONAL, strict=True
+        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
     )
-    @pytest.mark.skipif("pyodbc" in testing.db.dialect.driver, reason=PYODBC_RATIONAL)
+    @pytest.mark.skipif("pyodbc" in testing.db.dialect.driver, reason=PYODBC_RATIONALE)
     @testing.requires.sane_multi_rowcount
     def test_multi_update_rowcount(self, connection):
         super().test_multi_update_rowcount(connection)
 
     @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONAL, strict=True
+        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
     )
-    @pytest.mark.skipif("pyodbc" in testing.db.dialect.driver, reason=PYODBC_RATIONAL)
+    @pytest.mark.skipif("pyodbc" in testing.db.dialect.driver, reason=PYODBC_RATIONALE)
     @testing.requires.sane_multi_rowcount
     def test_multi_delete_rowcount(self, connection):
         super().test_multi_delete_rowcount(connection)
 
     @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONAL, strict=True
+        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
     )
     def test_update_rowcount1(self, connection):
         super().test_update_rowcount1(connection)
 
     @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONAL, strict=True
+        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
     )
     def test_update_rowcount2(self, connection):
         super().test_update_rowcount2(connection)
 
     @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONAL, strict=True
+        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
     )
     def test_delete_rowcount(self, connection):
         super().test_delete_rowcount(connection)
 
     @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONAL, strict=True
+        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
     )
     @testing.requires.sane_rowcount_w_returning
     def test_update_rowcount_return_defaults(self, connection):

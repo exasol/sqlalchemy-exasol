@@ -12,6 +12,7 @@ from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParame
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
+from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
@@ -20,6 +21,31 @@ from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
+
+
+class HasTableTest(_HasTableTest):
+    RATIONALE = cleandoc(
+        """
+    The Exasol dialect does not check against views for `has_table`, see also `Inspector.has_table()`.
+    
+    This behaviour is subject to change with sqlalchemy 2.0.
+    See also:
+    * https://github.com/sqlalchemy/sqlalchemy/blob/3fc6c40ea77c971d3067dab0fdf57a5b5313b69b/lib/sqlalchemy/engine/reflection.py#L415
+    * https://github.com/sqlalchemy/sqlalchemy/discussions/8678
+    * https://github.com/sqlalchemy/sqlalchemy/commit/f710836488162518dcf2dc1006d90ecd77a2a178
+    """
+    )
+
+    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @testing.requires.views
+    def test_has_table_view(self, connection):
+        super().test_has_table_view(connection)
+
+    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @testing.requires.views
+    @testing.requires.schemas
+    def test_has_table_view_schema(self, connection):
+        super().test_has_table_view_schema(connection)
 
 
 class InsertBehaviorTest(_InsertBehaviorTest):

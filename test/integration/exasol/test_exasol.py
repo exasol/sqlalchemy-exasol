@@ -1,5 +1,6 @@
 import datetime
 
+import pytest
 from sqlalchemy import (
     Column,
     Date,
@@ -29,6 +30,7 @@ from sqlalchemy_exasol.merge import merge
 from sqlalchemy_exasol.util import raw_sql
 
 
+@pytest.mark.skip
 class MergeTest(fixtures.TablesTest):
 
     __backend__ = True

@@ -178,8 +178,9 @@ def start_db(session: Session) -> None:
             transaction(
                 connection,
                 (
-                    "CREATE SCHEMA TEST_SCHEMA;",
-                    # "CREATE SCHEMA TEST_SCHEMA_2;",
+                    "CREATE SCHEMA IF NOT EXISTS TEST",
+                    "CREATE SCHEMA IF NOT EXISTS TEST_SCHEMA;",
+                    "CREATE SCHEMA IF NOT EXISTS TEST_SCHEMA_2;",
                 ),
             )
             connection.close()
@@ -318,7 +319,15 @@ def clean(session: Session) -> None:
 def build(session: Session) -> None:
     """Build the documentation"""
     session.run(
-        "sphinx-build", "-b", "html", "-W", f"{DOC}", f"{DOC_BUILD}", external=True
+        "poetry",
+        "run",
+        "sphinx-build",
+        "-b",
+        "html",
+        "-W",
+        f"{DOC}",
+        f"{DOC_BUILD}",
+        external=True,
     )
 
 

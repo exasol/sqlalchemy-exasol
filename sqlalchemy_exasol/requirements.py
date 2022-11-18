@@ -228,3 +228,17 @@ class Requirements(SuiteRequirements):
                 True, """A binary type is not natively supported by the EXASOL DB"""
             )
         )
+
+    @property
+    def sql_expression_limit_offset(self):
+        """
+        This feature roughly expects the following query types to be available:
+
+        - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <expr>;
+        - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <expr> OFFSET <expr>;
+        - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <expr> OFFSET <literal/value>;
+        - SELECT * FROM <table> ORDER BY <col> ASC OFFSET <expr>;
+              Exasol -> SELECT * FROM <table> ORDER BY <col> ASC LIMIT <offset>, <count>;
+        - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <count> OFFSET <expr>;
+        """
+        return skip_if(BooleanPredicate(True, """Not Implemented Yet"""))

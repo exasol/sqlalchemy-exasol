@@ -1,0 +1,8 @@
+sqla requirement,test case,supported by exasol db,supported by exasol sqla dialect,test status,comment
+sql_expression_limit_offset,FetchLimitOffsetTest*.test_expr_limit,yes,no,skipped,not implemented
+sql_expression_limit_offset,FetchLimitOffsetTest*.test_expr_limit_offset,yes,no,skipped,not implemented
+sql_expression_limit_offset,FetchLimitOffsetTest*.test_expr_limit_simple_offset,yes,no,skipped,not implemented
+sql_expression_limit_offset,FetchLimitOffsetTest*.test_expr_offset,partially,no,skipped,not implemented
+sql_expression_limit_offset,FetchLimitOffsetTest*.test_simple_limit_expr_offset,yes,no,skipped,not implemented
+,HasIndexTest*.*,no,no,skipped,not supported
+,ComponentReflectionTest*.test_get_indexes*,no,no,skipped,not supported

@@ -957,8 +957,10 @@ class EXADialect(default.DefaultDialect):
 
         result = connection.execute(
             sql.text(sql_statement),
-            table_name=self.denormalize_name(table_name),
-            schema=self.denormalize_name(schema),
+            {
+                "table_name": self.denormalize_name(table_name),
+                "schema": self.denormalize_name(schema),
+            },
         )
         row = result.fetchone()
         return row is not None

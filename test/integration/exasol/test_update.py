@@ -14,46 +14,58 @@ from sqlalchemy.testing.schema import (
 class _UpdateTestBase:
     @classmethod
     def define_tables(cls, metadata):
+        cls.schema = "TEST"
         Table(
             "mytable",
             metadata,
             Column("myid", Integer),
             Column("name", String(30)),
             Column("description", String(50)),
+            schema=cls.schema,
         )
         Table(
             "myothertable",
             metadata,
             Column("otherid", Integer),
             Column("othername", String(30)),
+            schema=cls.schema,
         )
-        Table(
+        users = Table(
             "users",
             metadata,
             Column("id", Integer, primary_key=True, test_needs_autoincrement=True),
             Column("name", String(30), nullable=False),
+            schema=cls.schema,
         )
-        Table(
+        addresses = Table(
             "addresses",
             metadata,
             Column("id", Integer, primary_key=True, test_needs_autoincrement=True),
-            Column("user_id", None, ForeignKey("users.id")),
+            Column("user_id", None, ForeignKey(users.c.id)),
             Column("name", String(30), nullable=False),
             Column("email_address", String(50), nullable=False),
+            schema=cls.schema,
         )
         Table(
             "dingalings",
             metadata,
             Column("id", Integer, primary_key=True, test_needs_autoincrement=True),
-            Column("address_id", None, ForeignKey("addresses.id")),
+            Column("address_id", None, ForeignKey(addresses.c.id)),
             Column("data", String(30)),
+            schema=cls.schema,
         )
 
     @classmethod
     def fixtures(cls):
-        return dict(
-            users=(("id", "name"), (7, "jack"), (8, "ed"), (9, "fred"), (10, "chuck")),
-            addresses=(
+        return {
+            f"{cls.schema}.users": (
+                ("id", "name"),
+                (7, "jack"),
+                (8, "ed"),
+                (9, "fred"),
+                (10, "chuck"),
+            ),
+            f"{cls.schema}.addresses": (
                 ("id", "user_id", "name", "email_address"),
                 (1, 7, "x", "jack@bean.com"),
                 (2, 8, "x", "ed@wood.com"),
@@ -61,12 +73,12 @@ class _UpdateTestBase:
                 (4, 8, "x", "ed@lala.com"),
                 (5, 9, "x", "fred@fred.com"),
             ),
-            dingalings=(
+            f"{cls.schema}.dingalings": (
                 ("id", "address_id", "data"),
                 (1, 2, "ding 1/2"),
                 (2, 5, "ding 2/5"),
             ),
-        )
+        }
 
 
 @pytest.mark.skipif(
@@ -77,7 +89,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
 
     def test_update_simple(self):
         """test simple update and assert that exasol returns the right rowcount"""
-        users = self.tables.users
+        users = self.tables[f"{self.schema}.users"]
         result = testing.db.execute(
             users.update().values(name="peter").where(users.c.id == 10)
         )
@@ -87,7 +99,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
 
     def test_update_simple_multiple_rows_rowcount(self):
         """test simple update and assert that exasol returns the right rowcount"""
-        users = self.tables.users
+        users = self.tables[f"{self.schema}.users"]
         result = testing.db.execute(
             users.update().values(name="peter").where(users.c.id >= 9)
         )
@@ -98,7 +110,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
     def test_update_executemany(self):
         """test that update with executemany work as well, but rowcount
         is undefined for executemany updates"""
-        users = self.tables.users
+        users = self.tables[f"{self.schema}.users"]
 
         stmt = (
             users.update()

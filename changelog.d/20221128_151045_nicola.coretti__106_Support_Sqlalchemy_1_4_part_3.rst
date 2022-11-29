@@ -6,6 +6,7 @@
 ----------
 
 * Removed custom merge statement
+  (If we will be notified, that someone users depend on this feature, we are open to add it again.)
 ..
 .. - A bullet item for the Removed category.
 ..

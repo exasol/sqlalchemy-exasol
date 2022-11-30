@@ -9,9 +9,9 @@ on:
 
 jobs:
 
-  build_docs:
+  docs:
     runs-on: ubuntu-latest
-    name: build_docs
+    name: Build Documentation
 
     steps:
       - name: Checkout
@@ -32,9 +32,42 @@ jobs:
         run: |
           poetry run python -m nox -s build-docs
 
-  run_tests:
+  checks:
     runs-on: ubuntu-latest
-    needs: build_docs
+    name: Project Checks (Python-${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        python:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+    steps:
+      - name: Fetch sqlalchemy_exasol code from repository
+        uses: actions/checkout@v3
+
+      - name: Install via apt
+        run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
+
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2.1.5
+        with:
+          poetry-version: 1.2.1
+
+      - name: Install python project dependencies
+        run: poetry install
+
+      - name: Project Checks (Python-${{ matrix.python }})
+        run: poetry run nox -s check
+
+  tests:
+    runs-on: ubuntu-latest
+    needs: [docs, checks]
     strategy:
       fail-fast: false
       matrix:
@@ -49,79 +82,74 @@ jobs:
           - 7.1.9
           - 7.0.18
 
-    name: Run Tests (Python-${{ matrix.python }}, Connector-${{ matrix.connector }}, Exasol-${{ matrix.exasol_version }})
+    name: Integration Tests (Python-${{ matrix.python }}, Connector-${{ matrix.connector }}, Exasol-${{ matrix.exasol_version }})
 
     steps:
 
-    - name: Fetch sqlalchemy_exasol code from repository
-      uses: actions/checkout@v3
+      - name: Fetch sqlalchemy_exasol code from repository
+        uses: actions/checkout@v3
 
-    - name: Setup integration-test-docker-environment
-      uses: actions/setup-python@v4
+      - name: Install via apt
+        run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
 
-    - name: Install via apt
-      run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
 
-    - name: Setup Python ${{ matrix.python }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2.1.5
+        with:
+          poetry-version: 1.2.1
 
-    - name: Install poetry
-      uses: abatilo/actions-poetry@v2.1.5
-      with:
-        poetry-version: 1.1.13
+      - name: Install python project dependencies
+        run: poetry install
 
-    - name: Install python project dependencies
-      run: poetry install
+      - name: Install python project dependencies including trubodbc
+        run: poetry install --extras "turbodbc"
+        if: ${{ matrix.connector == 'turbodbc' }}
 
-    - name: Install python project dependencies including trubodbc
-      run: poetry install --extras "turbodbc"
-      if: ${{ matrix.connector == 'turbodbc' }}
+      - name: Checkout test environment
+        run: git clone --depth 1 --branch ${ITDE_TAG} ${ITDE_URL}
+        working-directory: ..
+        env:
+          ITDE_URL: "https://github.com/exasol/integration-test-docker-environment.git"
+          ITDE_TAG: "0.11.0"
 
-    - name: Checkout test environment
-      run: git clone --depth 1 --branch ${ITDE_TAG} ${ITDE_URL}
-      working-directory: ..
-      env:
-        ITDE_URL: "https://github.com/exasol/integration-test-docker-environment.git"
-        ITDE_TAG: "0.11.0"
-
-    - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-      run: poetry run nox -s "verify(connector='${{ matrix.connector }}', db_version='${{ matrix.exasol_version }}')"
+      - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
+        run: poetry run nox -s integration-tests -- -- --connector ${{ matrix.connector }} --db-version ${{ matrix.exasol_version }}
 
   upload_to_pypi:
     runs-on: ubuntu-latest
-    needs: run_tests
+    needs: tests
+    name: Build & Upload Package [PYPI]
     if: startsWith(github.event.ref, 'refs/tags')
     strategy:
       matrix:
-        python: [3.8]
-
-    name: Build & Upload Package [PYPI]
+        python: [ 3.8 ]
 
     steps:
+      - name: Fetch sqlalchemy_exasol code from repository
+        uses: actions/checkout@v3
 
-    - name: Fetch sqlalchemy_exasol code from repository
-      uses: actions/checkout@v3
+      - name: Fetch all tags
+        run: git fetch origin +refs/tags/*:refs/tags/*
 
-    - name: Fetch all tags
-      run: git fetch origin +refs/tags/*:refs/tags/*
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
 
-    - name: Setup Python ${{ matrix.python }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2.1.5
+        with:
+          poetry-version: 1.2.1
 
-    - name: Install poetry
-      uses: abatilo/actions-poetry@v2.1.5
-      with:
-        poetry-version: 1.1.13
+      - name: Install python project dependencies
+        run: poetry install
 
-    - name: Install python project dependencies
-      run: poetry install
-
-    - name: Build and push package to PYPI
-      env:
-        POETRY_HTTP_BASIC_PYPI_USERNAME: "__token__"
-        POETRY_HTTP_BASIC_PYPI_PASSWORD: "${{ secrets.pypi_token }}"
-      run: poetry run nox -s release
+      - name: Build and push package to PYPI
+        env:
+          POETRY_HTTP_BASIC_PYPI_USERNAME: "__token__"
+          POETRY_HTTP_BASIC_PYPI_PASSWORD: "${{ secrets.pypi_token }}"
+        run: poetry run nox -s release

@@ -23,12 +23,12 @@ jobs:
       - name: Install Dependencies
         run: |
           poetry install
-      - name: Build Documentations
+      - name: Build Documentation
         run: |
           poetry run python -m nox -s build-docs
           touch doc/build/.nojekyll
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4.3.0
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
           folder: ./doc/build

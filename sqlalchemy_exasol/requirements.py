@@ -198,3 +198,47 @@ class Requirements(SuiteRequirements):
         WHERE clause, in situations where it has to be typed.
         """
         return exclusions.closed()
+
+    @property
+    def binary_literals(self):
+        """target backend supports simple binary literals, e.g. an
+        expression like::
+
+            SELECT CAST('foo' AS BINARY)
+
+        Where ``BINARY`` is the type emitted from :class:`.LargeBinary`,
+        e.g. it could be ``BLOB`` or similar.
+
+        Basically fails on Oracle.
+
+        """
+        return skip_if(
+            BooleanPredicate(
+                True, """A binary type is not natively supported by the EXASOL DB"""
+            )
+        )
+
+    @property
+    def binary_comparisons(self):
+        """target database/driver can allow BLOB/BINARY fields to be compared
+        against a bound parameter value.
+        """
+        return skip_if(
+            BooleanPredicate(
+                True, """A binary type is not natively supported by the EXASOL DB"""
+            )
+        )
+
+    @property
+    def sql_expression_limit_offset(self):
+        """
+        This feature roughly expects the following query types to be available:
+
+        - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <expr>;
+        - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <expr> OFFSET <expr>;
+        - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <expr> OFFSET <literal/value>;
+        - SELECT * FROM <table> ORDER BY <col> ASC OFFSET <expr>;
+              Exasol -> SELECT * FROM <table> ORDER BY <col> ASC LIMIT <offset>, <count>;
+        - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <count> OFFSET <expr>;
+        """
+        return skip_if(BooleanPredicate(True, """Not Implemented Yet"""))

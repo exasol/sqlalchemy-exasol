@@ -25,6 +25,7 @@ logger = logging.getLogger("sqlalchemy_exasol")
 
 
 class EXADialect_pyodbc(EXADialect, PyODBCConnector):
+    supports_statement_cache = False
     execution_ctx_cls = EXAExecutionContext
 
     driver_version = None
@@ -178,11 +179,15 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             logger.warning("Using sql fallback instead of odbc functions")
         return is_fallback_requested
 
+    @staticmethod
+    def _dbapi_connection(connection):
+        return connection.connection.driver_connection
+
     @reflection.cache
     def _tables_for_schema(self, connection, schema, table_type=None, table_name=None):
         schema = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
-        conn = connection.engine.raw_connection()
+        conn = self._dbapi_connection(connection)
         with conn.cursor().tables(
             schema=schema, tableType=table_type, table=table_name
         ) as table_cursor:
@@ -272,7 +277,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         if self._is_sql_fallback_requested(**kw):
             return super()._get_pk_constraint(connection, table_name, schema, **kw)
 
-        conn = connection.engine.raw_connection()
+        conn = self._dbapi_connection(connection)
         schema = self._get_schema_for_input_or_current(connection, schema)
         table_name = self.denormalize_name(table_name)
         with conn.cursor().primaryKeys(table=table_name, schema=schema) as cursor:

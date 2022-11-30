@@ -51,7 +51,7 @@ def _create_parser() -> ArgumentParser:
     parser.add_argument("test_results")
     parser.add_argument("-o", "--output", type=FileType("w"), default="-")
     parser.add_argument("-f", "--format", choices=["human", "csv"], default="csv")
-    parser.add_argument("--debug", type=bool, action="store_true", default=False)
+    parser.add_argument("--debug", action="store_true", default=False)
     return parser
 
 

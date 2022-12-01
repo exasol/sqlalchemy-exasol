@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "sqlalchemy_exasol"
-version = "3.2.3"
+version = "4.0.0"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
 authors = [
@@ -40,16 +40,20 @@ keywords = [
     "data science",
     "database",
 ]
-repository = "https://github.com/exasol/sqlalchemy-exasol"
-homepage = "https://www.exasol.com/"
-documentation = "https://exasol.github.io/sqlalchemy-exasol/"
-
 include = [
     "README.rst",
-    "CHANGES.md",
+    "CHANGELOG.rst",
     "LICENSE",
 ]
 exclude = []
+
+[tool.poetry.urls]
+"Homepage" = "https://www.exasol.com/"
+"Documentation" = "https://exasol.github.io/sqlalchemy-exasol/"
+"Source" = "https://github.com/exasol/sqlalchemy-exasol"
+"Issues" = "https://github.com/exasol/sqlalchemy-exasol/issues"
+"Changelog" = "https://exasol.github.io/sqlalchemy-exasol/changelog.html"
+"Github" = "https://github.com/exasol/sqlalchemy-exasol"
 
 
 [tool.poetry.dependencies]
@@ -57,7 +61,7 @@ python = ">=3.8,<4.0"
 SQLAlchemy = ">=1.4"
 pyodbc = ">=4.0.34"
 packaging = "^21.3"
-turbodbc = {version = ">=4.5.4", optional = true}
+turbodbc = { version = ">=4.5.4", optional = true }
 
 [tool.poetry.dev-dependencies]
 nox = ">=2022.1.7"
@@ -86,7 +90,7 @@ turbodbc = ["turbodbc"]
 "exa.turbodbc" = "sqlalchemy_exasol.turbodbc:EXADialect_turbodbc"
 
 [tool.pytest.ini_options]
-addopts= "--tb native -v -r fxX --log-debug=sqlalchemy.engine --log-debug=sqlalchemy.pool"
+addopts = "--tb native -v -r fxX --log-debug=sqlalchemy.engine --log-debug=sqlalchemy.pool"
 filterwarnings = [
     "error::DeprecationWarning",
     "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",

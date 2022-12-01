@@ -53,7 +53,6 @@ exclude = []
 "Source" = "https://github.com/exasol/sqlalchemy-exasol"
 "Issues" = "https://github.com/exasol/sqlalchemy-exasol/issues"
 "Changelog" = "https://exasol.github.io/sqlalchemy-exasol/changelog.html"
-"Github" = "https://github.com/exasol/sqlalchemy-exasol"
 
 
 [tool.poetry.dependencies]

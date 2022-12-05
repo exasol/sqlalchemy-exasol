@@ -636,7 +636,7 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "scriv"
-version = "0.16.0"
+version = "1.0.0"
 description = "Scriv changelog management tool"
 category = "dev"
 optional = false
@@ -651,6 +651,7 @@ requests = "*"
 
 [package.extras]
 toml = ["tomli"]
+yaml = ["pyyaml"]
 
 [[package]]
 name = "setuptools"
@@ -972,7 +973,7 @@ turbodbc = ["turbodbc"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "e1885ee28538966550968f0147408583c3973d7e6fbd728e30442e96e6cd7e20"
+content-hash = "9c3b9297761584ded5b64e9c61382dbbdd3a2ba3b7a7b05bae0e1b6b6a7367b4"
 
 [metadata.files]
 alabaster = [
@@ -1460,8 +1461,8 @@ requests = [
     {file = "requests-2.28.1.tar.gz", hash = "sha256:7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983"},
 ]
 scriv = [
-    {file = "scriv-0.16.0-py2.py3-none-any.whl", hash = "sha256:da9c4971bce08afa721c0bd98c1ee12a62999a104fb09a636ead5f242c821b2d"},
-    {file = "scriv-0.16.0.tar.gz", hash = "sha256:6e1e0118861ece421f8dd8ae6a3e2f054fa4fa14ad015040d22067b1e72fae56"},
+    {file = "scriv-1.0.0-py2.py3-none-any.whl", hash = "sha256:a7b8769cf99fce19263445fa48caba30f2ade0f059decc7a8e94462620550f9c"},
+    {file = "scriv-1.0.0.tar.gz", hash = "sha256:ddbe78e7903b80d6fbc8080b2c916aca7f1fd077be124972374d0e2e2045f921"},
 ]
 setuptools = [
     {file = "setuptools-65.6.3-py3-none-any.whl", hash = "sha256:57f6f22bde4e042978bcd50176fdb381d7c21a9efa4041202288d3737a0c6a54"},

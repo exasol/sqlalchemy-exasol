@@ -40,7 +40,7 @@ class EXADialectTurbodbcTest(fixtures.TestBase):
             "use_async_io", False
         )
 
-    def setup(self):
+    def setup_method(self):
         self.dialect = EXADialect_turbodbc()
 
     def _get_connection_arguments(self, dsn):

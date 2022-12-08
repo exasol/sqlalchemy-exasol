@@ -59,7 +59,7 @@ exclude = []
 python = ">=3.8,<4.0"
 SQLAlchemy = ">=1.4"
 pyodbc = ">=4.0.34"
-packaging = "^21.3"
+packaging = ">=21.3,<23.0"
 turbodbc = { version = ">=4.5.4", optional = true }
 
 [tool.poetry.dev-dependencies]

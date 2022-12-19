@@ -873,14 +873,14 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "turbodbc"
-version = "4.5.5"
+version = "4.5.6"
 description = "turbodbc is a Python DB API 2.0 compatible ODBC driver"
 category = "main"
 optional = true
 python-versions = ">=3.8"
 
 [package.extras]
-arrow = ["pyarrow (>=1.0,<9.1.0)"]
+arrow = ["pyarrow (>=1.0,<11)"]
 numpy = ["numpy (>=1.19.0)"]
 
 [[package]]
@@ -1562,7 +1562,7 @@ tomlkit = [
     {file = "tomlkit-0.11.6.tar.gz", hash = "sha256:71b952e5721688937fb02cf9d354dbcf0785066149d2855e44531ebdd2b65d73"},
 ]
 turbodbc = [
-    {file = "turbodbc-4.5.5.tar.gz", hash = "sha256:dd019f51be83c48903657088cab9afa353cf4c7c3afa6411c1c0af43cbf01c54"},
+    {file = "turbodbc-4.5.6.tar.gz", hash = "sha256:d2af28ac36ea316ee4f8ef4d839ea3e3a9dde188484d71bb8c0c1c75b1d10030"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.4.0-py3-none-any.whl", hash = "sha256:16fa4864408f655d35ec496218b85f79b3437c829e93320c7c9215ccfd92489e"},

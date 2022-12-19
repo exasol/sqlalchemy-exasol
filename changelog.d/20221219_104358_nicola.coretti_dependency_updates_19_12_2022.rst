@@ -1,0 +1,43 @@
+.. A new scriv changelog fragment.
+..
+.. Uncomment the header that is right (remove the leading dots).
+..
+.. 🗑️ Removed
+.. ----------
+..
+.. - A bullet item for the Removed category.
+..
+.. ✨ Added
+.. ---------
+..
+.. - A bullet item for the Added category.
+..
+🔧 Changed
+-----------
+* Updated Dependencies
+  • certifi (2022.9.24 -> 2022.12.7)
+  • pytz (2022.6 -> 2022.7)
+  • coverage (6.5.0 -> 7.0.0)
+  • identify (2.5.9 -> 2.5.10)
+  • isort (5.10.1 -> 5.11.3)
+  • pathspec (0.10.2 -> 0.10.3)
+  • black (22.10.0 -> 22.12.0)
+  • pylint (2.15.8 -> 2.15.9)
+  • sqlalchemy (1.4.44 -> 1.4.45)
+.. - A bullet item for the Changed category.
+..
+.. 🚧 Deprecated
+.. --------------
+..
+.. - A bullet item for the Deprecated category.
+..
+.. 🐞 Fixed
+.. ---------
+..
+.. - A bullet item for the Fixed category.
+..
+.. 🔐 Security
+.. -----------
+..
+.. - A bullet item for the Security category.
+..

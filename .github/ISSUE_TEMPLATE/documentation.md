@@ -9,7 +9,7 @@ assignees: ''
 
 # Summary
 <!---
-A short summary on what of what needs to be documented or updated.
+A short summary of what needs to be documented or updated.
 --->
 
 # Details

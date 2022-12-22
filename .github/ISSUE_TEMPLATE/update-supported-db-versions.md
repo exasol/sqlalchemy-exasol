@@ -1,7 +1,7 @@
 ---
-name: Exasol-DB Version Update
+name: ⚙ Exasol-DB Version Update
 about: Upgrade supported database version(s)
-title: Update supported database version(s) to X.Y.Z
+title: ⚙ Update supported database version(s) to X.Y.Z
 labels: feature, source:exasol
 assignees: ''
 

@@ -52,7 +52,7 @@ Links to related issues or other sources like link to CVE.
 Describe possible solution(s), how to address this issue.
 --->
 
-# Credit
+# Credits
 <!--
 Whom to thank, kudos for the reporter(s)
 -->

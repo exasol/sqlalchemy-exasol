@@ -54,7 +54,7 @@ If known
 
 ## Context
 <!---
-Describe the actual observed behaviour: A clear and concise description of what you observed.
+Describe the context of the observed behavior: A clear and concise description of what appears relevant to you.
 Screenshot: If applicable, add screenshots to help explain your problem.
 -->
 

@@ -1,0 +1,67 @@
+"""
+This module contains compatibility tests for pythons dbapi module interface
+"""
+import datetime
+import importlib
+
+import pytest
+
+
+@pytest.fixture
+def dbapi():
+    yield importlib.import_module("exasol.driver.websocket")
+
+
+def test_defines_api_level(dbapi):
+    assert dbapi.apilevel in {"1.0", "2.0"}
+
+
+def test_defines_threadsafety(dbapi):
+    assert dbapi.threadsafety in {0, 1, 2, 3}
+
+
+def test_defines_paramstyle(dbapi):
+    assert dbapi.paramstyle in {"qmark", "numeric", "named", "format", "pyformat"}
+
+
+@pytest.mark.parametrize(
+    "exception",
+    [
+        "Warning",
+        "Error",
+        "InterfaceError",
+        "DatabaseError",
+        "DataError",
+        "OperationalError",
+        "IntegrityError",
+        "InternalError",
+        "ProgrammingError",
+        "NotSupportedError",
+    ],
+)
+def test_all_exceptions_are_available(dbapi, exception):
+    assert issubclass(getattr(dbapi, exception), Exception)
+
+
+@pytest.mark.parametrize("year,month,day", [(2022, 12, 24), (2023, 1, 1)])
+def test_date_constructor(dbapi, year, month, day):
+    actual = dbapi.Date(year, month, day)
+    expected = datetime.date(year, month, day)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("hour,minute,second", [(12, 1, 24), (23, 1, 1)])
+def test_time_constructor(dbapi, hour, minute, second):
+    actual = dbapi.Time(hour, minute, second)
+    expected = datetime.time(hour, minute, second)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "year,month,day,hour,minute,second",
+    [(2022, 12, 24, 12, 1, 24), (2023, 1, 1, 23, 1, 1)],
+)
+def test_timestamp_constructor(dbapi, year, month, day, hour, minute, second):
+    actual = dbapi.Timestamp(year, month, day, hour, minute, second)
+    expected = datetime.datetime(year, month, day, hour, minute, second)
+    assert actual == expected

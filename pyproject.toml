@@ -61,6 +61,7 @@ SQLAlchemy = ">=1.4"
 pyodbc = ">=4.0.34"
 packaging = "^21.3"
 turbodbc = { version = ">=4.5.4", optional = true }
+pyexasol = "^0.25.1"
 
 [tool.poetry.dev-dependencies]
 nox = ">=2022.1.7"

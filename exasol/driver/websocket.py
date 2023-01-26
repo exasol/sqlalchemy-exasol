@@ -14,6 +14,8 @@ from enum import (
 from time import localtime
 from typing import Protocol
 
+import pyexasol
+
 apilevel = "2.0"
 threadsafety = 1
 paramstyle = "qmark"
@@ -95,6 +97,7 @@ class Connection(Protocol):
         Attention:
             Addition not required by pep-249.
         """
+        ...
 
     def close(self):
         """
@@ -106,6 +109,7 @@ class Connection(Protocol):
         Note that closing a connection without committing the changes first will cause an implicit rollback
         to be performed.
         """
+        ...
 
     def commit(self):
         """
@@ -116,6 +120,7 @@ class Connection(Protocol):
             An interface method may be provided to turn it back on.
             Database modules that do not support transactions should implement this method with void functionality.
         """
+        ...
 
     def rollback(self):
         """
@@ -125,6 +130,7 @@ class Connection(Protocol):
         of any pending transaction. Closing a connection without committing the changes first
         will cause an implicit rollback to be performed.
         """
+        ...
 
     def cursor(self):
         """
@@ -133,6 +139,7 @@ class Connection(Protocol):
         If the database does not provide a direct cursor concept, the module will have to emulate cursors
         using other means to the extent needed by this specification.
         """
+        ...
 
 
 class Cursor(Protocol):
@@ -227,23 +234,102 @@ DATETIME = Types.DATETIME
 ROWID = Types.ROWID
 
 
-class DefaultConnection:
-    def __init__(self, **kwargs):
-        raise NotImplemented()
+class _DefaultConnection:
+    """
+    Implementation of a websocket based connection.
 
-    def connect(self, **kwargs):
-        raise NotImplemented()
+    For more details see :class: `Connection` protocol definition.
+    """
+
+    def __init__(
+        self,
+        dsn: str = None,
+        username: str = None,
+        password: str = None,
+        schema: str = "",
+        autocommit: bool = True,
+        tls: bool = True,
+    ):
+        """
+        Create a _DefaultConnection object.
+
+        Args:
+
+            dsn: Connection string, same format as standard JDBC/ODBC drivers.
+            username: which will be used for the authentication.
+            password: which will be used for the authentication
+            schema: to open after connecting.
+            autocommit: enable autocommit.
+            tls: enable tls.
+        """
+
+        # for more details see pyexasol.connection.ExaConnection
+        self._options = {
+            "dsn": dsn,
+            "user": username,
+            "password": password,
+            "schema": schema,
+            "autocommit": autocommit,
+            "snapshot_transactions": None,
+            "connection_timeout": 10,
+            "socket_timeout": 30,
+            "query_timeout": 0,
+            "compression": False,
+            "encryption": tls,
+            "fetch_dict": False,
+            "fetch_mapper": None,
+            "fetch_size_bytes": 5 * 1024 * 1024,
+            "lower_ident": False,
+            "quote_ident": False,
+            "json_lib": "json",
+            "verbose_error": True,
+            "debug": False,
+            "debug_logdir": None,
+            "udf_output_bind_address": None,
+            "udf_output_connect_address": None,
+            "udf_output_dir": None,
+            "http_proxy": None,
+            "client_name": None,
+            "client_version": None,
+            "client_os_username": None,
+            "protocol_version": 3,
+            "websocket_sslopt": None,
+            "access_token": None,
+            "refresh_token": None,
+        }
+        self._connection = None
+
+    def connect(self):
+        """See also :py:meth: `Connection.connect`"""
+        try:
+            self._connection = pyexasol.connect(**self._options)
+        except Exception as ex:
+            raise Error() from ex
+        return self
 
     def close(self):
-        raise NotImplemented()
+        """See also :py:meth: `Connection.close`"""
+        try:
+            self._connection.close()
+        except Exception as ex:
+            raise Error() from ex
 
     def commit(self):
-        raise NotImplemented()
+        """See also :py:meth: `Connection.commit`"""
+        try:
+            self._connection.commit()
+        except Exception as ex:
+            raise Error() from ex
 
     def rollback(self):
-        raise NotImplemented()
+        """See also :py:meth: `Connection.rollback`"""
+        try:
+            self._connection.rollback()
+        except Exception as ex:
+            raise Error() from ex
 
     def cursor(self):
+        """See also :py:meth: `Connection.cursor`"""
         raise NotImplemented()
 
     def __del__(self):
@@ -300,7 +386,7 @@ class DefaultCursor:
         self.close()
 
 
-def connect(connection_class=DefaultConnection, **kwargs) -> Connection:
+def connect(connection_class=_DefaultConnection, **kwargs) -> Connection:
     """
     Creates a connection to the database.
 
@@ -313,5 +399,4 @@ def connect(connection_class=DefaultConnection, **kwargs) -> Connection:
         returns a dbapi2 complaint connection object.
     """
     connection = connection_class(**kwargs)
-    connection.connect()
-    return connection
+    return connection.connect()

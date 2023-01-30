@@ -70,7 +70,7 @@ pytest-json-report = ">=1.5.0"
 # The limitation/issue pytest <6 is tracked in https://github.com/exasol/sqlalchemy-exasol/issues/144
 pytest = ">=6"
 pytest-cov = ">=2.7.0"
-pre-commit = "^2.19.0"
+pre-commit = "^3.0.2"
 black = "^22.6.0"
 isort = "^5.10.1"
 pylint = "^2.14.5"

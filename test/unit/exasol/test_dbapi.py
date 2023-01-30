@@ -6,6 +6,11 @@ import importlib
 
 import pytest
 
+from exasol.driver.websocket import (
+    Error,
+    requires_connection,
+)
+
 
 @pytest.fixture
 def dbapi():
@@ -65,3 +70,48 @@ def test_timestamp_constructor(dbapi, year, month, day, hour, minute, second):
     actual = dbapi.Timestamp(year, month, day, hour, minute, second)
     expected = datetime.datetime(year, month, day, hour, minute, second)
     assert actual == expected
+
+
+def test_requires_connection_decorator_throws_exception_if_no_connection_is_available():
+    class MyConnection:
+        def __init__(self, con=None):
+            self._connection = con
+
+        @requires_connection
+        def close(self):
+            pass
+
+        def connect(self):
+            self._connection = object()
+
+    connection = MyConnection()
+    with pytest.raises(Error) as e_info:
+        connection.close()
+
+    assert "No active connection available" == f"{e_info.value}"
+
+
+def test_requires_connection_decorator_does_not_throw_exception_connection_is_available():
+    class MyConnection:
+        def __init__(self, con=None):
+            self._connection = con
+
+        @requires_connection
+        def close(self):
+            return self._connection
+
+        def connect(self):
+            self._connection = object()
+
+    connection = MyConnection(con=object())
+    assert connection.close()
+
+
+def test_requires_connection_decorator_does_use_wrap():
+    class MyConnection:
+        @requires_connection
+        def close(self):
+            return True
+
+    connection = MyConnection()
+    assert "close" == connection.close.__name__

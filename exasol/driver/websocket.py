@@ -11,6 +11,7 @@ from enum import (
     IntFlag,
     auto,
 )
+from functools import wraps
 from time import localtime
 from typing import Protocol
 
@@ -234,6 +235,23 @@ DATETIME = Types.DATETIME
 ROWID = Types.ROWID
 
 
+def requires_connection(method):
+    """
+    Decorator requires the object to have a working connection.
+
+    Raises:
+        Error if the connection object has no active connection.
+    """
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        if not self._connection:
+            raise Error("No active connection available")
+        return method(self, *args, **kwargs)
+
+    return wrapper
+
+
 class _DefaultConnection:
     """
     Implementation of a websocket based connection.
@@ -303,10 +321,13 @@ class _DefaultConnection:
         """See also :py:meth: `Connection.connect`"""
         try:
             self._connection = pyexasol.connect(**self._options)
+        except pyexasol.exceptions.ExaConnectionError as ex:
+            raise Error("Connection failed") from ex
         except Exception as ex:
             raise Error() from ex
         return self
 
+    @requires_connection
     def close(self):
         """See also :py:meth: `Connection.close`"""
         try:
@@ -314,6 +335,7 @@ class _DefaultConnection:
         except Exception as ex:
             raise Error() from ex
 
+    @requires_connection
     def commit(self):
         """See also :py:meth: `Connection.commit`"""
         try:
@@ -321,6 +343,7 @@ class _DefaultConnection:
         except Exception as ex:
             raise Error() from ex
 
+    @requires_connection
     def rollback(self):
         """See also :py:meth: `Connection.rollback`"""
         try:

@@ -25,32 +25,31 @@ _DEFAULTS = {
 
 
 def pytest_addoption(parser):
-    option = "--exasol-{name}"
     group = parser.getgroup("exasol")
     group.addoption(
-        option.format(name="port"),
+        _option_name("port"),
         type=int,
         help="Port on which the exasol db is listening (default: 8888).",
     )
     group.addoption(
-        option.format(name="host"),
+        _option_name("host"),
         type=str,
         help="Host to connect to (default: 'localhost').",
     )
     group.addoption(
-        option.format(name="username"),
+        _option_name("username"),
         type=str,
         help="Username used to authenticate against the exasol db (default: 'SYS').",
     )
     group.addoption(
-        option.format(name="password"),
+        _option_name("password"),
         type=str,
         help="Password used to authenticate against the exasol db (default: 'exasol').",
     )
     group.addoption(
-        option.format(name="schema"),
+        _option_name("schema"),
         type=str,
-        help=f"Schema to open after connecting to the db (default: ).",
+        help=f"Schema to open after connecting to the db (default: TEST).",
     )
 
 

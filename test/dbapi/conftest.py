@@ -2,6 +2,7 @@ import os
 from collections import ChainMap
 from dataclasses import dataclass
 
+import pyexasol
 import pytest
 
 
@@ -13,7 +14,7 @@ def _envvar_name(name: str):
     return f"EXASOL_{name.upper()}"
 
 
-_OPTIONS = ["port", "host", "username", "password", "schema"]
+_OPTIONS = ["port", "host", "username", "password", "schema", "bootstrap"]
 
 _DEFAULTS = {
     _envvar_name("port"): 8888,
@@ -21,6 +22,7 @@ _DEFAULTS = {
     _envvar_name("username"): "SYS",
     _envvar_name("password"): "exasol",
     _envvar_name("schema"): "TEST",
+    _envvar_name("bootstrap"): False,
 }
 
 
@@ -51,6 +53,11 @@ def pytest_addoption(parser):
         type=str,
         help=f"Schema to open after connecting to the db (default: TEST).",
     )
+    group.addoption(
+        _option_name("bootstrap"),
+        type=bool,
+        help=f"Signals that pytest itself should start the exasol db rather than using an active one (default: False).",
+    )
 
 
 @dataclass
@@ -62,9 +69,10 @@ class Config:
     username: str
     password: str
     schema: str
+    bootstrap: bool
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def exasol_test_config(request) -> Config:
     """
     Provides configuration information of the test environment.
@@ -92,3 +100,54 @@ def exasol_test_config(request) -> Config:
     }
     options = ChainMap(pytest_options, env, defaults)
     return Config(**options)
+
+
+@pytest.fixture
+def db_connection(exasol_test_config):
+    """
+    Returns a db connection which can be used to interact with the test database.
+    """
+    config = exasol_test_config
+    connection = pyexasol.connect(
+        dsn=f"{config.host}:{config.port}",
+        user=config.username,
+        password=config.password,
+    )
+    yield connection
+    connection.close()
+
+
+@pytest.fixture(scope="session")
+def test_schema():
+    yield "TEST"
+
+
+@pytest.fixture(scope="session")
+def exasol_db(exasol_test_config, test_schema):
+    """
+    Sets up an exasol db for testion.
+    """
+    config = exasol_test_config
+
+    if config.bootstrap:
+        raise Exception("Bootstrapping the db from pytest is not supported yet")
+
+    connection = pyexasol.connect(
+        dsn=f"{config.host}:{config.port}",
+        user=config.username,
+        password=config.password,
+    )
+
+    connection.execute(f"DROP SCHEMA IF EXISTS {test_schema} CASCADE;")
+    connection.execute(f"CREATE SCHEMA {test_schema};")
+    connection.commit()
+
+    yield
+
+    connection.execute(f"DROP SCHEMA IF EXISTS {test_schema} CASCADE;")
+    connection.commit()
+    connection.close()
+
+    if config.bootstrap:
+        # TODO: once the bootstrapping is implemented th shutdown code goes here
+        pass

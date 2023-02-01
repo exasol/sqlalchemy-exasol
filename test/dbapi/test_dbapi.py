@@ -21,3 +21,27 @@ def test_websocket_dbapi_connect_fails():
     with pytest.raises(Error) as e_info:
         connect(dsn=dsn, username=username, password=password)
     assert "Connection failed" == f"{e_info.value}"
+
+
+def test_retrieve_cursor_via_websocket_dbapi(exasol_test_config):
+    config = exasol_test_config
+    connection = connect(
+        dsn=f"{config.host}:{config.port}",
+        username=config.username,
+        password=config.password,
+    )
+    cursor = connection.cursor()
+    assert cursor
+    connection.close()
+
+
+def test_retrieve_cursor_via_websocket_dbapi(exasol_test_config):
+    config = exasol_test_config
+    connection = connect(
+        dsn=f"{config.host}:{config.port}",
+        username=config.username,
+        password=config.password,
+    )
+    cursor = connection.cursor()
+    assert cursor
+    cursor.close()

@@ -252,7 +252,7 @@ def requires_connection(method):
     return wrapper
 
 
-class _DefaultConnection:
+class DefaultConnection:
     """
     Implementation of a websocket based connection.
 
@@ -327,9 +327,10 @@ class _DefaultConnection:
             raise Error() from ex
         return self
 
-    @requires_connection
     def close(self):
         """See also :py:meth: `Connection.close`"""
+        if not self._connection:
+            return
         try:
             self._connection.close()
         except Exception as ex:
@@ -351,9 +352,10 @@ class _DefaultConnection:
         except Exception as ex:
             raise Error() from ex
 
+    @requires_connection
     def cursor(self):
         """See also :py:meth: `Connection.cursor`"""
-        raise NotImplemented()
+        return DefaultCursor(self)
 
     def __del__(self):
         self.close()
@@ -362,6 +364,10 @@ class _DefaultConnection:
 class DefaultCursor:
     # see https://peps.python.org/pep-0249/#arraysize
     DBAPI_DEFAULT_ARRAY_SIZE = 1
+
+    def __init__(self, connection):
+        self._connection = connection
+        self._cursor = None
 
     @property
     def arraysize(self):
@@ -379,7 +385,8 @@ class DefaultCursor:
         raise NotImplemented()
 
     def close(self):
-        raise NotImplemented()
+        if not self._cursor:
+            return
 
     def execute(self, operation, parameters):
         raise NotImplemented()
@@ -409,7 +416,7 @@ class DefaultCursor:
         self.close()
 
 
-def connect(connection_class=_DefaultConnection, **kwargs) -> Connection:
+def connect(connection_class=DefaultConnection, **kwargs) -> Connection:
     """
     Creates a connection to the database.
 

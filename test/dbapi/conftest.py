@@ -5,6 +5,8 @@ from dataclasses import dataclass
 import pyexasol
 import pytest
 
+from exasol.driver.websocket import connect
+
 
 def _option_name(name: str):
     return f"--exasol-{name}"
@@ -103,7 +105,19 @@ def exasol_test_config(request) -> Config:
 
 
 @pytest.fixture
-def db_connection(exasol_test_config):
+def connection(exasol_test_config):
+    config = exasol_test_config
+    _connection = connect(
+        dsn=f"{config.host}:{config.port}",
+        username=config.username,
+        password=config.password,
+    )
+    yield _connection
+    _connection.close()
+
+
+@pytest.fixture
+def control_connection(exasol_test_config):
     """
     Returns a db connection which can be used to interact with the test database.
     """
@@ -122,7 +136,7 @@ def test_schema():
     yield "TEST"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def exasol_db(exasol_test_config, test_schema):
     """
     Sets up an exasol db for testion.

@@ -79,7 +79,7 @@ scriv = "^0.16.0"
 Sphinx = "^6"
 furo = "^2022.6.21"
 sphinx-copybutton = "^0.5.0"
-mypy = "^0.982"
+mypy = ">=0.982"
 pyupgrade = "^3.0.0"
 
 [tool.poetry.extras]
@@ -89,8 +89,12 @@ turbodbc = ["turbodbc"]
 "exa.pyodbc" = "sqlalchemy_exasol.pyodbc:EXADialect_pyodbc"
 "exa.turbodbc" = "sqlalchemy_exasol.turbodbc:EXADialect_turbodbc"
 
+
+[tool.poetry.group.dev.dependencies]
+rich = "^13.3.1"
+
 [tool.pytest.ini_options]
-addopts = "--tb native -v -r fxX --log-debug=sqlalchemy.engine --log-debug=sqlalchemy.pool"
+addopts = "--tb native -v -r fxX"
 filterwarnings = [
     "error::DeprecationWarning",
     "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",

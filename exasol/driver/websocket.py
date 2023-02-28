@@ -166,13 +166,41 @@ class Cursor(Protocol):
     def close(self):
         ...
 
-    def execute(self, operation, parameters):
+    def execute(self, operation, *args, **kwargs):
+        """
+        Prepare and execute a database operation (query or command).
+
+        Parameters may be provided as sequence or mapping and will be bound to variables in the operation.
+        Variables are specified in a database-specific notation (see the module’s paramstyle
+        attribute for details).
+
+        A reference to the operation will be retained by the cursor.
+        If the same operation object is passed in again, then the cursor can optimize its behavior.
+        This is most effective for algorithms where the same operation is used, but different parameters are bound to it
+        (many times).
+
+        For maximum efficiency when reusing an operation, it is best to use the .setinputsizes() method to specify the
+        parameter types and sizes ahead of time.
+        It is legal for a parameter to not match the predefined information; the implementation should compensate,
+        possibly with a loss of efficiency.
+
+        The parameters may also be specified as list of tuples to e.g. insert multiple rows in a single operation,
+        but this kind of usage is deprecated: .executemany() should be used instead.
+
+        Return values are not defined.
+        """
         ...
 
     def executemany(self, operation, seq_of_parameters):
         ...
 
     def fetchone(self):
+        """
+        Fetch the next row of a query result set, returning a single sequence, or None when no more data is available.
+
+        An Error (or subclass) exception is raised if the previous call to .execute*() did not produce any result set
+        or no call was issued yet.
+        """
         ...
 
     def fetchmany(self, size=None):
@@ -327,6 +355,10 @@ class DefaultConnection:
             raise Error() from ex
         return self
 
+    @property
+    def connection(self):
+        return self._connection
+
     def close(self):
         """See also :py:meth: `Connection.close`"""
         if not self._connection:
@@ -388,14 +420,17 @@ class DefaultCursor:
         if not self._cursor:
             return
 
-    def execute(self, operation, parameters):
-        raise NotImplemented()
+    def execute(self, operation, *args, **kwargs):
+        connection = self._connection.connection
+        self._cursor = connection.execute(operation, *args, **kwargs)
 
     def executemany(self, operation, seq_of_parameters):
         raise NotImplemented()
 
     def fetchone(self):
-        raise NotImplemented()
+        if not self._cursor:
+            raise Error("No result have been produced.")
+        return self._cursor.fetchone()
 
     def fetchmany(self, size=None):
         raise NotImplemented()

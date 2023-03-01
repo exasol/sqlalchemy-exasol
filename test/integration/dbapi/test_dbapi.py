@@ -78,8 +78,12 @@ def test_cursor_fetchone(cursor, sql_statement, expected):
     assert cursor.fetchone() == expected
 
 
-def test_cursor_fetch_one_raises_exception_if_not_results_have_been_produced(cursor):
+@pytest.mark.parametrize("method", ("fetchone", "fetchmany", "fetchall"))
+def test_cursor_function_raises_exception_if_no_result_have_been_produced(
+    cursor, method
+):
     expected = "No result have been produced."
+    cursor_method = getattr(cursor, method)
     with pytest.raises(Error) as e_info:
-        cursor.fetchone()
+        cursor_method()
     assert f"{e_info.value}" == expected

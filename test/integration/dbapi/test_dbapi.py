@@ -1,3 +1,5 @@
+from inspect import cleandoc
+
 import pytest
 
 from exasol.driver.websocket import (
@@ -123,3 +125,46 @@ def test_cursor_fetchmany(cursor, sql_statement, size, expected):
 def test_cursor_fetchmany(cursor, sql_statement, expected):
     cursor.execute(sql_statement)
     assert cursor.fetchall() == expected
+
+
+def test_description_returns_none_if_no_query_have_been_executed(cursor):
+    assert cursor.description is None
+
+
+@pytest.mark.parametrize(
+    "sql_statement, expected",
+    [
+        (
+            "SELECT CAST(A as INT) A FROM VALUES 1, 2, 3 as T(A);",
+            (("col_name", "NUMBER", None, None, None, None, None),),
+        ),
+        (
+            "SELECT CAST(A as DOUBLE) A FROM VALUES 1, 2, 3 as T(A);",
+            (("col_name", "NUMBER", None, None, None, None, None),),
+        ),
+        (
+            "SELECT CAST(A as BOOL) A FROM VALUES TRUE, FALSE, TRUE as T(A);",
+            (("col_name", "NUMBER", None, None, None, None, None),),
+        ),
+        (
+            "SELECT CAST(A as VARCHAR(10)) A FROM VALUES 'Foo', 'Bar' as T(A);",
+            (("col_name", "NUMBER", None, None, None, None, None),),
+        ),
+        (
+            cleandoc(
+                """
+             SELECT CAST(A as INT) A, CAST(B as VARCHAR(100)) B, CAST(C as BOOL) C, CAST(D as DOUBLE) D
+             FROM VALUES ((1,'Some String', TRUE, 1.0), (3,'Other String', FALSE, 2.0)) as TB(A, B, C, D);
+            """
+            ),
+            (
+                ("col_name", "STRING", None, None, None, None, None),
+                ("col_name", "STRING", None, None, None, None, None),
+            ),
+        ),
+    ],
+    ids=str,
+)
+def test_description_attribute(cursor, sql_statement, expected):
+    cursor.execute(sql_statement)
+    assert cursor.description == expected

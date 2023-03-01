@@ -168,7 +168,7 @@ class Cursor(Protocol):
     def rowcount(self):
         ...
 
-    def callproc(self, procname, parameters):
+    def callproc(self, procname, *args, **kwargs):
         ...
 
     def close(self):
@@ -402,6 +402,12 @@ class DefaultConnection:
 
 
 class DefaultCursor:
+    """
+    Implementation of a cursor based on the DefaultConnection.
+
+    For more details see :class: `Cursor` protocol definition.
+    """
+
     # see https://peps.python.org/pep-0249/#arraysize
     DBAPI_DEFAULT_ARRAY_SIZE = 1
 
@@ -411,48 +417,61 @@ class DefaultCursor:
 
     @property
     def arraysize(self):
+        """See also :py:meth: `Cursor.arraysize`"""
         return self.DBAPI_DEFAULT_ARRAY_SIZE
 
     @property
     def description(self):
+        """See also :py:meth: `Cursor.description`"""
         raise NotImplemented()
 
     @property
     def rowcount(self):
+        """See also :py:meth: `Cursor.rowcount`"""
         raise NotImplemented()
 
-    def callproc(self, procname, parameters):
+    def callproc(self, procname, *args, **kwargs):
+        """See also :py:meth: `Cursor.callproc`"""
         raise NotImplemented()
 
     def close(self):
+        """See also :py:meth: `Cursor.close`"""
         if not self._cursor:
             return
 
     def execute(self, operation, *args, **kwargs):
+        """See also :py:meth: `Cursor.execute`"""
         connection = self._connection.connection
         self._cursor = connection.execute(operation, *args, **kwargs)
 
     def executemany(self, operation, seq_of_parameters):
+        """See also :py:meth: `Cursor.executemany`"""
         raise NotImplemented()
 
     def fetchone(self):
+        """See also :py:meth: `Cursor.fetchone`"""
         if not self._cursor:
             raise Error("No result have been produced.")
         return self._cursor.fetchone()
 
     def fetchmany(self, size=None):
+        """See also :py:meth: `Cursor.fetchmany`"""
         raise NotImplemented()
 
     def fetchall(self):
+        """See also :py:meth: `Cursor.fetchall`"""
         raise NotImplemented()
 
     def nextset(self):
+        """See also :py:meth: `Cursor.nextset`"""
         raise NotSupportedError("Optional and therefore not supported")
 
     def setinputsizes(self, sizes):
+        """See also :py:meth: `Cursor.setinputsizes`"""
         raise NotImplemented()
 
     def setoutputsizes(self, size, column):
+        """See also :py:meth: `Cursor.setoutputsize`"""
         raise NotImplemented()
 
     def __del__(self):

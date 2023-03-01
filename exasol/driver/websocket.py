@@ -162,6 +162,25 @@ class Cursor(Protocol):
 
     @property
     def description(self):
+        """
+        This read-only attribute is a sequence of 7-item sequences.
+
+        Each of these sequences contains information describing one result column:
+
+            * name
+            * type_code
+            * display_size
+            * internal_size
+            * precision
+            * scale
+            * null_ok
+
+        The first two items (name and type_code) are mandatory, the other five are optional and
+        are set to None if no meaningful values can be provided.
+
+        This attribute will be None for operations that do not return rows or if the cursor has not had an operation
+        invoked via the .execute*() method yet.
+        """
         ...
 
     @property

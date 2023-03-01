@@ -490,7 +490,8 @@ class DefaultCursor:
     @requires_result
     def fetchmany(self, size=None):
         """See also :py:meth: `Cursor.fetchmany`"""
-        raise NotImplemented()
+        size = size if size is not None else self.arraysize
+        return self._cursor.fetchmany(size)
 
     @requires_result
     def fetchall(self):

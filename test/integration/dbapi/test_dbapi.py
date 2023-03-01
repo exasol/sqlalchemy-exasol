@@ -87,3 +87,21 @@ def test_cursor_function_raises_exception_if_no_result_have_been_produced(
     with pytest.raises(Error) as e_info:
         cursor_method()
     assert f"{e_info.value}" == expected
+
+
+@pytest.mark.parametrize(
+    "sql_statement, size, expected",
+    [
+        ("SELECT 1;", None, [(1,)]),
+        ("SELECT 1;", 1, [(1,)]),
+        ("SELECT 1;", 10, [(1,)]),
+        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", None, [(1, 2)]),
+        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 1, [(1, 2)]),
+        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 2, [(1, 2), (3, 4)]),
+        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 10, [(1, 2), (3, 4), (5, 6)]),
+    ],
+    ids=str,
+)
+def test_cursor_fetchmany(cursor, sql_statement, size, expected):
+    cursor.execute(sql_statement)
+    assert cursor.fetchmany(size) == expected

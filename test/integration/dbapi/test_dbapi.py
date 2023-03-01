@@ -105,3 +105,21 @@ def test_cursor_function_raises_exception_if_no_result_have_been_produced(
 def test_cursor_fetchmany(cursor, sql_statement, size, expected):
     cursor.execute(sql_statement)
     assert cursor.fetchmany(size) == expected
+
+
+@pytest.mark.parametrize(
+    "sql_statement, expected",
+    [
+        ("SELECT 1;", [(1,)]),
+        ("SELECT * FROM VALUES ((1,2), (3,4));", [(1, 2), (3, 4)]),
+        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", [(1, 2), (3, 4), (5, 6)]),
+        (
+            "SELECT * FROM VALUES ((1,2), (3,4), (5,6), (7, 8));",
+            [(1, 2), (3, 4), (5, 6), (7, 8)],
+        ),
+    ],
+    ids=str,
+)
+def test_cursor_fetchmany(cursor, sql_statement, expected):
+    cursor.execute(sql_statement)
+    assert cursor.fetchall() == expected

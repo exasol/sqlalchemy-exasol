@@ -231,6 +231,13 @@ class Cursor(Protocol):
         ...
 
     def fetchall(self):
+        """
+        Fetch all (remaining) rows of a query result, returning them as a sequence of sequences (e.g. a list of tuples).
+
+        Note that the cursor’s arraysize attribute can affect the performance of this operation.
+        An Error (or subclass) exception is raised if the previous call to .execute*() did not produce any result set
+        or no call was issued yet.
+        """
         ...
 
     def nextset(self):
@@ -496,7 +503,7 @@ class DefaultCursor:
     @requires_result
     def fetchall(self):
         """See also :py:meth: `Cursor.fetchall`"""
-        raise NotImplemented()
+        return self._cursor.fetchall()
 
     def nextset(self):
         """See also :py:meth: `Cursor.nextset`"""

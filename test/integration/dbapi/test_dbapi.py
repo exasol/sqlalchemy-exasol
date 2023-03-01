@@ -49,15 +49,32 @@ def test_retrieve_cursor_from_connection(connection):
     cursor.close()
 
 
-def test_cursor_execute(cursor):
+@pytest.mark.parametrize(
+    "sql_statement", ["SELECT 1;", "SELECT * FROM VALUES BETWEEN 1 AND 15 WITH STEP 4;"]
+)
+def test_cursor_execute(cursor, sql_statement):
     # Because the dbapi does not specify a required return value, this is just a smoke test
     # to ensure the execute call won't crash.
-    cursor.execute("SELECT 1;")
+    cursor.execute(sql_statement)
 
 
-def test_cursor_fetchone(cursor):
-    expected = (1,)
-    cursor.execute("SELECT 1;")
+def _id_func(value):
+    if not isinstance(value, str):
+        return ""
+    return value
+
+
+@pytest.mark.parametrize(
+    "sql_statement, expected",
+    [
+        ("SELECT 1;", (1,)),
+        ("SELECT * FROM VALUES (1, 2, 3);", (1, 2, 3)),
+        ("SELECT * FROM VALUES BETWEEN 1 AND 15 WITH STEP 4;", (1,)),
+    ],
+    ids=str,
+)
+def test_cursor_fetchone(cursor, sql_statement, expected):
+    cursor.execute(sql_statement)
     assert cursor.fetchone() == expected
 
 

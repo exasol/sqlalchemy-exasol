@@ -438,6 +438,7 @@ class DefaultCursor:
         """See also :py:meth: `Cursor.close`"""
         if not self._cursor:
             return
+        self._cursor.close()
 
     def execute(self, operation, *args, **kwargs):
         """See also :py:meth: `Cursor.execute`"""

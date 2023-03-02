@@ -138,6 +138,7 @@ def test_requires_connection_decorator_does_use_wrap():
             ("D", {"type": "DOUBLE"}, MetaData(name="D", type_code=Types.NUMBER)),
         )
     ),
+    ids=str,
 )
 def test_metadata_from_pyexasol_metadata(name, metadata, expected):
     actual = _from_pyexasol(name, metadata)

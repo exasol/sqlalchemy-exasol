@@ -193,6 +193,18 @@ class Cursor(Protocol):
 
     @property
     def rowcount(self):
+        """
+        This read-only attribute specifies the number of rows that the last .execute*() produced
+        (for DQL statements like SELECT) or affected (for DML statements like UPDATE or INSERT).
+
+        The attribute is -1 in case no .execute*() has been performed on the cursor or
+        the rowcount of the last operation is cannot be determined by the interface.
+
+        .. note::
+
+            Future versions of the DB API specification could redefine the latter case
+            to have the object return None instead of -1.
+        """
         ...
 
     def callproc(self, procname, *args, **kwargs):
@@ -531,8 +543,21 @@ class DefaultCursor:
 
     @property
     def rowcount(self):
-        """See also :py:meth: `Cursor.rowcount`"""
-        raise NotImplemented()
+        """
+        See also :py:meth: `Cursor.rowcount`
+
+        Attention: This implementation of the rowcount attribute deviates slightly from what the dbapi2 requires.
+
+               Difference:
+
+                    If the rowcount of the last operation cannot be determined it will return 0.
+
+                    Expected by DBAPI2 = -1
+                    Actually returned  = 0
+        """
+        if not self._cursor:
+            return -1
+        return self._cursor.rowcount()
 
     def callproc(self, procname, *args, **kwargs):
         """See also :py:meth: `Cursor.callproc`"""

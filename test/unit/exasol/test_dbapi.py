@@ -11,7 +11,7 @@ from exasol.driver.websocket import (
     MetaData,
     Types,
     _from_pyexasol,
-    requires_connection,
+    _requires_connection,
 )
 
 
@@ -80,7 +80,7 @@ def test_requires_connection_decorator_throws_exception_if_no_connection_is_avai
         def __init__(self, con=None):
             self._connection = con
 
-        @requires_connection
+        @_requires_connection
         def close(self):
             pass
 
@@ -99,7 +99,7 @@ def test_requires_connection_decorator_does_not_throw_exception_connection_is_av
         def __init__(self, con=None):
             self._connection = con
 
-        @requires_connection
+        @_requires_connection
         def close(self):
             return self._connection
 
@@ -112,7 +112,7 @@ def test_requires_connection_decorator_does_not_throw_exception_connection_is_av
 
 def test_requires_connection_decorator_does_use_wrap():
     class MyConnection:
-        @requires_connection
+        @_requires_connection
         def close(self):
             return True
 

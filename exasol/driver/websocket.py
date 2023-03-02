@@ -351,7 +351,7 @@ def _from_pyexasol(name, metadata) -> MetaData:
     return MetaData(**{k: metadata[key_mapping[k]] for k in key_mapping})
 
 
-def requires_connection(method):
+def _requires_connection(method):
     """
     Decorator requires the object to have a working connection.
 
@@ -456,7 +456,7 @@ class DefaultConnection:
         except Exception as ex:
             raise Error() from ex
 
-    @requires_connection
+    @_requires_connection
     def commit(self):
         """See also :py:meth: `Connection.commit`"""
         try:
@@ -464,7 +464,7 @@ class DefaultConnection:
         except Exception as ex:
             raise Error() from ex
 
-    @requires_connection
+    @_requires_connection
     def rollback(self):
         """See also :py:meth: `Connection.rollback`"""
         try:
@@ -472,7 +472,7 @@ class DefaultConnection:
         except Exception as ex:
             raise Error() from ex
 
-    @requires_connection
+    @_requires_connection
     def cursor(self):
         """See also :py:meth: `Connection.cursor`"""
         return DefaultCursor(self)
@@ -481,7 +481,7 @@ class DefaultConnection:
         self.close()
 
 
-def requires_result(method):
+def _requires_result(method):
     """
     Decorator requires the object to have a result.
 
@@ -553,18 +553,18 @@ class DefaultCursor:
         """See also :py:meth: `Cursor.executemany`"""
         raise NotImplemented()
 
-    @requires_result
+    @_requires_result
     def fetchone(self):
         """See also :py:meth: `Cursor.fetchone`"""
         return self._cursor.fetchone()
 
-    @requires_result
+    @_requires_result
     def fetchmany(self, size=None):
         """See also :py:meth: `Cursor.fetchmany`"""
         size = size if size is not None else self.arraysize
         return self._cursor.fetchmany(size)
 
-    @requires_result
+    @_requires_result
     def fetchall(self):
         """See also :py:meth: `Cursor.fetchall`"""
         return self._cursor.fetchall()

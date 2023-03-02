@@ -4,6 +4,7 @@ import pytest
 
 from exasol.driver.websocket import (
     Error,
+    Types,
     connect,
 )
 
@@ -136,19 +137,19 @@ def test_description_returns_none_if_no_query_have_been_executed(cursor):
     [
         (
             "SELECT CAST(A as INT) A FROM VALUES 1, 2, 3 as T(A);",
-            (("col_name", "NUMBER", None, None, None, None, None),),
+            [("A", Types.NUMBER, None, None, 18, 0, None)],
         ),
         (
             "SELECT CAST(A as DOUBLE) A FROM VALUES 1, 2, 3 as T(A);",
-            (("col_name", "NUMBER", None, None, None, None, None),),
+            [("A", Types.NUMBER, None, None, None, None, None)],
         ),
         (
             "SELECT CAST(A as BOOL) A FROM VALUES TRUE, FALSE, TRUE as T(A);",
-            (("col_name", "NUMBER", None, None, None, None, None),),
+            [("A", Types.STRING, None, None, None, None, None)],
         ),
         (
             "SELECT CAST(A as VARCHAR(10)) A FROM VALUES 'Foo', 'Bar' as T(A);",
-            (("col_name", "NUMBER", None, None, None, None, None),),
+            [("A", Types.STRING, None, 10, None, None, None)],
         ),
         (
             cleandoc(
@@ -157,10 +158,12 @@ def test_description_returns_none_if_no_query_have_been_executed(cursor):
              FROM VALUES ((1,'Some String', TRUE, 1.0), (3,'Other String', FALSE, 2.0)) as TB(A, B, C, D);
             """
             ),
-            (
-                ("col_name", "STRING", None, None, None, None, None),
-                ("col_name", "STRING", None, None, None, None, None),
-            ),
+            [
+                ("A", Types.NUMBER, None, None, 18, 0, None),
+                ("B", Types.STRING, None, 100, None, None, None),
+                ("C", Types.STRING, None, None, None, None, None),
+                ("D", Types.NUMBER, None, None, None, None, None),
+            ],
         ),
     ],
     ids=str,

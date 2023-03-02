@@ -8,6 +8,9 @@ import pytest
 
 from exasol.driver.websocket import (
     Error,
+    MetaData,
+    Types,
+    _from_pyexasol,
     requires_connection,
 )
 
@@ -115,3 +118,27 @@ def test_requires_connection_decorator_does_use_wrap():
 
     connection = MyConnection()
     assert "close" == connection.close.__name__
+
+
+@pytest.mark.parametrize(
+    "name,metadata,expected",
+    (
+        (
+            (
+                "A",
+                {"type": "DECIMAL", "precision": 18, "scale": 0},
+                MetaData(name="A", type_code=Types.NUMBER, precision=18, scale=0),
+            ),
+            (
+                "B",
+                {"type": "VARCHAR", "size": 100, "characterSet": "UTF8"},
+                MetaData(name="B", type_code=Types.STRING, internal_size=100),
+            ),
+            ("C", {"type": "BOOLEAN"}, MetaData(name="C", type_code=Types.STRING)),
+            ("D", {"type": "DOUBLE"}, MetaData(name="D", type_code=Types.NUMBER)),
+        )
+    ),
+)
+def test_metadata_from_pyexasol_metadata(name, metadata, expected):
+    actual = _from_pyexasol(name, metadata)
+    assert actual == expected

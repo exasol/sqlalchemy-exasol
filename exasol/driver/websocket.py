@@ -2,6 +2,11 @@
 This module provides a `PEP-249 <https://peps.python.org/pep-0249/#interfaceerror>`_ compliant DBAPI interface,
 for a `websocket based <https://github.com/exasol/websocket-api>`_ `EXASOL <https://www.exasol.com/de/>`_ database driver.
 """
+from collections import defaultdict
+from dataclasses import (
+    astuple,
+    dataclass,
+)
 from datetime import (
     date,
     datetime,
@@ -13,7 +18,10 @@ from enum import (
 )
 from functools import wraps
 from time import localtime
-from typing import Protocol
+from typing import (
+    Optional,
+    Protocol,
+)
 
 import pyexasol
 
@@ -313,6 +321,36 @@ DATETIME = Types.DATETIME
 ROWID = Types.ROWID
 
 
+@dataclass
+class MetaData:
+    name: str
+    type_code: Types
+    display_size: Optional[int] = None
+    internal_size: Optional[int] = None
+    precision: Optional[int] = None
+    scale: Optional[int] = None
+    null_ok: Optional[bool] = None
+
+
+def _from_pyexasol(name, metadata) -> MetaData:
+    type_mapping = defaultdict(
+        lambda: Types.STRING, {"DOUBLE": Types.NUMBER, "DECIMAL": Types.NUMBER}
+    )
+    key_mapping = {
+        "name": "name",
+        "type_code": "type",
+        "precision": "precision",
+        "scale": "scale",
+        "display_size": "unknown",
+        "internal_size": "size",
+        "null_ok": "unknown",
+    }
+    metadata = defaultdict(lambda: None, metadata)
+    metadata["type"] = type_mapping[metadata["type"]]
+    metadata["name"] = name
+    return MetaData(**{k: metadata[key_mapping[k]] for k in key_mapping})
+
+
 def requires_connection(method):
     """
     Decorator requires the object to have a working connection.
@@ -482,7 +520,14 @@ class DefaultCursor:
     @property
     def description(self):
         """See also :py:meth: `Cursor.description`"""
-        raise NotImplemented()
+        if not self._cursor:
+            return None
+        columns_metadata = (
+            _from_pyexasol(name, metadata)
+            for name, metadata in self._cursor.columns().items()
+        )
+        columns_metadata = [astuple(metadata) for metadata in columns_metadata]
+        return columns_metadata
 
     @property
     def rowcount(self):

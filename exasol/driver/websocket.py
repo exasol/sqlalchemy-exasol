@@ -208,6 +208,18 @@ class Cursor(Protocol):
         ...
 
     def callproc(self, procname, *args, **kwargs):
+        """
+        Call a stored database procedure with the given name.
+        (This method is optional since not all databases provide stored procedures.)
+
+        The sequence of parameters must contain one entry for each argument that the procedure expects.
+        The result of the call is returned as modified copy of the input sequence.
+        Input parameters are left untouched, output and input/output parameters replaced with
+        possibly new values.
+
+        The procedure may also provide a result set as output. This must then be made available through
+        the standard .fetch*() methods.
+        """
         ...
 
     def close(self):
@@ -561,7 +573,7 @@ class DefaultCursor:
 
     def callproc(self, procname, *args, **kwargs):
         """See also :py:meth: `Cursor.callproc`"""
-        raise NotImplemented()
+        raise NotSupportedError("Optional and therefore not supported")
 
     def close(self):
         """See also :py:meth: `Cursor.close`"""

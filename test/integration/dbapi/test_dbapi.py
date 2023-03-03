@@ -4,6 +4,7 @@ import pytest
 
 from exasol.driver.websocket import (
     Error,
+    NotSupportedError,
     Types,
     connect,
 )
@@ -154,9 +155,9 @@ def test_description_returns_none_if_no_query_have_been_executed(cursor):
         (
             cleandoc(
                 """
-                     SELECT CAST(A as INT) A, CAST(B as VARCHAR(100)) B, CAST(C as BOOL) C, CAST(D as DOUBLE) D
-                     FROM VALUES ((1,'Some String', TRUE, 1.0), (3,'Other String', FALSE, 2.0)) as TB(A, B, C, D);
-                    """
+                         SELECT CAST(A as INT) A, CAST(B as VARCHAR(100)) B, CAST(C as BOOL) C, CAST(D as DOUBLE) D
+                         FROM VALUES ((1,'Some String', TRUE, 1.0), (3,'Other String', FALSE, 2.0)) as TB(A, B, C, D);
+                        """
             ),
             [
                 ("A", Types.NUMBER, None, None, 18, 0, None),
@@ -196,3 +197,10 @@ def test_rowcount_attribute(cursor, sql_statement, expected):
 def test_rowcount_attribute_returns_minus_one_if_no_statement_was_executed_yet(cursor):
     expected = -1
     assert cursor.rowcount == expected
+
+
+def test_callproc_is_not_supported(cursor):
+    expected = "Optional and therefore not supported"
+    with pytest.raises(NotSupportedError) as exec_info:
+        cursor.callproc(None)
+    assert f"{exec_info.value}" == expected

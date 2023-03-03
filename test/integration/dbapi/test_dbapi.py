@@ -62,12 +62,6 @@ def test_cursor_execute(cursor, sql_statement):
     cursor.execute(sql_statement)
 
 
-def _id_func(value):
-    if not isinstance(value, str):
-        return ""
-    return value
-
-
 @pytest.mark.parametrize(
     "sql_statement, expected",
     [
@@ -83,10 +77,10 @@ def test_cursor_fetchone(cursor, sql_statement, expected):
 
 
 @pytest.mark.parametrize("method", ("fetchone", "fetchmany", "fetchall"))
-def test_cursor_function_raises_exception_if_no_result_have_been_produced(
+def test_cursor_function_raises_exception_if_no_result_has_been_produced(
     cursor, method
 ):
-    expected = "No result have been produced."
+    expected = "No result has been produced."
     cursor_method = getattr(cursor, method)
     with pytest.raises(Error) as e_info:
         cursor_method()
@@ -124,12 +118,12 @@ def test_cursor_fetchmany(cursor, sql_statement, size, expected):
     ],
     ids=str,
 )
-def test_cursor_fetchmany(cursor, sql_statement, expected):
+def test_cursor_fetchall(cursor, sql_statement, expected):
     cursor.execute(sql_statement)
     assert cursor.fetchall() == expected
 
 
-def test_description_returns_none_if_no_query_have_been_executed(cursor):
+def test_description_returns_none_if_no_query_has_been_executed(cursor):
     assert cursor.description is None
 
 
@@ -154,10 +148,12 @@ def test_description_returns_none_if_no_query_have_been_executed(cursor):
         ),
         (
             cleandoc(
+                # fmt: off
                 """
-                         SELECT CAST(A as INT) A, CAST(B as VARCHAR(100)) B, CAST(C as BOOL) C, CAST(D as DOUBLE) D
-                         FROM VALUES ((1,'Some String', TRUE, 1.0), (3,'Other String', FALSE, 2.0)) as TB(A, B, C, D);
-                        """
+                SELECT CAST(A as INT) A, CAST(B as VARCHAR(100)) B, CAST(C as BOOL) C, CAST(D as DOUBLE) D
+                FROM VALUES ((1,'Some String', TRUE, 1.0), (3,'Other String', FALSE, 2.0)) as TB(A, B, C, D);
+                """
+                # fmt: on
             ),
             [
                 ("A", Types.NUMBER, None, None, 18, 0, None),

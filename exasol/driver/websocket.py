@@ -96,7 +96,7 @@ class NotSupportedError(DatabaseError):
 
 class Connection(Protocol):
     """
-    Defines a protocol which is compliant with https://peps.python.org/pep-0249/#connection-objects connection objects.
+    Defines a connection protocol based on https://peps.python.org/pep-0249/#connection-objects.
     """
 
     def connect(self):
@@ -409,7 +409,7 @@ class DefaultConnection:
         tls: bool = True,
     ):
         """
-        Create a _DefaultConnection object.
+        Create a DefaultConnection object.
 
         Args:
 
@@ -516,7 +516,7 @@ def _requires_result(method):
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         if not self._cursor:
-            raise Error("No result have been produced.")
+            raise Error("No result has been produced.")
         return method(self, *args, **kwargs)
 
     return wrapper

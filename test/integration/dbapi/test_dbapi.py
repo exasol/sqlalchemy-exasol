@@ -149,10 +149,10 @@ def test_description_returns_none_if_no_query_has_been_executed(cursor):
         (
             cleandoc(
                 # fmt: off
-                """
-                SELECT CAST(A as INT) A, CAST(B as VARCHAR(100)) B, CAST(C as BOOL) C, CAST(D as DOUBLE) D
-                FROM VALUES ((1,'Some String', TRUE, 1.0), (3,'Other String', FALSE, 2.0)) as TB(A, B, C, D);
-                """
+                    """
+                    SELECT CAST(A as INT) A, CAST(B as VARCHAR(100)) B, CAST(C as BOOL) C, CAST(D as DOUBLE) D
+                    FROM VALUES ((1,'Some String', TRUE, 1.0), (3,'Other String', FALSE, 2.0)) as TB(A, B, C, D);
+                    """
                 # fmt: on
             ),
             [
@@ -202,10 +202,55 @@ def test_callproc_is_not_supported(cursor):
     assert f"{exec_info.value}" == expected
 
 
-def test_nextset_is_not_supported(cursor):
+def test_cursor_nextset_is_not_supported(cursor):
     expected = "Optional and therefore not supported"
     with pytest.raises(NotSupportedError) as exec_info:
         cursor.nextset()
+    assert f"{exec_info.value}" == expected
+
+
+@pytest.mark.parametrize("property", ("arraysize", "description", "rowcount"))
+def test_cursor_closed_cursor_raises_exception_on_property_access(connection, property):
+    expected = "Cursor is closed, further operations are not permitted."
+
+    cursor = connection.cursor()
+    cursor.close()
+
+    with pytest.raises(Error) as exec_info:
+        _ = getattr(cursor, property)
+
+    assert f"{exec_info.value}" == expected
+
+
+@pytest.mark.parametrize(
+    "method,args",
+    (
+        ("callproc", [None]),
+        ("execute", ["SELECT 1;"]),
+        ("executemany", ["SELECT 1;", []]),
+        ("fetchone", []),
+        ("fetchmany", []),
+        ("fetchall", []),
+        ("nextset", []),
+        ("setinputsizes", [None]),
+        ("setoutputsize", [None, None]),
+        ("close", []),
+    ),
+    ids=str,
+)
+def test_cursor_closed_cursor_raises_exception_on_method_usage(
+    connection, method, args
+):
+    expected = "Cursor is closed, further operations are not permitted."
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT 1;")
+    cursor.close()
+
+    with pytest.raises(Error) as exec_info:
+        method = getattr(cursor, method)
+        method(*args)
+
     assert f"{exec_info.value}" == expected
 
 
@@ -217,5 +262,5 @@ def test_nextset_is_not_supported(cursor):
     ids=str,
 )
 def test_cursor_executemany(cursor, sql_statement, expected):
-    # Not implmented yet
+    # Not implemented yet
     assert False

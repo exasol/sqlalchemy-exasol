@@ -223,6 +223,12 @@ class Cursor(Protocol):
         ...
 
     def close(self):
+        """
+        Close the cursor now (rather than whenever __del__ is called).
+
+        The cursor will be unusable from this point forward; an Error (or subclass) exception will be raised
+        if any operation is attempted with the cursor.
+        """
         ...
 
     def execute(self, operation, *args, **kwargs):
@@ -251,6 +257,20 @@ class Cursor(Protocol):
         ...
 
     def executemany(self, operation, seq_of_parameters):
+        """
+        Prepare a database operation (query or command) and then execute it against all parameter sequences
+        or mappings found in the sequence seq_of_parameters.
+
+        Modules are free to implement this method using multiple calls to the .execute() method or by using
+        array operations to have the database process the sequence as a whole in one call.
+
+        Use of this method for an operation which produces one or more result sets constitutes undefined behavior,
+        and the implementation is permitted (but not required) to raise an exception when it detects that a result set has been created by an invocation of the operation.
+
+        The same comments as for .execute() also apply accordingly to this method.
+
+        Return values are not defined.
+        """
         ...
 
     def fetchone(self):
@@ -532,6 +552,23 @@ def _requires_result(method):
     return wrapper
 
 
+def _is_not_closed(method):
+    """
+    Decorator requires the object to have a result.
+
+    Raises:
+        Error if the cursor object has not produced a result yet.
+    """
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        if self._is_closed:
+            raise Error("Cursor is closed, further operations are not permitted.")
+        return method(self, *args, **kwargs)
+
+    return wrapper
+
+
 class DefaultCursor:
     """
     Implementation of a cursor based on the DefaultConnection.
@@ -545,13 +582,16 @@ class DefaultCursor:
     def __init__(self, connection):
         self._connection = connection
         self._cursor = None
+        self._is_closed = False
 
     @property
+    @_is_not_closed
     def arraysize(self):
         """See also :py:meth: `Cursor.arraysize`"""
         return self.DBAPI_DEFAULT_ARRAY_SIZE
 
     @property
+    @_is_not_closed
     def description(self):
         """See also :py:meth: `Cursor.description`"""
         if not self._cursor:
@@ -564,6 +604,7 @@ class DefaultCursor:
         return columns_metadata
 
     @property
+    @_is_not_closed
     def rowcount(self):
         """
         See also :py:meth: `Cursor.rowcount`
@@ -581,50 +622,64 @@ class DefaultCursor:
             return -1
         return self._cursor.rowcount()
 
+    @_is_not_closed
     def callproc(self, procname, *args, **kwargs):
         """See also :py:meth: `Cursor.callproc`"""
         raise NotSupportedError("Optional and therefore not supported")
 
+    @_is_not_closed
     def close(self):
         """See also :py:meth: `Cursor.close`"""
+        self._is_closed = True
         if not self._cursor:
             return
         self._cursor.close()
 
+    @_is_not_closed
     def execute(self, operation, *args, **kwargs):
         """See also :py:meth: `Cursor.execute`"""
         connection = self._connection.connection
         self._cursor = connection.execute(operation, *args, **kwargs)
 
+    @_is_not_closed
     def executemany(self, operation, seq_of_parameters):
         """See also :py:meth: `Cursor.executemany`"""
-        raise NotImplemented()
+        self._cursor = self._connection.cls_statement(
+            self._connection, operation, prepare=True
+        )
+        self._cursor.execute_prepared(seq_of_parameters)
 
     @_requires_result
+    @_is_not_closed
     def fetchone(self):
         """See also :py:meth: `Cursor.fetchone`"""
         return self._cursor.fetchone()
 
     @_requires_result
+    @_is_not_closed
     def fetchmany(self, size=None):
         """See also :py:meth: `Cursor.fetchmany`"""
         size = size if size is not None else self.arraysize
         return self._cursor.fetchmany(size)
 
     @_requires_result
+    @_is_not_closed
     def fetchall(self):
         """See also :py:meth: `Cursor.fetchall`"""
         return self._cursor.fetchall()
 
+    @_is_not_closed
     def nextset(self):
         """See also :py:meth: `Cursor.nextset`"""
         raise NotSupportedError("Optional and therefore not supported")
 
+    @_is_not_closed
     def setinputsizes(self, sizes):
         """See also :py:meth: `Cursor.setinputsizes`"""
         raise NotImplemented()
 
-    def setoutputsizes(self, size, column):
+    @_is_not_closed
+    def setoutputsize(self, size, column):
         """See also :py:meth: `Cursor.setoutputsize`"""
         raise NotImplemented()
 

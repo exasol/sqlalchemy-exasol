@@ -292,6 +292,16 @@ class Cursor(Protocol):
         ...
 
     def nextset(self):
+        """
+        This method will make the cursor skip to the next available set, discarding any remaining rows from the current set.
+        (This method is optional since not all databases support multiple result sets.)
+
+        If there are no more sets, the method returns None. Otherwise, it returns a true value and
+        subsequent calls to the .fetch*() methods will return rows from the next result set.
+
+        An Error (or subclass) exception is raised if the previous call to .execute*() did not produce any result
+        set or no call was issued yet.
+        """
         ...
 
     def setinputsizes(self, sizes):

@@ -200,3 +200,22 @@ def test_callproc_is_not_supported(cursor):
     with pytest.raises(NotSupportedError) as exec_info:
         cursor.callproc(None)
     assert f"{exec_info.value}" == expected
+
+
+def test_nextset_is_not_supported(cursor):
+    expected = "Optional and therefore not supported"
+    with pytest.raises(NotSupportedError) as exec_info:
+        cursor.nextset()
+    assert f"{exec_info.value}" == expected
+
+
+@pytest.mark.parametrize(
+    "sql_statement, expected",
+    [
+        ("SELECT 1;", [(1,)]),
+    ],
+    ids=str,
+)
+def test_cursor_executemany(cursor, sql_statement, expected):
+    # Not implmented yet
+    assert False

@@ -424,6 +424,7 @@ def lint(session: Session) -> None:
         "python",
         "-m",
         "pylint",
+        f'{PROJECT_ROOT / "exasol"}',
         f'{PROJECT_ROOT / "scripts"}',
         f'{PROJECT_ROOT / "sqlalchemy_exasol"}',
     )

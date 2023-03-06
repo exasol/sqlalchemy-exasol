@@ -12,8 +12,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2.1.5
+        with:
+          poetry-version: 1.2.2
 
       - name: Set up Python
         uses: actions/setup-python@v4

@@ -237,6 +237,16 @@ def sqlalchemy_tests(session: Session) -> None:
         )
 
 
+@nox.session(name="unit-tests", python=False)
+def unit_tests(session: Session) -> None:
+    """Run the unit tests"""
+    session.run(
+        "pytest",
+        f"{PROJECT_ROOT / 'test' / 'unit' }",
+        external=True,
+    )
+
+
 @nox.session(name="exasol-tests", python=False)
 def exasol_tests(session: Session) -> None:
     """Run the integration tests with a specific connector. For more details append '-- -h'"""
@@ -266,6 +276,8 @@ def exasol_tests(session: Session) -> None:
             external=True,
             env=env,
         )
+
+    session.run("pytest", f"{PROJECT_ROOT / 'test' / 'integration' / 'dbapi'}")
 
 
 @nox.session(name="integration-tests", python=False)

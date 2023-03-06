@@ -117,7 +117,9 @@ jobs:
           ITDE_TAG: "0.11.0"
 
       - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
-        run: poetry run nox -s integration-tests -- -- --connector ${{ matrix.connector }} --db-version ${{ matrix.exasol_version }}
+        run: |
+          poetry run nox -s unit-tests
+          poetry run nox -s integration-tests -- -- --connector ${{ matrix.connector }} --db-version ${{ matrix.exasol_version }}
 
   upload_to_pypi:
     runs-on: ubuntu-latest

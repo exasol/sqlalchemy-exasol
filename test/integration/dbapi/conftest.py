@@ -152,13 +152,13 @@ def exasol_db(exasol_test_config, test_schema):
         password=config.password,
     )
 
-    connection.execute(f'DROP SCHEMA IF EXISTS "{test_schema}" CASCADE;')
-    connection.execute(f'CREATE SCHEMA "{test_schema}";')
+    connection.execute(f"DROP SCHEMA IF EXISTS '{test_schema}' CASCADE;")
+    connection.execute(f"CREATE SCHEMA '{test_schema}';")
     connection.commit()
 
     yield
 
-    connection.execute(f'DROP SCHEMA IF EXISTS "{test_schema}" CASCADE;')
+    connection.execute(f"DROP SCHEMA IF EXISTS '{test_schema}' CASCADE;")
     connection.commit()
     connection.close()
 

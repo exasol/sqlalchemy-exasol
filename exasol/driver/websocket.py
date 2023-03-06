@@ -325,9 +325,30 @@ class Cursor(Protocol):
         ...
 
     def setinputsizes(self, sizes):
+        """
+        This can be used before a call to .execute*() to predefine memory areas for the operation’s parameters.
+
+        sizes is specified as a sequence — one item for each input parameter. The item should be a Type Object
+        that corresponds to the input that will be used, or it should be an integer specifying the
+        maximum length of a string parameter. If the item is None, then no predefined memory area will be reserved
+        for that column (this is useful to avoid predefined areas for large inputs).
+
+        This method would be used before the .execute*() method is invoked.
+
+        Implementations are free to have this method do nothing and users are free to not use it.
+        """
         ...
 
     def setoutputsizes(self, size, column):
+        """
+        Set a column buffer size for fetches of large columns (e.g. LONGs, BLOBs, etc.).
+
+        The column is specified as an index into the result sequence. Not specifying the column will set
+        the default size for all large columns in the cursor.
+        This method would be used before the .execute*() method is invoked.
+
+        Implementations are free to have this method do nothing and users are free to not use it.
+        """
         ...
 
 
@@ -644,9 +665,8 @@ class DefaultCursor:
     @_is_not_closed
     def executemany(self, operation, seq_of_parameters):
         """See also :py:meth: `Cursor.executemany`"""
-        self._cursor = self._connection.cls_statement(
-            self._connection, operation, prepare=True
-        )
+        connection = self._connection.connection
+        self._cursor = connection.cls_statement(connection, operation, prepare=True)
         self._cursor.execute_prepared(seq_of_parameters)
 
     @_requires_result
@@ -675,15 +695,23 @@ class DefaultCursor:
 
     @_is_not_closed
     def setinputsizes(self, sizes):
-        """See also :py:meth: `Cursor.setinputsizes`"""
-        raise NotImplemented()
+        """See also :py:meth: `Cursor.setinputsizes`
+
+        Attention:
+            This method does nothing.
+        """
 
     @_is_not_closed
     def setoutputsize(self, size, column):
-        """See also :py:meth: `Cursor.setoutputsize`"""
-        raise NotImplemented()
+        """See also :py:meth: `Cursor.setoutputsize`
+
+        Attention:
+            This method does nothing.
+        """
 
     def __del__(self):
+        if self._is_closed:
+            return
         self.close()
 
 

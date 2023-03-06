@@ -254,13 +254,41 @@ def test_cursor_closed_cursor_raises_exception_on_method_usage(
     assert f"{exec_info.value}" == expected
 
 
-@pytest.mark.parametrize(
-    "sql_statement, expected",
-    [
-        ("SELECT 1;", [(1,)]),
-    ],
-    ids=str,
-)
-def test_cursor_executemany(cursor, sql_statement, expected):
-    # Not implemented yet
-    assert False
+@pytest.fixture
+def users_table(control_connection):
+    schema = "TEST"
+    table = "USERS"
+    connection = control_connection
+    connection.execute(f"DROP TABLE IF EXISTS {schema}.{table}")
+    connection.execute(
+        cleandoc(
+            # fmt: off
+            f"""
+            CREATE TABLE {schema}.{table} (
+                firstname VARCHAR(100) ,
+                lastname VARCHAR(100),
+                id DECIMAL
+            );
+            """
+            # fmt: on
+        )
+    )
+    yield f"{schema}.{table}"
+    connection.execute(f"DROP TABLE IF EXISTS {schema}.{table}")
+
+
+def test_cursor_executemany(users_table, cursor):
+    values = [("John", "Doe", 0), ("Donald", "Duck", 1)]
+
+    cursor.execute(f"SELECT * FROM {users_table};")
+    before = cursor.fetchall()
+
+    cursor.executemany(f"INSERT INTO {users_table} VALUES (?, ?, ?);", values)
+
+    cursor.execute(f"SELECT * FROM {users_table};")
+    after = cursor.fetchall()
+
+    expected = len(values)
+    actual = len(after) - len(before)
+
+    assert actual == expected

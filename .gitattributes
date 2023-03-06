@@ -1,1 +1,2 @@
-sqlalchemy_exasol/_version.py export-subst
+sqlalchemy_exasol/version.py        linguist-generated=true
+poetry.lock                         linguist-generated=true

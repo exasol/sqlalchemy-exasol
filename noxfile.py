@@ -154,40 +154,8 @@ def start_db(session: Session) -> None:
                 external=True,
             )
 
-    # TODO/FIXME: setup to populate in confest.py
-    def populate() -> None:
-        with odbcconfig(Settings.ODBC_DRIVER):
-            settings = {
-                "driver": "EXAODBC",
-                "server": "localhost:8888",
-                "user": "sys",
-                "password": "exasol",
-                "ssl_certificate": "SSL_VERIFY_NONE",
-            }
-            connection = connect(
-                ";".join(
-                    [
-                        "DRIVER={driver}",
-                        "EXAHOST={server}",
-                        "UID={user}",
-                        "PWD={password}",
-                        "SSLCertificate={ssl_certificate}",
-                    ]
-                ).format(**settings)
-            )
-            transaction(
-                connection,
-                (
-                    "CREATE SCHEMA IF NOT EXISTS TEST",
-                    "CREATE SCHEMA IF NOT EXISTS TEST_SCHEMA;",
-                    "CREATE SCHEMA IF NOT EXISTS TEST_SCHEMA_2;",
-                ),
-            )
-            connection.close()
-
     args = parser().parse_args(session.posargs)
     start(args.db_version)
-    populate()
 
 
 @nox.session(name="db-stop", python=False)
@@ -242,7 +210,7 @@ def unit_tests(session: Session) -> None:
     """Run the unit tests"""
     session.run(
         "pytest",
-        f"{PROJECT_ROOT / 'test' / 'unit' }",
+        f"{PROJECT_ROOT / 'test' / 'unit'}",
         external=True,
     )
 

@@ -54,7 +54,7 @@ def test_retrieve_cursor_from_connection(connection):
 
 
 @pytest.mark.parametrize(
-    "sql_statement", ["SELECT 1;", "SELECT * FROM VALUES BETWEEN 1 AND 15 WITH STEP 4;"]
+    "sql_statement", ["SELECT 1;", "SELECT * FROM VALUES 1, 2, 3, 4;"]
 )
 def test_cursor_execute(cursor, sql_statement):
     # Because the dbapi does not specify a required return value, this is just a smoke test
@@ -67,7 +67,7 @@ def test_cursor_execute(cursor, sql_statement):
     [
         ("SELECT 1;", (1,)),
         ("SELECT * FROM VALUES (1, 2, 3);", (1, 2, 3)),
-        ("SELECT * FROM VALUES BETWEEN 1 AND 15 WITH STEP 4;", (1,)),
+        ("SELECT * FROM VALUES 1, 5, 9, 13;", (1,)),
     ],
     ids=str,
 )

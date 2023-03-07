@@ -18,7 +18,7 @@ from sqlalchemy.testing.plugin.pytestplugin import (
     pytest_sessionstart as _pytest_sessionstart,
 )
 
-_TEST_SCHEMA = "TEST"
+_TEST_SCHEMAS = ["TEST", "TEST_SCHEMA", "TEST_SCHEMA2"]
 
 
 @contextmanager
@@ -34,8 +34,9 @@ def _connection(dsn="localhost:8888", user="SYS", password="exasol"):
 
 def pytest_sessionstart(session):
     with _connection() as con:
-        con.execute(f"DROP SCHEMA IF EXISTS {_TEST_SCHEMA} CASCADE;")
-        con.execute(f"CREATE SCHEMA {_TEST_SCHEMA};")
+        for schema in _TEST_SCHEMAS:
+            con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE;")
+            con.execute(f"CREATE SCHEMA {schema};")
         con.commit()
 
     _pytest_sessionstart(session)
@@ -43,7 +44,8 @@ def pytest_sessionstart(session):
 
 def pytest_sessionfinish(session):
     with _connection() as con:
-        con.execute(f"DROP SCHEMA IF EXISTS {_TEST_SCHEMA} CASCADE;")
+        for schema in _TEST_SCHEMAS:
+            con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE;")
         con.commit()
 
     _pytest_sessionfinish(session)

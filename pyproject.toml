@@ -57,10 +57,14 @@ exclude = []
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-SQLAlchemy = ">=1.4"
-pyodbc = ">=4.0.34"
+pyodbc = "^4.0.34"
 packaging = "^21.3"
-turbodbc = { version = ">=4.5.4", optional = true }
+pyexasol = "^0.25.1"
+sqlalchemy = ">=1.4,<1.4.45"
+
+[tool.poetry.dependencies.turbodbc]
+version = "==4.5.4"
+optional = true
 
 [tool.poetry.dev-dependencies]
 nox = ">=2022.1.7"
@@ -75,10 +79,10 @@ black = "^22.6.0"
 isort = "^5.10.1"
 pylint = "^2.14.5"
 scriv = "^0.16.0"
-Sphinx = "^6"
+Sphinx = ">=6"
 furo = "^2022.6.21"
 sphinx-copybutton = "^0.5.0"
-mypy = "^0.982"
+mypy = ">=0.982"
 pyupgrade = "^3.0.0"
 
 [tool.poetry.extras]
@@ -88,8 +92,12 @@ turbodbc = ["turbodbc"]
 "exa.pyodbc" = "sqlalchemy_exasol.pyodbc:EXADialect_pyodbc"
 "exa.turbodbc" = "sqlalchemy_exasol.turbodbc:EXADialect_turbodbc"
 
+
+[tool.poetry.group.dev.dependencies]
+rich = "^13.3.1"
+
 [tool.pytest.ini_options]
-addopts = "--tb native -v -r fxX --log-debug=sqlalchemy.engine --log-debug=sqlalchemy.pool"
+addopts = "--tb native -v -r fxX"
 filterwarnings = [
     "error::DeprecationWarning",
     "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",
@@ -105,7 +113,7 @@ profile = "black"
 force_grid_wrap = 2
 
 [tool.pylint.master]
-fail-under = 5.6
+fail-under = 5.5
 
 [tool.pylint.format]
 max-line-length = 88

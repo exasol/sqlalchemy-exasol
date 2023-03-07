@@ -57,12 +57,14 @@ exclude = []
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-SQLAlchemy = "^1.4"
 pyodbc = "^4.0.34"
 packaging = "^21.3"
-turbodbc = { version = ">=4.5.4", optional = true }
 pyexasol = "^0.25.1"
-sqlalchemy = ">=1.4,<2.0"
+sqlalchemy = ">=1.4,<2.0.0"
+
+[tool.poetry.dependencies.turbodbc]
+version = "==4.5.4"
+optional = true
 
 [tool.poetry.dev-dependencies]
 nox = ">=2022.1.7"

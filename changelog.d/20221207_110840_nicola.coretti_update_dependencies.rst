@@ -16,12 +16,7 @@
 🔧 Changed
 -----------
 - Updated Dependencies
-  • filelock (3.8.0 -> 3.8.2)
-  • platformdirs (2.5.4 -> 2.6.0)
-  • virtualenv (20.17.0 -> 20.17.1)
-  • furo (2022.9.29 -> 2022.12.7)
-  • pylint (2.15.7 -> 2.15.8)
-  • pyupgrade (3.2.3 -> 3.3.1)
+- Loosend deve dependency constraints
 
 ..
 .. 🚧 Deprecated

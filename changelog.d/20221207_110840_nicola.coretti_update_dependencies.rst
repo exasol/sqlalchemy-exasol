@@ -16,7 +16,7 @@
 🔧 Changed
 -----------
 - Updated Dependencies
-- Loosend deve dependency constraints
+- Loosend dev dependency constraints
 
 ..
 .. 🚧 Deprecated

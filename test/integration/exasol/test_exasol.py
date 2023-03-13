@@ -49,7 +49,6 @@ class DefaultsTest(fixtures.TablesTest):
 
 
 class KeywordTest(fixtures.TablesTest):
-
     __backend__ = True
 
     def test_keywords(self):
@@ -135,7 +134,6 @@ class UtilTest(fixtures.TablesTest):
         )
 
     def test_raw_sql(self):
-
         restriction = or_(
             self.tables.t.c.id == 1,
             self.tables.t.c.name == "bob",

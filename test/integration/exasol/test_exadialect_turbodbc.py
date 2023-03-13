@@ -17,7 +17,6 @@ from sqlalchemy_exasol.turbodbc import (
     reason="This tests are only relevant for the dialect Exasol turbodbc dialect",
 )
 class EXADialectTurbodbcTest(fixtures.TestBase):
-
     dialect = None
     default_host_args = {"exahost": "192.168.1.2..8:1234", "exaschema": "my_schema"}
     default_user_args = {

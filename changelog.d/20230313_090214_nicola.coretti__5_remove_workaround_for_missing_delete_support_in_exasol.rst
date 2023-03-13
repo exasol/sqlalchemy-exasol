@@ -1,5 +1,4 @@
 .. A new scriv changelog fragment.
-
 ..
 .. Uncomment the header that is right (remove the leading dots).
 ..
@@ -13,11 +12,10 @@
 ..
 .. - A bullet item for the Added category.
 ..
-🔧 Changed
------------
-- Updated Dependencies
-- Loosend dev dependency constraints
-
+.. 🔧 Changed
+.. -----------
+..
+.. - A bullet item for the Changed category.
 ..
 .. 🚧 Deprecated
 .. --------------
@@ -33,4 +31,7 @@
 .. -----------
 ..
 .. - A bullet item for the Security category.
-..
+🧰Internal
+----------
+* Removed workaround for outdated DB versions
+  (for futher details see https://github.com/exasol/sqlalchemy-exasol/issues/5)

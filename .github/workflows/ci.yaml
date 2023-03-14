@@ -59,7 +59,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2.1.5
+        uses: abatilo/actions-poetry@v2.3.0
         with:
           poetry-version: 1.2.2
 
@@ -102,7 +102,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2.1.5
+        uses: abatilo/actions-poetry@v2.3.0
         with:
           poetry-version: 1.2.2
 
@@ -147,7 +147,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2.1.5
+        uses: abatilo/actions-poetry@v2.3.0
         with:
           poetry-version: 1.2.2
 

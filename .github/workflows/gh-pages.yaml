@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2.1.5
+        uses: abatilo/actions-poetry@v2.3.0
         with:
           poetry-version: 1.2.2
 

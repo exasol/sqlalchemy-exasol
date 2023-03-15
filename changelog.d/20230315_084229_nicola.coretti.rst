@@ -32,8 +32,8 @@
 ..
 .. - A bullet item for the Security category.
 ..
-.. 🧰 Internal
-.. -----------
-..
-.. - A bullet item for the Internal category.
-..
+🧰 Internal
+-----------
+- Simplify workflows by factoring out python & poetry setup into an action
+- Add an internal category to the changelog fragment template
+- Add a manual trigger for the gh-pages workflow

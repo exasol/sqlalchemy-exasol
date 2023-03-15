@@ -1,7 +1,16 @@
 .. _changelog-unreleased:
 
 Unreleased
-==================
+==========
+
+ **🚨 Attention:**
+
+    The turbodbc dependency was pinned to *4.5.4* due to issues with newer versions.
+
+    Failing tests in the SQLA compliance test suite, in regard to the turbodbc dialect
+    won't be addressed until explicitly required/requested by users.
+
+    Note: It is also very likely that turbodbc support will be dropped in future versions.
 
 ✨ Added
 --------
@@ -18,7 +27,7 @@ Unreleased
 
 🧰 Internal
 -----------
-* Change change log workflow
+* Change changelog workflow
 
     - Removed scriv
     - Added unreleased section to track unreleased changes
@@ -28,8 +37,6 @@ Unreleased
 * Add a manual trigger for the gh-pages workflow
 * Removed workaround for outdated DB versions
   (for further details see https://github.com/exasol/sqlalchemy-exasol/issues/5)
-
-
 
 
 .. _changelog-4.0.0:

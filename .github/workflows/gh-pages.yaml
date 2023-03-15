@@ -14,23 +14,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v2.3.0
-        with:
-          poetry-version: 1.2.2
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Setup Python & Poetry Environment
+        uses: ./.github/actions/python-environment
         with:
           python-version: 3.9
 
-      - name: Install Dependencies
-        run: |
-          poetry install
       - name: Build Documentation
         run: |
           poetry run python -m nox -s build-docs
           touch doc/build/.nojekyll
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:

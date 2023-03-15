@@ -34,6 +34,6 @@
 ..
 🧰 Internal
 -----------
-- Simplify workflows by facotring out python & poetry setup into an action
+- Simplify workflows by factoring out python & poetry setup into an action
 - Add an internal category to the changelog fragment template
 - Add a manual trigger for the gh-pages workflow

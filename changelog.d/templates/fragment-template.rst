@@ -35,5 +35,5 @@
 .. 🧰 Internal
 .. -----------
 ..
-.. - A bullet item for the Security category.
+.. - A bullet item for the Internal category.
 ..

@@ -1,3 +1,35 @@
+.. _changelog-unreleased:
+
+Unreleased
+==================
+
+✨ Added
+--------
+
+* Add websocket based dbapi2 compliant database driver
+
+🔧 Changed
+----------
+
+* Updated pytest
+* Updated Dependencies
+* Loosened version constraints on 'packaging' dependency
+* Loosened dev dependency constraints
+
+🧰 Internal
+-----------
+* Change change log workflow
+
+    - Removed scriv
+    - Added unreleased section to track unreleased changes
+
+* Simplified workflows by factoring out python & poetry setup into an action
+* Add an internal category to the changelog fragment template
+* Add a manual trigger for the gh-pages workflow
+* Removed workaround for outdated DB versions
+  (for further details see https://github.com/exasol/sqlalchemy-exasol/issues/5)
+
+
 
 
 .. _changelog-4.0.0:

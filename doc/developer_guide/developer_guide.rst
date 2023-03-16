@@ -189,7 +189,7 @@ Example of *CHANGELOG.rst* after *5.0.0* release:
     .. _changelog-unreleased:
 
     Unreleased
-    ==================
+    ==========
 
     .. _changelog-5.0.0:
 

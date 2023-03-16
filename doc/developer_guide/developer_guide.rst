@@ -154,7 +154,7 @@ Changelog
 Currently we keep our changelog in a single file *CHANGELOG.rst*.
 For every relevant change an entry in the *unreleased* section of the changelog is
 added. When a release is created the *unreleased* section is turned into the
-section for the release, by replacing the section title by the version number and the release date of the release.
+section for the release, by replacing the section title with the version number and the release date of the release.
 Afterwards a new empty unreleased section must be added at the top of the changelog.
 
 Example of *CHANGELOG.rst* before *5.0.0* release:

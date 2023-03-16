@@ -148,43 +148,73 @@ Tests
 
     If something still is not working or unclear, you may want to look into the CI/CD action_ files.
 
-Changelog (scriv)
------------------
-What, why and from whom to write a changelog you can read up on keepachangelog_, in
-this section we just want give the information on how to keep track of fragments
-which later will be used to create the changelog on the next published release.
+Changelog
+---------
 
-For the bookkeeping and generation of the changelog we use scriv_, so if you
-find the information in this section not sufficient we recommend to consult the
-scriv_ documentation.
+Currently we keep our changelog in a single file *CHANGELOG.rst*.
+For every relevant change an entry in the *unreleased* section of the changelog is
+added. When a release is created the *unreleased* section is turned into the
+section for the release, by replacing the section title with the version number and the release date of the release.
+Afterwards a new empty unreleased section must be added at the top of the changelog.
 
-.. note::
+Example of *CHANGELOG.rst* before *5.0.0* release:
 
-    keep in mind that all our docs, including the changelog are in the
-    restructuredText format when you format your entries.
+.. code-block:: rst
 
+    .. _changelog-unreleased:
 
-Run the following command to create a new changelog fragment.
+    Unreleased
+    ==================
 
-.. code-block:: shell
+    ✨ Added
+    --------
 
-    scriv create --edit
-
-An editor will open and you get prompted with a template, uncomment
-sections headings you need and add your entries below.
-Also make sure you commit the created fragment once you're done.
-
-.. note::
-
-    To make sure you won't forgetting to commit the fragment, you can use
-    the `--add` flag to automatically add it to the git index.
-
-    .. code-block:: shell
-
-        scriv create --edit --add
+    * Some more changes ...
 
 
-.. _scriv: https://scriv.readthedocs.io/en/latest/index.html
+    .. _changelog-4.0.0:
+
+    4.0.0 — 2022-12-01
+    ==================
+
+    ✨ Added
+    --------
+
+    * Some changes ...
+
+Example of *CHANGELOG.rst* after *5.0.0* release:
+
+.. code-block:: rst
+
+    .. _changelog-unreleased:
+
+    Unreleased
+    ==========
+
+    .. _changelog-5.0.0:
+
+    5.0.0 - 2023-01-01
+    ==================
+
+    ✨ Added
+    --------
+
+    * Some more changes ...
+
+
+    .. _changelog-4.0.0:
+
+    4.0.0 — 2022-12-01
+    ==================
+
+    ✨ Added
+    --------
+
+    * Some changes ...
+
+For more general information on, why and for whom to create a changelog, have a
+look at keepachangelog_.
+
 .. _keepachangelog: https://keepachangelog.com/en/1.1.0/
 .. _action: https://github.com/exasol/sqlalchemy_exasol/actions
 .. _python: https://www.python.org/

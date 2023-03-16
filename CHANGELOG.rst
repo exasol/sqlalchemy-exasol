@@ -1,3 +1,42 @@
+.. _changelog-unreleased:
+
+Unreleased
+==========
+
+ **🚨 Attention:**
+
+    The turbodbc dependency was pinned to *4.5.4* due to issues with newer versions.
+
+    Failing tests in the SQLA compliance test suite, in regard to the turbodbc dialect
+    won't be addressed until explicitly required/requested by users.
+
+    Note: It is also very likely that turbodbc support will be dropped in future versions.
+
+✨ Added
+--------
+
+* Add websocket based dbapi2 compliant database driver
+
+🔧 Changed
+----------
+
+* Updated pytest
+* Updated Dependencies
+* Loosened version constraints on 'packaging' dependency
+* Loosened dev dependency constraints
+
+🧰 Internal
+-----------
+* Change changelog workflow
+
+    - Removed scriv
+    - Added unreleased section to track unreleased changes
+
+* Simplified workflows by factoring out python & poetry setup into an action
+* Add an internal category to the changelog fragment template
+* Add a manual trigger for the gh-pages workflow
+* Removed workaround for outdated DB versions
+  (for further details see https://github.com/exasol/sqlalchemy-exasol/issues/5)
 
 
 .. _changelog-4.0.0:

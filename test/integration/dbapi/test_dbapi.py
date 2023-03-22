@@ -11,8 +11,8 @@ from exasol.driver.websocket import (
 
 
 @pytest.fixture
-def connection(exasol_test_config):
-    config = exasol_test_config
+def connection(exasol_config):
+    config = exasol_config
     connection = connect(
         dsn=f"{config.host}:{config.port}",
         username=config.username,
@@ -29,8 +29,8 @@ def cursor(connection):
     cursor.close()
 
 
-def test_websocket_dbapi(exasol_test_config):
-    cfg = exasol_test_config
+def test_websocket_dbapi(exasol_config):
+    cfg = exasol_config
     connection = connect(
         dsn=f"{cfg.host}:{cfg.port}", username=cfg.username, password=cfg.password
     )
@@ -255,16 +255,25 @@ def test_cursor_closed_cursor_raises_exception_on_method_usage(
 
 
 @pytest.fixture
-def users_table(control_connection):
+def test_schema(control_connection):
     schema = "TEST"
+    connection = control_connection
+    connection.execute(f"DROP SCHEMA IF EXISTS {schema};")
+    connection.execute(f"CREATE SCHEMA {schema};")
+    yield schema
+    connection.execute(f"DROP SCHEMA IF EXISTS {schema};")
+
+
+@pytest.fixture
+def users_table(control_connection, test_schema):
     table = "USERS"
     connection = control_connection
-    connection.execute(f"DROP TABLE IF EXISTS {schema}.{table}")
+    connection.execute(f"DROP TABLE IF EXISTS {test_schema}.{table}")
     connection.execute(
         cleandoc(
             # fmt: off
             f"""
-            CREATE TABLE {schema}.{table} (
+            CREATE TABLE {test_schema}.{table} (
                 firstname VARCHAR(100) ,
                 lastname VARCHAR(100),
                 id DECIMAL
@@ -273,8 +282,8 @@ def users_table(control_connection):
             # fmt: on
         )
     )
-    yield f"{schema}.{table}"
-    connection.execute(f"DROP TABLE IF EXISTS {schema}.{table}")
+    yield f"{test_schema}.{table}"
+    connection.execute(f"DROP TABLE IF EXISTS {test_schema}.{table}")
 
 
 def test_cursor_executemany(users_table, cursor):

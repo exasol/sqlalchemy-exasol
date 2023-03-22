@@ -158,7 +158,6 @@ def start_db(session: Session) -> None:
 def stop_db(session: Session) -> None:
     """Stop the test database"""
     session.run("docker", "kill", "db_container_test", external=True)
-    session.run("docker", "kill", "test_container_test", external=True)
 
 
 @nox.session(name="sqla-tests", python=False)

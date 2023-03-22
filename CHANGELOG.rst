@@ -15,7 +15,7 @@ Unreleased
 ✨ Added
 --------
 
-* Add websocket based dbapi2 compliant database driver
+* Added websocket based dbapi2 compliant database driver
 
 🔧 Changed
 ----------
@@ -27,17 +27,17 @@ Unreleased
 
 🧰 Internal
 -----------
-* Change changelog workflow
+* Changed changelog workflow
 
     - Removed scriv
     - Added unreleased section to track unreleased changes
 
 * Simplified workflows by factoring out python & poetry setup into an action
-* Add an internal category to the changelog fragment template
-* Add a manual trigger for the gh-pages workflow
+* Added a internal category to the changelog fragment template
+* Added manual trigger for the gh-pages workflow
 * Removed workaround for outdated DB versions
   (for further details see https://github.com/exasol/sqlalchemy-exasol/issues/5)
-
+* Added exasol-integration-test-docker-environment as dev dependency
 
 .. _changelog-4.0.0:
 

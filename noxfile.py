@@ -18,7 +18,7 @@ sys.path.append(f"{SCRIPTS}")
 from typing import Iterator
 
 import nox
-from git import tags
+from git_helpers import tags
 from links import check as _check
 from links import documentation as _documentation
 from links import urls as _urls
@@ -40,14 +40,13 @@ nox.options.sessions = ["fix"]
 
 
 class Settings:
-    ITDE = PROJECT_ROOT / ".." / "integration-test-docker-environment"
     ODBC_DRIVER = PROJECT_ROOT / "driver" / "libexaodbc-uo2214lv2.so"
     CONNECTORS = ("pyodbc", "turbodbc")
     ENVIRONMENT_NAME = "test"
     DB_PORT = 8888
     BUCKETFS_PORT = 6666
     VERSION_FILE = PROJECT_ROOT / "sqlalchemy_exasol" / "version.py"
-    DB_VERSIONS = ("7.1.9", "7.0.18")
+    DB_VERSIONS = ("7.1.17", "7.0.20")
 
 
 def find_session_runner(session: Session, name: str) -> SessionRunner:
@@ -135,24 +134,21 @@ def start_db(session: Session) -> None:
         return p
 
     def start(db_version: str) -> None:
-        # Consider adding ITDE as dev dependency once ITDE is packaged properly
-        with session.chdir(Settings.ITDE):
-            session.run(
-                "bash",
-                "start-test-env",
-                "spawn-test-environment",
-                "--environment-name",
-                f"{Settings.ENVIRONMENT_NAME}",
-                "--database-port-forward",
-                f"{Settings.DB_PORT}",
-                "--bucketfs-port-forward",
-                f"{Settings.BUCKETFS_PORT}",
-                "--docker-db-image-version",
-                db_version,
-                "--db-mem-size",
-                "4GB",
-                external=True,
-            )
+        session.run(
+            "itde",
+            "spawn-test-environment",
+            "--environment-name",
+            f"{Settings.ENVIRONMENT_NAME}",
+            "--database-port-forward",
+            f"{Settings.DB_PORT}",
+            "--bucketfs-port-forward",
+            f"{Settings.BUCKETFS_PORT}",
+            "--docker-db-image-version",
+            db_version,
+            "--db-mem-size",
+            "4GB",
+            external=True,
+        )
 
     args = parser().parse_args(session.posargs)
     start(args.db_version)
@@ -162,7 +158,6 @@ def start_db(session: Session) -> None:
 def stop_db(session: Session) -> None:
     """Stop the test database"""
     session.run("docker", "kill", "db_container_test", external=True)
-    session.run("docker", "kill", "test_container_test", external=True)
 
 
 @nox.session(name="sqla-tests", python=False)

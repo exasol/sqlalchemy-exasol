@@ -258,7 +258,7 @@ def test_cursor_closed_cursor_raises_exception_on_method_usage(
 def test_schema(control_connection):
     schema = "TEST"
     connection = control_connection
-    connection.execute(f"DROP SCHEMA IF EXISTS {schema};")
+    connection.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
     connection.execute(f"CREATE SCHEMA {schema};")
     yield schema
     connection.execute(f"DROP SCHEMA IF EXISTS {schema};")

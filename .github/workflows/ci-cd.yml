@@ -87,13 +87,6 @@ jobs:
         run: poetry install --extras "turbodbc"
         if: ${{ matrix.connector == 'turbodbc' }}
 
-      - name: Checkout test environment
-        run: git clone --depth 1 --branch ${ITDE_TAG} ${ITDE_URL}
-        working-directory: ..
-        env:
-          ITDE_URL: "https://github.com/exasol/integration-test-docker-environment.git"
-          ITDE_TAG: "0.11.0"
-
       - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
         run: |
           poetry run nox -s unit-tests

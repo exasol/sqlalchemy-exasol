@@ -537,7 +537,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pyexasol"
-version = "0.25.1"
+version = "0.25.2"
 description = "Exasol python driver with extra features"
 category = "main"
 optional = false
@@ -1651,8 +1651,8 @@ pycparser = [
     {file = "pycparser-2.21.tar.gz", hash = "sha256:e644fdec12f7872f86c58ff790da456218b10f863970249516d60a5eaca77206"},
 ]
 pyexasol = [
-    {file = "pyexasol-0.25.1-py3-none-any.whl", hash = "sha256:3e8ff6af323b2f42d0587f620613196362a9f7aa9542b53e06056004ca402c2e"},
-    {file = "pyexasol-0.25.1.tar.gz", hash = "sha256:91c592478568030b3e31c85246646ae98230585d37c9a3daf83ac006f5ab1cef"},
+    {file = "pyexasol-0.25.2-py3-none-any.whl", hash = "sha256:54be5c75f0867a4838b84b5b5a37466c33fa9b1ca6bf51d9c3d821d367936e6e"},
+    {file = "pyexasol-0.25.2.tar.gz", hash = "sha256:3b42cb2c32b7b2ffe7a78c82bf21c3a391043758f2a575c48460252a72386691"},
 ]
 pygments = [
     {file = "Pygments-2.14.0-py3-none-any.whl", hash = "sha256:fa7bd7bd2771287c0de303af8bfdfc731f51bd2c6a47ab69d117138893b82717"},

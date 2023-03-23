@@ -716,7 +716,14 @@ class DefaultCursor:
     def execute(self, operation, *args, **kwargs):
         """See also :py:meth: `Cursor.execute`"""
         connection = self._connection.connection
-        self._cursor = connection.execute(operation, *args, **kwargs)
+
+        if args or kwargs:
+            args = [arg for arg in args]
+            args += [arg for arg in kwargs.values()]
+            self.executemany(operation, args)
+            return
+
+        self._cursor = connection.execute(operation)
 
     @_is_not_closed
     def executemany(self, operation, seq_of_parameters):

@@ -8,6 +8,7 @@ from sqlalchemy_exasol.base import EXADialect
 
 class EXADialect_websocket(EXADialect):
     driver = "exasol.driver.websocket"
+    supports_statement_cache = False
 
     @classmethod
     def dbapi(cls):

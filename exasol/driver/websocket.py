@@ -217,7 +217,7 @@ class Cursor(Protocol):
             to have the object return None instead of -1.
         """
 
-    def callproc(self, procname, *args, **kwargs):
+    def callproc(self, procname, parameters):
         """
         Call a stored database procedure with the given name.
         (This method is optional since not all databases provide stored procedures)
@@ -239,7 +239,7 @@ class Cursor(Protocol):
         exception will be raised if any operation is attempted with the cursor.
         """
 
-    def execute(self, operation, *args, **kwargs):
+    def execute(self, operation, parameters=None):
         """
         Prepare and execute a database operation (query or command).
 
@@ -700,7 +700,7 @@ class DefaultCursor:
         return self._cursor.rowcount()
 
     @_is_not_closed
-    def callproc(self, procname, *args, **kwargs):
+    def callproc(self, procname, parameters=None):
         """See also :py:meth: `Cursor.callproc`"""
         raise NotSupportedError("Optional and therefore not supported")
 
@@ -713,14 +713,12 @@ class DefaultCursor:
         self._cursor.close()
 
     @_is_not_closed
-    def execute(self, operation, *args, **kwargs):
+    def execute(self, operation, parameters=None):
         """See also :py:meth: `Cursor.execute`"""
         connection = self._connection.connection
 
-        if args or kwargs:
-            args = [arg for arg in args]
-            args += [arg for arg in kwargs.values()]
-            self.executemany(operation, args)
+        if parameters:
+            self.executemany(operation, [parameters])
             return
 
         self._cursor = connection.execute(operation)

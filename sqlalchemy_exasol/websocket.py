@@ -3,12 +3,27 @@ from collections import (
     namedtuple,
 )
 
+from sqlalchemy.sql import sqltypes
+
 from sqlalchemy_exasol.base import EXADialect
+
+
+class Integer(sqltypes.INTEGER):
+    def result_processor(self, dialect, coltype):
+        def to_integer(value):
+            if isinstance(value, str):
+                return int(value)
+            return value
+
+        return to_integer
 
 
 class EXADialect_websocket(EXADialect):
     driver = "exasol.driver.websocket"
     supports_statement_cache = False
+    colspecs = {
+        sqltypes.Integer: Integer,
+    }
 
     @classmethod
     def dbapi(cls):

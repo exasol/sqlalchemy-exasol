@@ -50,11 +50,11 @@ threadsafety = 1  # pylint: disable=C0103
 paramstyle = "qmark"  # pylint: disable=C0103
 
 __all__ = [
-    # constants
+    # ----- Constants -----
     "apilevel",
     "threadsafety",
     "paramstyle",
-    # errors
+    # ----- Errors -----
     "Warning",
     "Error",
     "InterfaceError",
@@ -66,10 +66,10 @@ __all__ = [
     "InternalError",
     "ProgrammingError",
     "NotSupportedError",
-    # protocols
+    # ----- Protocols -----
     "Connection",
     "Cursor",
-    # types and type conversions
+    # ----- Types and Type-Conversions -----
     "Date",
     "Time",
     "Timestamp",

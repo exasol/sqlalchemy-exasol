@@ -5,6 +5,7 @@ database driver (see also `exasol-websocket-api`_).
 .. _PEP-249: https://peps.python.org/pep-0249/#interfaceerror
 .. _exasol-websocket-api: https://github.com/exasol/websocket-api
 """
+import decimal
 from collections import defaultdict
 from dataclasses import (
     astuple,
@@ -726,9 +727,13 @@ class DefaultCursor:
     @_is_not_closed
     def executemany(self, operation, seq_of_parameters):
         """See also :py:meth: `Cursor.executemany`"""
+        parameters = [
+            [str(p) if isinstance(p, (decimal.Decimal, float)) else p for p in params]
+            for params in seq_of_parameters
+        ]
         connection = self._connection.connection
         self._cursor = connection.cls_statement(connection, operation, prepare=True)
-        self._cursor.execute_prepared(seq_of_parameters)
+        self._cursor.execute_prepared(parameters)
 
     @_requires_result
     @_is_not_closed

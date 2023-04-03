@@ -2,7 +2,7 @@ from inspect import cleandoc
 
 import pytest
 
-from exasol.driver.websocket import (
+from exasol.driver.websocket.dbapi2 import (
     Error,
     NotSupportedError,
     Types,

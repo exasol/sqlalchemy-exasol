@@ -19,7 +19,7 @@ class Integer(sqltypes.INTEGER):
 
 
 class EXADialect_websocket(EXADialect):
-    driver = "exasol.driver.websocket"
+    driver = "exasol.driver.websocket.dbapi2"
     supports_statement_cache = False
     colspecs = {
         sqltypes.Integer: Integer,
@@ -27,7 +27,9 @@ class EXADialect_websocket(EXADialect):
 
     @classmethod
     def dbapi(cls):
-        return __import__("exasol.driver.websocket", fromlist="exasol.driver")
+        return __import__(
+            "exasol.driver.websocket.dbapi2", fromlist="exasol.driver.websocket"
+        )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

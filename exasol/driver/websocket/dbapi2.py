@@ -5,7 +5,6 @@ database driver (see also `exasol-websocket-api`_).
 .. _PEP-249: https://peps.python.org/pep-0249/#interfaceerror
 .. _exasol-websocket-api: https://github.com/exasol/websocket-api
 """
-# Add remaining definitions
 from exasol.driver.websocket._connection import Connection as DefaultConnection
 
 # Re-export types and definitions required by dbapi2
@@ -39,6 +38,8 @@ from exasol.driver.websocket._types import (
     TimestampFromTicks,
     Types,
 )
+
+# Add remaining definitions
 
 apilevel = "2.0"  # pylint: disable=C0103
 threadsafety = 1  # pylint: disable=C0103

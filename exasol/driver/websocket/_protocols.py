@@ -20,7 +20,7 @@ class Connection(Protocol):
         Connect to the database.
 
         Attention:
-            Addition not required by pep-249.
+            Addition not required by PEP-249.
         """
 
     def close(self):

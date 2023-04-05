@@ -114,7 +114,7 @@ class Cursor(Protocol):
         like UPDATE or INSERT).
 
         The attribute is -1 in case no .execute*() has been performed on the cursor or
-        the rowcount of the last operation is cannot be determined by the interface.
+        the rowcount of the last operation cannot be determined by the interface.
 
         .. note::
 

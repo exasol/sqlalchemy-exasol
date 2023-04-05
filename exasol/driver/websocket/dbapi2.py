@@ -41,9 +41,9 @@ from exasol.driver.websocket._types import (
 
 # Add remaining definitions
 
-apilevel = "2.0"  # pylint: disable=C0103
-threadsafety = 1  # pylint: disable=C0103
-paramstyle = "qmark"  # pylint: disable=C0103
+apilevel = "2.0"  # Required by spec. pylint: disable=C0103
+threadsafety = 1  # Required by spec. pylint: disable=C0103
+paramstyle = "qmark"  # Required by spec. pylint: disable=C0103
 
 
 def connect(connection_class=DefaultConnection, **kwargs) -> Connection:

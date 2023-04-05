@@ -78,7 +78,7 @@ class Cursor(Protocol):
         This read/write attribute specifies the number of rows to fetch
         at a time with .fetchmany().
 
-        It defaults to 1 meaning to fetch a single row at a time.
+        It defaults to 1, meaning to fetch a single row at a time.
         Implementations must observe this value with respect to the .fetchmany() method,
         but are free to interact with the database a single row at a time.
         It may also be used in the implementation of .executemany().

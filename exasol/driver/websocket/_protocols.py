@@ -157,7 +157,7 @@ class Cursor(Protocol):
         its behavior. This is most effective for algorithms where the same operation
         is used, but different parameters are bound to it (many times).
 
-        For maximum efficiency when reusing an operation, it is best to usethe
+        For maximum efficiency when reusing an operation, it is best to use the
         .setinputsizes() method to specify the parameter types and sizes ahead of time.
         It is legal for a parameter to not match the predefined information;
         the implementation should compensate, possibly with a loss of efficiency.

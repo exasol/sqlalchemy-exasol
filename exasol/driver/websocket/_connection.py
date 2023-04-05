@@ -122,6 +122,8 @@ class Connection:
     @_requires_connection
     def commit(self):
         """See also :py:meth: `Connection.commit`"""
+        # TODO: document and make sure autocommit is turned of by default
+        #       see dbapi2 specification
         try:
             self._connection.commit()
         except Exception as ex:

@@ -128,7 +128,7 @@ class Cursor(Protocol):
         (This method is optional since not all databases provide stored procedures)
 
         The sequence of parameters must contain one entry for each argument that the
-        procedure expects. The result of the call is returned as modified copy of
+        procedure expects. The result of the call is returned as a modified copy of
         the input sequence. Input parameters are left untouched, output and
         input/output parameters replaced with possibly new values.
 

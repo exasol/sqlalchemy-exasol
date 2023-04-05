@@ -110,7 +110,7 @@ class Cursor(Protocol):
     def rowcount(self):
         """
         This read-only attribute specifies the number of rows that the last .execute*()
-        produced (for DQL statements like SELECT) or affected(for DML statements
+        produced (for DQL statements like SELECT) or affected (for DML statements
         like UPDATE or INSERT).
 
         The attribute is -1 in case no .execute*() has been performed on the cursor or

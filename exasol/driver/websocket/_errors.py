@@ -6,7 +6,7 @@ This module provides contains `PEP-249`_ compliant DBAPI exceptions.
 """
 
 
-class Warning(Exception):  # pylint: disable=W0622
+class Warning(Exception):  # Required by spec. pylint: disable=W0622
     """
     Exception raised for important warnings like data truncations while inserting, etc.
     """

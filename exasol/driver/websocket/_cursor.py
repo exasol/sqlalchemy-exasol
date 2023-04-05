@@ -157,12 +157,11 @@ class Cursor:
     @_is_not_closed
     def execute(self, operation, parameters=None):
         """See also :py:meth: `Cursor.execute`"""
-        connection = self._connection.connection
-
         if parameters:
             self.executemany(operation, [parameters])
             return
 
+        connection = self._connection.connection
         self._cursor = connection.execute(operation)
 
     @_is_not_closed

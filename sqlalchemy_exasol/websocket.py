@@ -1,3 +1,4 @@
+import decimal
 from collections import (
     defaultdict,
     namedtuple,
@@ -18,12 +19,33 @@ class Integer(sqltypes.INTEGER):
         return to_integer
 
 
+class Decimal(sqltypes.DECIMAL):
+    def bind_processor(self, dialect):
+        return super().bind_processor(dialect)
+
+    def result_processor(self, dialect, coltype):
+        if not self.asdecimal:
+            return None
+
+        fstring = "%%.%df" % self._effective_decimal_return_scale
+
+        def to_decimal(value):
+            if value is None:
+                return None
+            elif isinstance(value, decimal.Decimal):
+                return value
+            elif isinstance(value, float):
+                return decimal.Decimal(fstring % value)
+            else:
+                return decimal.Decimal(value)
+
+        return to_decimal
+
+
 class EXADialect_websocket(EXADialect):
     driver = "exasol.driver.websocket.dbapi2"
     supports_statement_cache = False
-    colspecs = {
-        sqltypes.Integer: Integer,
-    }
+    colspecs = {sqltypes.Integer: Integer, sqltypes.Numeric: Decimal}
 
     @classmethod
     def dbapi(cls):

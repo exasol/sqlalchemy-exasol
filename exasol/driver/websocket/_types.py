@@ -15,22 +15,9 @@ from enum import (
 )
 from time import localtime
 
-
-def Date(year: int, month: int, day: int) -> date:  # pylint: disable=C0103
-    """This function constructs an object holding a date value."""
-    return date(year, month, day)
-
-
-def Time(hour: int, minute: int, second: int) -> time:  # pylint: disable=C0103
-    """This function constructs an object holding a time value."""
-    return time(hour, minute, second)
-
-
-def Timestamp(  # pylint: disable=C0103
-    year: int, month: int, day: int, hour: int, minute: int, second: int
-) -> datetime:
-    """This function constructs an object holding a time stamp value."""
-    return datetime(year, month, day, hour, minute, second)
+Date = date
+Time = time
+Timestamp = datetime
 
 
 def DateFromTicks(ticks: int) -> date:  # pylint: disable=C0103

@@ -4,6 +4,7 @@ This module provides `PEP-249`_ DBAPI compliant cursor implementation.
 
 .. _PEP-249-cursor: https://peps.python.org/pep-0249/#cursor-objects
 """
+import datetime
 import decimal
 from collections import defaultdict
 from dataclasses import (
@@ -167,10 +168,18 @@ class Cursor:
     @_is_not_closed
     def executemany(self, operation, seq_of_parameters):
         """See also :py:meth: `Cursor.executemany`"""
-        parameters = [
-            [str(p) if isinstance(p, (decimal.Decimal, float)) else p for p in params]
-            for params in seq_of_parameters
-        ]
+
+        def convert(value):
+            def identity(v):
+                return v
+
+            converters = defaultdict(
+                lambda: identity, {decimal.Decimal: str, float: str, datetime.date: str}
+            )
+            converter = converters[type(value)]
+            return converter(value)
+
+        parameters = [[convert(p) for p in params] for params in seq_of_parameters]
         connection = self._connection.connection
         self._cursor = connection.cls_statement(connection, operation, prepare=True)
         self._cursor.execute_prepared(parameters)
@@ -179,7 +188,8 @@ class Cursor:
     @_is_not_closed
     def fetchone(self):
         """See also :py:meth: `Cursor.fetchone`"""
-        return self._cursor.fetchone()
+        row = self._cursor.fetchone()
+        return row
 
     @_requires_result
     @_is_not_closed

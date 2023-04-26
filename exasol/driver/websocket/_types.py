@@ -9,10 +9,7 @@ from datetime import (
     datetime,
     time,
 )
-from enum import (
-    IntFlag,
-    auto,
-)
+from enum import Enum
 from time import localtime
 
 Date = date
@@ -50,34 +47,44 @@ def TimestampFromTicks(ticks: int) -> datetime:  # pylint: disable=C0103
     return Timestamp(year, month, day, hour, minute, second)
 
 
-class Types(IntFlag):
+class TypeCode(Enum):
     """
-    This enum defines the supported DBAPI2 types.
+    Type codes for Exasol DB column types.
 
-    Types:
-        STRING type
-            This type object is used to describe columns in a database
-            that are string-based (e.g. CHAR).
-        BINARY type
-            This type object is used to describe (long) binary columns in a database
-            (e.g. LONG, RAW, BLOBs).
-        NUMBER type
-            This type object is used to describe numeric columns in a database.
-        DATETIME type
-            This type object is used to describe date/time columns in a database.
-        ROWID type
-            This type object is used to describe the “Row ID” column in a database.
+    See: https://github.com/exasol/websocket-api/blob/master/docs/WebsocketAPIV3.md#data-types-type-names-and-properties
     """
 
-    STRING = auto()
-    BINARY = auto()
-    NUMBER = auto()
-    DATETIME = auto()
-    ROWID = auto()
+    Bool = "BOOLEAN"
+    Char = "CHAR"
+    Date = "DATE"
+    Decimal = "DECIMAL"
+    Double = "DOUBLE"
+    Geometry = "GEOMETRY"
+    IntervalDayToSecond = "INTERVAL DAY TO SECOND"
+    IntervalYearToMonth = "INTERVAL YEAR TO MONTH"
+    Timestamp = "TIMESTAMP"
+    TimestampTz = "TIMESTAMP WITH LOCAL TIME ZONE"
+    String = "VARCHAR"
 
 
-STRING = Types.STRING
-BINARY = Types.BINARY
-NUMBER = Types.NUMBER
-DATETIME = Types.DATETIME
-ROWID = Types.ROWID
+class _DBAPITypeObject:
+    def __init__(self, *type_codes) -> None:
+        self.type_codes = type_codes
+
+    def __eq__(self, other):
+        return other in self.type_codes
+
+
+STRING = _DBAPITypeObject(TypeCode.String)
+# A binary type is not natively supported by Exasol
+BINARY = _DBAPITypeObject(None)
+NUMBER = _DBAPITypeObject(TypeCode.Decimal, TypeCode.Double)
+DATETIME = _DBAPITypeObject(
+    TypeCode.Date,
+    TypeCode.Timestamp,
+    TypeCode.TimestampTz,
+    TypeCode.IntervalDayToSecond,
+    TypeCode.IntervalYearToMonth,
+)
+# Exasol does manage indexes internally
+ROWID = _DBAPITypeObject(None)

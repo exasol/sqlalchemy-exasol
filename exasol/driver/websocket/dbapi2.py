@@ -36,7 +36,7 @@ from exasol.driver.websocket._types import (
     TimeFromTicks,
     Timestamp,
     TimestampFromTicks,
-    Types,
+    TypeCode,
 )
 
 # Add remaining definitions
@@ -97,5 +97,5 @@ __all__ = [
     # ----- Functions ------
     "connect",
     # ----- Non DBAPI exports -----
-    "Types",
+    "TypeCode",
 ]

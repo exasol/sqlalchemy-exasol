@@ -18,7 +18,7 @@ from exasol.driver.websocket._errors import (
     Error,
     NotSupportedError,
 )
-from exasol.driver.websocket._types import Types
+from exasol.driver.websocket._types import TypeCode
 
 
 @dataclass
@@ -26,7 +26,7 @@ class MetaData:
     """Meta data describing a result column"""
 
     name: str
-    type_code: Types
+    type_code: TypeCode
     display_size: Optional[int] = None
     internal_size: Optional[int] = None
     precision: Optional[int] = None
@@ -35,9 +35,7 @@ class MetaData:
 
 
 def _from_pyexasol(name, metadata) -> MetaData:
-    type_mapping = defaultdict(
-        lambda: Types.STRING, {"DOUBLE": Types.NUMBER, "DECIMAL": Types.NUMBER}
-    )
+    type_mapping = {t.value: t for t in TypeCode}
     key_mapping = {
         "name": "name",
         "type_code": "type",
@@ -118,7 +116,7 @@ class Cursor:
             _from_pyexasol(name, metadata)
             for name, metadata in self._cursor.columns().items()
         )
-        columns_metadata = [astuple(metadata) for metadata in columns_metadata]
+        columns_metadata = tuple(astuple(metadata) for metadata in columns_metadata)
         return columns_metadata
 
     @property

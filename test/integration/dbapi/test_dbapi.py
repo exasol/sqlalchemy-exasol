@@ -5,7 +5,7 @@ import pytest
 from exasol.driver.websocket.dbapi2 import (
     Error,
     NotSupportedError,
-    Types,
+    TypeCode,
     connect,
 )
 
@@ -132,19 +132,19 @@ def test_description_returns_none_if_no_query_has_been_executed(cursor):
     [
         (
             "SELECT CAST(A as INT) A FROM VALUES 1, 2, 3 as T(A);",
-            [("A", Types.NUMBER, None, None, 18, 0, None)],
+            (("A", TypeCode.Decimal, None, None, 18, 0, None),),
         ),
         (
             "SELECT CAST(A as DOUBLE) A FROM VALUES 1, 2, 3 as T(A);",
-            [("A", Types.NUMBER, None, None, None, None, None)],
+            (("A", TypeCode.Double, None, None, None, None, None),),
         ),
         (
             "SELECT CAST(A as BOOL) A FROM VALUES TRUE, FALSE, TRUE as T(A);",
-            [("A", Types.STRING, None, None, None, None, None)],
+            (("A", TypeCode.Bool, None, None, None, None, None),),
         ),
         (
             "SELECT CAST(A as VARCHAR(10)) A FROM VALUES 'Foo', 'Bar' as T(A);",
-            [("A", Types.STRING, None, 10, None, None, None)],
+            (("A", TypeCode.String, None, 10, None, None, None),),
         ),
         (
             cleandoc(
@@ -155,12 +155,12 @@ def test_description_returns_none_if_no_query_has_been_executed(cursor):
                     """
                 # fmt: on
             ),
-            [
-                ("A", Types.NUMBER, None, None, 18, 0, None),
-                ("B", Types.STRING, None, 100, None, None, None),
-                ("C", Types.STRING, None, None, None, None, None),
-                ("D", Types.NUMBER, None, None, None, None, None),
-            ],
+            (
+                ("A", TypeCode.Decimal, None, None, 18, 0, None),
+                ("B", TypeCode.String, None, 100, None, None, None),
+                ("C", TypeCode.Bool, None, None, None, None, None),
+                ("D", TypeCode.Double, None, None, None, None, None),
+            ),
         ),
     ],
     ids=str,

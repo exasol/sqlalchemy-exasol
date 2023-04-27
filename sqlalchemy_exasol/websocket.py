@@ -1,3 +1,4 @@
+import datetime
 import decimal
 from collections import (
     defaultdict,
@@ -42,10 +43,27 @@ class Decimal(sqltypes.DECIMAL):
         return to_decimal
 
 
+class Date(sqltypes.DATE):
+    def bind_processor(self, dialect):
+        return super().bind_processor(dialect)
+
+    def result_processor(self, dialect, coltype):
+        def to_date(value):
+            if not isinstance(value, str):
+                return value
+            return datetime.date.fromisoformat(value)
+
+        return to_date
+
+
 class EXADialect_websocket(EXADialect):
     driver = "exasol.driver.websocket.dbapi2"
     supports_statement_cache = False
-    colspecs = {sqltypes.Integer: Integer, sqltypes.Numeric: Decimal}
+    colspecs = {
+        sqltypes.Integer: Integer,
+        sqltypes.Numeric: Decimal,
+        sqltypes.Date: Date,
+    }
 
     @classmethod
     def dbapi(cls):

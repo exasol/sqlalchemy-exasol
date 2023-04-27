@@ -6,6 +6,7 @@ This module provides `PEP-249`_ DBAPI compliant cursor implementation.
 """
 import datetime
 import decimal
+import time
 from collections import defaultdict
 from dataclasses import (
     astuple,
@@ -101,6 +102,16 @@ def _pyexasol2dbapi(value, metadata):
     )
     metadata = MetaData(**{k: v for k, v in zip(members, metadata)})
 
+    def to_datetime(v):
+        if not isinstance(v, str):
+            return v
+        try:
+            t = time.strptime(v, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            return v
+
+        return datetime.datetime.fromtimestamp(time.mktime(t))
+
     def to_date(v):
         if not isinstance(v, str):
             return v
@@ -112,7 +123,11 @@ def _pyexasol2dbapi(value, metadata):
         return float(v)
 
     converters = defaultdict(
-        lambda: _identity, {TypeCode.Date: to_date, TypeCode.Double: to_float}
+        lambda: _identity,
+        {
+            TypeCode.Date: to_date,
+            TypeCode.Double: to_float,
+        },
     )
     converter = converters[metadata.type_code]
     return converter(value)

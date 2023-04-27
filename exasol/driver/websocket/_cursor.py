@@ -34,7 +34,7 @@ class MetaData:
     null_ok: Optional[bool] = None
 
 
-def _from_pyexasol(name, metadata) -> MetaData:
+def _metadata(name, metadata) -> MetaData:
     type_mapping = {t.value: t for t in TypeCode}
     key_mapping = {
         "name": "name",
@@ -85,6 +85,48 @@ def _requires_result(method):
     return wrapper
 
 
+def _identity(value):
+    return value
+
+
+def _pyexasol2dbapi(value, metadata):
+    members = (
+        "name",
+        "type_code",
+        "display_size",
+        "internal_size",
+        "precision",
+        "scale",
+        "null_ok",
+    )
+    metadata = MetaData(**{k: v for k, v in zip(members, metadata)})
+
+    def to_date(v):
+        if not isinstance(v, str):
+            return v
+        return datetime.date.fromisoformat(v)
+
+    def to_float(v):
+        if not isinstance(v, str):
+            return v
+        return float(v)
+
+    converters = defaultdict(
+        lambda: _identity, {TypeCode.Date: to_date, TypeCode.Double: to_float}
+    )
+    converter = converters[metadata.type_code]
+    return converter(value)
+
+
+def _dbapi2pyexasol(value):
+    converters = defaultdict(
+        lambda: _identity,
+        {decimal.Decimal: str, float: str, datetime.date: str, datetime.datetime: str},
+    )
+    converter = converters[type(value)]
+    return converter(value)
+
+
 class Cursor:
     """
     Implementation of a cursor based on the DefaultConnection.
@@ -113,7 +155,7 @@ class Cursor:
         if not self._cursor:
             return None
         columns_metadata = (
-            _from_pyexasol(name, metadata)
+            _metadata(name, metadata)
             for name, metadata in self._cursor.columns().items()
         )
         columns_metadata = tuple(astuple(metadata) for metadata in columns_metadata)
@@ -166,41 +208,49 @@ class Cursor:
     @_is_not_closed
     def executemany(self, operation, seq_of_parameters):
         """See also :py:meth: `Cursor.executemany`"""
-
-        def convert(value):
-            def identity(v):
-                return v
-
-            converters = defaultdict(
-                lambda: identity, {decimal.Decimal: str, float: str, datetime.date: str}
-            )
-            converter = converters[type(value)]
-            return converter(value)
-
-        parameters = [[convert(p) for p in params] for params in seq_of_parameters]
+        parameters = [
+            [_dbapi2pyexasol(p) for p in params] for params in seq_of_parameters
+        ]
         connection = self._connection.connection
         self._cursor = connection.cls_statement(connection, operation, prepare=True)
         self._cursor.execute_prepared(parameters)
+
+    def _convert(self, rows):
+        if rows is None:
+            return None
+
+        return tuple(self._convert_row(row) for row in rows)
+
+    def _convert_row(self, row):
+        if row is None:
+            return row
+
+        return tuple(
+            _pyexasol2dbapi(value, metadata)
+            for value, metadata in zip(row, self.description)
+        )
 
     @_requires_result
     @_is_not_closed
     def fetchone(self):
         """See also :py:meth: `Cursor.fetchone`"""
         row = self._cursor.fetchone()
-        return row
+        return self._convert_row(row)
 
     @_requires_result
     @_is_not_closed
     def fetchmany(self, size=None):
         """See also :py:meth: `Cursor.fetchmany`"""
         size = size if size is not None else self.arraysize
-        return self._cursor.fetchmany(size)
+        rows = self._cursor.fetchmany(size)
+        return self._convert(rows)
 
     @_requires_result
     @_is_not_closed
     def fetchall(self):
         """See also :py:meth: `Cursor.fetchall`"""
-        return self._cursor.fetchall()
+        rows = self._cursor.fetchall()
+        return self._convert(rows)
 
     @_is_not_closed
     def nextset(self):

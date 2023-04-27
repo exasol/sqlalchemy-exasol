@@ -9,7 +9,7 @@ import pytest
 from exasol.driver.websocket._connection import _requires_connection
 from exasol.driver.websocket._cursor import (
     MetaData,
-    _from_pyexasol,
+    _metadata,
 )
 from exasol.driver.websocket.dbapi2 import (
     Error,
@@ -143,5 +143,5 @@ def test_requires_connection_decorator_does_use_wrap():
     ids=str,
 )
 def test_metadata_from_pyexasol_metadata(name, metadata, expected):
-    actual = _from_pyexasol(name, metadata)
+    actual = _metadata(name, metadata)
     assert actual == expected

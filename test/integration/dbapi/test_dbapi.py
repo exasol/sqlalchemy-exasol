@@ -90,13 +90,28 @@ def test_cursor_function_raises_exception_if_no_result_has_been_produced(
 @pytest.mark.parametrize(
     "sql_statement, size, expected",
     [
-        ("SELECT 1;", None, [(1,)]),
-        ("SELECT 1;", 1, [(1,)]),
-        ("SELECT 1;", 10, [(1,)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", None, [(1, 2)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 1, [(1, 2)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 2, [(1, 2), (3, 4)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 10, [(1, 2), (3, 4), (5, 6)]),
+        ("SELECT 1;", None, ((1,),)),
+        ("SELECT 1;", 1, ((1,),)),
+        ("SELECT 1;", 10, ((1,),)),
+        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", None, ((1, 2),)),
+        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 1, ((1, 2),)),
+        (
+            "SELECT * FROM VALUES ((1,2), (3,4), (5,6));",
+            2,
+            (
+                (1, 2),
+                (3, 4),
+            ),
+        ),
+        (
+            "SELECT * FROM VALUES ((1,2), (3,4), (5,6));",
+            10,
+            (
+                (1, 2),
+                (3, 4),
+                (5, 6),
+            ),
+        ),
     ],
     ids=str,
 )
@@ -108,12 +123,30 @@ def test_cursor_fetchmany(cursor, sql_statement, size, expected):
 @pytest.mark.parametrize(
     "sql_statement, expected",
     [
-        ("SELECT 1;", [(1,)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4));", [(1, 2), (3, 4)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", [(1, 2), (3, 4), (5, 6)]),
+        ("SELECT 1;", ((1,),)),
+        (
+            "SELECT * FROM VALUES ((1,2), (3,4));",
+            (
+                (1, 2),
+                (3, 4),
+            ),
+        ),
+        (
+            "SELECT * FROM VALUES ((1,2), (3,4), (5,6));",
+            (
+                (1, 2),
+                (3, 4),
+                (5, 6),
+            ),
+        ),
         (
             "SELECT * FROM VALUES ((1,2), (3,4), (5,6), (7, 8));",
-            [(1, 2), (3, 4), (5, 6), (7, 8)],
+            (
+                (1, 2),
+                (3, 4),
+                (5, 6),
+                (7, 8),
+            ),
         ),
     ],
     ids=str,

@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import time
 from collections import (
     defaultdict,
     namedtuple,
@@ -56,6 +57,31 @@ class Date(sqltypes.DATE):
         return to_date
 
 
+class DateTime(sqltypes.DATETIME):
+    def bind_processor(self, dialect):
+        return super().bind_processor(dialect)
+
+    def result_processor(self, dialect, coltype):
+        def datetime_fmt(v):
+            formats = ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M:%S.%f")
+            for fmt in formats:
+                try:
+                    time.strptime(v, fmt)
+                except ValueError:
+                    continue
+                return fmt
+            raise ValueError("Unknown date/time format")
+
+        def to_datetime(v):
+            if not isinstance(v, str):
+                return v
+            fmt = datetime_fmt(v)
+            timestamp = time.strptime(v, fmt)
+            return datetime.datetime.fromtimestamp(time.mktime(timestamp))
+
+        return to_datetime
+
+
 class EXADialect_websocket(EXADialect):
     driver = "exasol.driver.websocket.dbapi2"
     supports_statement_cache = False
@@ -63,6 +89,7 @@ class EXADialect_websocket(EXADialect):
         sqltypes.Integer: Integer,
         sqltypes.Numeric: Decimal,
         sqltypes.Date: Date,
+        sqltypes.DateTime: DateTime,
     }
 
     @classmethod

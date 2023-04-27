@@ -102,16 +102,6 @@ def _pyexasol2dbapi(value, metadata):
     )
     metadata = MetaData(**{k: v for k, v in zip(members, metadata)})
 
-    def to_datetime(v):
-        if not isinstance(v, str):
-            return v
-        try:
-            t = time.strptime(v, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            return v
-
-        return datetime.datetime.fromtimestamp(time.mktime(t))
-
     def to_date(v):
         if not isinstance(v, str):
             return v

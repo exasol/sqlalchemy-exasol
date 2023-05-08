@@ -147,6 +147,12 @@ class Cursor:
         self._cursor = None
         self._is_closed = False
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     @property
     @_is_not_closed
     def arraysize(self):

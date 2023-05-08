@@ -147,9 +147,11 @@ class Cursor:
         self._cursor = None
         self._is_closed = False
 
+    # Note: Needed for compatibility with sqlalchemy_exasol base dialect.
     def __enter__(self):
         return self
 
+    # Note: Needed for compatibility with sqlalchemy_exasol base dialect.
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 

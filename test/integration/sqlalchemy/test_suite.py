@@ -17,10 +17,27 @@ from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
+from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
+
+
+class RowFetchTest(_RowFetchTest):
+    RATIONAL = cleandoc(
+        """
+    PyExasol currently does not support/allow duplicate names in the results set.
+    
+    See also: 
+    * pyexasol.statement.ExaStatement._check_duplicate_col_names
+    """
+    )
+
+    @testing.config.requirements.duplicate_names_in_cursor_description
+    @pytest.mark.skipif("websocket" in testing.db.dialect.driver, reason=RATIONAL)
+    def test_row_with_dupe_names(self, connection):
+        super().test_row_with_dupe_names(connection)
 
 
 class HasTableTest(_HasTableTest):

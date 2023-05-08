@@ -15,6 +15,8 @@ from dataclasses import (
 from functools import wraps
 from typing import Optional
 
+import pyexasol.exceptions
+
 from exasol.driver.websocket._errors import (
     Error,
     NotSupportedError,
@@ -216,7 +218,10 @@ class Cursor:
             return
 
         connection = self._connection.connection
-        self._cursor = connection.execute(operation)
+        try:
+            self._cursor = connection.execute(operation)
+        except pyexasol.exceptions.ExaError as ex:
+            raise Error() from ex
 
     @_is_not_closed
     def executemany(self, operation, seq_of_parameters):
@@ -226,7 +231,10 @@ class Cursor:
         ]
         connection = self._connection.connection
         self._cursor = connection.cls_statement(connection, operation, prepare=True)
-        self._cursor.execute_prepared(parameters)
+        try:
+            self._cursor.execute_prepared(parameters)
+        except pyexasol.exceptions.ExaError as ex:
+            raise Error() from ex
 
     def _convert(self, rows):
         if rows is None:

@@ -174,6 +174,7 @@ class Cursor:
             for name, metadata in self._cursor.columns().items()
         )
         columns_metadata = tuple(astuple(metadata) for metadata in columns_metadata)
+        columns_metadata = columns_metadata if columns_metadata != () else None
         return columns_metadata
 
     @property

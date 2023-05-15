@@ -72,7 +72,8 @@ def test_lastrowid_does_not_create_extra_commit(
         conn = engine.connect()
         trans = conn.begin()
 
-        # insert without an explicit ID will trigger get_lastrowid
+        # Insert without an explicit ID will trigger a call to `get_lastrowid`
+        # which in turn cause the unintended autocommit
         insert_statement = insert(table).values(name="Gandalf")
         conn.execute(insert_statement)
         trans.rollback()

@@ -47,6 +47,7 @@ representation (all uppercase).
 
 import logging
 import re
+from contextlib import closing
 from datetime import (
     date,
     datetime,
@@ -750,7 +751,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         sql_stmnt += " AND column_schema = ?" if schema else ""
         args = (table, id_col, schema) if schema else (table, id_col)
 
-        with self.create_cursor() as cursor:
+        with closing(self.create_cursor()) as cursor:
             cursor.execute(sql_stmnt, args)
             result = cursor.fetchone()
             return int(result[0]) - 1

@@ -13,6 +13,10 @@ from typing import (
 
 from pyodbc import Connection
 
+PROJECT_ROOT = Path(__file__).parent / ".." / ".."
+
+ODBC_DRIVER = PROJECT_ROOT / "driver" / "libexaodbc-uo2214lv2.so"
+
 ODBCINST_INI_TEMPLATE = dedent(
     """
     [ODBC]

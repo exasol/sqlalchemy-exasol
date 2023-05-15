@@ -12,6 +12,10 @@ Unreleased
 
     Note: It is also very likely that turbodbc support will be dropped in future versions.
 
+🐞 Fixed
+--------
+- Fixed invalid implicit autocommit behaviour, for details see `<Issue-https://github.com/exasol/sqlalchemy-exasol/issues/335>`_
+
 ✨ Added
 --------
 

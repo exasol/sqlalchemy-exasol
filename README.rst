@@ -63,6 +63,10 @@ On Linux/Unix like systems you need:
 Turbodbc support
 ````````````````
 
+.. warning::
+
+    Maintenance of this feature is on hold. Also it is very likely that turbodbc support will be dropped in future versions.
+
 - You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.8.
 - Multi row update is not supported, see
   `test/test_update.py <test/test_update.py>`_ for an example

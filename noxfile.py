@@ -243,6 +243,12 @@ def exasol_tests(session: Session) -> None:
     session.run("pytest", f"{PROJECT_ROOT / 'test' / 'integration' / 'dbapi'}")
 
 
+@nox.session(name="regression-tests", python=False)
+def regression_tests(session: Session) -> None:
+    """Run regression tests"""
+    session.run("pytest", f"{PROJECT_ROOT / 'test' / 'integration' / 'regression'}")
+
+
 @nox.session(name="integration-tests", python=False)
 def integration_tests(session: Session) -> None:
     """Run integration tests with a specific configuration. For more details append '-- -h'"""
@@ -278,6 +284,9 @@ def integration_tests(session: Session) -> None:
     session.notify(
         find_session_runner(session, f"exasol-tests"),
         posargs=["--connector", f"{args.connector}"],
+    )
+    session.notify(
+        find_session_runner(session, f"regression-tests"),
     )
     session.notify(find_session_runner(session, "db-stop"))
 

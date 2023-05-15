@@ -12,10 +12,10 @@ from sqlalchemy import (
     insert,
 )
 
-PROJECT_ROOT = Path(__file__).parent / ".." / ".." / ".."
-SCRIPTS = PROJECT_ROOT / "scripts"
-ODBC_DRIVER = PROJECT_ROOT / "driver" / "libexaodbc-uo2214lv2.so"
-sys.path.append(f"{SCRIPTS.resolve()}")
+from exasol.driver.odbc import (
+    ODBC_DRIVER,
+    odbcconfig,
+)
 
 
 @pytest.fixture
@@ -67,8 +67,6 @@ def test_lastrowid_does_not_create_extra_commit(
         Column("name", String(2000)),
         schema=schema_name,
     )
-
-    from odbc import odbcconfig
 
     with odbcconfig(ODBC_DRIVER):
         conn = engine.connect()

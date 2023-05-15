@@ -24,15 +24,15 @@ from links import documentation as _documentation
 from links import urls as _urls
 from nox import Session
 from nox.sessions import SessionRunner
-from odbc import (
-    odbcconfig,
-    transaction,
-)
-from pyodbc import connect
 from version_check import (
     version_from_poetry,
     version_from_python_module,
     version_from_string,
+)
+
+from exasol.driver.odbc import (
+    ODBC_DRIVER,
+    odbcconfig,
 )
 
 # default actions to be run if nothing is explicitly specified with the -s option
@@ -40,7 +40,6 @@ nox.options.sessions = ["fix"]
 
 
 class Settings:
-    ODBC_DRIVER = PROJECT_ROOT / "driver" / "libexaodbc-uo2214lv2.so"
     CONNECTORS = ("pyodbc", "turbodbc")
     ENVIRONMENT_NAME = "test"
     DB_PORT = 8888
@@ -186,7 +185,7 @@ def sqlalchemy_tests(session: Session) -> None:
         )
         return p
 
-    with odbcconfig(Settings.ODBC_DRIVER) as (config, env):
+    with odbcconfig(ODBC_DRIVER) as (config, env):
         args = parser().parse_args(session.posargs)
         connector = args.connector
         session.run(
@@ -227,7 +226,7 @@ def exasol_tests(session: Session) -> None:
         )
         return p
 
-    with odbcconfig(Settings.ODBC_DRIVER) as (config, env):
+    with odbcconfig(ODBC_DRIVER) as (config, env):
         args = parser().parse_args(session.posargs)
         connector = args.connector
         session.run(
@@ -440,7 +439,7 @@ def report_skipped(session: Session) -> None:
     with TemporaryDirectory() as tmp_dir:
         for connector in Settings.CONNECTORS:
             report = Path(tmp_dir) / f"test-report{connector}.json"
-            with odbcconfig(Settings.ODBC_DRIVER) as (config, env):
+            with odbcconfig(ODBC_DRIVER) as (config, env):
                 session.run(
                     "pytest",
                     "--dropfirst",

@@ -27,9 +27,7 @@ logger = logging.getLogger("sqlalchemy_exasol")
 class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     supports_statement_cache = False
     execution_ctx_cls = EXAExecutionContext
-
     driver_version = None
-    server_version_info = None
 
     def __init__(self, **kw):
         super().__init__(**kw)
@@ -41,29 +39,6 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
                 connection.connection.getinfo(self.dbapi.SQL_DRIVER_VER) or "2.0.0"
             )
         return self.driver_version
-
-    def _get_server_version_info(self, connection):
-        if self.server_version_info is None:
-            # need to check if current version of EXAODBC returns proper server version
-            if self.get_driver_version(connection) >= version.parse("4.2.1"):
-                # v4.2.1 and above should deliver usable SQL_DBMS_VER
-                result = connection.connection.getinfo(self.dbapi.SQL_DBMS_VER).split(
-                    "."
-                )
-            else:
-                # Older versions do not include patchlevels, so we need to get info through SQL call
-                query = "select PARAM_VALUE from SYS.EXA_METADATA where PARAM_NAME = 'databaseProductVersion'"
-                result = connection.execute(query).fetchone()[0].split(".")
-
-            # last version position can something like: '12-S' for an EXASolo
-            self.server_version_info = (
-                int(result[0]),
-                int(result[1]),
-                int(result[2].split("-")[0]),
-            )
-
-        # return cached info
-        return self.server_version_info
 
     if sys.platform == "darwin":
 

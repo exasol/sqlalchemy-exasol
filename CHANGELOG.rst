@@ -3,6 +3,11 @@
 Unreleased
 ==========
 
+.. _changelog-4.4.0:
+
+4.4.0 — 2023-05-15
+==================
+
  **🚨 Attention:**
 
     The turbodbc dependency was pinned to *4.5.4* due to issues with newer versions.
@@ -14,7 +19,8 @@ Unreleased
 
 🐞 Fixed
 --------
-- Fixed invalid implicit autocommit behaviour, for details see `<Issue-https://github.com/exasol/sqlalchemy-exasol/issues/335>`_
+
+* Fixed invalid implicit autocommit behaviour, for details see `<Issue-https://github.com/exasol/sqlalchemy-exasol/issues/335>`_
 
 ✨ Added
 --------

@@ -3,7 +3,7 @@
 # If you need to change the version, do so in the project.toml, e.g. by using `poetry version X.Y.Z`.
 
 MAJOR = 4
-MINOR = 3
+MINOR = 4
 PATCH = 0
 
 VERSION = f"{MAJOR}.{MINOR}.{PATCH}"

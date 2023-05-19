@@ -5,6 +5,7 @@ This module provides `PEP-249`_ DBAPI compliant connection implementation.
 .. _PEP-249-connection: https://peps.python.org/pep-0249/#connection-objects
 """
 
+import ssl
 from functools import wraps
 
 import pyexasol
@@ -45,6 +46,7 @@ class Connection:
         schema: str = "",
         autocommit: bool = True,
         tls: bool = True,
+        certificate_validation: bool = True,
     ):
         """
         Create a Connection object.
@@ -89,7 +91,9 @@ class Connection:
             "client_version": None,
             "client_os_username": None,
             "protocol_version": 3,
-            "websocket_sslopt": None,
+            "websocket_sslopt": {"cert_reqs": ssl.CERT_REQUIRED}
+            if certificate_validation
+            else None,
             "access_token": None,
             "refresh_token": None,
         }

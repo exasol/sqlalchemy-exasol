@@ -2,6 +2,7 @@ import datetime
 import decimal
 import time
 from collections import (
+    ChainMap,
     defaultdict,
     namedtuple,
 )
@@ -106,6 +107,13 @@ class EXADialect_websocket(EXADialect):
         args, kwargs = [], url.translate_connect_args(database="schema")
 
         def tls(value):
+            value = value.lower()
+            mapping = defaultdict(
+                lambda: True, {"y": True, "yes": "True", "n": False, "no": False}
+            )
+            return mapping[value]
+
+        def certificate_validation(value):
             return True if not value == "SSL_VERIFY_NONE" else False
 
         def autocommit(value):
@@ -116,19 +124,22 @@ class EXADialect_websocket(EXADialect):
             return mapping[value]
 
         converters = {
-            "SSLCertificate": Converter("tls", tls),
+            "ENCRYPTION": Converter("tls", tls),
+            "SSLCertificate": Converter(
+                "certificate_validation", certificate_validation
+            ),
             "AUTOCOMMIT": Converter("autocommit", autocommit),
         }
-
+        defaults = {"tls": True, "certificate_validation": True}
         known_options = {
             option: value for option, value in url.query.items() if option in converters
         }
-        for name, value in known_options.items():
-            converter = converters[name]
-            kwargs[converter.name] = converter.map(value)
-
+        user_settings = {
+            converters[name].name: converters[name].map(value)
+            for name, value in known_options.items()
+        }
         kwargs["dsn"] = f'{kwargs.pop("host")}:{kwargs.pop("port")}'
-
+        kwargs = ChainMap(user_settings, kwargs, defaults)
         return args, kwargs
 
 

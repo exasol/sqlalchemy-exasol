@@ -17,6 +17,7 @@ def connection(exasol_config):
         dsn=f"{config.host}:{config.port}",
         username=config.username,
         password=config.password,
+        certificate_validation=False,
     )
     yield connection
     connection.close()
@@ -32,7 +33,10 @@ def cursor(connection):
 def test_websocket_dbapi(exasol_config):
     cfg = exasol_config
     connection = connect(
-        dsn=f"{cfg.host}:{cfg.port}", username=cfg.username, password=cfg.password
+        dsn=f"{cfg.host}:{cfg.port}",
+        username=cfg.username,
+        password=cfg.password,
+        certificate_validation=False,
     )
     assert connection
     connection.close()
@@ -44,7 +48,7 @@ def test_websocket_dbapi_connect_fails():
     password = "ThisShouldNotBeAValidPasswordForTheUser"
     with pytest.raises(Error) as e_info:
         connect(dsn=dsn, username=username, password=password)
-    assert "Connection failed" == f"{e_info.value}"
+    assert "Connection failed" in f"{e_info.value}"
 
 
 def test_retrieve_cursor_from_connection(connection):

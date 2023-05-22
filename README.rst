@@ -26,7 +26,7 @@ SQLAlchemy Dialect for EXASOL DB
     :target: https://pycqa.github.io/isort/
     :alt: Formatter - Isort
 
-.. image:: https://img.shields.io/badge/pylint-5.8-yellow
+.. image:: https://img.shields.io/badge/pylint-6.4-yellowgreen
     :target: https://github.com/PyCQA/pylint
     :alt: Pylint
 

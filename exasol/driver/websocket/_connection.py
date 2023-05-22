@@ -104,7 +104,7 @@ class Connection:
         try:
             self._connection = pyexasol.connect(**self._options)
         except pyexasol.exceptions.ExaConnectionError as ex:
-            raise Error("Connection failed") from ex
+            raise Error(f"Connection failed, {ex}") from ex
         except Exception as ex:
             raise Error() from ex
         return self

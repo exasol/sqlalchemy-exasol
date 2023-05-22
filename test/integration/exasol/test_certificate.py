@@ -39,8 +39,10 @@ class CertificateTest(TestBase):
 
         engine = create_engine(url)
         with pytest.raises(sqlalchemy.exc.DBAPIError) as exec_info:
-            # we expect the connect call to fail, but want to close it in case it succeeds
+            # we expect connect call to fail, but want to close it in case it succeeds
             with engine.connect() as conn:
                 pass
 
-        assert "self signed certificate" in f"{exec_info.value}"
+        actual_message = f"{exec_info.value}"
+        expected_substrings = ["self-signed certificate", "self signed certificate"]
+        assert any([e in actual_message for e in expected_substrings])

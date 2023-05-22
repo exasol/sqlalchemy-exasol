@@ -7,6 +7,7 @@ from collections import (
     namedtuple,
 )
 
+from sqlalchemy.exc import ArgumentError
 from sqlalchemy.sql import sqltypes
 
 from sqlalchemy_exasol.base import EXADialect
@@ -139,7 +140,12 @@ class EXADialect_websocket(EXADialect):
             for name, value in known_options.items()
         }
         kwargs["dsn"] = f'{kwargs.pop("host")}:{kwargs.pop("port")}'
-        kwargs = ChainMap(user_settings, kwargs, defaults)
+        kwargs = dict(**ChainMap(user_settings, kwargs, defaults))
+
+        if not kwargs["tls"] and kwargs["certificate_validation"]:
+            raise ArgumentError(
+                "Certificate validation (True), can't be used without TLS (False)."
+            )
         return args, kwargs
 
 

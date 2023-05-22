@@ -49,17 +49,6 @@ How to get started
 We assume you have a good understanding of (unix)ODBC. If not, make sure you
 read their documentation carefully - there are lot's of traps 🪤 to step into.
 
-Meet the system requirements
-````````````````````````````
-
-On Linux/Unix like systems you need:
-
-- Python
-- An Exasol DB (e.g. `docker-db <test_docker_image_>`_ or a `cloud instance <test_drive_>`_)
-- The packages unixODBC and unixODBC-dev >= 2.2.14
-- The Exasol `ODBC driver <odbc_driver_>`_
-- The ODBC.ini and ODBCINST.ini configurations files setup
-
 Turbodbc support
 ````````````````
 
@@ -71,6 +60,18 @@ Turbodbc support
 - Multi row update is not supported, see
   `test/test_update.py <test/test_update.py>`_ for an example
 
+
+
+Meet the system requirements
+````````````````````````````
+
+On Linux/Unix like systems you need:
+
+- Python
+- An Exasol DB (e.g. `docker-db <test_docker_image_>`_ or a `cloud instance <test_drive_>`_)
+- The packages unixODBC and unixODBC-dev >= 2.2.14
+- The Exasol `ODBC driver <odbc_driver_>`_
+- The ODBC.ini and ODBCINST.ini configurations files setup
 
 Setup your python project and install sqlalchemy-exasol
 ```````````````````````````````````````````````````````
@@ -109,7 +110,7 @@ The dialect supports two types of connection urls creating an engine. A DSN (Dat
 
 .. list-table::
 
-   * - Type
+    * - Type
      - Example
    * - DSN URL
      - 'exa+pyodbc://USER:PWD@exa_test'
@@ -120,7 +121,6 @@ Features
 ++++++++
 
 - SELECT, INSERT, UPDATE, DELETE statements
-- you can even use the MERGE statement (see unit tests for examples)
 
 Notes
 +++++
@@ -139,3 +139,96 @@ Development & Testing
 `````````````````````
 See `developer guide`_
 
+Websocket support
+-----------------
+
+.. attention::
+
+    The Websocket support currently is in Beta, therefore it should not be used in production.
+    We also recommend to have a look into the know issues, before you start using it.
+
+    If you find encounter any issue, just `create an issue <https://github.com/exasol/sqlalchemy-exasol/issues/new?assignees=&labels=bug&projects=&template=bug.md&title=%F0%9F%90%9E+%3CInsert+Title%3E>`_.
+    With your feedback, we will be able stabilize this feature more quickly.
+
+What is Websocket support?
+``````````````````````````
+In the context of SQLA and Exasol, websocket support means that an SQLA dialect
+supporting the `Exasol Websocket Protocol <https://github.com/exasol/websocket-api>`_
+is provided.
+
+Using the websocket based protocol instead over ODBC will provide various advantages:
+
+* Less System Dependencies
+* Easier to use than ODBC based driver(s)
+* Lock free metadata calls etc.
+
+For further details `Why a Websockets API  <https://github.com/exasol/websocket-api#why-a-websockets-api>`_.
+
+Examples Usage(s)
+`````````````````
+
+.. code-block:: python
+
+    from sqla import create_engine
+
+    engine = create_engine("exa+websocket://sys:exasol@127.0.0.1:8888")
+    with engine.connect() as con:
+        ...
+
+.. code-block:: python
+
+    from sqla import create_engine
+
+    # ATTENTION:
+    # In terms of security it is NEVER a good idea to turn of certificate validation!!
+    # In rare cases it may be handy for non security related reasons.
+    # That said, if you are not a 100% sure about your scenario, stick with the
+    # secure defaults.
+    # In most cases, having a valid certificate and/or configuring the truststore(s)
+    # appropriately is the best/correct solution.
+    engine = create_engine("exa+websocket://sys:exasol@127.0.0.1:8888?SSLCertificate=SSL_VERIFY_NONE")
+    with engine.connect() as con:
+        ...
+
+Supported Connection Parameters
+```````````````````````````````
+.. list-table::
+
+   * - Parameter
+     - Values
+     - Comment
+   * - ENCRYPTION
+     - Y, Yes, N, No
+     - Y or Yes Enable Encryption (TLS) default, N or No disable Encryption
+   * - SSLCertificate
+     - SSL_VERIFY_NONE
+     - Disable certificate validation
+
+
+Known Issues
+````````````
+
+* Literal casts within prepared statements do not work
+    - :code:`INSERT INTO t (x) VALUES (CAST(? AS VARCHAR(50)));`
+* Various conversions regarding float, decimals
+    - Certain scenarios still yield a :code:`string` type instead :code:`float` or :code:`decimal` type.
+* Insert
+    - Insert Multiple does not work
+    - Insert from select does not work
+* For some prepared statements, the wss protocol type conversion does not work properly
+    - Error messages usually state some JSON type mismatch, e.g.: '... getString: JSON value is not a string ...'
+* Exists
+* Known failing tests of the SQLA compliance test suite
+    - FAILED test/integration/sqlalchemy/test_suite.py::CastTypeDecoratorTest_exasol+exasol_driver_websocket_dbapi2::test_special_type - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
+    - FAILED test/integration/sqlalchemy/test_suite.py::ExistsTest_exasol+exasol_driver_websocket_dbapi2::test_select_exists - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
+    - FAILED test/integration/sqlalchemy/test_suite.py::ExistsTest_exasol+exasol_driver_websocket_dbapi2::test_select_exists_false - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
+    - FAILED test/integration/sqlalchemy/test_suite.py::InsertBehaviorTest_exasol+exasol_driver_websocket_dbapi2::test_empty_insert_multiple - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
+    - ERROR  test/integration/sqlalchemy/test_suite.py::InsertBehaviorTest_exasol+exasol_driver_websocket_dbapi2::test_empty_insert_multiple_teardown - ERROR
+    - FAILED test/integration/sqlalchemy/test_suite.py::InsertBehaviorTest_exasol+exasol_driver_websocket_dbapi2::test_insert_from_select - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
+    - FAILED test/integration/sqlalchemy/test_suite.py::InsertBehaviorTest_exasol+exasol_driver_websocket_dbapi2::test_insert_from_select_with_defaults - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
+    - FAILED test/integration/sqlalchemy/test_suite.py::NumericTest_exasol+exasol_driver_websocket_dbapi2::test_float_as_decimal - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
+    - FAILED test/integration/sqlalchemy/test_suite.py::NumericTest_exasol+exasol_driver_websocket_dbapi2::test_float_as_float - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
+    - FAILED test/integration/sqlalchemy/test_suite.py::NumericTest_exasol+exasol_driver_websocket_dbapi2::test_float_coerce_round_trip - AssertionError: '15.7563' != 15.7563
+    - FAILED test/integration/sqlalchemy/test_suite.py::NumericTest_exasol+exasol_driver_websocket_dbapi2::test_float_custom_scale - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
+    - FAILED test/integration/sqlalchemy/test_suite.py::NumericTest_exasol+exasol_driver_websocket_dbapi2::test_numeric_as_float - AssertionError: {'15.7563'} != {15.7563}
+    - FAILED test/integration/sqlalchemy/test_suite.py::NumericTest_exasol+exasol_driver_websocket_dbapi2::test_render_literal_numeric_asfloat - AssertionError: assert '15.7563' in [15.7563]

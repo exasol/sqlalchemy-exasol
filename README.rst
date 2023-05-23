@@ -152,7 +152,7 @@ Websocket support
 
 What is Websocket support?
 ``````````````````````````
-In the context of SQLA and Exasol, websocket support means that an SQLA dialect
+In the context of SQLA and Exasol, Websocket support means that an SQLA dialect
 supporting the `Exasol Websocket Protocol <https://github.com/exasol/websocket-api>`_
 is provided.
 

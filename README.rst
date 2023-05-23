@@ -214,7 +214,7 @@ Known Issues
     - Certain scenarios still yield a :code:`string` type instead :code:`float` or :code:`decimal` type.
 * Insert
     - Insert Multiple does not work
-    - Insert from select does not work
+    - Insert from SELECT does not work
 * For some prepared statements, the wss protocol type conversion does not work properly
     - Error messages usually state some JSON type mismatch, e.g.: '... getString: JSON value is not a string ...'
 * Exists

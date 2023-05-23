@@ -131,7 +131,11 @@ class EXADialect_websocket(EXADialect):
             ),
             "AUTOCOMMIT": Converter("autocommit", autocommit),
         }
-        defaults = {"tls": True, "certificate_validation": True}
+        defaults = {
+            "tls": True,
+            "certificate_validation": True,
+            "client_name": "EXASOL:SQLA:WS",
+        }
         known_options = {
             option: value for option, value in url.query.items() if option in converters
         }

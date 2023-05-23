@@ -47,6 +47,7 @@ class Connection:
         autocommit: bool = True,
         tls: bool = True,
         certificate_validation: bool = True,
+        client_name: str = "EXASOL:DBAPI2:WS",
     ):
         """
         Create a Connection object.
@@ -59,6 +60,8 @@ class Connection:
             schema: to open after connecting.
             autocommit: enable autocommit.
             tls: enable tls.
+            certificate_validation: disable certificate validation.
+            client_name: which is communicated to the DB server.
         """
 
         # for more details see pyexasol.connection.ExaConnection
@@ -87,7 +90,7 @@ class Connection:
             "udf_output_connect_address": None,
             "udf_output_dir": None,
             "http_proxy": None,
-            "client_name": None,
+            "client_name": client_name,
             "client_version": None,
             "client_os_username": None,
             "protocol_version": 3,

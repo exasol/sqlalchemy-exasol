@@ -311,16 +311,20 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
 
 
 class NumericTest(_NumericTest):
-    @pytest.mark.skip(
+    @pytest.mark.skipif(
+        "pyodbc" in testing.db.dialect.driver,
         reason=cleandoc(
             """FIXME: test skipped to allow upgrading to SQLAlchemy 1.3.x due
         to vulnerability in 1.2.x. Need to understand reason for this.
         Hypothesis is that the data type is not correctly coerced between
         EXASOL and pyodbc."""
-        )
+        ),
     )
-    def test_decimal_coerce_round_trip(self):
-        super().test_decimal_coerce_round_trip()
+    @ISSUE_342
+    @testing.requires.implicit_decimal_binds
+    @testing.emits_warning(r".*does \*not\* support Decimal objects natively")
+    def test_decimal_coerce_round_trip(self, connection):
+        super().test_decimal_coerce_round_trip(connection)
 
     @ISSUE_342
     @testing.emits_warning(r".*does \*not\* support Decimal objects natively")
@@ -335,12 +339,6 @@ class NumericTest(_NumericTest):
     @testing.requires.precision_generic_float_type
     def test_float_custom_scale(self, do_numeric_test):
         super().test_float_custom_scale(do_numeric_test)
-
-    @ISSUE_342
-    @testing.requires.implicit_decimal_binds
-    @testing.emits_warning(r".*does \*not\* support Decimal objects natively")
-    def test_decimal_coerce_round_trip(self, connection):
-        super().test_decimal_coerce_round_trip(connection)
 
     @ISSUE_341
     def test_float_as_float(self, do_numeric_test):

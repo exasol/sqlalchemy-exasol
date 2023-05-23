@@ -125,9 +125,14 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
 
         result = testing.db.execute(stmt, values)
         expected = [(7, "jack2"), (8, "ed"), (9, "fred2"), (10, "chuck")]
+
         # Depending on the dialect it either reports that the affected rows information
         # is not available (-1) or it reports the actual number of updated/affected rows(2)
-        assert result.rowcount in [-1, 2]
+        expected_rowcount_odbc = -1
+        expected_rowcount_wss = 2
+        expected_rowcount = [expected_rowcount_odbc, expected_rowcount_wss]
+        assert result.rowcount in expected_rowcount
+
         self._assert_users(users, expected)
 
     def _assert_addresses(self, addresses, expected):

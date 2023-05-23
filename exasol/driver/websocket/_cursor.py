@@ -37,7 +37,7 @@ class MetaData:
     null_ok: Optional[bool] = None
 
 
-def _metadata(name, metadata) -> MetaData:
+def _pyexasol2dbapi_metadata(name, metadata) -> MetaData:
     type_mapping = {t.value: t for t in TypeCode}
     key_mapping = {
         "name": "name",
@@ -172,7 +172,7 @@ class Cursor:
         if not self._cursor:
             return None
         columns_metadata = (
-            _metadata(name, metadata)
+            _pyexasol2dbapi_metadata(name, metadata)
             for name, metadata in self._cursor.columns().items()
         )
         columns_metadata = tuple(astuple(metadata) for metadata in columns_metadata)

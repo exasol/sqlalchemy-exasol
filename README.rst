@@ -148,7 +148,7 @@ Websocket support
     We also recommend to have a look into the known issues, before you start using it.
 
     If you encounter any issue, please `create an issue <https://github.com/exasol/sqlalchemy-exasol/issues/new?assignees=&labels=bug&projects=&template=bug.md&title=%F0%9F%90%9E+%3CInsert+Title%3E>`_.
-    With your feedback, we will be able stabilize this feature more quickly.
+    With your feedback, we will be able to stabilize this feature more quickly.
 
 What is Websocket support?
 ``````````````````````````

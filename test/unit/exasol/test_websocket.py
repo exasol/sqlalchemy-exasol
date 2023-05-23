@@ -12,7 +12,12 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
             make_url("exa+websocket://localhost:8888"),
             (
                 [],
-                {"dsn": "localhost:8888", "tls": True, "certificate_validation": True},
+                {
+                    "dsn": "localhost:8888",
+                    "tls": True,
+                    "certificate_validation": True,
+                    "client_name": "EXASOL:SQLA:WS",
+                },
             ),
         ),
         (
@@ -25,6 +30,7 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                     "username": "sys",
                     "tls": True,
                     "certificate_validation": True,
+                    "client_name": "EXASOL:SQLA:WS",
                 },
             ),
         ),
@@ -43,6 +49,7 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                     "tls": True,
                     "certificate_validation": False,
                     "schema": "TEST",
+                    "client_name": "EXASOL:SQLA:WS",
                 },
             ),
         ),
@@ -62,6 +69,7 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                     "tls": False,
                     "certificate_validation": False,
                     "schema": "TEST",
+                    "client_name": "EXASOL:SQLA:WS",
                 },
             ),
         ),

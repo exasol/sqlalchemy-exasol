@@ -55,7 +55,7 @@ class Connection:
 
             dsn: Connection string, same format as for standard JDBC / ODBC drivers.
             username: which will be used for the authentication.
-            password: which will be used for the authentication
+            password: which will be used for the authentication.
             schema: to open after connecting.
             autocommit: enable autocommit.
             tls: enable tls.

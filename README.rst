@@ -112,10 +112,10 @@ The dialect supports two types of connection urls creating an engine. A DSN (Dat
 
     * - Type
       - Example
-   * - DSN URL
-     - 'exa+pyodbc://USER:PWD@exa_test'
-   * - HOST URL
-     - 'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
+    * - DSN URL
+      - 'exa+pyodbc://USER:PWD@exa_test'
+    * - HOST URL
+      - 'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
 
 Features
 ++++++++

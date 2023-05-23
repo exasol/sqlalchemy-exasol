@@ -193,6 +193,11 @@ class Cursor:
 
                     Expected by DBAPI2 = -1
                     Actually returned  = 0
+
+               Rational:
+
+                    With the usage of pyexasol as underlying driver, there is no trivial
+                    way to do this.
         """
         if not self._cursor:
             return -1

@@ -217,7 +217,6 @@ Known Issues
     - Insert from SELECT does not work
 * For some prepared statements, the wss protocol type conversion does not work properly
     - Error messages usually state some JSON type mismatch, e.g.: '... getString: JSON value is not a string ...'
-* Exists
 * Known failing tests of the SQLA compliance test suite
     - FAILED test/integration/sqlalchemy/test_suite.py::CastTypeDecoratorTest_exasol+exasol_driver_websocket_dbapi2::test_special_type - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)
     - FAILED test/integration/sqlalchemy/test_suite.py::ExistsTest_exasol+exasol_driver_websocket_dbapi2::test_select_exists - sqlalchemy.exc.DBAPIError: (exasol.driver.websocket._errors.Error)

@@ -248,7 +248,9 @@ def test_cursor_nextset_is_not_supported(cursor):
 
 @pytest.mark.parametrize("property", ("arraysize", "description", "rowcount"))
 def test_cursor_closed_cursor_raises_exception_on_property_access(connection, property):
-    expected = "Cursor is closed, further operations are not permitted."
+    expected = (
+        f"Unable to execute operation <{property}>, because cursor was already closed."
+    )
 
     cursor = connection.cursor()
     cursor.close()
@@ -278,7 +280,9 @@ def test_cursor_closed_cursor_raises_exception_on_property_access(connection, pr
 def test_cursor_closed_cursor_raises_exception_on_method_usage(
     connection, method, args
 ):
-    expected = "Cursor is closed, further operations are not permitted."
+    expected = (
+        f"Unable to execute operation <{method}>, because cursor was already closed."
+    )
 
     cursor = connection.cursor()
     cursor.execute("SELECT 1;")

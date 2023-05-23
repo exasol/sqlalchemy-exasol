@@ -56,16 +56,18 @@ def _metadata(name, metadata) -> MetaData:
 
 def _is_not_closed(method):
     """
-    Decorator requires the object to have a result.
+    Mark a function to require an open connection.
 
     Raises:
-        Error if the cursor object has not produced a result yet.
+        An Error if the marked function is called without an open connection.
     """
 
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         if self._is_closed:
-            raise Error("Cursor is closed, further operations are not permitted.")
+            raise Error(
+                f"Unable to execute operation <{method.__name__}>, because cursor was already closed."
+            )
         return method(self, *args, **kwargs)
 
     return wrapper

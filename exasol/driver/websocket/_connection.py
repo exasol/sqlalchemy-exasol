@@ -33,7 +33,7 @@ def _requires_connection(method):
 
 class Connection:
     """
-    Implementation of a websocket based connection.
+    Implementation of a websocket-based connection.
 
     For more details see :class: `Connection` protocol definition.
     """

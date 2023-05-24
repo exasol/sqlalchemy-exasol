@@ -48,6 +48,7 @@ class Connection:
         tls: bool = True,
         certificate_validation: bool = True,
         client_name: str = "EXASOL:DBAPI2:WS",
+        client_version: str = "unknown",
     ):
         """
         Create a Connection object.
@@ -91,8 +92,7 @@ class Connection:
             "udf_output_dir": None,
             "http_proxy": None,
             "client_name": client_name,
-            "client_version": None,
-            "client_os_username": None,
+            "client_version": client_version,
             "protocol_version": 3,
             "websocket_sslopt": {"cert_reqs": ssl.CERT_REQUIRED}
             if certificate_validation

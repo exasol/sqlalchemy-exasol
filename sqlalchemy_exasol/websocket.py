@@ -11,6 +11,7 @@ from sqlalchemy.exc import ArgumentError
 from sqlalchemy.sql import sqltypes
 
 from sqlalchemy_exasol.base import EXADialect
+from sqlalchemy_exasol.version import VERSION
 
 
 class Integer(sqltypes.INTEGER):
@@ -135,6 +136,7 @@ class EXADialect_websocket(EXADialect):
             "tls": True,
             "certificate_validation": True,
             "client_name": "EXASOL:SQLA:WS",
+            "client_version": VERSION,
         }
         known_options = {
             option: value for option, value in url.query.items() if option in converters

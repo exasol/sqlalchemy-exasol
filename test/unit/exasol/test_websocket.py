@@ -2,6 +2,7 @@ import pytest
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
 
+from sqlalchemy_exasol.version import VERSION
 from sqlalchemy_exasol.websocket import EXADialect_websocket
 
 
@@ -17,6 +18,7 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                     "tls": True,
                     "certificate_validation": True,
                     "client_name": "EXASOL:SQLA:WS",
+                    "client_version": VERSION,
                 },
             ),
         ),
@@ -31,6 +33,7 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                     "tls": True,
                     "certificate_validation": True,
                     "client_name": "EXASOL:SQLA:WS",
+                    "client_version": VERSION,
                 },
             ),
         ),
@@ -50,6 +53,7 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                     "certificate_validation": False,
                     "schema": "TEST",
                     "client_name": "EXASOL:SQLA:WS",
+                    "client_version": VERSION,
                 },
             ),
         ),
@@ -70,6 +74,7 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                     "certificate_validation": False,
                     "schema": "TEST",
                     "client_name": "EXASOL:SQLA:WS",
+                    "client_version": VERSION,
                 },
             ),
         ),

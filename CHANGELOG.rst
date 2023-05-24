@@ -3,7 +3,11 @@
 Unreleased
 ==========
 
-* Add Beta version of websocket based dialect
+.. _changelog-4.5.0:
+
+4.5.0 — 2023-05-24
+==================
+* Added Beta version of websocket based dialect
 
      **🚨 Attention:**
 

@@ -6,18 +6,20 @@ import importlib
 
 import pytest
 
-from exasol.driver.websocket import (
-    Error,
+from exasol.driver.websocket._connection import _requires_connection
+from exasol.driver.websocket._cursor import (
     MetaData,
-    Types,
-    _from_pyexasol,
-    _requires_connection,
+    _pyexasol2dbapi_metadata,
+)
+from exasol.driver.websocket.dbapi2 import (
+    Error,
+    TypeCode,
 )
 
 
 @pytest.fixture
 def dbapi():
-    yield importlib.import_module("exasol.driver.websocket")
+    yield importlib.import_module("exasol.driver.websocket.dbapi2")
 
 
 def test_defines_api_level(dbapi):
@@ -127,19 +129,19 @@ def test_requires_connection_decorator_does_use_wrap():
             (
                 "A",
                 {"type": "DECIMAL", "precision": 18, "scale": 0},
-                MetaData(name="A", type_code=Types.NUMBER, precision=18, scale=0),
+                MetaData(name="A", type_code=TypeCode.Decimal, precision=18, scale=0),
             ),
             (
                 "B",
                 {"type": "VARCHAR", "size": 100, "characterSet": "UTF8"},
-                MetaData(name="B", type_code=Types.STRING, internal_size=100),
+                MetaData(name="B", type_code=TypeCode.String, internal_size=100),
             ),
-            ("C", {"type": "BOOLEAN"}, MetaData(name="C", type_code=Types.STRING)),
-            ("D", {"type": "DOUBLE"}, MetaData(name="D", type_code=Types.NUMBER)),
+            ("C", {"type": "BOOLEAN"}, MetaData(name="C", type_code=TypeCode.Bool)),
+            ("D", {"type": "DOUBLE"}, MetaData(name="D", type_code=TypeCode.Double)),
         )
     ),
     ids=str,
 )
 def test_metadata_from_pyexasol_metadata(name, metadata, expected):
-    actual = _from_pyexasol(name, metadata)
+    actual = _pyexasol2dbapi_metadata(name, metadata)
     assert actual == expected

@@ -2,10 +2,10 @@ from inspect import cleandoc
 
 import pytest
 
-from exasol.driver.websocket import (
+from exasol.driver.websocket.dbapi2 import (
     Error,
     NotSupportedError,
-    Types,
+    TypeCode,
     connect,
 )
 
@@ -17,6 +17,7 @@ def connection(exasol_config):
         dsn=f"{config.host}:{config.port}",
         username=config.username,
         password=config.password,
+        certificate_validation=False,
     )
     yield connection
     connection.close()
@@ -32,7 +33,10 @@ def cursor(connection):
 def test_websocket_dbapi(exasol_config):
     cfg = exasol_config
     connection = connect(
-        dsn=f"{cfg.host}:{cfg.port}", username=cfg.username, password=cfg.password
+        dsn=f"{cfg.host}:{cfg.port}",
+        username=cfg.username,
+        password=cfg.password,
+        certificate_validation=False,
     )
     assert connection
     connection.close()
@@ -44,7 +48,7 @@ def test_websocket_dbapi_connect_fails():
     password = "ThisShouldNotBeAValidPasswordForTheUser"
     with pytest.raises(Error) as e_info:
         connect(dsn=dsn, username=username, password=password)
-    assert "Connection failed" == f"{e_info.value}"
+    assert "Connection failed" in f"{e_info.value}"
 
 
 def test_retrieve_cursor_from_connection(connection):
@@ -90,13 +94,28 @@ def test_cursor_function_raises_exception_if_no_result_has_been_produced(
 @pytest.mark.parametrize(
     "sql_statement, size, expected",
     [
-        ("SELECT 1;", None, [(1,)]),
-        ("SELECT 1;", 1, [(1,)]),
-        ("SELECT 1;", 10, [(1,)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", None, [(1, 2)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 1, [(1, 2)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 2, [(1, 2), (3, 4)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 10, [(1, 2), (3, 4), (5, 6)]),
+        ("SELECT 1;", None, ((1,),)),
+        ("SELECT 1;", 1, ((1,),)),
+        ("SELECT 1;", 10, ((1,),)),
+        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", None, ((1, 2),)),
+        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", 1, ((1, 2),)),
+        (
+            "SELECT * FROM VALUES ((1,2), (3,4), (5,6));",
+            2,
+            (
+                (1, 2),
+                (3, 4),
+            ),
+        ),
+        (
+            "SELECT * FROM VALUES ((1,2), (3,4), (5,6));",
+            10,
+            (
+                (1, 2),
+                (3, 4),
+                (5, 6),
+            ),
+        ),
     ],
     ids=str,
 )
@@ -108,12 +127,30 @@ def test_cursor_fetchmany(cursor, sql_statement, size, expected):
 @pytest.mark.parametrize(
     "sql_statement, expected",
     [
-        ("SELECT 1;", [(1,)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4));", [(1, 2), (3, 4)]),
-        ("SELECT * FROM VALUES ((1,2), (3,4), (5,6));", [(1, 2), (3, 4), (5, 6)]),
+        ("SELECT 1;", ((1,),)),
+        (
+            "SELECT * FROM VALUES ((1,2), (3,4));",
+            (
+                (1, 2),
+                (3, 4),
+            ),
+        ),
+        (
+            "SELECT * FROM VALUES ((1,2), (3,4), (5,6));",
+            (
+                (1, 2),
+                (3, 4),
+                (5, 6),
+            ),
+        ),
         (
             "SELECT * FROM VALUES ((1,2), (3,4), (5,6), (7, 8));",
-            [(1, 2), (3, 4), (5, 6), (7, 8)],
+            (
+                (1, 2),
+                (3, 4),
+                (5, 6),
+                (7, 8),
+            ),
         ),
     ],
     ids=str,
@@ -132,19 +169,19 @@ def test_description_returns_none_if_no_query_has_been_executed(cursor):
     [
         (
             "SELECT CAST(A as INT) A FROM VALUES 1, 2, 3 as T(A);",
-            [("A", Types.NUMBER, None, None, 18, 0, None)],
+            (("A", TypeCode.Decimal, None, None, 18, 0, None),),
         ),
         (
             "SELECT CAST(A as DOUBLE) A FROM VALUES 1, 2, 3 as T(A);",
-            [("A", Types.NUMBER, None, None, None, None, None)],
+            (("A", TypeCode.Double, None, None, None, None, None),),
         ),
         (
             "SELECT CAST(A as BOOL) A FROM VALUES TRUE, FALSE, TRUE as T(A);",
-            [("A", Types.STRING, None, None, None, None, None)],
+            (("A", TypeCode.Bool, None, None, None, None, None),),
         ),
         (
             "SELECT CAST(A as VARCHAR(10)) A FROM VALUES 'Foo', 'Bar' as T(A);",
-            [("A", Types.STRING, None, 10, None, None, None)],
+            (("A", TypeCode.String, None, 10, None, None, None),),
         ),
         (
             cleandoc(
@@ -155,12 +192,12 @@ def test_description_returns_none_if_no_query_has_been_executed(cursor):
                     """
                 # fmt: on
             ),
-            [
-                ("A", Types.NUMBER, None, None, 18, 0, None),
-                ("B", Types.STRING, None, 100, None, None, None),
-                ("C", Types.STRING, None, None, None, None, None),
-                ("D", Types.NUMBER, None, None, None, None, None),
-            ],
+            (
+                ("A", TypeCode.Decimal, None, None, 18, 0, None),
+                ("B", TypeCode.String, None, 100, None, None, None),
+                ("C", TypeCode.Bool, None, None, None, None, None),
+                ("D", TypeCode.Double, None, None, None, None, None),
+            ),
         ),
     ],
     ids=str,
@@ -211,7 +248,9 @@ def test_cursor_nextset_is_not_supported(cursor):
 
 @pytest.mark.parametrize("property", ("arraysize", "description", "rowcount"))
 def test_cursor_closed_cursor_raises_exception_on_property_access(connection, property):
-    expected = "Cursor is closed, further operations are not permitted."
+    expected = (
+        f"Unable to execute operation <{property}>, because cursor was already closed."
+    )
 
     cursor = connection.cursor()
     cursor.close()
@@ -241,7 +280,9 @@ def test_cursor_closed_cursor_raises_exception_on_property_access(connection, pr
 def test_cursor_closed_cursor_raises_exception_on_method_usage(
     connection, method, args
 ):
-    expected = "Cursor is closed, further operations are not permitted."
+    expected = (
+        f"Unable to execute operation <{method}>, because cursor was already closed."
+    )
 
     cursor = connection.cursor()
     cursor.execute("SELECT 1;")

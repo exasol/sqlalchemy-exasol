@@ -6,10 +6,12 @@ from sqlalchemy import (
     create_engine,
     testing,
 )
+from sqlalchemy.testing.suite import CastTypeDecoratorTest as _CastTypeDecoratorTest
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
+from sqlalchemy.testing.suite import ExistsTest as _ExistsTest
 from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
@@ -17,10 +19,55 @@ from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
+from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
+
+# Please remove override(s) once https://github.com/exasol/sqlalchemy-exasol/issues/341 is fixed.
+ISSUE_341 = pytest.mark.xfail(
+    "websocket" in testing.db.dialect.driver,
+    reason="Not implemented yet see also https://github.com/exasol/sqlalchemy-exasol/issues/341",
+)
+
+# Please remove override(s) once https://github.com/exasol/sqlalchemy-exasol/issues/342 is fixed.
+ISSUE_342 = pytest.mark.xfail(
+    "websocket" in testing.db.dialect.driver,
+    reason="Not implemented yet see also https://github.com/exasol/sqlalchemy-exasol/issues/342",
+)
+
+
+class CastTypeDecoratorTest(_CastTypeDecoratorTest):
+    @ISSUE_341
+    def test_special_type(self, metadata, connection, string_as_int):
+        super().test_special_type(metadata, connection, string_as_int)
+
+
+class ExistsTest(_ExistsTest):
+    @ISSUE_341
+    def test_select_exists(self, connection):
+        super().test_select_exists(connection)
+
+    @ISSUE_341
+    def test_select_exists_false(self, connection):
+        super().test_select_exists_false(connection)
+
+
+class RowFetchTest(_RowFetchTest):
+    RATIONAL = cleandoc(
+        """
+    PyExasol currently does not support/allow duplicate names in the results set.
+    
+    See also: 
+    * pyexasol.statement.ExaStatement._check_duplicate_col_names
+    """
+    )
+
+    @testing.config.requirements.duplicate_names_in_cursor_description
+    @pytest.mark.skipif("websocket" in testing.db.dialect.driver, reason=RATIONAL)
+    def test_row_with_dupe_names(self, connection):
+        super().test_row_with_dupe_names(connection)
 
 
 class HasTableTest(_HasTableTest):
@@ -49,6 +96,7 @@ class HasTableTest(_HasTableTest):
 
 
 class InsertBehaviorTest(_InsertBehaviorTest):
+    @ISSUE_342
     @pytest.mark.xfail(
         "turbodbc" in testing.db.dialect.driver,
         reason=cleandoc(
@@ -63,6 +111,16 @@ class InsertBehaviorTest(_InsertBehaviorTest):
     @testing.requires.empty_inserts_executemany
     def test_empty_insert_multiple(self, connection):
         super().test_empty_insert_multiple(connection)
+
+    @ISSUE_341
+    @requirements.insert_from_select
+    def test_insert_from_select(self, connection):
+        super().test_insert_from_select(connection)
+
+    @ISSUE_341
+    @requirements.insert_from_select
+    def test_insert_from_select_with_defaults(self, connection):
+        super().test_insert_from_select_with_defaults(connection)
 
 
 class RowCountTest(_RowCountTest):
@@ -253,16 +311,47 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
 
 
 class NumericTest(_NumericTest):
-    @pytest.mark.skip(
+    @pytest.mark.skipif(
+        "pyodbc" in testing.db.dialect.driver,
         reason=cleandoc(
             """FIXME: test skipped to allow upgrading to SQLAlchemy 1.3.x due
         to vulnerability in 1.2.x. Need to understand reason for this.
         Hypothesis is that the data type is not correctly coerced between
         EXASOL and pyodbc."""
-        )
+        ),
     )
-    def test_decimal_coerce_round_trip(self):
-        return
+    @ISSUE_342
+    @testing.requires.implicit_decimal_binds
+    @testing.emits_warning(r".*does \*not\* support Decimal objects natively")
+    def test_decimal_coerce_round_trip(self, connection):
+        super().test_decimal_coerce_round_trip(connection)
+
+    @ISSUE_342
+    @testing.emits_warning(r".*does \*not\* support Decimal objects natively")
+    def test_render_literal_numeric_asfloat(self, literal_round_trip):
+        super().test_render_literal_numeric_asfloat(literal_round_trip)
+
+    @ISSUE_342
+    def test_numeric_as_float(self, do_numeric_test):
+        super().test_numeric_as_float(do_numeric_test)
+
+    @ISSUE_341
+    @testing.requires.precision_generic_float_type
+    def test_float_custom_scale(self, do_numeric_test):
+        super().test_float_custom_scale(do_numeric_test)
+
+    @ISSUE_341
+    def test_float_as_float(self, do_numeric_test):
+        super().test_float_as_float(do_numeric_test)
+
+    @ISSUE_341
+    @testing.requires.floats_to_four_decimals
+    def test_float_as_decimal(self, do_numeric_test):
+        super().test_float_as_decimal(do_numeric_test)
+
+    @ISSUE_342
+    def test_float_coerce_round_trip(self, connection):
+        super().test_float_coerce_round_trip(connection)
 
 
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):

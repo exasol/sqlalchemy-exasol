@@ -66,7 +66,6 @@ class _ExaInteger(sqltypes.INTEGER):
 class EXADialect_turbodbc(EXADialect):
     driver = "turbodbc"
     driver_version = None
-    server_version_info = None
     supports_statement_cache = False
     supports_native_decimal = False
     supports_sane_multi_rowcount = False
@@ -83,25 +82,6 @@ class EXADialect_turbodbc(EXADialect):
         self._interpret_destination(options)
 
         return [[options.pop("dsn", None)], options]
-
-    def _get_server_version_info(self, connection):
-        if self.server_version_info is None:
-            query = "select PARAM_VALUE from SYS.EXA_METADATA where PARAM_NAME = 'databaseProductVersion'"
-            result = connection.execute(query).fetchone()[0].split(".")
-            major, minor, patch = 0, 0, 0
-            major = int(result[0])
-            minor = int(result[1])
-            try:
-                # last version position can something like: '12-S' or 'RC2'
-                # might fail with ValueError
-                patch = int(result[2].split("-")[0])
-            except ValueError:
-                # ignore if there is some funky string in the patch field
-                pass
-            self.server_version_info = (major, minor, patch)
-
-        # return cached info
-        return self.server_version_info
 
     @staticmethod
     def _get_options_with_defaults(url):

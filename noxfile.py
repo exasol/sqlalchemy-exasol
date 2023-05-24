@@ -40,7 +40,7 @@ nox.options.sessions = ["fix"]
 
 
 class Settings:
-    CONNECTORS = ("pyodbc", "turbodbc")
+    CONNECTORS = ("pyodbc", "turbodbc", "websocket")
     ENVIRONMENT_NAME = "test"
     DB_PORT = 8888
     BUCKETFS_PORT = 6666

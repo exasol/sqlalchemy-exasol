@@ -788,12 +788,35 @@ class EXADialect(default.DefaultDialect):
     ischema_names = ischema_names
     colspecs = colspecs
     isolation_level = None
+    server_version_info = None
 
     def __init__(self, isolation_level=None, native_datetime=False, **kwargs):
         default.DefaultDialect.__init__(self, **kwargs)
         self.isolation_level = isolation_level
 
     _isolation_lookup = {"SERIALIZABLE": 0}
+
+    def _get_server_version_info(self, connection):
+        if self.server_version_info is None:
+            query = (
+                "select PARAM_VALUE from SYS.EXA_METADATA"
+                " where PARAM_NAME = 'databaseProductVersion'"
+            )
+            result = connection.execute(query).fetchone()[0].split(".")
+            major, minor, patch = 0, 0, 0
+            major = int(result[0])
+            minor = int(result[1])
+            try:
+                # last version position can something like: '12-S' or 'RC2'
+                # might fail with ValueError
+                patch = int(result[2].split("-")[0])
+            except ValueError:
+                # ignore if there is some funky string in the patch field
+                pass
+            self.server_version_info = (major, minor, patch)
+
+        # return cached info
+        return self.server_version_info
 
     def _get_default_schema_name(self, connection):
         """

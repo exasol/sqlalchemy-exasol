@@ -1,6 +1,6 @@
 import pytest
 
-from exasol.driver.websocket import connect
+from exasol.driver.websocket.dbapi2 import connect
 
 
 @pytest.fixture

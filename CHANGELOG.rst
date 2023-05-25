@@ -3,6 +3,16 @@
 Unreleased
 ==========
 
+.. _changelog-4.5.1:
+
+4.5.1 — 2023-05-25
+==================
+
+🐞 Fixed
+---------
+
+- Fixed missing websocket driver package in release deliverables
+
 .. _changelog-4.5.0:
 
 4.5.0 — 2023-05-24

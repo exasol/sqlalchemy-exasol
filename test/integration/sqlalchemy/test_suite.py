@@ -25,13 +25,7 @@ from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
 
-# Please remove override(s) once https://github.com/exasol/sqlalchemy-exasol/issues/341 is fixed.
-ISSUE_341 = pytest.mark.xfail(
-    "websocket" in testing.db.dialect.driver,
-    reason="Not implemented yet see also https://github.com/exasol/sqlalchemy-exasol/issues/341",
-)
-
-# Please remove override(s) once https://github.com/exasol/sqlalchemy-exasol/issues/342 is fixed.
+ISSUE_341 = pytest.mark.issue_341
 ISSUE_342 = pytest.mark.xfail(
     "websocket" in testing.db.dialect.driver,
     reason="Not implemented yet see also https://github.com/exasol/sqlalchemy-exasol/issues/342",

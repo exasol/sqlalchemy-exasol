@@ -240,7 +240,19 @@ class Cursor:
         self._cursor = connection.cls_statement(connection, operation, prepare=True)
 
         def adapt_params(params, parameter_data):
-            converters = defaultdict(lambda: _identity, {"VARCHAR": str})
+            def varchar(value):
+                if value is None:
+                    return None
+                return str(value)
+
+            def double(value):
+                if value is None:
+                    return None
+                return float(value)
+
+            converters = defaultdict(
+                lambda: _identity, {"VARCHAR": varchar, "DOUBLE": double}
+            )
             selected_converters = (
                 converters[c["dataType"]["type"]] for c in parameter_data["columns"]
             )

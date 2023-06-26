@@ -6,7 +6,6 @@ This module provides `PEP-249`_ DBAPI compliant cursor implementation.
 """
 import datetime
 import decimal
-import time
 from collections import defaultdict
 from dataclasses import (
     astuple,
@@ -239,6 +238,18 @@ class Cursor:
         ]
         connection = self._connection.connection
         self._cursor = connection.cls_statement(connection, operation, prepare=True)
+
+        def adapt_params(params, parameter_data):
+            converters = defaultdict(lambda: _identity, {"VARCHAR": str})
+            selected_converters = (
+                converters[c["dataType"]["type"]] for c in parameter_data["columns"]
+            )
+            params = zip(selected_converters, params)
+            params = [converter(value) for converter, value in params]
+            return params
+
+        parameter_data = self._cursor.parameter_data
+        parameters = [adapt_params(params, parameter_data) for params in parameters]
         try:
             self._cursor.execute_prepared(parameters)
         except pyexasol.exceptions.ExaError as ex:

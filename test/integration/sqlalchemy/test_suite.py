@@ -6,12 +6,10 @@ from sqlalchemy import (
     create_engine,
     testing,
 )
-from sqlalchemy.testing.suite import CastTypeDecoratorTest as _CastTypeDecoratorTest
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
-from sqlalchemy.testing.suite import ExistsTest as _ExistsTest
 from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
@@ -25,27 +23,10 @@ from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
 
-ISSUE_341 = pytest.mark.issue_341
 ISSUE_342 = pytest.mark.xfail(
     "websocket" in testing.db.dialect.driver,
     reason="Not implemented yet see also https://github.com/exasol/sqlalchemy-exasol/issues/342",
 )
-
-
-class CastTypeDecoratorTest(_CastTypeDecoratorTest):
-    @ISSUE_341
-    def test_special_type(self, metadata, connection, string_as_int):
-        super().test_special_type(metadata, connection, string_as_int)
-
-
-class ExistsTest(_ExistsTest):
-    @ISSUE_341
-    def test_select_exists(self, connection):
-        super().test_select_exists(connection)
-
-    @ISSUE_341
-    def test_select_exists_false(self, connection):
-        super().test_select_exists_false(connection)
 
 
 class RowFetchTest(_RowFetchTest):
@@ -105,16 +86,6 @@ class InsertBehaviorTest(_InsertBehaviorTest):
     @testing.requires.empty_inserts_executemany
     def test_empty_insert_multiple(self, connection):
         super().test_empty_insert_multiple(connection)
-
-    @ISSUE_341
-    @requirements.insert_from_select
-    def test_insert_from_select(self, connection):
-        super().test_insert_from_select(connection)
-
-    @ISSUE_341
-    @requirements.insert_from_select
-    def test_insert_from_select_with_defaults(self, connection):
-        super().test_insert_from_select_with_defaults(connection)
 
 
 class RowCountTest(_RowCountTest):
@@ -328,20 +299,6 @@ class NumericTest(_NumericTest):
     @ISSUE_342
     def test_numeric_as_float(self, do_numeric_test):
         super().test_numeric_as_float(do_numeric_test)
-
-    @ISSUE_341
-    @testing.requires.precision_generic_float_type
-    def test_float_custom_scale(self, do_numeric_test):
-        super().test_float_custom_scale(do_numeric_test)
-
-    @ISSUE_341
-    def test_float_as_float(self, do_numeric_test):
-        super().test_float_as_float(do_numeric_test)
-
-    @ISSUE_341
-    @testing.requires.floats_to_four_decimals
-    def test_float_as_decimal(self, do_numeric_test):
-        super().test_float_as_decimal(do_numeric_test)
 
     @ISSUE_342
     def test_float_coerce_round_trip(self, connection):

@@ -250,7 +250,7 @@ class Cursor:
                 * VARCHAR
                 * DOUBLE
 
-            therefore the future it may be necessary to improve or extend this.
+            therefore it the future it may be necessary to improve or extend this.
 
             A hint that patching of a specific type is required, could be and
             error message similar to this one:

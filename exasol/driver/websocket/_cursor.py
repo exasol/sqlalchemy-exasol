@@ -6,7 +6,6 @@ This module provides `PEP-249`_ DBAPI compliant cursor implementation.
 """
 import datetime
 import decimal
-import time
 from collections import defaultdict
 from dataclasses import (
     astuple,
@@ -231,6 +230,59 @@ class Cursor:
         except pyexasol.exceptions.ExaError as ex:
             raise Error() from ex
 
+    @staticmethod
+    def _adapt_to_requested_db_types(parameters, db_response):
+        """
+        Adapt parameter types to match the types requested by the DB in the
+        `createPreparedStatement <https://github.com/exasol/websocket-api/blob/master/docs/commands/createPreparedStatementV1.md>`_
+        response.
+
+        Args:
+
+            parameters: which will be passed/send to the database.
+            db_response: contains the DB response including the required types.
+
+
+        Attention:
+
+            This shim method currently only patches the following types:
+
+                * VARCHAR
+                * DOUBLE
+
+            therefore it the future it may be necessary to improve or extend this.
+
+            A hint that patching of a specific type is required, could be and
+            error message similar to this one:
+
+            .. code-block::
+
+                pyexasol.exceptions.ExaRequestError:
+                ...
+                message  => getString: JSON value is not a string. (...)
+                ...
+        """
+
+        def varchar(value):
+            if value is None:
+                return None
+            return str(value)
+
+        def double(value):
+            if value is None:
+                return None
+            return float(value)
+
+        converters = defaultdict(
+            lambda: _identity, {"VARCHAR": varchar, "DOUBLE": double}
+        )
+        selected_converters = (
+            converters[column["dataType"]["type"]] for column in db_response["columns"]
+        )
+        parameters = zip(selected_converters, parameters)
+        parameters = [converter(value) for converter, value in parameters]
+        return parameters
+
     @_is_not_closed
     def executemany(self, operation, seq_of_parameters):
         """See also :py:meth: `Cursor.executemany`"""
@@ -239,6 +291,12 @@ class Cursor:
         ]
         connection = self._connection.connection
         self._cursor = connection.cls_statement(connection, operation, prepare=True)
+
+        parameter_data = self._cursor.parameter_data
+        parameters = [
+            Cursor._adapt_to_requested_db_types(params, parameter_data)
+            for params in parameters
+        ]
         try:
             self._cursor.execute_prepared(parameters)
         except pyexasol.exceptions.ExaError as ex:

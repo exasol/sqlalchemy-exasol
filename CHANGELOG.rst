@@ -3,6 +3,11 @@
 Unreleased
 ==========
 
+🐞 Fixed
+---------
+
+- Fixed `prepared statements send the wrong types as parameters to the server <https://github.com/exasol/sqlalchemy-exasol/issues/341>`_
+
 .. _changelog-4.5.1:
 
 4.5.1 — 2023-05-25

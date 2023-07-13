@@ -30,7 +30,7 @@ class Decimal(sqltypes.DECIMAL):
 
     def result_processor(self, dialect, coltype):
         if not self.asdecimal:
-            return None
+            return lambda value: None if value is None else float(value)
 
         fstring = "%%.%df" % self._effective_decimal_return_scale
 

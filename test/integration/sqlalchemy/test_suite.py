@@ -77,6 +77,11 @@ class InsertBehaviorTest(_InsertBehaviorTest):
         ),
         strict=True,
     )
+    @pytest.mark.xfail(
+        "websocket" in testing.db.dialect.driver,
+        reason="This currently isn't supported by the websocket protocol L3-1064.",
+        strict=True,
+    )
     @testing.requires.empty_inserts_executemany
     def test_empty_insert_multiple(self, connection):
         super().test_empty_insert_multiple(connection)

@@ -173,8 +173,8 @@ Using the websocket based protocol instead over ODBC will provide various advant
 
 For further details `Why a Websockets API  <https://github.com/exasol/websocket-api#why-a-websockets-api>`_.
 
-Examples Usage(s)
-~~~~~~~~~~~~~~~~~~
+Example Usage(s)
+++++++++++++++++++
 
 .. code-block:: python
 
@@ -200,7 +200,7 @@ Examples Usage(s)
         ...
 
 Supported Connection Parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++++++++
 .. list-table::
 
    * - Parameter
@@ -215,6 +215,6 @@ Supported Connection Parameters
 
 
 Known Issues
-~~~~~~~~~~~~
+++++++++++++
 * Insert
     - Insert multiple empty rows via prepared statements does not work in all cases

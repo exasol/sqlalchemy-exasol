@@ -7,6 +7,7 @@ Unreleased
 ---------
 
 - Fixed `prepared statements send the wrong types as parameters to the server <https://github.com/exasol/sqlalchemy-exasol/issues/341>`_
+- Fixed `Various SQLA compliance tests are failing for the websocket based dialect <https://github.com/exasol/sqlalchemy-exasol/issues/342>`_
 
 .. _changelog-4.5.1:
 

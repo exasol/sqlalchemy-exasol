@@ -23,11 +23,6 @@ from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
 
-ISSUE_342 = pytest.mark.xfail(
-    "websocket" in testing.db.dialect.driver,
-    reason="Not implemented yet see also https://github.com/exasol/sqlalchemy-exasol/issues/342",
-)
-
 
 class RowFetchTest(_RowFetchTest):
     RATIONAL = cleandoc(
@@ -71,7 +66,6 @@ class HasTableTest(_HasTableTest):
 
 
 class InsertBehaviorTest(_InsertBehaviorTest):
-    @ISSUE_342
     @pytest.mark.xfail(
         "turbodbc" in testing.db.dialect.driver,
         reason=cleandoc(
@@ -81,6 +75,11 @@ class InsertBehaviorTest(_InsertBehaviorTest):
         * turbodbc maintenance is paused until if it is clear if there is still demand for it
         """
         ),
+        strict=True,
+    )
+    @pytest.mark.xfail(
+        "websocket" in testing.db.dialect.driver,
+        reason="This currently isn't supported by the websocket protocol L3-1064.",
         strict=True,
     )
     @testing.requires.empty_inserts_executemany
@@ -285,24 +284,10 @@ class NumericTest(_NumericTest):
         EXASOL and pyodbc."""
         ),
     )
-    @ISSUE_342
     @testing.requires.implicit_decimal_binds
     @testing.emits_warning(r".*does \*not\* support Decimal objects natively")
     def test_decimal_coerce_round_trip(self, connection):
         super().test_decimal_coerce_round_trip(connection)
-
-    @ISSUE_342
-    @testing.emits_warning(r".*does \*not\* support Decimal objects natively")
-    def test_render_literal_numeric_asfloat(self, literal_round_trip):
-        super().test_render_literal_numeric_asfloat(literal_round_trip)
-
-    @ISSUE_342
-    def test_numeric_as_float(self, do_numeric_test):
-        super().test_numeric_as_float(do_numeric_test)
-
-    @ISSUE_342
-    def test_float_coerce_round_trip(self, connection):
-        super().test_float_coerce_round_trip(connection)
 
 
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):

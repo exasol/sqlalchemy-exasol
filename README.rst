@@ -2,8 +2,8 @@ SQLAlchemy Dialect for EXASOL DB
 ================================
 
 
-.. image:: https://github.com/exasol/sqlalchemy_exasol/workflows/CI/badge.svg?branch=master
-    :target: https://github.com/exasol/sqlalchemy_exasol/actions?query=workflow%3ACI
+.. image:: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml/badge.svg?branch=master&event=push
+    :target: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml
      :alt: CI Status
 
 .. image:: https://img.shields.io/pypi/v/sqlalchemy_exasol

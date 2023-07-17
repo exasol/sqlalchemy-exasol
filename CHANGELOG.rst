@@ -3,6 +3,18 @@
 Unreleased
 ==========
 
+.. _changelog-4.6.0:
+
+4.6.0 — 2023-07-17
+==================
+
+🚀 Feature
+-----------
+
+- Websocket based dialect have been stabilized and is officially supported now
+
+    📘 Note: Inserting multiple empty row's, facilitating default settings currently isn't supported.
+
 🐞 Fixed
 ---------
 

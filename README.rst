@@ -49,7 +49,7 @@ How to get started
 Currently sqlalchemy-exasol supports multiple dialects. The core difference
 being if the dialect is :code:`odbc` or :code:`websocket` based.
 
-Generally we advise to use the websocket based Dialect, because odbc
+Generally, we advise to use the websocket based Dialect, because odbc
 based dialects require a good understanding of (unix)ODBC and the setup is
 significant more complicated.
 

@@ -96,7 +96,7 @@ Talk to the EXASOL DB using SQLAlchemy
 
 **Websocket based Dialect:**
 
-For more details regarding the websocket support checkout `What is Websocket support? <wss>`_.
+For more details regarding the websocket support checkout the section: "What is Websocket support?"
 
 .. code-block:: python
 
@@ -158,7 +158,6 @@ Development & Testing
 `````````````````````
 See `developer guide`_
 
-.. _wss:
 What is Websocket support?
 ``````````````````````````
 In the context of SQLA and Exasol, Websocket support means that an SQLA dialect

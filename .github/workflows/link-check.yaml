@@ -21,7 +21,7 @@ jobs:
     steps:
 
       - name: Fetch sqlalchemy_exasol code from repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
         uses: ./.github/actions/python-environment

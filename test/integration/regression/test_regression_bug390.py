@@ -32,6 +32,6 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
     )
     r = pytester.runpytest_subprocess()
     expected = ""
-    actual = f"{r.stderr}"
+    actual = str(r.stderr)
 
     assert actual == expected

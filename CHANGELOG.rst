@@ -3,6 +3,11 @@
 Unreleased
 ==========
 
+🐞 Fixed
+---------
+
+- Fixed `WebSocket connection isn't properly closed in case of process termination <https://github.com/exasol/pyexasol/issues/108>`_
+
 .. _changelog-4.6.0:
 
 4.6.0 — 2023-07-18

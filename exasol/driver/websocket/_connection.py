@@ -119,10 +119,12 @@ class Connection:
 
     def close(self):
         """See also :py:meth: `Connection.close`"""
-        if not self._connection:
+        connection_to_close = self._connection
+        self._connection = None
+        if connection_to_close is None or connection_to_close.is_closed:
             return
         try:
-            self._connection.close()
+            connection_to_close.close()
         except Exception as ex:
             raise Error() from ex
 
@@ -148,4 +150,16 @@ class Connection:
         return DefaultCursor(self)
 
     def __del__(self):
-        self.close()
+        if self._connection is None:
+            return
+
+        # Currently, the only way to handle this gracefully is to invoke the`__del__`
+        # method of the underlying connection rather than calling an explicit `close`.
+        #
+        # For more details, see also:
+        # * https://github.com/exasol/sqlalchemy-exasol/issues/390
+        # * https://github.com/exasol/pyexasol/issues/108
+        #
+        # If the above tickets are resolved, it should be safe to switch back to using
+        # `close` instead of `__del__`.
+        self._connection.__del__()

@@ -3,14 +3,14 @@ from inspect import cleandoc
 pytest_plugins = "pytester"
 
 
-def test_connection_with_block_cleans_up_properly(pytester, itde):
-    config = itde.db
+def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
+    config = exasol_config
     # Because the error only occurs on process shutdown we need to run a test within a test
     # (We require the result (stderr) of a terminated process triggering the failure.
     pytester.makepyfile(
         # fmt: off
         cleandoc(
-        f"""
+            f"""
         from sqlalchemy import create_engine
         
         def test():
@@ -20,7 +20,7 @@ def test_connection_with_block_cleans_up_properly(pytester, itde):
                 pw="{config.password}",
                 host="{config.host}",
                 port={config.port},
-                schema="{itde.itde.schemas[0]}",
+                schema="TEST",
             )
             engine = create_engine(url)
             query = "SELECT 42;"

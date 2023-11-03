@@ -119,10 +119,12 @@ class Connection:
 
     def close(self):
         """See also :py:meth: `Connection.close`"""
-        if not self._connection:
+        connection_to_close = self._connection
+        self._connection = None
+        if connection_to_close is None or connection_to_close.is_closed:
             return
         try:
-            self._connection.close()
+            connection_to_close.close()
         except Exception as ex:
             raise Error() from ex
 

@@ -1644,6 +1644,20 @@ pytest = ">=4.6"
 testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtualenv"]
 
 [[package]]
+name = "pytest-history"
+version = "0.2.0"
+description = "Pytest plugin to keep a history of your pytest runs"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "pytest_history-0.2.0-py3-none-any.whl", hash = "sha256:31a59426b44b83543936f8a60c49d58f96b03c6c0bb9353b9bd619fff477244c"},
+    {file = "pytest_history-0.2.0.tar.gz", hash = "sha256:f88e199664750091e1192a1546c0086b3f38e33350ca5645833ac0daaa0a87f4"},
+]
+
+[package.dependencies]
+pytest = ">=7.4.3,<8.0.0"
+
+[[package]]
 name = "pytest-json-report"
 version = "1.5.0"
 description = "A pytest plugin to report test results as JSON files"
@@ -2613,4 +2627,4 @@ turbodbc = ["turbodbc"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "a7c8806d3d05b616b9f9631ad63068e462f59b9d24fd27aeb6d86398e19da1a4"
+content-hash = "38ab99ef01cd159e8bd5ffe7b4002d29775aadfca1b9cd15e0d4d0f48b0d4f5d"

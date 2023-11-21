@@ -154,8 +154,7 @@ class RowCountTest(_RowCountTest):
 
 
 class DifficultParametersTest(_DifficultParametersTest):
-    @pytest.mark.xfail(reason="https://github.com/exasol/sqlalchemy-exasol/issues/232")
-    @testing.combinations(
+    tough_parameters = testing.combinations(
         ("boring",),
         ("per cent",),
         ("per % cent",),
@@ -163,16 +162,28 @@ class DifficultParametersTest(_DifficultParametersTest):
         ("par(ens)",),
         ("percent%(ens)yah",),
         ("col:ons",),
+        ("_starts_with_underscore",),
+        ("dot.s",),
         ("more :: %colons%",),
+        ("_name",),
+        ("___name",),
+        ("[BracketsAndCase]",),
+        ("42numbers",),
+        ("percent%signs",),
+        ("has spaces",),
         ("/slashes/",),
         ("more/slashes",),
         ("q?marks",),
         ("1param",),
         ("1col:on",),
-        argnames="name",
+        argnames="paramname",
     )
-    def test_round_trip(self, name, connection, metadata):
-        super().test_round_trip(name, connection, metadata)
+
+    @pytest.mark.xfail(reason="https://github.com/exasol/sqlalchemy-exasol/issues/232")
+    @tough_parameters
+    @config.requirements.unusual_column_name_characters
+    def test_round_trip_same_named_column(self, paramname, connection, metadata):
+        super().test_round_trip_same_named_column(paramname, connection, metadata)
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):

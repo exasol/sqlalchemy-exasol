@@ -2,7 +2,10 @@
 from inspect import cleandoc
 
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import (
+    create_engine,
+    testing,
+)
 from sqlalchemy.schema import DDL
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
@@ -182,7 +185,6 @@ class DifficultParametersTest(_DifficultParametersTest):
         ("percent%(ens)yah",),
         ("col:ons",),
         ("_starts_with_underscore",),
-        ("dot.s",),
         ("more :: %colons%",),
         ("_name",),
         ("___name",),
@@ -192,15 +194,14 @@ class DifficultParametersTest(_DifficultParametersTest):
         ("has spaces",),
         ("/slashes/",),
         ("more/slashes",),
-        ("q?marks",),
         ("1param",),
         ("1col:on",),
         argnames="paramname",
     )
 
-    @pytest.mark.xfail(reason="https://github.com/exasol/sqlalchemy-exasol/issues/232")
     @tough_parameters
     def test_round_trip_same_named_column(self, paramname, connection, metadata):
+        # dot_s and qmarks are currently disabled see "https://github.com/exasol/sqlalchemy-exasol/issues/232"
         super().test_round_trip_same_named_column(paramname, connection, metadata)
 
 

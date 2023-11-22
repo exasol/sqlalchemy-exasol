@@ -6,6 +6,7 @@ from sqlalchemy import (
     create_engine,
     testing,
 )
+from sqlalchemy.schema import DDL
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
@@ -41,6 +42,27 @@ class RowFetchTest(_RowFetchTest):
 
 
 class HasTableTest(_HasTableTest):
+    @classmethod
+    def define_views(cls, metadata):
+        query = 'CREATE VIEW vv AS SELECT id, "data" FROM test_table'
+
+        event.listen(metadata, "after_create", DDL(query))
+        event.listen(metadata, "before_drop", DDL("DROP VIEW vv"))
+
+        if testing.requires.schemas.enabled:
+            query = (
+                'CREATE VIEW {}.vv AS SELECT id, "data" FROM {}.test_table_s'.format(
+                    config.test_schema,
+                    config.test_schema,
+                )
+            )
+            event.listen(metadata, "after_create", DDL(query))
+            event.listen(
+                metadata,
+                "before_drop",
+                DDL("DROP VIEW %s.vv" % (config.test_schema)),
+            )
+
     RATIONALE = cleandoc(
         """
     The Exasol dialect does not check against views for `has_table`, see also `Inspector.has_table()`.
@@ -154,8 +176,7 @@ class RowCountTest(_RowCountTest):
 
 
 class DifficultParametersTest(_DifficultParametersTest):
-    @pytest.mark.xfail(reason="https://github.com/exasol/sqlalchemy-exasol/issues/232")
-    @testing.combinations(
+    tough_parameters = testing.combinations(
         ("boring",),
         ("per cent",),
         ("per % cent",),
@@ -163,16 +184,25 @@ class DifficultParametersTest(_DifficultParametersTest):
         ("par(ens)",),
         ("percent%(ens)yah",),
         ("col:ons",),
+        ("_starts_with_underscore",),
         ("more :: %colons%",),
+        ("_name",),
+        ("___name",),
+        ("[BracketsAndCase]",),
+        ("42numbers",),
+        ("percent%signs",),
+        ("has spaces",),
         ("/slashes/",),
         ("more/slashes",),
-        ("q?marks",),
         ("1param",),
         ("1col:on",),
-        argnames="name",
+        argnames="paramname",
     )
-    def test_round_trip(self, name, connection, metadata):
-        super().test_round_trip(name, connection, metadata)
+
+    @tough_parameters
+    def test_round_trip_same_named_column(self, paramname, connection, metadata):
+        # dot_s and qmarks are currently disabled see https://github.com/exasol/sqlalchemy-exasol/issues/232
+        super().test_round_trip_same_named_column(paramname, connection, metadata)
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):

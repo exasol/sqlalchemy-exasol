@@ -64,7 +64,7 @@ python = ">=3.8,<4.0"
 pyodbc = "^4.0.34"
 packaging = ">=21.3"
 pyexasol = "^0.25.1"
-sqlalchemy = ">=1.4,<1.4.45"
+sqlalchemy = ">=1.4,<2"
 
 [tool.poetry.dependencies.turbodbc]
 version = "==4.5.4"
@@ -89,6 +89,7 @@ mypy = ">=0.982"
 pyupgrade = ">=3.0.0"
 rich = "^13.3.1"
 exasol-integration-test-docker-environment = "^1.5.0"
+pytest-history = "^0.2.0"
 
 [tool.poetry.extras]
 turbodbc = ["turbodbc"]

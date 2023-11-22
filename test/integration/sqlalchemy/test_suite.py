@@ -2,10 +2,8 @@
 from inspect import cleandoc
 
 import pytest
-from sqlalchemy import (
-    create_engine,
-    testing,
-)
+from sqlalchemy import create_engine
+from sqlalchemy.schema import DDL
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
@@ -41,6 +39,27 @@ class RowFetchTest(_RowFetchTest):
 
 
 class HasTableTest(_HasTableTest):
+    @classmethod
+    def define_views(cls, metadata):
+        query = 'CREATE VIEW vv AS SELECT id, "data" FROM test_table'
+
+        event.listen(metadata, "after_create", DDL(query))
+        event.listen(metadata, "before_drop", DDL("DROP VIEW vv"))
+
+        if testing.requires.schemas.enabled:
+            query = (
+                'CREATE VIEW {}.vv AS SELECT id, "data" FROM {}.test_table_s'.format(
+                    config.test_schema,
+                    config.test_schema,
+                )
+            )
+            event.listen(metadata, "after_create", DDL(query))
+            event.listen(
+                metadata,
+                "before_drop",
+                DDL("DROP VIEW %s.vv" % (config.test_schema)),
+            )
+
     RATIONALE = cleandoc(
         """
     The Exasol dialect does not check against views for `has_table`, see also `Inspector.has_table()`.

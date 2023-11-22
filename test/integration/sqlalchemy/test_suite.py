@@ -200,7 +200,6 @@ class DifficultParametersTest(_DifficultParametersTest):
 
     @pytest.mark.xfail(reason="https://github.com/exasol/sqlalchemy-exasol/issues/232")
     @tough_parameters
-    @config.requirements.unusual_column_name_characters
     def test_round_trip_same_named_column(self, paramname, connection, metadata):
         super().test_round_trip_same_named_column(paramname, connection, metadata)
 

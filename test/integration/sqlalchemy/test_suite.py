@@ -201,7 +201,7 @@ class DifficultParametersTest(_DifficultParametersTest):
 
     @tough_parameters
     def test_round_trip_same_named_column(self, paramname, connection, metadata):
-        # dot_s and qmarks are currently disabled see "https://github.com/exasol/sqlalchemy-exasol/issues/232"
+        # dot_s and qmarks are currently disabled see https://github.com/exasol/sqlalchemy-exasol/issues/232
         super().test_round_trip_same_named_column(paramname, connection, metadata)
 
 

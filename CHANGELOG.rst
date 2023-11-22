@@ -11,7 +11,7 @@ Unreleased
 🔧 Changed
 -----------
 
-- Loosened the SQLAlchemy dependency constraint to `>1.4,<2`
+- Loosened the SQLAlchemy dependency constraint to `>=1.4,<2`
 
 .. _changelog-4.6.1:
 

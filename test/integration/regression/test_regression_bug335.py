@@ -1,4 +1,7 @@
+import warnings
+
 import pytest
+import sqlalchemy.exc
 from sqlalchemy import (
     Column,
     Integer,
@@ -65,17 +68,21 @@ def test_lastrowid_does_not_create_extra_commit(
         schema=schema_name,
     )
 
-    with odbcconfig(ODBC_DRIVER):
-        conn = engine.connect()
-        trans = conn.begin()
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=sqlalchemy.exc.RemovedIn20Warning)
+        with odbcconfig(ODBC_DRIVER):
+            conn = engine.connect()
+            trans = conn.begin()
 
-        # Insert without an explicit ID will trigger a call to `get_lastrowid`
-        # which in turn cause the unintended autocommit
-        insert_statement = insert(table).values(name="Gandalf")
-        conn.execute(insert_statement)
-        trans.rollback()
+            # Insert without an explicit ID will trigger a call to `get_lastrowid`
+            # which in turn cause the unintended autocommit
+            insert_statement = insert(table).values(name="Gandalf")
+            conn.execute(insert_statement)
+            trans.rollback()
 
-        result = conn.execute(f"SELECT * FROM {schema_name}.{table_name};").fetchall()
-        conn.close()
+            result = conn.execute(
+                f"SELECT * FROM {schema_name}.{table_name};"
+            ).fetchall()
+            conn.close()
 
-        assert len(result) == 0
+            assert len(result) == 0

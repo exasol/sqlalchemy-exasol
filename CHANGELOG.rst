@@ -3,6 +3,16 @@
 Unreleased
 ==========
 
+.. _changelog-4.6.2:
+
+4.6.2 — 2023-11-22
+==================
+
+🔧 Changed
+-----------
+
+- Loosened the SQLAlchemy dependency constraint to `>1.4,<2`
+
 .. _changelog-4.6.1:
 
 4.6.1 — 2023-11-06

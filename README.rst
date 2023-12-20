@@ -1,6 +1,7 @@
 SQLAlchemy Dialect for EXASOL DB
 ================================
 
+DO NOT MERGE
 
 .. image:: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml/badge.svg?branch=master&event=push
     :target: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml

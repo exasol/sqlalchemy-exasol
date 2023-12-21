@@ -3,6 +3,22 @@
 Unreleased
 ==========
 
+.. _changelog-4.6.3:
+
+4.6.3 — 2023-12-21
+==================
+
+🔧 Changed
+-----------
+- Changed pyodbc upper bound constraint
+  (Allow larger upper bounds)
+
+🧰 Internal
+-----------
+- Relocked dependencies
+- Bumped versions of GitHub actions
+- Adjusted workflow triggers, to enbale workflow runs for external branches
+
 .. _changelog-4.6.2:
 
 4.6.2 — 2023-11-22

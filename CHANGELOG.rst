@@ -3,10 +3,15 @@
 Unreleased
 ==========
 
+.. _changelog-4.6.3:
+
+4.6.3 — 2023-12-21
+==================
+
 🔧 Changed
 -----------
 - Changed pyodbc upper bound constraint
-  (Allowed larger upper bounds)
+  (Allow larger upper bounds)
 
 🧰 Internal
 -----------

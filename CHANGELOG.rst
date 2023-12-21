@@ -17,7 +17,7 @@ Unreleased
 -----------
 - Relocked dependencies
 - Bumped versions of GitHub actions
-- Adjusted workflow triggers, to enbale workflow runs for external branches
+- Adjusted workflow triggers, to enable workflow runs for external branches
 
 .. _changelog-4.6.2:
 

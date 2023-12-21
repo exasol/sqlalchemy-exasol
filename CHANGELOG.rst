@@ -10,6 +10,7 @@ Unreleased
 
 🧰 Internal
 -----------
+- Relocked dependencies
 - Bumped versions of GitHub actions
 - Adjusted workflow triggers, to enbale workflow runs for external branches
 

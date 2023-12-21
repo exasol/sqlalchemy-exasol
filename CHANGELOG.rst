@@ -3,6 +3,16 @@
 Unreleased
 ==========
 
+🔧 Changed
+-----------
+- Changed pyodbc upper bound constraint
+  (Allowed larger upper bounds)
+
+🧰 Internal
+-----------
+- Bumped versions of GitHub actions
+- Adjusted workflow triggers, to enbale workflow runs for external branches
+
 .. _changelog-4.6.2:
 
 4.6.2 — 2023-11-22

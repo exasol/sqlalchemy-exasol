@@ -61,13 +61,16 @@ exclude = []
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
-pyodbc = ">=4.0.34,<6"
 packaging = ">=21.3"
 pyexasol = "^0.25.1"
 sqlalchemy = ">=1.4,<2"
 
 [tool.poetry.dependencies.turbodbc]
 version = "==4.5.4"
+optional = true
+
+[tool.poetry.dependencies.pyodbc]
+version = ">=4.0.34,<6"
 optional = true
 
 [tool.poetry.group.dev.dependencies]
@@ -92,6 +95,7 @@ exasol-integration-test-docker-environment = "^1.5.0"
 pytest-history = ">=0.2.0"
 
 [tool.poetry.extras]
+pyodbc = ["pyodbc"]
 turbodbc = ["turbodbc"]
 
 [tool.poetry.plugins."sqlalchemy.dialects"]

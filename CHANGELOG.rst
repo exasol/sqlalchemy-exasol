@@ -3,6 +3,10 @@
 Unreleased
 ==========
 
+🧰 Internal
+-----------
+- Relocked dependencies
+
 .. _changelog-4.6.3:
 
 4.6.3 — 2023-12-21

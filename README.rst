@@ -43,60 +43,56 @@ SQLAlchemy Dialect for EXASOL DB
     :alt: PyPI - Downloads
 
 
-How to get started
-------------------
+Getting Started with SQLAlchemy-Exasol
+--------------------------------------
+SQLAlchemy-Exasol supports multiple dialects, primarily differentiated by whether they are ODBC or Websocket based.
 
-Currently, sqlalchemy-exasol supports multiple dialects. The core difference
-being if the dialect is :code:`odbc` or :code:`websocket` based.
+Choosing a Dialect
+++++++++++++++++++
 
-Generally, we advise to use the websocket based Dialect, because odbc
-based dialects require a good understanding of (unix)ODBC and the setup is
-significant more complicated.
+We recommend using the Websocket-based dialect due to its simplicity. ODBC-based dialects demand a thorough understanding of (Unix)ODBC, and the setup is considerably more complex.
 
+.. note::
 
-Turbodbc support
-````````````````
+   To use an ODBC-based dialect, you must specify it as an extra during installation.
+
+   .. code-block:: shell
+
+      pip install "sqlalchemy-exasol[pydobc]"
+      pip install "sqlalchemy-exasol[turbodbc]"
+
 
 .. warning::
 
-    Maintenance of this feature is on hold. Also it is very likely that turbodbc support will be dropped in future versions.
-
-- You can use Turbodbc with sqlalchemy_exasol if you use a python version >= 3.8.
-- Multi row update is not supported, see
-  `test/test_update.py <test/test_update.py>`_ for an example
+    The maintenance of Turbodbc support is currently paused, and it may be phased out in future versions.
+    We are also planning to phase out the pyodbc support in the future.
 
 
-Meet the system requirements
-````````````````````````````
+
+System Requirements
+-------------------
 - Python
 - An Exasol DB (e.g. `docker-db <test_docker_image_>`_ or a `cloud instance <test_drive_>`_)
 
-ODBC-based dialects additionally require the following to be available and set up:
+.. note::
 
-- The packages unixODBC and unixODBC-dev >= 2.2.14
-- The Exasol `ODBC driver <odbc_driver_>`_
-- The ODBC.ini and ODBCINST.ini configurations files setup
+   For ODBC-Based Dialects, additional libraries required for ODBC are necessary
+   (for further details, checkout the `developer guide`_).
 
+Setting Up Your Python Project
+------------------------------
 
-Setup your python project and install sqlalchemy-exasol
-```````````````````````````````````````````````````````
+Install SQLAlchemy-Exasol:
 
 .. code-block:: shell
 
     $ pip install sqlalchemy-exasol
 
-for turbodbc support:
 
-.. code-block:: shell
-
-    $ pip install sqlalchemy-exasol[turbodbc]
-
-Talk to the EXASOL DB using SQLAlchemy
-``````````````````````````````````````
+Using SQLAlchemy with EXASOL DB
+-------------------------------
 
 **Websocket based Dialect:**
-
-For more details regarding the websocket support checkout the section: "What is Websocket support?"
 
 .. code-block:: python
 
@@ -105,75 +101,7 @@ For more details regarding the websocket support checkout the section: "What is 
 	e = create_engine(url)
 	r = e.execute("select 42 from dual").fetchall()
 
-
-**Pyodbc (ODBC based Dialect):**
-
-.. code-block:: python
-
-	from sqlalchemy import create_engine
-	url = "exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
-	e = create_engine(url)
-	r = e.execute("select 42 from dual").fetchall()
-
-**Turbodbc (ODBC based Dialect):**
-
-.. code-block:: python
-
-	from sqlalchemy import create_engine
-	url = "exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
-	e = create_engine(url)
-	r = e.execute("select 42 from dual").fetchall()
-
-
-The dialect supports two types of connection urls creating an engine. A DSN (Data Source Name) mode and a host mode:
-
-.. list-table::
-
-    * - Type
-      - Example
-    * - DSN URL
-      - 'exa+pyodbc://USER:PWD@exa_test'
-    * - HOST URL
-      - 'exa+pyodbc://USER:PWD@192.168.14.227..228:1234/my_schema?parameter'
-
-Features
-++++++++
-
-- SELECT, INSERT, UPDATE, DELETE statements
-
-Notes
-+++++
-
-- Schema name and parameters are optional for the host url
-- At least on Linux/Unix systems it has proven valuable to pass 'CONNECTIONLCALL=en_US.UTF-8' as a url parameter. This will make sure that the client process (Python) and the EXASOL driver (UTF-8 internal) know how to interpret code pages correctly.
-- Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
-- As of Exasol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
-
-.. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
-.. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
-.. _test_drive: https://www.exasol.com/test-it-now/cloud/
-.. _test_docker_image: https://github.com/exasol/docker-db
-
-Development & Testing
-`````````````````````
-See `developer guide`_
-
-What is Websocket support?
-``````````````````````````
-In the context of SQLA and Exasol, Websocket support means that an SQLA dialect
-supporting the `Exasol Websocket Protocol <https://github.com/exasol/websocket-api>`_
-is provided.
-
-Using the websocket based protocol instead over ODBC will provide various advantages:
-
-* Less System Dependencies
-* Easier to use than ODBC based driver(s)
-* Lock free metadata calls etc.
-
-For further details `Why a Websockets API  <https://github.com/exasol/websocket-api#why-a-websockets-api>`_.
-
-Example Usage(s)
-++++++++++++++++++
+Examples:
 
 .. code-block:: python
 
@@ -198,22 +126,51 @@ Example Usage(s)
     with engine.connect() as con:
         ...
 
-Supported Connection Parameters
-+++++++++++++++++++++++++++++++
-.. list-table::
 
-   * - Parameter
-     - Values
-     - Comment
-   * - ENCRYPTION
-     - Y, Yes, N, No
-     - Y or Yes Enable Encryption (TLS) default, N or No disable Encryption
-   * - SSLCertificate
-     - SSL_VERIFY_NONE
-     - Disable certificate validation
+**Pyodbc (ODBC based Dialect):**
 
+.. code-block:: python
+
+	from sqlalchemy import create_engine
+	url = "exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
+	e = create_engine(url)
+	r = e.execute("select 42 from dual").fetchall()
+
+**Turbodbc (ODBC based Dialect):**
+
+.. code-block:: python
+
+	from sqlalchemy import create_engine
+	url = "exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
+	e = create_engine(url)
+	r = e.execute("select 42 from dual").fetchall()
+
+
+Features
+--------
+
+- SELECT, INSERT, UPDATE, DELETE statements
+
+General Notes
+-------------
+
+- Schema name and parameters are optional for the host url
+- At least on Linux/Unix systems it has proven valuable to pass 'CONNECTIONLCALL=en_US.UTF-8' as a url parameter. This will make sure that the client process (Python) and the EXASOL driver (UTF-8 internal) know how to interpret code pages correctly.
+- Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
+- As of Exasol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
+
+.. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
+.. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
+.. _test_drive: https://www.exasol.com/test-it-now/cloud/
+.. _test_docker_image: https://github.com/exasol/docker-db
 
 Known Issues
-++++++++++++
+------------
 * Insert
     - Insert multiple empty rows via prepared statements does not work in all cases
+
+Development & Testing
+---------------------
+See `developer guide`_
+
+

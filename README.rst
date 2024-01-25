@@ -52,16 +52,6 @@ Choosing a Dialect
 
 We recommend using the Websocket-based dialect due to its simplicity. ODBC-based dialects demand a thorough understanding of (Unix)ODBC, and the setup is considerably more complex.
 
-.. note::
-
-   To use an ODBC-based dialect, you must specify it as an extra during installation.
-
-   .. code-block:: shell
-
-      pip install "sqlalchemy-exasol[pydobc]"
-      pip install "sqlalchemy-exasol[turbodbc]"
-
-
 .. warning::
 
     The maintenance of Turbodbc support is currently paused, and it may be phased out in future versions.
@@ -87,6 +77,15 @@ Install SQLAlchemy-Exasol:
 .. code-block:: shell
 
     $ pip install sqlalchemy-exasol
+
+.. note::
+
+   To use an ODBC-based dialect, you must specify it as an extra during installation.
+
+   .. code-block:: shell
+
+      pip install "sqlalchemy-exasol[pydobc]"
+      pip install "sqlalchemy-exasol[turbodbc]"
 
 
 Using SQLAlchemy with EXASOL DB

@@ -161,12 +161,12 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="readme.html">Readme</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="developer_guide/index.html">Development</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="developer_guide/integration_tests.html">Integration Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer_guide/integration_tests.html#setup">Setup</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
 </div>
@@ -203,22 +203,18 @@
         <article role="main">
           <section id="sqlalchemy-exasol">
 <h1>SQLAlchemy-Exasol<a class="headerlink" href="#sqlalchemy-exasol" title="Permalink to this heading">#</a></h1>
-<p>SQLAlchemy-Exasol is an SQLAlchemy dialect extension.</p>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
-<p>The dialect is the system SQLAlchemy uses to communicate with various types of DBAPI implementations and databases.
-The sections that follow contain reference documentation and notes specific to the usage of each backend,
-as well as notes for the various DBAPIs.</p>
-<p>For more details have a look into the <a class="reference external" href="https://docs.sqlalchemy.org/en/13/dialects/">SQLAlchemy documentation</a>.</p>
-</section>
+<p>SQLAlchemy-Exasol is a dialect extension for SQLAlchemy, implementing support for Exasol databases.</p>
 <section id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">#</a></h2>
 <ol class="arabic">
-<li><p><a class="reference external" href="https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc.htm">Install the Exasol-ODBC driver</a></p></li>
-<li><p>Add <a class="reference external" href="https://pypi.org/project/sqlalchemy-exasol/">sqlalchemy-exasol</a> as a dependency</p>
+<li><p>Install the <a class="reference external" href="https://pypi.org/project/sqlalchemy-exasol/">SQLAlchemy-Exasol extension</a></p>
 <blockquote>
 <div><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>sqlalchemy-exasol
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SQLAlchemy will be installed due to the fact that it is an required dependency for SQLAlchemy-Exasol.</p>
 </div>
 </div></blockquote>
 </li>
@@ -285,7 +281,6 @@ as well as notes for the various DBAPIs.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">SQLAlchemy-Exasol</a><ul>
-<li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a></li>
 </ul>
 </li>

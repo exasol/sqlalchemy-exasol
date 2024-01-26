@@ -1,25 +1,19 @@
 SQLAlchemy-Exasol
 =================
-SQLAlchemy-Exasol is an SQLAlchemy dialect extension.
-
-Overview
---------
-The dialect is the system SQLAlchemy uses to communicate with various types of DBAPI implementations and databases.
-The sections that follow contain reference documentation and notes specific to the usage of each backend,
-as well as notes for the various DBAPIs.
-
-For more details have a look into the `SQLAlchemy documentation <https://docs.sqlalchemy.org/en/13/dialects/>`_.
+SQLAlchemy-Exasol is a dialect extension for SQLAlchemy, implementing support for Exasol databases.
 
 Getting Started
 ---------------
 
-#. `Install the Exasol-ODBC driver <https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc.htm>`_
-
-#. Add `sqlalchemy-exasol <https://pypi.org/project/sqlalchemy-exasol/>`_ as a dependency
+#. Install the `SQLAlchemy-Exasol extension <https://pypi.org/project/sqlalchemy-exasol/>`_
 
     .. code-block:: shell
 
         $ pip install sqlalchemy-exasol
+
+    .. note::
+
+        SQLAlchemy will be installed due to the fact that it is an required dependency for SQLAlchemy-Exasol.
 
 #. Execute queries
 
@@ -38,5 +32,5 @@ For more details on SQLAlchemy consult it's `documenation <https://docs.sqlalche
    :hidden:
 
    readme
-   changelog
    developer_guide/index
+   changelog

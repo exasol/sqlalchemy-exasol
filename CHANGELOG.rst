@@ -3,6 +3,11 @@
 Unreleased
 ==========
 
+🔧 Changed
+-----------
+- Made websockets the default way to use sqlalchemy with exasol
+- Made pydobc an optional dependency
+
 🧰 Internal
 -----------
 - Relocked dependencies

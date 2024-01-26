@@ -84,8 +84,8 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
-      - name: Install python project dependencies including trubodbc
-        run: poetry install --extras "turbodbc"
+      - name: Install python project dependencies including turbodbc
+        run: poetry install --all-extras
         if: ${{ matrix.connector == 'turbodbc' }}
 
       - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}

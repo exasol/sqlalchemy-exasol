@@ -104,7 +104,7 @@ Examples:
 
 .. code-block:: python
 
-    from sqla import create_engine
+    from sqlalchemy import create_engine
 
     engine = create_engine("exa+websocket://sys:exasol@127.0.0.1:8888")
     with engine.connect() as con:
@@ -112,7 +112,7 @@ Examples:
 
 .. code-block:: python
 
-    from sqla import create_engine
+    from sqlalchemy import create_engine
 
     # ATTENTION:
     # In terms of security it is NEVER a good idea to turn of certificate validation!!

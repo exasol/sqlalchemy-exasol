@@ -4,8 +4,8 @@ from warnings import warn
 from sqlalchemy import types as sqltypes
 from sqlalchemy import util
 
-from sqlalchemy_exasol.warnings import SqlaExasolDeprecationWarning
 from sqlalchemy_exasol.base import EXADialect
+from sqlalchemy_exasol.warnings import SqlaExasolDeprecationWarning
 
 DEFAULT_CONNECTION_PARAMS = {
     # always enable efficient conversion to Python types:
@@ -128,8 +128,7 @@ class EXADialect_turbodbc(EXADialect):
                     value = util.asint(raw)
                 turbodbc_options[param] = value
 
-        options["turbodbc_options"] = real_turbodbc.make_options(
-            **turbodbc_options)
+        options["turbodbc_options"] = real_turbodbc.make_options(**turbodbc_options)
 
         return options
 

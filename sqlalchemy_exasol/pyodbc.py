@@ -10,8 +10,11 @@ import logging
 import re
 import sys
 
+from warnings import warn
+
 from packaging import version
 from sqlalchemy import sql
+from sqlalchemy_exasol.warnings import SqlaExasolDeprecationWarning
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.engine import reflection
 from sqlalchemy.util.langhelpers import asbool
@@ -30,13 +33,19 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     driver_version = None
 
     def __init__(self, **kw):
+        message = (
+            "'pyodbc' support in 'sqlalchemy_exasol' is deprecated and will be removed. "
+            "Please switch to the websocket driver. See documentation for details."
+        )
+        warn(message, SqlaExasolDeprecationWarning)
         super().__init__(**kw)
 
     def get_driver_version(self, connection):
         # LooseVersion will also work with interim versions like '4.2.7dev1' or '5.0.rc4'
         if self.driver_version is None:
             self.driver_version = version.parse(
-                connection.connection.getinfo(self.dbapi.SQL_DRIVER_VER) or "2.0.0"
+                connection.connection.getinfo(
+                    self.dbapi.SQL_DRIVER_VER) or "2.0.0"
             )
         return self.driver_version
 
@@ -81,9 +90,11 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             if param in keys:
                 connect_args[param.upper()] = asbool(keys.pop(param))
 
-        dsn_connection = "dsn" in keys or ("host" in keys and "port" not in keys)
+        dsn_connection = "dsn" in keys or (
+            "host" in keys and "port" not in keys)
         if dsn_connection:
-            connectors = ["DSN=%s" % (keys.pop("dsn", "") or keys.pop("host", ""))]
+            connectors = ["DSN=%s" %
+                          (keys.pop("dsn", "") or keys.pop("host", ""))]
         else:
             connectors = ["DRIVER={%s}" % keys.pop("driver", None)]
 
@@ -110,7 +121,8 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         # client encoding.  This should obviously be set to 'No' if
         # you query a cp1253 encoded database from a latin1 client...
         if "odbc_autotranslate" in keys:
-            connectors.append("AutoTranslate=%s" % keys.pop("odbc_autotranslate"))
+            connectors.append("AutoTranslate=%s" %
+                              keys.pop("odbc_autotranslate"))
 
         connectors.extend([f"{k}={v}" for k, v in sorted(keys.items())])
         return [[";".join(connectors)], connect_args]
@@ -195,7 +207,8 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     def get_table_names(self, connection, schema, **kw):
         if self._is_sql_fallback_requested(**kw):
             return super().get_table_names(connection, schema, **kw)
-        tables = self._tables_for_schema(connection, schema, table_type="TABLE")
+        tables = self._tables_for_schema(
+            connection, schema, table_type="TABLE")
         return [self.normalize_name(row.table_name) for row in tables]
 
     @reflection.cache

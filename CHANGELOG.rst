@@ -5,6 +5,7 @@ Unreleased
 
 🔧 Changed
 -----------
+- Added deprecation warnings for pyodbc and trubodbc dialects
 - Made websockets the default way to use sqlalchemy with exasol
 - Made pydobc an optional dependency
 

@@ -1,8 +1,10 @@
 import decimal
+from warnings import warn
 
 from sqlalchemy import types as sqltypes
 from sqlalchemy import util
 
+from sqlalchemy_exasol.warnings import SqlaExasolDeprecationWarning
 from sqlalchemy_exasol.base import EXADialect
 
 DEFAULT_CONNECTION_PARAMS = {
@@ -72,6 +74,14 @@ class EXADialect_turbodbc(EXADialect):
 
     colspecs = {sqltypes.Numeric: _ExaDecimal, sqltypes.Integer: _ExaInteger}
 
+    def __init__(self, **kw):
+        message = (
+            "'turbodbc' support in 'sqlalchemy_exasol' is deprecated and will be removed. "
+            "Please switch to the websocket driver. See documentation for details."
+        )
+        warn(message, SqlaExasolDeprecationWarning)
+        super().__init__(**kw)
+
     @classmethod
     def dbapi(cls):
         return __import__("turbodbc")
@@ -118,7 +128,8 @@ class EXADialect_turbodbc(EXADialect):
                     value = util.asint(raw)
                 turbodbc_options[param] = value
 
-        options["turbodbc_options"] = real_turbodbc.make_options(**turbodbc_options)
+        options["turbodbc_options"] = real_turbodbc.make_options(
+            **turbodbc_options)
 
         return options
 

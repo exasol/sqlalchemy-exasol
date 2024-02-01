@@ -9,6 +9,7 @@ Connect string::
 import logging
 import re
 import sys
+from warnings import warn
 
 from packaging import version
 from sqlalchemy import sql
@@ -20,6 +21,7 @@ from sqlalchemy_exasol.base import (
     EXADialect,
     EXAExecutionContext,
 )
+from sqlalchemy_exasol.warnings import SqlaExasolDeprecationWarning
 
 logger = logging.getLogger("sqlalchemy_exasol")
 
@@ -30,6 +32,11 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     driver_version = None
 
     def __init__(self, **kw):
+        message = (
+            "'pyodbc' support in 'sqlalchemy_exasol' is deprecated and will be removed. "
+            "Please switch to the websocket driver. See documentation for details."
+        )
+        warn(message, SqlaExasolDeprecationWarning)
         super().__init__(**kw)
 
     def get_driver_version(self, connection):

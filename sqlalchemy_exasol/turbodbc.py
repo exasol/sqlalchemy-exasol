@@ -1,9 +1,11 @@
 import decimal
+from warnings import warn
 
 from sqlalchemy import types as sqltypes
 from sqlalchemy import util
 
 from sqlalchemy_exasol.base import EXADialect
+from sqlalchemy_exasol.warnings import SqlaExasolDeprecationWarning
 
 DEFAULT_CONNECTION_PARAMS = {
     # always enable efficient conversion to Python types:
@@ -71,6 +73,14 @@ class EXADialect_turbodbc(EXADialect):
     supports_sane_multi_rowcount = False
 
     colspecs = {sqltypes.Numeric: _ExaDecimal, sqltypes.Integer: _ExaInteger}
+
+    def __init__(self, **kw):
+        message = (
+            "'turbodbc' support in 'sqlalchemy_exasol' is deprecated and will be removed. "
+            "Please switch to the websocket driver. See documentation for details."
+        )
+        warn(message, SqlaExasolDeprecationWarning)
+        super().__init__(**kw)
 
     @classmethod
     def dbapi(cls):

@@ -110,6 +110,7 @@ addopts = "--tb native -v -r fxX"
 filterwarnings = [
     "error::DeprecationWarning",
     "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",
+    "ignore::DeprecationWarning:sqlalchemy_exasol.*",
 ]
 
 [tool.black]

@@ -6,6 +6,7 @@ Unreleased
 🧰 Internal
 -----------
 - Remove testing against Exasol 7.0
+- Relocked dependencies
 
 .. _changelog-5.0.0:
 

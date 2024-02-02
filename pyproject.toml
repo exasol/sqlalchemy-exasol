@@ -10,7 +10,7 @@ packages = [
     { include = "sqlalchemy_exasol" },
     { include = "exasol" }
 ]
-version = "4.6.3"
+version = "5.0.0"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
 authors = [

@@ -4,6 +4,7 @@ This module provides `PEP-249`_ a DBAPI compliant types and type conversion defi
 
 .. _PEP-249-types: https://peps.python.org/pep-0249/#type-objects-and-constructors
 """
+
 from datetime import (
     date,
     datetime,

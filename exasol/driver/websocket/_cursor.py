@@ -4,6 +4,7 @@ This module provides `PEP-249`_ DBAPI compliant cursor implementation.
 
 .. _PEP-249-cursor: https://peps.python.org/pep-0249/#cursor-objects
 """
+
 import datetime
 import decimal
 from collections import defaultdict

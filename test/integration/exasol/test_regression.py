@@ -1,4 +1,5 @@
 """This module contains various regression test for issues which have been fixed in the past"""
+
 import pytest
 from sqlalchemy import (
     Column,

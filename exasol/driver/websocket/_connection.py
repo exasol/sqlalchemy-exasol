@@ -94,9 +94,9 @@ class Connection:
             "client_name": client_name,
             "client_version": client_version,
             "protocol_version": 3,
-            "websocket_sslopt": {"cert_reqs": ssl.CERT_REQUIRED}
-            if certificate_validation
-            else None,
+            "websocket_sslopt": (
+                {"cert_reqs": ssl.CERT_REQUIRED} if certificate_validation else None
+            ),
             "access_token": None,
             "refresh_token": None,
         }

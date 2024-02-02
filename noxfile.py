@@ -45,7 +45,7 @@ class Settings:
     DB_PORT = 8888
     BUCKETFS_PORT = 6666
     VERSION_FILE = PROJECT_ROOT / "sqlalchemy_exasol" / "version.py"
-    DB_VERSIONS = ("7.1.17", "7.0.20")
+    DB_VERSIONS = ("7.1.17",)
 
 
 def find_session_runner(session: Session, name: str) -> SessionRunner:

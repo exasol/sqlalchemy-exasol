@@ -1,6 +1,7 @@
 """
 This module contains compatibility tests for pythons dbapi module interface
 """
+
 import datetime
 import importlib
 

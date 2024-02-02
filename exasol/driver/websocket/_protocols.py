@@ -5,6 +5,7 @@ This module provides `PEP-249`_ a DBAPI compliant Connection and Cursor protocol
 .. _PEP-249-connection: https://peps.python.org/pep-0249/#connection-objects
 .. _PEP-249-cursor: https://peps.python.org/pep-0249/#cursor-objects
 """
+
 from typing import Protocol
 
 

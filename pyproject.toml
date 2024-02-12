@@ -63,7 +63,7 @@ exclude = []
 python = ">=3.8,<4.0"
 packaging = ">=21.3"
 pyexasol = "^0.25.1"
-sqlalchemy = ">=1.4,<2"
+sqlalchemy = ">=1.4,<3"
 
 [tool.poetry.dependencies.turbodbc]
 version = "==4.5.4"

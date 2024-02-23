@@ -160,7 +160,7 @@ General Notes
 
 .. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
 .. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
-.. _test_drive: https://www.exasol.com/test-it-now/cloud/
+.. _test_drive: https://cloud.exasol.com/signup 
 .. _test_docker_image: https://github.com/exasol/docker-db
 
 Known Issues

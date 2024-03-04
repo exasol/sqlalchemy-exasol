@@ -27,13 +27,13 @@ test = ["coverage", "mypy", "pexpect", "ruff", "wheel"]
 
 [[package]]
 name = "astroid"
-version = "3.0.3"
+version = "3.1.0"
 description = "An abstract syntax tree for Python with inference support."
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "astroid-3.0.3-py3-none-any.whl", hash = "sha256:92fcf218b89f449cdf9f7b39a269f8d5d617b27be68434912e11e79203963a17"},
-    {file = "astroid-3.0.3.tar.gz", hash = "sha256:4148645659b08b70d72460ed1921158027a9e53ae8b7234149b1400eddacbb93"},
+    {file = "astroid-3.1.0-py3-none-any.whl", hash = "sha256:951798f922990137ac090c53af473db7ab4e70c770e6d7fae0cec59f74411819"},
+    {file = "astroid-3.1.0.tar.gz", hash = "sha256:ac248253bfa4bd924a0de213707e7ebeeb3138abeb48d798784ead1e56d419d4"},
 ]
 
 [package.dependencies]
@@ -567,23 +567,23 @@ files = [
 
 [[package]]
 name = "docker"
-version = "7.0.0"
+version = "6.1.3"
 description = "A Python library for the Docker Engine API."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.7"
 files = [
-    {file = "docker-7.0.0-py3-none-any.whl", hash = "sha256:12ba681f2777a0ad28ffbcc846a69c31b4dfd9752b47eb425a274ee269c5e14b"},
-    {file = "docker-7.0.0.tar.gz", hash = "sha256:323736fb92cd9418fc5e7133bc953e11a9da04f4483f828b527db553f1e7e5a3"},
+    {file = "docker-6.1.3-py3-none-any.whl", hash = "sha256:aecd2277b8bf8e506e484f6ab7aec39abe0038e29fa4a6d3ba86c3fe01844ed9"},
+    {file = "docker-6.1.3.tar.gz", hash = "sha256:aa6d17830045ba5ef0168d5eaa34d37beeb113948c413affe1d5991fc11f9a20"},
 ]
 
 [package.dependencies]
 packaging = ">=14.0"
 requests = ">=2.26.0"
 urllib3 = ">=1.26.0"
+websocket-client = ">=0.32.0"
 
 [package.extras]
 ssh = ["paramiko (>=2.4.3)"]
-websockets = ["websocket-client (>=1.3.0)"]
 
 [[package]]
 name = "docutils"
@@ -613,20 +613,32 @@ requests = ">=2.24.0"
 typeguard = "4.0.0"
 
 [[package]]
+name = "exasol-error-reporting"
+version = "0.4.0"
+description = "Exasol Python Error Reporting"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "exasol_error_reporting-0.4.0-py3-none-any.whl", hash = "sha256:851aed9fd95bc3c6a566ba174a8052897442bfe503c9b8858faab26e3d6f0153"},
+    {file = "exasol_error_reporting-0.4.0.tar.gz", hash = "sha256:a0bc5056aa23df97eb47d2da95d112d9b2dcd5295016fdefac2fc7aa5e7eea19"},
+]
+
+[[package]]
 name = "exasol-integration-test-docker-environment"
-version = "1.7.1"
+version = "3.0.0"
 description = "Integration Test Docker Environment for Exasol"
 optional = false
 python-versions = ">=3.8,<4"
 files = [
-    {file = "exasol_integration_test_docker_environment-1.7.1-py3-none-any.whl", hash = "sha256:531bf53a5c60c422850472710d3ad11983d8636cb5edfbb705c86f0a4a69a125"},
-    {file = "exasol_integration_test_docker_environment-1.7.1.tar.gz", hash = "sha256:7fb6b2e225673c124e1ebecd1bbc03d313bf56d3915d526496f21ba0ca9fa816"},
+    {file = "exasol_integration_test_docker_environment-3.0.0-py3-none-any.whl", hash = "sha256:0c041f7a0acb10fd4fee5dcf159984fcd347f123566f761fb8ec3e495570e778"},
+    {file = "exasol_integration_test_docker_environment-3.0.0.tar.gz", hash = "sha256:4ca6ee1e3b60c0e8bb0adc13625276a5ccfc0fb749393dd3daf904eede246860"},
 ]
 
 [package.dependencies]
 click = ">=7.0"
-docker = {version = ">=4.0.0", markers = "sys_platform != \"win32\""}
+docker = {version = ">=4.0.0,<7.0.0", markers = "sys_platform != \"win32\""}
 exasol-bucketfs = ">=0.6.0,<2.0.0"
+exasol-error-reporting = ">=0.4.0,<0.5.0"
 fabric = ">=3.0.1,<4.0.0"
 gitpython = ">=2.1.0"
 humanfriendly = ">=4.18"
@@ -638,7 +650,6 @@ netaddr = ">=0.7.19"
 networkx = ">=2.3"
 portalocker = ">=2.7.0,<3.0.0"
 pydot = ">=1.4.0"
-pyexasol = ">=0.25.2,<0.26.0"
 pytest = ">=7.2.2,<8.0.0"
 requests = ">=2.21.0"
 simplejson = ">=3.16.0"
@@ -1232,23 +1243,24 @@ setuptools = "*"
 
 [[package]]
 name = "nox"
-version = "2023.4.22"
+version = "2024.3.2"
 description = "Flexible test automation."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "nox-2023.4.22-py3-none-any.whl", hash = "sha256:0b1adc619c58ab4fa57d6ab2e7823fe47a32e70202f287d78474adcc7bda1891"},
-    {file = "nox-2023.4.22.tar.gz", hash = "sha256:46c0560b0dc609d7d967dc99e22cb463d3c4caf54a5fda735d6c11b5177e3a9f"},
+    {file = "nox-2024.3.2-py3-none-any.whl", hash = "sha256:e53514173ac0b98dd47585096a55572fe504fecede58ced708979184d05440be"},
+    {file = "nox-2024.3.2.tar.gz", hash = "sha256:f521ae08a15adbf5e11f16cb34e8d0e6ea521e0b92868f684e91677deb974553"},
 ]
 
 [package.dependencies]
 argcomplete = ">=1.9.4,<4.0"
 colorlog = ">=2.6.1,<7.0.0"
 packaging = ">=20.9"
-virtualenv = ">=14"
+virtualenv = ">=20.14.1"
 
 [package.extras]
-tox-to-nox = ["jinja2", "tox (<4)"]
+tox-to-nox = ["jinja2", "tox"]
+uv = ["uv"]
 
 [[package]]
 name = "packaging"
@@ -1442,17 +1454,17 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pylint"
-version = "3.0.3"
+version = "3.1.0"
 description = "python code static checker"
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "pylint-3.0.3-py3-none-any.whl", hash = "sha256:7a1585285aefc5165db81083c3e06363a27448f6b467b3b0f30dbd0ac1f73810"},
-    {file = "pylint-3.0.3.tar.gz", hash = "sha256:58c2398b0301e049609a8429789ec6edf3aabe9b6c5fec916acd18639c16de8b"},
+    {file = "pylint-3.1.0-py3-none-any.whl", hash = "sha256:507a5b60953874766d8a366e8e8c7af63e058b26345cfcb5f91f89d987fd6b74"},
+    {file = "pylint-3.1.0.tar.gz", hash = "sha256:6a69beb4a6f63debebaab0a3477ecd0f559aa726af4954fc948c51f7a2549e23"},
 ]
 
 [package.dependencies]
-astroid = ">=3.0.1,<=3.1.0-dev0"
+astroid = ">=3.1.0,<=3.2.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
 dill = [
     {version = ">=0.2", markers = "python_version < \"3.11\""},
@@ -1772,6 +1784,7 @@ files = [
     {file = "PyYAML-6.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:bf07ee2fef7014951eeb99f56f39c9bb4af143d8aa3c21b1677805985307da34"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:855fb52b0dc35af121542a76b9a84f8d1cd886ea97c84703eaa6d88e37a2ad28"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:40df9b996c2b73138957fe23a16a4f0ba614f4c0efce1e9406a184b6d07fa3a9"},
+    {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a08c6f0fe150303c1c6b71ebcd7213c2858041a7e01975da3a99aed1e7a378ef"},
     {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6c22bec3fbe2524cde73d7ada88f6566758a8f7227bfbf93a408a9d86bcc12a0"},
     {file = "PyYAML-6.0.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:8d4e9c88387b0f5c7d5f281e55304de64cf7f9c0021a3525bd3b1c542da3b0e4"},
     {file = "PyYAML-6.0.1-cp312-cp312-win32.whl", hash = "sha256:d483d2cdf104e7c9fa60c544d92981f12ad66a457afae824d146093b8c294c54"},
@@ -1829,13 +1842,13 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "rich"
-version = "13.7.0"
+version = "13.7.1"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "rich-13.7.0-py3-none-any.whl", hash = "sha256:6da14c108c4866ee9520bbffa71f6fe3962e193b7da68720583850cd4548e235"},
-    {file = "rich-13.7.0.tar.gz", hash = "sha256:5cb5123b5cf9ee70584244246816e9114227e0b98ad9176eede6ad54bf5403fa"},
+    {file = "rich-13.7.1-py3-none-any.whl", hash = "sha256:4edbae314f59eb482f54e9e30bf00d33350aaa94f4bfcd4e9e3110e64d0d7222"},
+    {file = "rich-13.7.1.tar.gz", hash = "sha256:9be308cb1fe2f1f57d67ce99e95af38a1e2bc71ad9813b0e247cf7ffbcc3a432"},
 ]
 
 [package.dependencies]
@@ -2591,4 +2604,4 @@ turbodbc = ["turbodbc"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4.0"
-content-hash = "c443ec026d48491c601f8f51351ccac383a1d80258c93562bfd2cfb266f73b27"
+content-hash = "2957dda68f567c7141b91237edccfc401ce56cfc4390cd0913c69b69fd5d2c2d"

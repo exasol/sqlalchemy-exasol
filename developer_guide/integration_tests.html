@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Changelog" href="../changelog.html" /><link rel="prev" title="Development" href="index.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.1.2 and Furo 2024.04.27 -->
         <title>Integration Test - SQLAlchemy-Exasol 5.0.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=437aa6ec" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
     
@@ -113,6 +113,8 @@
   <div class="visually-hidden">Hide table of contents sidebar</div>
 </label>
 
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
 
 
 <div class="page">
@@ -200,9 +202,9 @@
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
-        <article role="main">
+        <article role="main" id="furo-main-content">
           <section id="integration-test">
-<h1>Integration Test<a class="headerlink" href="#integration-test" title="Permalink to this heading">#</a></h1>
+<h1>Integration Test<a class="headerlink" href="#integration-test" title="Permalink to this heading">¶</a></h1>
 <p>The integration tests are located within <cite>test/integration</cite>. They are split in
 two groups.</p>
 <ol class="arabic">
@@ -248,12 +250,12 @@ this side effect.</p>
 </div>
 </section>
 <section id="setup">
-<h1>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">#</a></h1>
+<h1>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">¶</a></h1>
 <p>Integration testing automatically is done by GitHub Actions contained in this repository, which provide a CI/CD pipeline to test, build, and deploy sqlalchemy_exasol to PyPI.
 All important tasks within the actions are using <strong>nox</strong>, which also can be used locally.</p>
 <p>Two main workflows are used for this purpose:</p>
 <section id="ci">
-<h2>CI<a class="headerlink" href="#ci" title="Permalink to this heading">#</a></h2>
+<h2>CI<a class="headerlink" href="#ci" title="Permalink to this heading">¶</a></h2>
 <p>This is meant to be used as the test workflow. It’s located under:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sqlalchemy_exasol</span><span class="o">/.</span><span class="n">github</span><span class="o">/</span><span class="n">workflows</span><span class="o">/</span><span class="n">CI</span><span class="o">.</span><span class="n">yml</span>
 </pre></div>
@@ -263,7 +265,7 @@ All important tasks within the actions are using <strong>nox</strong>, which als
 <p><a class="reference external" href="https://github.com/exasol/sqlalchemy_exasol/actions">https://github.com/exasol/sqlalchemy_exasol/actions</a></p>
 </section>
 <section id="ci-cd">
-<h2>CI-CD<a class="headerlink" href="#ci-cd" title="Permalink to this heading">#</a></h2>
+<h2>CI-CD<a class="headerlink" href="#ci-cd" title="Permalink to this heading">¶</a></h2>
 <p>This is meant to be used as the Production workflow. It’s located under:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sqlalchemy_exasol</span><span class="o">/.</span><span class="n">github</span><span class="o">/</span><span class="n">workflows</span><span class="o">/</span><span class="n">CI</span><span class="o">-</span><span class="n">CD</span><span class="o">.</span><span class="n">yml</span>
 </pre></div>
@@ -327,7 +329,7 @@ All important tasks within the actions are using <strong>nox</strong>, which als
 </div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ec0e10ea"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
-    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../_static/scripts/furo.js?v=4e2eecee"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     </body>

@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.1.2 and Furo 2024.04.27 -->
         <title>Development - SQLAlchemy-Exasol 5.0.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=437aa6ec" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
     
@@ -113,6 +113,8 @@
   <div class="visually-hidden">Hide table of contents sidebar</div>
 </label>
 
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
 
 
 <div class="page">
@@ -200,15 +202,15 @@
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
-        <article role="main">
+        <article role="main" id="furo-main-content">
           <section id="development">
-<h1>Development<a class="headerlink" href="#development" title="Permalink to this heading">#</a></h1>
+<h1>Development<a class="headerlink" href="#development" title="Permalink to this heading">¶</a></h1>
 <p>This chapter contains information helpful when you want to engage in development of this project.</p>
 <section id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading">#</a></h2>
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading">¶</a></h2>
 <p>If you want to engage in development of this project you should have the following libraries and tools available.</p>
 <section id="tools">
-<h3>Tools<a class="headerlink" href="#tools" title="Permalink to this heading">#</a></h3>
+<h3>Tools<a class="headerlink" href="#tools" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.python.org/">python</a> &gt;= 3.8</p></li>
 <li><p><a class="reference external" href="https://python-poetry.org/">poetry</a> &gt;= 1.1.0</p></li>
@@ -224,7 +226,7 @@
 </ul>
 </section>
 <section id="libraries">
-<h3>Libraries<a class="headerlink" href="#libraries" title="Permalink to this heading">#</a></h3>
+<h3>Libraries<a class="headerlink" href="#libraries" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>unixodbc</p></li>
 <li><p>unixodbc-dev</p></li>
@@ -238,7 +240,7 @@
 </div>
 </section>
 <section id="locale">
-<h3>Locale<a class="headerlink" href="#locale" title="Permalink to this heading">#</a></h3>
+<h3>Locale<a class="headerlink" href="#locale" title="Permalink to this heading">¶</a></h3>
 <p>Make sure the local is setup appropriately.</p>
 <p>Example: Setting up an english locale</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sed</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/&#39;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">locale</span><span class="o">.</span><span class="n">gen</span> <span class="o">&amp;&amp;</span> <span class="n">locale</span><span class="o">-</span><span class="n">gen</span>
@@ -247,7 +249,7 @@
 </div>
 </section>
 <section id="project-layout">
-<h3>Project Layout<a class="headerlink" href="#project-layout" title="Permalink to this heading">#</a></h3>
+<h3>Project Layout<a class="headerlink" href="#project-layout" title="Permalink to this heading">¶</a></h3>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
 <p>Currently it is required that the <a class="reference external" href="https://github.com/exasol/integration-test-docker-environment">integration-test-docker-environment</a>  project is checked out in parallel to this
@@ -265,15 +267,15 @@ project. For more details on this have a look at the <cite>Settings</cite> in <c
 </section>
 </section>
 <section id="setup-your-workspace">
-<h2>Setup Your Workspace<a class="headerlink" href="#setup-your-workspace" title="Permalink to this heading">#</a></h2>
+<h2>Setup Your Workspace<a class="headerlink" href="#setup-your-workspace" title="Permalink to this heading">¶</a></h2>
 <section id="get-the-source">
-<h3>Get The Source<a class="headerlink" href="#get-the-source" title="Permalink to this heading">#</a></h3>
+<h3>Get The Source<a class="headerlink" href="#get-the-source" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">exasol</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">-</span><span class="n">exasol</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </section>
 <section id="setup-the-tooling-virtual-environment">
-<h3>Setup the Tooling &amp; Virtual Environment<a class="headerlink" href="#setup-the-tooling-virtual-environment" title="Permalink to this heading">#</a></h3>
+<h3>Setup the Tooling &amp; Virtual Environment<a class="headerlink" href="#setup-the-tooling-virtual-environment" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">shell</span>
 <span class="n">poetry</span> <span class="n">install</span>
 </pre></div>
@@ -284,7 +286,7 @@ project. For more details on this have a look at the <cite>Settings</cite> in <c
 </div>
 </section>
 <section id="install-the-git-commit-hooks">
-<h3>Install the Git Commit Hooks<a class="headerlink" href="#install-the-git-commit-hooks" title="Permalink to this heading">#</a></h3>
+<h3>Install the Git Commit Hooks<a class="headerlink" href="#install-the-git-commit-hooks" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pre</span><span class="o">-</span><span class="n">commit</span> <span class="n">install</span>
 </pre></div>
 </div>
@@ -296,7 +298,7 @@ see <cite>pre-commit install -h</cite>.</p>
 </section>
 </section>
 <section id="task-runner-nox">
-<h2>Task Runner (Nox)<a class="headerlink" href="#task-runner-nox" title="Permalink to this heading">#</a></h2>
+<h2>Task Runner (Nox)<a class="headerlink" href="#task-runner-nox" title="Permalink to this heading">¶</a></h2>
 <p>Most repeating and complex tasks within this project are automated using the task runner <cite>nox</cite>.
 To get an overview about the available <cite>tasks</cite> just run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nox</span> <span class="o">-</span><span class="n">l</span>
@@ -310,7 +312,7 @@ In order to run a specific task execute the following command:</p>
 <p>You can modify or add new task by editing the file <cite>noxfile.py</cite>.</p>
 </section>
 <section id="tests">
-<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this heading">#</a></h2>
+<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>Install all python dependencies needed for development</p>
 <blockquote>
@@ -345,7 +347,7 @@ In order to run a specific task execute the following command:</p>
 </div>
 </section>
 <section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h2>
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h2>
 <p>Currently we keep our changelog in a single file <em>CHANGELOG.rst</em>.
 For every relevant change an entry in the <em>unreleased</em> section of the changelog is
 added. When a release is created the <em>unreleased</em> section is turned into the
@@ -475,7 +477,7 @@ look at <a class="reference external" href="https://keepachangelog.com/en/1.1.0/
 </div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ec0e10ea"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
-    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../_static/scripts/furo.js?v=4e2eecee"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     </body>

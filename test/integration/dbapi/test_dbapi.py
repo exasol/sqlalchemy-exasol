@@ -311,8 +311,8 @@ def users_table(control_connection, test_schema):
     connection = control_connection
     connection.execute(f"DROP TABLE IF EXISTS {test_schema}.{table}")
     connection.execute(
+        # fmt: off
         cleandoc(
-            # fmt: off
             f"""
             CREATE TABLE {test_schema}.{table} (
                 firstname VARCHAR(100) ,
@@ -320,8 +320,8 @@ def users_table(control_connection, test_schema):
                 id DECIMAL
             );
             """
-            # fmt: on
         )
+        # fmt: on
     )
     yield f"{test_schema}.{table}"
     connection.execute(f"DROP TABLE IF EXISTS {test_schema}.{table}")

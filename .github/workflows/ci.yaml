@@ -32,7 +32,6 @@ jobs:
       fail-fast: false
       matrix:
         python:
-          - "3.8"
           - "3.9"
           - "3.10"
     steps:
@@ -57,7 +56,6 @@ jobs:
       fail-fast: false
       matrix:
         python:
-          - "3.8"
           - "3.9"
           - "3.10"
         connector:
@@ -97,7 +95,7 @@ jobs:
     needs: tests
     strategy:
       matrix:
-        python: [ 3.8 ]
+        python: [ 3.9 ]
 
     steps:
 

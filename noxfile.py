@@ -42,8 +42,8 @@ nox.options.sessions = ["fix"]
 class Settings:
     CONNECTORS = ("pyodbc", "turbodbc", "websocket")
     ENVIRONMENT_NAME = "test"
-    DB_PORT = 8888
-    BUCKETFS_PORT = 6666
+    DB_PORT = 8563
+    BUCKETFS_PORT = 2580
     VERSION_FILE = PROJECT_ROOT / "sqlalchemy_exasol" / "version.py"
     DB_VERSIONS = ("7.1.17",)
 

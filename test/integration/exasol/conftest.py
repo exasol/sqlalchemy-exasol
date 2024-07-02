@@ -28,7 +28,7 @@ _TEST_SCHEMA = "TEST"
 
 
 @contextmanager
-def _connection(dsn="localhost:8888", user="SYS", password="exasol"):
+def _connection(dsn="localhost:8563", user="SYS", password="exasol"):
     connection = pyexasol.connect(
         dsn=dsn,
         user=user,

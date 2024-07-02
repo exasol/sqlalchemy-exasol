@@ -1,11 +1,11 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="">
+<html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Development" href="developer_guide/index.html" /><link rel="prev" title="SQLAlchemy-Exasol" href="index.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2024.05.06 -->
+    <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
         <title>Readme - SQLAlchemy-Exasol 5.0.0</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=387cc868" />
@@ -265,9 +265,9 @@
         </div>
         <article role="main" id="furo-main-content">
           <section id="readme">
-<h1>Readme<a class="headerlink" href="#readme" title="Permalink to this heading">¶</a></h1>
+<h1>Readme<a class="headerlink" href="#readme" title="Link to this heading">¶</a></h1>
 <section id="sqlalchemy-dialect-for-exasol-db">
-<h2>SQLAlchemy Dialect for EXASOL DB<a class="headerlink" href="#sqlalchemy-dialect-for-exasol-db" title="Permalink to this heading">¶</a></h2>
+<h2>SQLAlchemy Dialect for EXASOL DB<a class="headerlink" href="#sqlalchemy-dialect-for-exasol-db" title="Link to this heading">¶</a></h2>
 <a class="reference external image-reference" href="https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml:alt:CIStatus"><img alt="https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml/badge.svg?branch=master&amp;event=push" src="https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml/badge.svg?branch=master&amp;event=push" /></a>
 <a class="reference external image-reference" href="https://pypi.org/project/sqlalchemy-exasol/"><img alt="PyPI Version" src="https://img.shields.io/pypi/v/sqlalchemy_exasol" /></a>
 <a class="reference external image-reference" href="https://pypi.org/project/sqlalchemy-exasol"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/sqlalchemy-exasol" /></a>
@@ -279,10 +279,10 @@
 <a class="reference external image-reference" href="https://pypi.org/project/sqlalchemy-exasol/"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/exasol/sqlalchemy-exasol" /></a>
 <a class="reference external image-reference" href="https://pypi.org/project/sqlalchemy-exasol"><img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/sqlalchemy-exasol" /></a>
 <section id="getting-started-with-sqlalchemy-exasol">
-<h3>Getting Started with SQLAlchemy-Exasol<a class="headerlink" href="#getting-started-with-sqlalchemy-exasol" title="Permalink to this heading">¶</a></h3>
+<h3>Getting Started with SQLAlchemy-Exasol<a class="headerlink" href="#getting-started-with-sqlalchemy-exasol" title="Link to this heading">¶</a></h3>
 <p>SQLAlchemy-Exasol supports multiple dialects, primarily differentiated by whether they are ODBC or Websocket based.</p>
 <section id="choosing-a-dialect">
-<h4>Choosing a Dialect<a class="headerlink" href="#choosing-a-dialect" title="Permalink to this heading">¶</a></h4>
+<h4>Choosing a Dialect<a class="headerlink" href="#choosing-a-dialect" title="Link to this heading">¶</a></h4>
 <p>We recommend using the Websocket-based dialect due to its simplicity. ODBC-based dialects demand a thorough understanding of (Unix)ODBC, and the setup is considerably more complex.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -292,7 +292,7 @@ We are also planning to phase out the pyodbc support in the future.</p>
 </section>
 </section>
 <section id="system-requirements">
-<h3>System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this heading">¶</a></h3>
+<h3>System Requirements<a class="headerlink" href="#system-requirements" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Python</p></li>
 <li><p>An Exasol DB (e.g. <a class="reference external" href="https://github.com/exasol/docker-db">docker-db</a> or a <a class="reference external" href="https://cloud.exasol.com/signup">cloud instance</a>)</p></li>
@@ -304,7 +304,7 @@ We are also planning to phase out the pyodbc support in the future.</p>
 </div>
 </section>
 <section id="setting-up-your-python-project">
-<h3>Setting Up Your Python Project<a class="headerlink" href="#setting-up-your-python-project" title="Permalink to this heading">¶</a></h3>
+<h3>Setting Up Your Python Project<a class="headerlink" href="#setting-up-your-python-project" title="Link to this heading">¶</a></h3>
 <p>Install SQLAlchemy-Exasol:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>sqlalchemy-exasol
 </pre></div>
@@ -319,7 +319,7 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot
 </div>
 </section>
 <section id="using-sqlalchemy-with-exasol-db">
-<h3>Using SQLAlchemy with EXASOL DB<a class="headerlink" href="#using-sqlalchemy-with-exasol-db" title="Permalink to this heading">¶</a></h3>
+<h3>Using SQLAlchemy with EXASOL DB<a class="headerlink" href="#using-sqlalchemy-with-exasol-db" title="Link to this heading">¶</a></h3>
 <p><strong>Websocket based Dialect:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;exa+websocket://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&quot;</span>
@@ -365,13 +365,13 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot
 </div>
 </section>
 <section id="features">
-<h3>Features<a class="headerlink" href="#features" title="Permalink to this heading">¶</a></h3>
+<h3>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>SELECT, INSERT, UPDATE, DELETE statements</p></li>
 </ul>
 </section>
 <section id="general-notes">
-<h3>General Notes<a class="headerlink" href="#general-notes" title="Permalink to this heading">¶</a></h3>
+<h3>General Notes<a class="headerlink" href="#general-notes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Schema name and parameters are optional for the host url</p></li>
 <li><p>At least on Linux/Unix systems it has proven valuable to pass ‘CONNECTIONLCALL=en_US.UTF-8’ as a url parameter. This will make sure that the client process (Python) and the EXASOL driver (UTF-8 internal) know how to interpret code pages correctly.</p></li>
@@ -380,7 +380,7 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot
 </ul>
 </section>
 <section id="known-issues">
-<h3>Known Issues<a class="headerlink" href="#known-issues" title="Permalink to this heading">¶</a></h3>
+<h3>Known Issues<a class="headerlink" href="#known-issues" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><dl class="simple">
 <dt>Insert</dt><dd><ul>
@@ -474,9 +474,9 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot
       
     </aside>
   </div>
-</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=ec0e10ea"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+</div><script src="_static/documentation_options.js?v=ce74c6a2"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=4e2eecee"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>

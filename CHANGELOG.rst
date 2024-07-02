@@ -3,6 +3,11 @@
 Unreleased
 ==========
 
+🗑️ Removed
+----------
+- Dropped python 3.8 support
+  * If you still depend on python 3.8 use the 5.x version line
+
 🧰 Internal
 -----------
 - Remove testing against Exasol 7.0

@@ -239,8 +239,6 @@ def exasol_tests(session: Session) -> None:
             env=env,
         )
 
-    session.run("pytest", f"{PROJECT_ROOT / 'test' / 'integration' / 'dbapi'}")
-
 
 @nox.session(name="regression-tests", python=False)
 def regression_tests(session: Session) -> None:

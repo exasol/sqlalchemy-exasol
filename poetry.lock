@@ -203,13 +203,13 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "certifi"
-version = "2024.6.2"
+version = "2024.7.4"
 description = "Python package for providing Mozilla's CA Bundle."
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "certifi-2024.6.2-py3-none-any.whl", hash = "sha256:ddc6c8ce995e6987e7faf5e3f1b02b302836a0e5d98ece18392cb1a36c72ad56"},
-    {file = "certifi-2024.6.2.tar.gz", hash = "sha256:3cd43f1c6fa7dedc5899d69d3ad0398fd018ad1a17fba83ddaf78aa46c747516"},
+    {file = "certifi-2024.7.4-py3-none-any.whl", hash = "sha256:c198e21b1289c2ab85ee4e67bb4b4ef3ead0892059901a8d5b622f24a1101e90"},
+    {file = "certifi-2024.7.4.tar.gz", hash = "sha256:5a1e7645bc0ec61a09e26c36f6106dd4cf40c6db3a1fb6352b0244e7fb057c7b"},
 ]
 
 [[package]]
@@ -1545,13 +1545,13 @@ tests = ["black", "chardet", "tox"]
 
 [[package]]
 name = "pyexasol"
-version = "0.25.2"
+version = "0.26.0"
 description = "Exasol python driver with extra features"
 optional = false
-python-versions = ">=3.6"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pyexasol-0.25.2-py3-none-any.whl", hash = "sha256:54be5c75f0867a4838b84b5b5a37466c33fa9b1ca6bf51d9c3d821d367936e6e"},
-    {file = "pyexasol-0.25.2.tar.gz", hash = "sha256:3b42cb2c32b7b2ffe7a78c82bf21c3a391043758f2a575c48460252a72386691"},
+    {file = "pyexasol-0.26.0-py3-none-any.whl", hash = "sha256:b4bd2cf28bfb42352916efae7878beac847ca49bbab7be9f0066346ca0865de4"},
+    {file = "pyexasol-0.26.0.tar.gz", hash = "sha256:d00fd8e05936767c332c50be5f953514579a2c7a80f8a8922cbf7d8a56603fbb"},
 ]
 
 [package.dependencies]
@@ -1562,8 +1562,9 @@ websocket-client = ">=1.0.1"
 
 [package.extras]
 examples = ["pproxy"]
+numpy = ["numpy (>1.26.0,<2)"]
 orjson = ["orjson (>=3.6)"]
-pandas = ["pandas"]
+pandas = ["pandas[numpy] (>=2,<3)"]
 rapidjson = ["python-rapidjson"]
 ujson = ["ujson"]
 
@@ -2596,13 +2597,13 @@ urwid = ">=1.2.1"
 
 [[package]]
 name = "urwid"
-version = "2.6.14"
+version = "2.6.15"
 description = "A full-featured console (xterm et al.) user interface library"
 optional = false
 python-versions = ">3.7"
 files = [
-    {file = "urwid-2.6.14-py3-none-any.whl", hash = "sha256:3c8afb3cb30f08873608214e2eb9a7a1351a8a19f80addfbd44d9ba476f5102b"},
-    {file = "urwid-2.6.14.tar.gz", hash = "sha256:feeafc4fa9343fdfa1e9b01914064a4a9399ec746b814a550d44462e5ef85c72"},
+    {file = "urwid-2.6.15-py3-none-any.whl", hash = "sha256:71b3171cabaa0092902f556768756bd2f2ebb24c0da287ee08f081d235340cb7"},
+    {file = "urwid-2.6.15.tar.gz", hash = "sha256:9ecc57330d88c8d9663ffd7092a681674c03ff794b6330ccfef479af7aa9671b"},
 ]
 
 [package.dependencies]
@@ -2767,4 +2768,4 @@ turbodbc = ["turbodbc"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4.0"
-content-hash = "97ab1beec419927b9d4684281f64aaa253683522b52cedad877b33bd7756303d"
+content-hash = "351acd740794bf3870c13c7f9b9d45f43786fc99de58a82dd76dd9fc5c35ce2b"

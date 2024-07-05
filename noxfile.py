@@ -30,7 +30,7 @@ from version_check import (
     version_from_string,
 )
 
-from exasol.driver.odbc import (
+from exasol.odbc import (
     ODBC_DRIVER,
     odbcconfig,
 )
@@ -238,8 +238,6 @@ def exasol_tests(session: Session) -> None:
             external=True,
             env=env,
         )
-
-    session.run("pytest", f"{PROJECT_ROOT / 'test' / 'integration' / 'dbapi'}")
 
 
 @nox.session(name="regression-tests", python=False)

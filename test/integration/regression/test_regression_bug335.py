@@ -12,7 +12,7 @@ from sqlalchemy import (
     insert,
 )
 
-from exasol.driver.odbc import (
+from exasol.odbc import (
     ODBC_DRIVER,
     odbcconfig,
 )

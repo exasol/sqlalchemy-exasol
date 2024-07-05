@@ -61,7 +61,7 @@ exclude = []
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 packaging = ">=21.3"
-pyexasol = ">=0.25.1,<1"
+pyexasol = ">=0.26.0,<1"
 sqlalchemy = ">=1.4,<2"
 
 [tool.poetry.dependencies.turbodbc]

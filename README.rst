@@ -1,5 +1,5 @@
 SQLAlchemy Dialect for EXASOL DB
-================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 .. image:: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml/badge.svg?branch=master&event=push

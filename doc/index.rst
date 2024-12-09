@@ -1,36 +1,36 @@
-SQLAlchemy-Exasol
-=================
-SQLAlchemy-Exasol is a dialect extension for SQLAlchemy, implementing support for Exasol databases.
+Documentation of SQLAlchemy-Exasol
+==================================
 
-Getting Started
----------------
+.. grid:: 1 1 3 2
+    :gutter: 2
+    :padding: 0
+    :class-container: surface
 
-#. Install the `SQLAlchemy-Exasol extension <https://pypi.org/project/sqlalchemy-exasol/>`_
+    .. grid-item-card:: :octicon:`person` User Guide
+        :link: user_guide
+        :link-type: ref
 
-    .. code-block:: shell
+        Resource for users to understand how to utilize this project and its features.
 
-        $ pip install sqlalchemy-exasol
+    .. grid-item-card:: :octicon:`tools` Developer Guide
+        :link: developer_guide
+        :link-type: ref
 
-    .. note::
+        Instructions and best practices to help developers contribute to the project and set up their development environment.
 
-        SQLAlchemy will be installed due to the fact that it is an required dependency for SQLAlchemy-Exasol.
+    .. grid-item-card:: :octicon:`question` FAQ
+        :link: faq
+        :link-type: ref
 
-#. Execute queries
-
-    .. code-block:: python
-
-        from sqlalchemy import create_engine
-        url = "exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
-        e = create_engine(url)
-        r = e.execute("select 42 from dual").fetchall()
-
-
-For more details on SQLAlchemy consult it's `documenation <https://docs.sqlalchemy.org/en/13/>`_.
+        Frequently asked questsions.
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :hidden:
 
-   readme
+   user_guide
    developer_guide/index
+   faq
    changelog
+   changes/changelog
+

@@ -10,14 +10,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 import sys
-from pathlib import Path
 
-SPHINX_ROOT = Path(__file__).parent
-sys.path.insert(0, f"{SPHINX_ROOT.parent.resolve()}")
-
-from sqlalchemy_exasol.version import VERSION
+sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
 
@@ -25,15 +21,33 @@ project = "sqlalchemy-exasol"
 copyright = "2022, Exasol & Blue Yonder"
 author = "Exasol,  Blue Yonder"
 
-# The full version, including alpha/beta/rc tags
-release = VERSION
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx_copybutton", "sphinx.ext.intersphinx"]
+extensions = [
+    "sphinx.ext.todo",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.autosummary",
+    "sphinx_copybutton",
+    "myst_parser",
+    "sphinx_design",
+]
+
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+
+# Make sure the target is unique
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".txt": "markdown",
+    ".md": "markdown",
+}
+
+todo_include_todos = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -48,14 +62,16 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "furo"
-html_title = f"SQLAlchemy-Exasol {release}"
-html_theme_options = {
-    "light_logo": "light-exasol-logo.svg",
-    "dark_logo": "dark-exasol-logo.svg",
-}
+html_theme = "shibuya"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+html_title = "sqlalchemy-exasol"
+html_theme_options = {
+    "light_logo": "_static/light-exasol-logo.svg",
+    "dark_logo": "_static/dark-exasol-logo.svg",
+    "github_url": "https://github.com/exasol/{{cookiecutter.repo_name}}",
+    "accent_color": "grass",
+}

@@ -12,4 +12,7 @@
 - Remove testing against Exasol 7.0
 - Relocked dependencies
 
+## 📚 Documentation
+
+* Added support for multiversion documentation
 

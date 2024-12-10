@@ -31,6 +31,5 @@ Documentation of SQLAlchemy-Exasol
    user_guide
    developer_guide/index
    faq
-   changelog
    changes/changelog
 

@@ -290,8 +290,6 @@ def integration_tests(session: Session) -> None:
     session.notify(find_session_runner(session, "db-stop"))
 
 
-
-
 @nox.session(python=False)
 def release(session: Session) -> None:
     """Release a sqlalchemy-exasol package. For more details append '-- -h'"""
@@ -452,13 +450,12 @@ def list_links(session: Session) -> None:
         session.log(f"Url: {url}, File: {path}")
 
 
-
 # fmt: off
 from exasol.toolbox.nox._documentation import (
     build_docs,
     build_multiversion,
     clean_docs,
     open_docs,
-    
 )
+
 # fmt: on

@@ -45,7 +45,7 @@ def check(url: str) -> Tuple[Optional[int], str]:
     """Checks if an url is still working (can be accessed)"""
     try:
         # User-Agent needs to be faked otherwise some webpages will deny access with a 403
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/10.0"})
         result = request.urlopen(req)
         return result.code, f"{result.msg}"
     except urllib.error.HTTPError as ex:

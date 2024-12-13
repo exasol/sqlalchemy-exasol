@@ -9,3 +9,4 @@
 ## 🧰 Internal
 
 - Relocked dependencies
+- Fix multi-version documentation workflow

@@ -21,14 +21,14 @@ jobs:
 
       - name: Build Documentation
         run: |
-          poetry run python -m nox -s build-docs
-          touch doc/build/.nojekyll
+          poetry run python -m nox -s docs:multiversion
+          touch .html-documentation/.nojekyll
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
           branch: gh-pages
-          folder: ./doc/build
+          folder: .html-documentation
           git-config-name: Github Action
           git-config-email: opensource@exasol.com
 

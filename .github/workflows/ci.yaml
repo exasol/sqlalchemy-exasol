@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Documentation
         run: |
-          poetry run python -m nox -s build-docs
+          poetry run python -m nox -s docs:build
 
   checks:
     runs-on: ubuntu-latest

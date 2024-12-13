@@ -8,12 +8,14 @@ from pathlib import Path
 from shutil import rmtree
 from tempfile import TemporaryDirectory
 
+# fmt: off
 PROJECT_ROOT = Path(__file__).parent
 # scripts path also contains administrative code/modules which are used by some nox targets
 SCRIPTS = PROJECT_ROOT / "scripts"
 DOC = PROJECT_ROOT / "doc"
 DOC_BUILD = DOC / "build"
 sys.path.append(f"{SCRIPTS}")
+# fmt: on
 
 from typing import Iterator
 
@@ -288,42 +290,6 @@ def integration_tests(session: Session) -> None:
     session.notify(find_session_runner(session, "db-stop"))
 
 
-@nox.session(python=False, name="clean-docs")
-def clean(session: Session) -> None:
-    """Remove all documentation artifacts"""
-    if DOC_BUILD.exists():
-        rmtree(DOC_BUILD.resolve())
-        session.log(f"Removed {DOC_BUILD}")
-
-
-@nox.session(python=False, name="build-docs")
-def build(session: Session) -> None:
-    """Build the documentation"""
-    session.run(
-        "poetry",
-        "run",
-        "sphinx-build",
-        "-b",
-        "html",
-        "-W",
-        f"{DOC}",
-        f"{DOC_BUILD}",
-        external=True,
-    )
-
-
-@nox.session(python=False, name="open-docs")
-def open_docs(session: Session) -> None:
-    """Open the documentation in the browser"""
-    index_page = DOC_BUILD / "index.html"
-    if not index_page.exists():
-        session.error(
-            f"File {index_page} does not exist." "Please run `nox -s build-docs` first"
-        )
-
-    webbrowser.open_new_tab(index_page.resolve().as_uri())
-
-
 @nox.session(python=False)
 def release(session: Session) -> None:
     """Release a sqlalchemy-exasol package. For more details append '-- -h'"""
@@ -482,3 +448,14 @@ def list_links(session: Session) -> None:
     """List all links within the documentation"""
     for path, url in _urls(_documentation(PROJECT_ROOT)):
         session.log(f"Url: {url}, File: {path}")
+
+
+# fmt: off
+from exasol.toolbox.nox._documentation import (
+    build_docs,
+    build_multiversion,
+    clean_docs,
+    open_docs,
+)
+
+# fmt: on

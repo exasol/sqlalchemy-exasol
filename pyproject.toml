@@ -94,6 +94,7 @@ exasol-integration-test-docker-environment = "^3.1.0"
 pytest-history = ">=0.2.0"
 pyodbc = ">=4.0.34,<6"
 pytest-exasol-itde = ">=0.2.0,<1"
+exasol-toolbox = "^0.19.0"
 
 [tool.poetry.extras]
 pyodbc = ["pyodbc"]
@@ -131,13 +132,16 @@ max-module-lines = 800
 
 [tool.mypy]
 files = [
-    'noxfile.py',
     'scripts/**/*.py',
     # Incrementaly add files and paths to fix until the entire project is checked
 ]
 
 [[tool.mypy.overrides]]
 module = "pyodbc"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "exasol.toolbox"
 ignore_missing_imports = true
 
 [tool.scriv]

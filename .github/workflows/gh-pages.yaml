@@ -1,5 +1,7 @@
 name: GH-Pages
 on:
+  pull_request:
+    branches: [ "master" ]
   push:
     branches:
       - master
@@ -21,7 +23,7 @@ jobs:
 
       - name: Build Documentation
         run: |
-          poetry run python -m nox -s docs:multiversion
+          poetry run python -m nox -vvvv -s docs:multiversion
           touch .html-documentation/.nojekyll
 
       - name: Deploy

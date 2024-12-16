@@ -426,6 +426,7 @@ def report_skipped(session: Session) -> None:
                     f"{report}",
                 )
 
+
 # fmt: off
 from exasol.toolbox.nox._documentation import (
     build_docs,
@@ -436,11 +437,13 @@ from exasol.toolbox.nox._documentation import (
 
 # fmt: on
 
+
 @nox.session(name="docs:links", python=False)
 def list_links(session: Session) -> None:
     """List all the links within the documentation."""
     for path, url in _urls(_documentation(PROJECT_ROOT)):
         session.log(f"Url: {url}, File: {path}")
+
 
 @nox.session(name="docs:links:check", python=False)
 def check_links(session: Session) -> None:
@@ -456,4 +459,3 @@ def check_links(session: Session) -> None:
             "\n"
             + "\n".join(f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors)
         )
-

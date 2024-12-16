@@ -38,7 +38,7 @@ from exasol.odbc import (
 )
 
 # default actions to be run if nothing is explicitly specified with the -s option
-nox.options.sessions = ["fix"]
+nox.options.sessions = ["project:fix"]
 
 
 class Settings:
@@ -65,34 +65,11 @@ def _python_files(path: Path) -> Iterator[Path]:
     return files
 
 
-@nox.session(python=False)
-def fix(session: Session) -> None:
-    """Run all available formatters and code upgrade tools against the code base"""
-
-    def apply_pyupgrade_fixes(session: Session) -> None:
-        files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
-        session.run(
-            "poetry",
-            "run",
-            "python",
-            "-m",
-            "pyupgrade",
-            "--py38-plus",
-            "--exit-zero-even-if-changed",
-            *files,
-        )
-
-    session.run(
-        "poetry",
-        "run",
-        "python",
-        f"{SCRIPTS / 'version_check.py'}",
-        "--fix",
-        f"{Settings.VERSION_FILE}",
-    )
-    apply_pyupgrade_fixes(session)
-    session.run("poetry", "run", "python", "-m", "isort", "-v", f"{PROJECT_ROOT}")
-    session.run("poetry", "run", "python", "-m", "black", f"{PROJECT_ROOT}")
+from exasol.toolbox.nox._format import (
+    _code_format,
+    _pyupgrade,
+    fix,
+)
 
 
 @nox.session(python=False)
@@ -328,37 +305,6 @@ def release(session: Session) -> None:
         "publish",
         *args,
         external=True,
-    )
-
-
-@nox.session(python=False)
-def pyupgrade(session: Session) -> None:
-    """Run pyupgrade against the code base"""
-    files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
-    session.run("poetry", "run", "python", "-m", "pyupgrade", "--py38-plus", *files)
-
-
-@nox.session(name="code-format", python=False)
-def code_format(session: Session) -> None:
-    """Run the code formatter against the codebase"""
-    session.run(
-        "poetry",
-        "run",
-        "python",
-        "-m",
-        "black",
-        "--check",
-        "--diff",
-        "--color",
-        f"{PROJECT_ROOT}",
-    )
-
-
-@nox.session(python=False)
-def isort(session: Session) -> None:
-    """Run isort against the codebase"""
-    session.run(
-        "poetry", "run", "python", "-m", "isort", "-v", "--check", f"{PROJECT_ROOT}"
     )
 
 

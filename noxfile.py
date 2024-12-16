@@ -426,10 +426,25 @@ def report_skipped(session: Session) -> None:
                     f"{report}",
                 )
 
+# fmt: off
+from exasol.toolbox.nox._documentation import (
+    build_docs,
+    build_multiversion,
+    clean_docs,
+    open_docs,
+)
 
-@nox.session(name="check-links", python=False)
+# fmt: on
+
+@nox.session(name="docs:links", python=False)
+def list_links(session: Session) -> None:
+    """List all the links within the documentation."""
+    for path, url in _urls(_documentation(PROJECT_ROOT)):
+        session.log(f"Url: {url}, File: {path}")
+
+@nox.session(name="docs:links:check", python=False)
 def check_links(session: Session) -> None:
-    """Checks weather or not all links in the documentation can be accessed"""
+    """Checks whether all links in the documentation are accessible."""
     errors = []
     for path, url in _urls(_documentation(PROJECT_ROOT)):
         status, details = _check(url)
@@ -442,20 +457,3 @@ def check_links(session: Session) -> None:
             + "\n".join(f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors)
         )
 
-
-@nox.session(name="list-links", python=False)
-def list_links(session: Session) -> None:
-    """List all links within the documentation"""
-    for path, url in _urls(_documentation(PROJECT_ROOT)):
-        session.log(f"Url: {url}, File: {path}")
-
-
-# fmt: off
-from exasol.toolbox.nox._documentation import (
-    build_docs,
-    build_multiversion,
-    clean_docs,
-    open_docs,
-)
-
-# fmt: on

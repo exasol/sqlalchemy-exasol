@@ -393,7 +393,7 @@ def type_check(session: Session) -> None:
     )
 
 
-@nox.session(name="report-skipped", python=False)
+@nox.session(name="test:skipped", python=False)
 def report_skipped(session: Session) -> None:
     """
     Runs all tests for all supported connectors and creates a csv report of skipped tests for each connector.

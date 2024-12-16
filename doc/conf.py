@@ -73,6 +73,6 @@ html_title = "sqlalchemy-exasol"
 html_theme_options = {
     "light_logo": "_static/light-exasol-logo.svg",
     "dark_logo": "_static/dark-exasol-logo.svg",
-    "github_url": "https://github.com/exasol/{{cookiecutter.repo_name}}",
+    "github_url": "https://github.com/exasol/sqlalchemy-exasol",
     "accent_color": "grass",
 }

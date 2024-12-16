@@ -117,7 +117,7 @@ def check(session: Session) -> None:
     session.notify("lint")
 
 
-@nox.session(name="db-start", python=False)
+@nox.session(name="db:start", python=False)
 def start_db(session: Session) -> None:
     """Start a test database. For more details append '-- -h'"""
 
@@ -155,7 +155,7 @@ def start_db(session: Session) -> None:
     start(args.db_version)
 
 
-@nox.session(name="db-stop", python=False)
+@nox.session(name="db:stop", python=False)
 def stop_db(session: Session) -> None:
     """Stop the test database"""
     session.run("docker", "kill", "db_container_test", external=True)

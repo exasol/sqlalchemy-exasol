@@ -70,6 +70,10 @@ from exasol.toolbox.nox._format import (
     _pyupgrade,
     fix,
 )
+from exasol.toolbox.nox._lint import (
+    lint,
+    type_check,
+)
 
 
 @nox.session(python=False)
@@ -90,8 +94,8 @@ def check(session: Session) -> None:
     session.notify("isort")
     session.notify("pyupgrade")
     session.notify("code-format")
-    session.notify("type-check")
-    session.notify("lint")
+    session.notify("lint:code")
+    session.notify("lint:typing")
 
 
 @nox.session(name="db:start", python=False)

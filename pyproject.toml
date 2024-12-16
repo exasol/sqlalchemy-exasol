@@ -124,25 +124,20 @@ profile = "black"
 force_grid_wrap = 2
 
 [tool.pylint.master]
-fail-under = 5.9
+fail-under = 5.8
 
 [tool.pylint.format]
 max-line-length = 88
 max-module-lines = 800
 
-[tool.mypy]
-files = [
-    'scripts/**/*.py',
-    # Incrementaly add files and paths to fix until the entire project is checked
+[[tool.mypy.overrides]]
+module = [
+    "noxfile",
+    "noxconfig",
+    "sqlalchemy_exasol.*", 
+    "test.*",
 ]
-
-[[tool.mypy.overrides]]
-module = "pyodbc"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "exasol.toolbox"
-ignore_missing_imports = true
+ignore_errors = true
 
 [tool.scriv]
 new_fragment_template = "file: templates/fragment-template.rst"

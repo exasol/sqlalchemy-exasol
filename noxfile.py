@@ -453,9 +453,28 @@ def list_links(session: Session) -> None:
 # fmt: off
 from exasol.toolbox.nox._documentation import (
     build_docs,
-    build_multiversion,
     clean_docs,
     open_docs,
 )
+
+
+def _build_multiversion_docs(session: nox.Session, config: Config) -> None:
+    from exasol.toolbox.nox._shared import DOCS_OUTPUT_DIR
+    session.run(
+        "poetry",
+        "run",
+        "sphinx-multiversion",
+        "--debug",
+        f"{config.doc}",
+        DOCS_OUTPUT_DIR,
+    )
+
+
+@nox.session(name="docs:multiversion", python=False)
+def build_multiversion(session: Session) -> None:
+    from noxconfig import PROJECT_CONFIG
+    """Builds the multiversion project documentation"""
+    _build_multiversion_docs(session, PROJECT_CONFIG)
+
 
 # fmt: on

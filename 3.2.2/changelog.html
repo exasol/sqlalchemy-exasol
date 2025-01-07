@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="grass" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Changelog - sqlalchemy-exasol</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Development" href="developer_guide/index.html" /><link rel="prev" title="Readme" href="readme.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=397bb51e" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=83eaa723" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    
+    <meta property="og:type" content="website"/><meta property="og:title" content="Changelog"/>
+<meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      <img class="light-logo" src="_static/light-exasol-logo.svg" alt="sqlalchemy-exasol" height="28" loading="lazy" />
+      <img class="dark-logo" src="_static/dark-exasol-logo.svg" alt="sqlalchemy-exasol" height="28" loading="lazy" />
+      <strong>sqlalchemy-exasol</strong>
+    </a>
+    <div class="sy-head-nav" id="HeadNav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="nav-versions">
+    <button type="button" aria-label="Versions">
+      <span class="md:hidden">Versions</span>
+      <span class="hidden md:inline">3.2.2</span>
+      <i class="i-lucide chevron-down"></i>
+    </button>
+    <div class="nav-versions-choices"><ul><li><a href="../master/index.html">master</a></li><li><a href="../5.0.0/changelog.html">5.0.0</a></li><li><a href="../4.6.3/changelog.html">4.6.3</a></li><li><a href="../4.6.2/changelog.html">4.6.2</a></li><li><a href="../4.6.1/changelog.html">4.6.1</a></li><li><a href="../4.6.0/changelog.html">4.6.0</a></li><li><a href="../4.5.1/changelog.html">4.5.1</a></li><li><a href="../4.5.0/changelog.html">4.5.0</a></li><li><a href="../4.4.0/changelog.html">4.4.0</a></li><li><a href="../4.0.0/changelog.html">4.0.0</a></li><li><a href="changelog.html">3.2.2</a></li></ul></div>
+  </div><div class="sy-head-socials">
+  <a href="https://github.com/exasol/sqlalchemy-exasol" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="HeadNav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2 -translate-x-2"></span>
+          <span class="hamburger_3 -translate-x-1"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Readme</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/index.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/integration_tests.html">Integration Test Setup</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#changelog-3-2-1">3.2.2 &#8212; 2022-08-12</a><ul>
+<li><a class="reference internal" href="#added">&#10024; Added</a></li>
+<li><a class="reference internal" href="#changed">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#removed">&#128465;&#65039; Removed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-3-1-1">3.1.1 &#8212; 2022-07-21</a><ul>
+<li><a class="reference internal" href="#id3">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id4">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#fixed">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-3-0-0">3.0.0 &#8212; 2022-07-14</a><ul>
+<li><a class="reference internal" href="#id6">&#128465;&#65039; Removed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-4-0">2.4.0 &#8212; 2022-05-19</a><ul>
+<li><a class="reference internal" href="#id8">&#128465;&#65039; Removed</a></li>
+<li><a class="reference internal" href="#id9">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-3-0">2.3.0 &#8212; 2022-04-13</a><ul>
+<li><a class="reference internal" href="#id11">&#128465;&#65039; Removed</a></li>
+<li><a class="reference internal" href="#id12">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id13">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-2-0">2.2.0 &#8212; 2020-09-02</a><ul>
+<li><a class="reference internal" href="#id15">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id16">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-1-0">2.1.0 &#8212; 2020-05-28</a><ul>
+<li><a class="reference internal" href="#id18">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-10">2.0.10 &#8212; 2020-05-08</a><ul>
+<li><a class="reference internal" href="#id20">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-9">2.0.9 &#8212; 2019-10-18</a><ul>
+<li><a class="reference internal" href="#id22">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id23">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-8">2.0.8 &#8212; 2019-10-07</a><ul>
+<li><a class="reference internal" href="#id25">&#10024; Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-7">2.0.7 &#8212; 2019-10-01</a><ul>
+<li><a class="reference internal" href="#id27">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-6">2.0.6 &#8212; 2019-08-12</a><ul>
+<li><a class="reference internal" href="#id29">&#128465;&#65039; Removed</a></li>
+<li><a class="reference internal" href="#id30">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id31">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id32">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-5">2.0.5 &#8212; 2019-05-03</a><ul>
+<li><a class="reference internal" href="#id34">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id35">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-4">2.0.4 &#8212; 2018-10-16</a><ul>
+<li><a class="reference internal" href="#id37">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id38">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-3">2.0.3 &#8212; 2018-08-02</a><ul>
+<li><a class="reference internal" href="#id40">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id41">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-1">2.0.1 &#8212; 2018-06-28</a><ul>
+<li><a class="reference internal" href="#id43">&#128465;&#65039; Removed</a></li>
+<li><a class="reference internal" href="#id44">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id45">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-2-0-0">2.0.0 &#8212; 2018-01-09</a><ul>
+<li><a class="reference internal" href="#id47">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-3-2">1.3.2 &#8212; 2017-10-15</a><ul>
+<li><a class="reference internal" href="#id49">&#128465;&#65039; Removed</a></li>
+<li><a class="reference internal" href="#id50">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-3-1">1.3.1 &#8212; 2017-08-16</a><ul>
+<li><a class="reference internal" href="#id52">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id53">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-3-0">1.3.0 &#8212; 2017-08-02</a><ul>
+<li><a class="reference internal" href="#id55">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id56">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id57">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-2-5">1.2.5 &#8212; 2017-08-02</a><ul>
+<li><a class="reference internal" href="#id59">&#128465;&#65039; Removed</a></li>
+<li><a class="reference internal" href="#id60">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id61">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-2-4">1.2.4 &#8212; 2017-06-26</a><ul>
+<li><a class="reference internal" href="#id63">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-2-3">1.2.3 &#8212; 2017-06-20</a><ul>
+<li><a class="reference internal" href="#id65">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id66">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id67">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-2-2">1.2.2 &#8212; 2017-05-29</a><ul>
+<li><a class="reference internal" href="#id69">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-2-1">1.2.1 &#8212; 2017-05-25</a><ul>
+<li><a class="reference internal" href="#id71">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-2-0">1.2.0 &#8212; 2017-04-04</a><ul>
+<li><a class="reference internal" href="#id73">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id74">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-1-1">1.1.1 &#8212; 2016-10-14</a><ul>
+<li><a class="reference internal" href="#id76">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-1-0">1.1.0 &#8212; 2016-07-15</a><ul>
+<li><a class="reference internal" href="#id78">&#128465;&#65039; Removed</a></li>
+<li><a class="reference internal" href="#id79">&#10024; Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-0-3">1.0.3 &#8212; 2016-04-14</a><ul>
+<li><a class="reference internal" href="#id81">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-0-2">1.0.2 &#8212; 2016-03-12</a><ul>
+<li><a class="reference internal" href="#id83">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id84">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id85">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-0-1">1.0.1 &#8212; 2015-03-21</a><ul>
+<li><a class="reference internal" href="#id87">&#10024; Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-1-0-0">1.0.0 &#8212; 2015-05-15</a><ul>
+<li><a class="reference internal" href="#id89">&#128465;&#65039; Removed</a></li>
+<li><a class="reference internal" href="#id90">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-9-3">0.9.3 &#8212; 2015-05-13</a><ul>
+<li><a class="reference internal" href="#id92">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-9-2">0.9.2 &#8212; 2015-05-06</a><ul>
+<li><a class="reference internal" href="#id94">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-9-1">0.9.1 &#8212; 2015-01-29</a><ul>
+<li><a class="reference internal" href="#id96">&#10024; Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-9-0">0.9.0 &#8212; 2015-01-26</a><ul>
+<li><a class="reference internal" href="#id98">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id99">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id100">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-8-5">0.8.5 &#8212; 2014-07-31</a><ul>
+<li><a class="reference internal" href="#id102">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id103">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-8-4">0.8.4 &#8212; 2014-07-30</a><ul>
+<li><a class="reference internal" href="#id105">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-8-3">0.8.3 &#8212; 2014-07-18</a><ul>
+<li><a class="reference internal" href="#id107">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-8-2">0.8.2 &#8212; 2014-07-17</a><ul>
+<li><a class="reference internal" href="#id109">&#10024; Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-8-1">0.8.1 &#8212; 2014-06-26</a><ul>
+<li><a class="reference internal" href="#id111">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id112">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-8-0">0.8.0 &#8212; 2014-06-26</a><ul>
+<li><a class="reference internal" href="#id114">&#10024; Added</a></li>
+<li><a class="reference internal" href="#id115">&#128295; Changed</a></li>
+<li><a class="reference internal" href="#id116">&#128030; Fixed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-7-5">0.7.5 &#8212; 2014-05-08</a><ul>
+<li><a class="reference internal" href="#id118">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-7-4">0.7.4 &#8212; 2014-04-01</a><ul>
+<li><a class="reference internal" href="#id120">&#128295; Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#changelog-0-7-0">0.7.0 &#8212; 2014-03-28</a><ul>
+<li><a class="reference internal" href="#id122">&#10024; Added</a></li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6"><div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">sqlalchemy-exasol</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Changelog</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<section id="changelog-3-2-1">
+<span id="id1"></span><h2>3.2.2 — 2022-08-12<a class="headerlink" href="#changelog-3-2-1" title="Link to this heading">¶</a></h2>
+<section id="added">
+<h3>✨ Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Added turbodbc support</dt><dd><ul>
+<li><p>Re-enabled with new minimum base version 4.5.4</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Added additional information to README</dt><dd><ul>
+<li><p>License information (badge)</p></li>
+<li><p>Code formatter(s) in use (black, isort)</p></li>
+<li><p>Linting score of the project</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="changed">
+<h3>🔧 Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Changed changelog format
+* Changelog now can be found in the file CHANGELOG.rst</p></li>
+<li><p>Reworked and restructured project documentation</p></li>
+</ul>
+</section>
+<section id="removed">
+<h3>🗑️ Removed<a class="headerlink" href="#removed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Removed markdown based changelog</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-3-1-1">
+<span id="id2"></span><h2>3.1.1 — 2022-07-21<a class="headerlink" href="#changelog-3-1-1" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h3>✨ Added<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added new exasol odbc driver 7.1.11</p></li>
+<li><p>Added additional badges for to improve project status overview</p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>🔧 Changed<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated databases for testing to 7.1.9 and 7.0.18</p></li>
+<li><p>Updated pyodbc dependency from 4.0.32 to 4.0.34</p></li>
+</ul>
+</section>
+<section id="fixed">
+<h3>🐞 Fixed<a class="headerlink" href="#fixed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed CI/CD build and publish target</p></li>
+<li><p>Fixed CI/CD to run tests against all configured databases</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-3-0-0">
+<span id="id5"></span><h2>3.0.0 — 2022-07-14<a class="headerlink" href="#changelog-3-0-0" title="Link to this heading">¶</a></h2>
+<section id="id6">
+<h3>🗑️ Removed<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The support of the turbodbc feature has been suspended, until the following issues have been addressed</dt><dd><ul>
+<li><p><a class="reference external" href="https://github.com/blue-yonder/turbodbc/issues/358">https://github.com/blue-yonder/turbodbc/issues/358</a></p></li>
+<li><p><a class="reference external" href="https://github.com/exasol/sqlalchemy-exasol/issues/146">https://github.com/exasol/sqlalchemy-exasol/issues/146</a></p></li>
+<li><p>Note: If you depend on turbodbc we suggest you to use the latest version supporting it (2.4.0)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Dropped python 3.7 support
+* If you still depend on python 3.7 use the 2.x version line</p></li>
+<li><p>Dropped conda forge support</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-4-0">
+<span id="id7"></span><h2>2.4.0 — 2022-05-19<a class="headerlink" href="#changelog-2-4-0" title="Link to this heading">¶</a></h2>
+<section id="id8">
+<h3>🗑️ Removed<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Removed odbc specific functionality from base dialect and moved it to the pyodbc dialect</p></li>
+<li><p>Removed remaining python2 compatibility artifacts and switches</p></li>
+<li><p>Dropped support for python versions &lt; 3.7</p></li>
+</ul>
+</section>
+<section id="id9">
+<h3>🐞 Fixed<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed bug when accessing underlying odbc connection while using NullPool based engine
+Note: This addresses the superset <a class="reference external" href="https://github.com/apache/superset/issues/20105">issue-20105</a></p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-3-0">
+<span id="id10"></span><h2>2.3.0 — 2022-04-13<a class="headerlink" href="#changelog-2-3-0" title="Link to this heading">¶</a></h2>
+<section id="id11">
+<h3>🗑️ Removed<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Removed outdated documentation and resources</p></li>
+<li><p>Dropped python 2.7 support</p></li>
+</ul>
+</section>
+<section id="id12">
+<h3>🔧 Changed<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Update supported versions of EXASOL DB to 7.1.6 and 7.0.16</p></li>
+<li><p>Update supported python versions to 3.6, 3.7, 3.8, 3.9</p></li>
+<li><p>Bumped SQLAlchemy dependency to 1.3.24</p></li>
+<li><p>Bumped pyodbc dependency to 4.0.32</p></li>
+<li><p>Updated documentation to reflect the latest version changes etc.</p></li>
+<li><p>Updated maintainer and contact information</p></li>
+</ul>
+</section>
+<section id="id13">
+<h3>🐞 Fixed<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed bug regarding maximum identifier length</p></li>
+<li><p>Fixed bug with custom translate maps</p></li>
+<li><p>Fixed bug regarding non existent error code mappings for EXASOL specific odbc error codes</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-2-0">
+<span id="id14"></span><h2>2.2.0 — 2020-09-02<a class="headerlink" href="#changelog-2-2-0" title="Link to this heading">¶</a></h2>
+<section id="id15">
+<h3>🔧 Changed<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated dependencies</p></li>
+</ul>
+</section>
+<section id="id16">
+<h3>🐞 Fixed<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed performance problems for large tables/databases. For more details see <a class="reference external" href="https://github.com/blue-yonder/sqlalchemy_exasol/pull/101">PR</a></p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-1-0">
+<span id="id17"></span><h2>2.1.0 — 2020-05-28<a class="headerlink" href="#changelog-2-1-0" title="Link to this heading">¶</a></h2>
+<section id="id18">
+<h3>🔧 Changed<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated documentation (README.rst and INTEGRATION_TEST.md)</p></li>
+<li><p>Updated dependencies</p></li>
+<li><p>Replaced metadata queries with ODBC metadata to avoid deadlocks</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-10">
+<span id="id19"></span><h2>2.0.10 — 2020-05-08<a class="headerlink" href="#changelog-2-0-10" title="Link to this heading">¶</a></h2>
+<section id="id20">
+<h3>🔧 Changed<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated SQLAlchemy dependency to 1.3.16</p></li>
+<li><p>Updated six dependency to 1.14.0</p></li>
+<li><p>Updated pyodbc dependency to 4.0.30</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-9">
+<span id="id21"></span><h2>2.0.9 — 2019-10-18<a class="headerlink" href="#changelog-2-0-9" title="Link to this heading">¶</a></h2>
+<section id="id22">
+<h3>✨ Added<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Add support for computed columns to merge (contribution by &#64;vamega)</p></li>
+</ul>
+</section>
+<section id="id23">
+<h3>🔧 Changed<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated SQLAlchemy dependency to 1.3.10</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-8">
+<span id="id24"></span><h2>2.0.8 — 2019-10-07<a class="headerlink" href="#changelog-2-0-8" title="Link to this heading">¶</a></h2>
+<section id="id25">
+<h3>✨ Added<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added new EXASOL keywords (contribution from &#64;vamega)</p></li>
+<li><p>Added MERGE statement to auto commit heuristic (contribution from &#64;vamega)</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-7">
+<span id="id26"></span><h2>2.0.7 — 2019-10-01<a class="headerlink" href="#changelog-2-0-7" title="Link to this heading">¶</a></h2>
+<section id="id27">
+<h3>🔧 Changed<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated SQLAlchemy dependency to 1.3.8</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-6">
+<span id="id28"></span><h2>2.0.6 — 2019-08-12<a class="headerlink" href="#changelog-2-0-6" title="Link to this heading">¶</a></h2>
+<section id="id29">
+<h3>🗑️ Removed<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Removed deprecated setting of ‘convert_unicode’ on engine</p></li>
+</ul>
+</section>
+<section id="id30">
+<h3>✨ Added<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for empty set expressions required by new SQLA tests</p></li>
+</ul>
+</section>
+<section id="id31">
+<h3>🔧 Changed<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated PyODBC dependency to 4.0.27</p></li>
+<li><p>Updated SQLAlchemy dependency to 1.3.6</p></li>
+</ul>
+</section>
+<section id="id32">
+<h3>🐞 Fixed<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed bug in reflection of CHAR colums (missing length). Contribution from &#64;vamega</p></li>
+<li><p>Fixed bug in rendering of SQL statements with common table expressions (CTE). Contribution from &#64;vamega</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-5">
+<span id="id33"></span><h2>2.0.5 — 2019-05-03<a class="headerlink" href="#changelog-2-0-5" title="Link to this heading">¶</a></h2>
+<section id="id34">
+<h3>🔧 Changed<a class="headerlink" href="#id34" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated SQLAlchemy dependency to 1.2.18</p></li>
+</ul>
+</section>
+<section id="id35">
+<h3>🐞 Fixed<a class="headerlink" href="#id35" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed bug in server version string parsing (turbodbc)</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-4">
+<span id="id36"></span><h2>2.0.4 — 2018-10-16<a class="headerlink" href="#changelog-2-0-4" title="Link to this heading">¶</a></h2>
+<section id="id37">
+<h3>🔧 Changed<a class="headerlink" href="#id37" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated pyodbc dependency to 4.0.24</p></li>
+</ul>
+</section>
+<section id="id38">
+<h3>🐞 Fixed<a class="headerlink" href="#id38" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fix string parameters in delete when using Python 3</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-3">
+<span id="id39"></span><h2>2.0.3 — 2018-08-02<a class="headerlink" href="#changelog-2-0-3" title="Link to this heading">¶</a></h2>
+<section id="id40">
+<h3>🔧 Changed<a class="headerlink" href="#id40" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Update SQLAlchemy dependency to 1.2.10</p></li>
+</ul>
+</section>
+<section id="id41">
+<h3>🐞 Fixed<a class="headerlink" href="#id41" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Pass the autocommit parameter when specified also to turodbc.</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-1">
+<span id="id42"></span><h2>2.0.1 — 2018-06-28<a class="headerlink" href="#changelog-2-0-1" title="Link to this heading">¶</a></h2>
+<section id="id43">
+<h3>🗑️ Removed<a class="headerlink" href="#id43" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Dropped EXASOL 5 support</p></li>
+</ul>
+</section>
+<section id="id44">
+<h3>✨ Added<a class="headerlink" href="#id44" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for the turbodbc parameters <cite>varchar_max_character_limit</cite>, <cite>prefer_unicode</cite>,
+<cite>large_decimals_as_64_bit_types</cite>, and <cite>limit_varchar_results_to_max</cite>.</p></li>
+</ul>
+</section>
+<section id="id45">
+<h3>🔧 Changed<a class="headerlink" href="#id45" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Update SQLAlchemy dependency to 1.2.8</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-2-0-0">
+<span id="id46"></span><h2>2.0.0 — 2018-01-09<a class="headerlink" href="#changelog-2-0-0" title="Link to this heading">¶</a></h2>
+<section id="id47">
+<h3>🔧 Changed<a class="headerlink" href="#id47" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>BREAKING CHANGE: default driver name removed from dialect. The driver must now be explicitly
+specified. Either in the DSN or in the connection string using the
+optional ‘driver’ parameter (e.g. appending &amp;driver=EXAODBC to connection URL)</p></li>
+<li><p>Updated SQLAlchemy dependency to 1.2.0</p></li>
+<li><p>Updated pyodbc dependency to 4.0.21</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-3-2">
+<span id="id48"></span><h2>1.3.2 — 2017-10-15<a class="headerlink" href="#changelog-1-3-2" title="Link to this heading">¶</a></h2>
+<section id="id49">
+<h3>🗑️ Removed<a class="headerlink" href="#id49" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Dropped support for Python3 version &lt; Python 3.6</p></li>
+</ul>
+</section>
+<section id="id50">
+<h3>🔧 Changed<a class="headerlink" href="#id50" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated SQLAlchemy dependency to 1.1.14</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-3-1">
+<span id="id51"></span><h2>1.3.1 — 2017-08-16<a class="headerlink" href="#changelog-1-3-1" title="Link to this heading">¶</a></h2>
+<section id="id52">
+<h3>✨ Added<a class="headerlink" href="#id52" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added <cite>raw_sql</cite> to util.py for debugging</p></li>
+</ul>
+</section>
+<section id="id53">
+<h3>🔧 Changed<a class="headerlink" href="#id53" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated SQLAlchemy dependency to 1.1.13</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-3-0">
+<span id="id54"></span><h2>1.3.0 — 2017-08-02<a class="headerlink" href="#changelog-1-3-0" title="Link to this heading">¶</a></h2>
+<section id="id55">
+<h3>✨ Added<a class="headerlink" href="#id55" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added EXASOL 6 driver (6.0.2)</p></li>
+</ul>
+</section>
+<section id="id56">
+<h3>🔧 Changed<a class="headerlink" href="#id56" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated SQLAlchemy dependency to 1.1.12</p></li>
+</ul>
+</section>
+<section id="id57">
+<h3>🐞 Fixed<a class="headerlink" href="#id57" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed issue #53 - TRUNCATE statements now autocommited (if autocommit = True)</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-2-5">
+<span id="id58"></span><h2>1.2.5 — 2017-08-02<a class="headerlink" href="#changelog-1-2-5" title="Link to this heading">¶</a></h2>
+<section id="id59">
+<h3>🗑️ Removed<a class="headerlink" href="#id59" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Removed support for EXASOL 4 driver</p></li>
+</ul>
+</section>
+<section id="id60">
+<h3>✨ Added<a class="headerlink" href="#id60" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for EXASOL 6</p></li>
+</ul>
+</section>
+<section id="id61">
+<h3>🔧 Changed<a class="headerlink" href="#id61" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated pyodbc dependency to 4.0.17</p></li>
+<li><p>Adjusted list of reserved keywords in respect to EXASOL 6</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-2-4">
+<span id="id62"></span><h2>1.2.4 — 2017-06-26<a class="headerlink" href="#changelog-1-2-4" title="Link to this heading">¶</a></h2>
+<section id="id63">
+<h3>🐞 Fixed<a class="headerlink" href="#id63" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed bug introduced by typo in base.py:454</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-2-3">
+<span id="id64"></span><h2>1.2.3 — 2017-06-20<a class="headerlink" href="#changelog-1-2-3" title="Link to this heading">¶</a></h2>
+<section id="id65">
+<h3>✨ Added<a class="headerlink" href="#id65" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added missing kw arg in limit_clause (contribution from sroecker)</p></li>
+</ul>
+</section>
+<section id="id66">
+<h3>🔧 Changed<a class="headerlink" href="#id66" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated SQLAlchemy dependency to 1.1.11</p></li>
+<li><p>Changed EXAExecutionContext.executemany to default ‘False’</p></li>
+</ul>
+</section>
+<section id="id67">
+<h3>🐞 Fixed<a class="headerlink" href="#id67" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed bug with incorrect handling of case insensitive names (lower case in SQLA, upper case in EXASOL)</p></li>
+<li><p>Fixed bug in lookup of default schema name to include schema provided in connection url</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-2-2">
+<span id="id68"></span><h2>1.2.2 — 2017-05-29<a class="headerlink" href="#changelog-1-2-2" title="Link to this heading">¶</a></h2>
+<section id="id69">
+<h3>🐞 Fixed<a class="headerlink" href="#id69" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed failing upload of build results to pypi</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-2-1">
+<span id="id70"></span><h2>1.2.1 — 2017-05-25<a class="headerlink" href="#changelog-1-2-1" title="Link to this heading">¶</a></h2>
+<section id="id71">
+<h3>🐞 Fixed<a class="headerlink" href="#id71" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed ODBC Driver name that is to be used</p></li>
+<li><p>Use unicode on osx for turbodbc fixes #63</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-2-0">
+<span id="id72"></span><h2>1.2.0 — 2017-04-04<a class="headerlink" href="#changelog-1-2-0" title="Link to this heading">¶</a></h2>
+<section id="id73">
+<h3>✨ Added<a class="headerlink" href="#id73" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added Support for Python 3.6</p></li>
+</ul>
+</section>
+<section id="id74">
+<h3>🔧 Changed<a class="headerlink" href="#id74" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Turbodbc support uses buffer size based on memory budget
+instead of a fixed number of rows.</p></li>
+<li><p>Turbodbc support requires turbodbc&gt;=0.4.1</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-1-1">
+<span id="id75"></span><h2>1.1.1 — 2016-10-14<a class="headerlink" href="#changelog-1-1-1" title="Link to this heading">¶</a></h2>
+<section id="id76">
+<h3>🔧 Changed<a class="headerlink" href="#id76" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Upgrade sqlalchemy test dependency to 1.1.1</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-1-0">
+<span id="id77"></span><h2>1.1.0 — 2016-07-15<a class="headerlink" href="#changelog-1-1-0" title="Link to this heading">¶</a></h2>
+<section id="id78">
+<h3>🗑️ Removed<a class="headerlink" href="#id78" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Dropped EXASOL 4 support</p></li>
+</ul>
+</section>
+<section id="id79">
+<h3>✨ Added<a class="headerlink" href="#id79" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Add support for the <a class="reference external" href="https://github.com/blue-yonder/turbodbc">turbodbc</a> driver</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-0-3">
+<span id="id80"></span><h2>1.0.3 — 2016-04-14<a class="headerlink" href="#changelog-1-0-3" title="Link to this heading">¶</a></h2>
+<section id="id81">
+<h3>🔧 Changed<a class="headerlink" href="#id81" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Reconnect after socket closed</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-0-2">
+<span id="id82"></span><h2>1.0.2 — 2016-03-12<a class="headerlink" href="#changelog-1-0-2" title="Link to this heading">¶</a></h2>
+<section id="id83">
+<h3>✨ Added<a class="headerlink" href="#id83" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added supports_native_decimal Flag</p></li>
+</ul>
+</section>
+<section id="id84">
+<h3>🔧 Changed<a class="headerlink" href="#id84" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Improved DSN handling</p></li>
+</ul>
+</section>
+<section id="id85">
+<h3>🐞 Fixed<a class="headerlink" href="#id85" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed Unicode Problems for OSX/Darwin</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-0-1">
+<span id="id86"></span><h2>1.0.1 — 2015-03-21<a class="headerlink" href="#changelog-1-0-1" title="Link to this heading">¶</a></h2>
+<section id="id87">
+<h3>✨ Added<a class="headerlink" href="#id87" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added OFFSET Support for Exasol 5.X</p></li>
+<li><p>Added Tests for Python 3.5</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-1-0-0">
+<span id="id88"></span><h2>1.0.0 — 2015-05-15<a class="headerlink" href="#changelog-1-0-0" title="Link to this heading">¶</a></h2>
+<section id="id89">
+<h3>🗑️ Removed<a class="headerlink" href="#id89" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Dropped support for sqlalchemy versions &lt; 1.0.x</p></li>
+</ul>
+</section>
+<section id="id90">
+<h3>🔧 Changed<a class="headerlink" href="#id90" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Update sqlalchemy dependency to 1.0.x</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-9-3">
+<span id="id91"></span><h2>0.9.3 — 2015-05-13<a class="headerlink" href="#changelog-0-9-3" title="Link to this heading">¶</a></h2>
+<section id="id92">
+<h3>🔧 Changed<a class="headerlink" href="#id92" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Changed execute behaviour for deletes as fixed in 0.9.2 for updates (#36)</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-9-2">
+<span id="id93"></span><h2>0.9.2 — 2015-05-06<a class="headerlink" href="#changelog-0-9-2" title="Link to this heading">¶</a></h2>
+<section id="id94">
+<h3>🐞 Fixed<a class="headerlink" href="#id94" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Changed execute behaviour for updates fixes #36</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-9-1">
+<span id="id95"></span><h2>0.9.1 — 2015-01-29<a class="headerlink" href="#changelog-0-9-1" title="Link to this heading">¶</a></h2>
+<section id="id96">
+<h3>✨ Added<a class="headerlink" href="#id96" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for DISTRIBUTE BY table constraints</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-9-0">
+<span id="id97"></span><h2>0.9.0 — 2015-01-26<a class="headerlink" href="#changelog-0-9-0" title="Link to this heading">¶</a></h2>
+<section id="id98">
+<h3>✨ Added<a class="headerlink" href="#id98" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for EXASolution 5.x</p></li>
+<li><p>Added documentation on how to setup the integration test against the EXASOL hosted test db</p></li>
+</ul>
+</section>
+<section id="id99">
+<h3>🔧 Changed<a class="headerlink" href="#id99" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Mark connection in pool as closed to prevent reuse</p></li>
+<li><p>Use bulk reflection per schema and improved caching for inspection</p></li>
+</ul>
+</section>
+<section id="id100">
+<h3>🐞 Fixed<a class="headerlink" href="#id100" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed conversion to uppercase in connection parameters</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-8-5">
+<span id="id101"></span><h2>0.8.5 — 2014-07-31<a class="headerlink" href="#changelog-0-8-5" title="Link to this heading">¶</a></h2>
+<section id="id102">
+<h3>✨ Added<a class="headerlink" href="#id102" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added Python 3.4 test</p></li>
+</ul>
+</section>
+<section id="id103">
+<h3>🔧 Changed<a class="headerlink" href="#id103" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Set default schema to ‘SYS’ to create reasonable reflections</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-8-4">
+<span id="id104"></span><h2>0.8.4 — 2014-07-30<a class="headerlink" href="#changelog-0-8-4" title="Link to this heading">¶</a></h2>
+<section id="id105">
+<h3>🔧 Changed<a class="headerlink" href="#id105" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Downgrade six dependency selector to &gt;=1.5</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-8-3">
+<span id="id106"></span><h2>0.8.3 — 2014-07-18<a class="headerlink" href="#changelog-0-8-3" title="Link to this heading">¶</a></h2>
+<section id="id107">
+<h3>🐞 Fixed<a class="headerlink" href="#id107" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed versioneer build parameter in setup.py to enable pip install</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-8-2">
+<span id="id108"></span><h2>0.8.2 — 2014-07-17<a class="headerlink" href="#changelog-0-8-2" title="Link to this heading">¶</a></h2>
+<section id="id109">
+<h3>✨ Added<a class="headerlink" href="#id109" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added README</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-8-1">
+<span id="id110"></span><h2>0.8.1 — 2014-06-26<a class="headerlink" href="#changelog-0-8-1" title="Link to this heading">¶</a></h2>
+<section id="id111">
+<h3>✨ Added<a class="headerlink" href="#id111" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added p3k support - contribution by iadrich</p></li>
+</ul>
+</section>
+<section id="id112">
+<h3>🔧 Changed<a class="headerlink" href="#id112" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated repository url</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-8-0">
+<span id="id113"></span><h2>0.8.0 — 2014-06-26<a class="headerlink" href="#changelog-0-8-0" title="Link to this heading">¶</a></h2>
+<section id="id114">
+<h3>✨ Added<a class="headerlink" href="#id114" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for SQL MERGE</p></li>
+</ul>
+</section>
+<section id="id115">
+<h3>🔧 Changed<a class="headerlink" href="#id115" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated SQLA dependency selector to 0.9.x (build requires &gt;= 0.9.6)</p></li>
+</ul>
+</section>
+<section id="id116">
+<h3>🐞 Fixed<a class="headerlink" href="#id116" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed incorrect quoting of identifiers with leading _</p></li>
+<li><p>Fixed incorrect implementation for retrieving last generated PK (for auto inc columns)</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-7-5">
+<span id="id117"></span><h2>0.7.5 — 2014-05-08<a class="headerlink" href="#changelog-0-7-5" title="Link to this heading">¶</a></h2>
+<section id="id118">
+<h3>🔧 Changed<a class="headerlink" href="#id118" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Switched to versioneer</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-7-4">
+<span id="id119"></span><h2>0.7.4 — 2014-04-01<a class="headerlink" href="#changelog-0-7-4" title="Link to this heading">¶</a></h2>
+<section id="id120">
+<h3>🔧 Changed<a class="headerlink" href="#id120" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>changed README from md to rst to display reasonable content on pypi</p></li>
+</ul>
+</section>
+</section>
+<section id="changelog-0-7-0">
+<span id="id121"></span><h2>0.7.0 — 2014-03-28<a class="headerlink" href="#changelog-0-7-0" title="Link to this heading">¶</a></h2>
+<section id="id122">
+<h3>✨ Added<a class="headerlink" href="#id122" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added first version of the SQLAlchemy EXASOL dialect (released under BSD license)</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="readme.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Readme</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="developer_guide/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Development</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2022, Exasol & Blue Yonder</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/exasol/sqlalchemy-exasol" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=dcedd534"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+      <script src="_static/shibuya.js?v=e2e99575"></script></body>
+</html>

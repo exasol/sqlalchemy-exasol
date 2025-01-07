@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="grass" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Integration Test - sqlalchemy-exasol</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Development" href="index.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=397bb51e" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=83eaa723" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    
+    <meta property="og:type" content="website"/><meta property="og:title" content="Integration Test"/>
+<meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      <img class="light-logo" src="../_static/light-exasol-logo.svg" alt="sqlalchemy-exasol" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/dark-exasol-logo.svg" alt="sqlalchemy-exasol" height="28" loading="lazy" />
+      <strong>sqlalchemy-exasol</strong>
+    </a>
+    <div class="sy-head-nav" id="HeadNav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="nav-versions">
+    <button type="button" aria-label="Versions">
+      <span class="md:hidden">Versions</span>
+      <span class="hidden md:inline">4.0.0</span>
+      <i class="i-lucide chevron-down"></i>
+    </button>
+    <div class="nav-versions-choices"><ul><li><a href="../../master/developer_guide/integration_tests.html">master</a></li><li><a href="../../5.0.0/developer_guide/integration_tests.html">5.0.0</a></li><li><a href="../../4.6.3/developer_guide/integration_tests.html">4.6.3</a></li><li><a href="../../4.6.2/developer_guide/integration_tests.html">4.6.2</a></li><li><a href="../../4.6.1/developer_guide/integration_tests.html">4.6.1</a></li><li><a href="../../4.6.0/developer_guide/integration_tests.html">4.6.0</a></li><li><a href="../../4.5.1/developer_guide/integration_tests.html">4.5.1</a></li><li><a href="../../4.5.0/developer_guide/integration_tests.html">4.5.0</a></li><li><a href="../../4.4.0/developer_guide/integration_tests.html">4.4.0</a></li><li><a href="integration_tests.html">4.0.0</a></li><li><a href="../../3.2.2/developer_guide/integration_tests.html">3.2.2</a></li></ul></div>
+  </div><div class="sy-head-socials">
+  <a href="https://github.com/exasol/sqlalchemy-exasol" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="HeadNav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2 -translate-x-2"></span>
+          <span class="hamburger_3 -translate-x-1"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Development</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Integration Test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setup">Setup</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#">Integration Test</a></li>
+<li><a class="reference internal" href="#setup">Setup</a><ul>
+<li><a class="reference internal" href="#ci">CI</a></li>
+<li><a class="reference internal" href="#ci-cd">CI-CD</a></li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6"><div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">sqlalchemy-exasol</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Development</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Integration Test</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="integration-test">
+<h1>Integration Test<a class="headerlink" href="#integration-test" title="Link to this heading">¶</a></h1>
+<p>The integration tests are located within <cite>test/integration</cite>. They are split in
+two groups.</p>
+<ol class="arabic">
+<li><p>The SQLAlchemy conformance test suite</p>
+<blockquote>
+<div><p>The sqlalchemy conformance test suite is provided and maintained by the sqlalchemy project and intended to support third party dialect developers.
+For further details see also <a class="reference external" href="https://docs.exasol.com/db/latest/sql_reference.htm">README.dialects.rst</a>.</p>
+</div></blockquote>
+</li>
+<li><p>Our custom Exasol test suite</p>
+<blockquote>
+<div><p>The Exasol test suite consists of test written and maintained by exasol.</p>
+</div></blockquote>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In order to reduce the likelihood of test side effects, the <cite>sqlalchemy</cite> and the <cite>exasol</cite> test suites
+are executed in separate pytest test runs.</p>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>The exasol database does do implicit schema/context changes (open &amp; close schema)
+in certain scenarios. Keep this in mind when setting up (writing) tests.</p>
+<ol class="arabic">
+<li><p>CREATE SCHEMA implicitly changes the CURRENT_SCHEMA context</p>
+<blockquote>
+<div><p>When you create a new schema, you implicitly open this new schema.</p>
+</div></blockquote>
+</li>
+<li><p>DROP SCHEMA sometimes switches the context to &lt;null&gt;</p>
+<blockquote>
+<div><p>If the CURRENT_SCHEMA is dropped an implicit context switch to &lt;null&gt; is done</p>
+</div></blockquote>
+</li>
+</ol>
+<p>For further details have a look at the <a class="reference external" href="https://docs.exasol.com/db/latest/sql_reference.htm">Exasol-Documentation</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Creating/Using a new un-pooled connection can be used for protecting against
+this side effect.</p>
+</div>
+</div>
+</section>
+<section id="setup">
+<h1>Setup<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h1>
+<p>Integration testing automatically is done by GitHub Actions contained in this repository, which provide a CI/CD pipeline to test, build, and deploy sqlalchemy_exasol to PyPI.
+All important tasks within the actions are using <strong>nox</strong>, which also can be used locally.</p>
+<p>Two main workflows are used for this purpose:</p>
+<section id="ci">
+<h2>CI<a class="headerlink" href="#ci" title="Link to this heading">¶</a></h2>
+<p>This is meant to be used as the test workflow. It’s located under:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">sqlalchemy_exasol</span><span class="o">/.</span><span class="n">github</span><span class="o">/</span><span class="n">workflows</span><span class="o">/</span><span class="n">CI</span><span class="o">.</span><span class="n">yml</span>
+</span></pre></div>
+</div>
+<p>This workflow will be executed anytime there’s a commit pushed to any branch that is <strong>not master</strong>, or whenever there’s a pull request created where the base branch is <strong>not master</strong>. It runs a Docker Container with an Exasol database for every version specified in <em>matrix.exasol_version</em>, and uses those DBs to executes all tests in the repository. If everything went fine, it will create a package distribution using both sdist and wheel.</p>
+<p>To run it just commit and push to any non-master branch and watch the workflow run in:</p>
+<p><a class="reference external" href="https://github.com/exasol/sqlalchemy_exasol/actions">https://github.com/exasol/sqlalchemy_exasol/actions</a></p>
+</section>
+<section id="ci-cd">
+<h2>CI-CD<a class="headerlink" href="#ci-cd" title="Link to this heading">¶</a></h2>
+<p>This is meant to be used as the Production workflow. It’s located under:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">sqlalchemy_exasol</span><span class="o">/.</span><span class="n">github</span><span class="o">/</span><span class="n">workflows</span><span class="o">/</span><span class="n">CI</span><span class="o">-</span><span class="n">CD</span><span class="o">.</span><span class="n">yml</span>
+</span></pre></div>
+</div>
+<p>This workflow will be executed anytime there’s a commit pushed to <strong>master</strong>, or whenever a <strong>tag</strong> (release) is pushed. It does all the same steps than the CI workflow with one additional step at the end: Upload the package to Pypi. This upload step only happens when a tag is pushed, it will not be executed when commits are done in master.</p>
+<p>To run it just commit and push to master (<em>Optional:</em> push a tag in case you want PyPI upload) and watch the workflow run in:</p>
+<p><a class="reference external" href="https://github.com/exasol/sqlalchemy_exasol/actions">https://github.com/exasol/sqlalchemy_exasol/actions</a></p>
+<p>The status of the CI-CD workflow will always be reflected in the badge called “build” in the README.rst and Home Page of this repository</p>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Development</div></div>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2022, Exasol & Blue Yonder</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/exasol/sqlalchemy-exasol" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=3304f9e4"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=e2e99575"></script></body>
+</html>

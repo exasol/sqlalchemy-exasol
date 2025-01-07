@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="grass" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Development - sqlalchemy-exasol</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Integration Test" href="integration_tests.html" /><link rel="prev" title="Changelog" href="../changelog.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=397bb51e" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=83eaa723" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    
+    <meta property="og:type" content="website"/><meta property="og:title" content="Development"/>
+<meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      <img class="light-logo" src="../_static/light-exasol-logo.svg" alt="sqlalchemy-exasol" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/dark-exasol-logo.svg" alt="sqlalchemy-exasol" height="28" loading="lazy" />
+      <strong>sqlalchemy-exasol</strong>
+    </a>
+    <div class="sy-head-nav" id="HeadNav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="nav-versions">
+    <button type="button" aria-label="Versions">
+      <span class="md:hidden">Versions</span>
+      <span class="hidden md:inline">4.4.0</span>
+      <i class="i-lucide chevron-down"></i>
+    </button>
+    <div class="nav-versions-choices"><ul><li><a href="../../master/developer_guide/index.html">master</a></li><li><a href="../../5.0.0/developer_guide/index.html">5.0.0</a></li><li><a href="../../4.6.3/developer_guide/index.html">4.6.3</a></li><li><a href="../../4.6.2/developer_guide/index.html">4.6.2</a></li><li><a href="../../4.6.1/developer_guide/index.html">4.6.1</a></li><li><a href="../../4.6.0/developer_guide/index.html">4.6.0</a></li><li><a href="../../4.5.1/developer_guide/index.html">4.5.1</a></li><li><a href="../../4.5.0/developer_guide/index.html">4.5.0</a></li><li><a href="index.html">4.4.0</a></li><li><a href="../../4.0.0/developer_guide/index.html">4.0.0</a></li><li><a href="../../3.2.2/developer_guide/index.html">3.2.2</a></li></ul></div>
+  </div><div class="sy-head-socials">
+  <a href="https://github.com/exasol/sqlalchemy-exasol" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="HeadNav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2 -translate-x-2"></span>
+          <span class="hamburger_3 -translate-x-1"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integration_tests.html">Integration Test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration_tests.html#setup">Setup</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li><a class="reference internal" href="#tools">Tools</a></li>
+<li><a class="reference internal" href="#libraries">Libraries</a></li>
+<li><a class="reference internal" href="#locale">Locale</a></li>
+<li><a class="reference internal" href="#project-layout">Project Layout</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#setup-your-workspace">Setup Your Workspace</a><ul>
+<li><a class="reference internal" href="#get-the-source">Get The Source</a></li>
+<li><a class="reference internal" href="#setup-the-tooling-virtual-environment">Setup the Tooling &amp; Virtual Environment</a></li>
+<li><a class="reference internal" href="#install-the-git-commit-hooks">Install the Git Commit Hooks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#task-runner-nox">Task Runner (Nox)</a></li>
+<li><a class="reference internal" href="#tests">Tests</a></li>
+<li><a class="reference internal" href="#changelog">Changelog</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6"><div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">sqlalchemy-exasol</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Development</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="development">
+<h1>Development<a class="headerlink" href="#development" title="Link to this heading">¶</a></h1>
+<p>This chapter contains information helpful when you want to engage in development of this project.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<p>If you want to engage in development of this project you should have the following libraries and tools available.</p>
+<section id="tools">
+<h3>Tools<a class="headerlink" href="#tools" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.python.org/">python</a> &gt;= 3.8</p></li>
+<li><p><a class="reference external" href="https://python-poetry.org/">poetry</a> &gt;= 1.1.0</p></li>
+<li><p><a class="reference external" href="https://git-scm.com/">git</a></p></li>
+<li><p><a class="reference external" href="https://www.docker.com/">Docker</a></p></li>
+<li><dl class="simple">
+<dt><a class="reference external" href="https://github.com/exasol/integration-test-docker-environment">integration-test-docker-environment</a></dt><dd><ul>
+<li><p><a class="reference external" href="https://github.com/exasol/integration-test-docker-environment#prerequisites&gt;">Prerequisites</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="libraries">
+<h3>Libraries<a class="headerlink" href="#libraries" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>unixodbc</p></li>
+<li><p>unixodbc-dev</p></li>
+<li><p>libboost-date-time-dev</p></li>
+<li><p>libboost-locale-dev</p></li>
+<li><p>libboost-system-dev</p></li>
+</ul>
+<p>Example: Install of required system libraries on Ubuntu</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">unixodbc</span> <span class="n">unixodbc</span><span class="o">-</span><span class="n">dev</span> <span class="n">libboost</span><span class="o">-</span><span class="n">date</span><span class="o">-</span><span class="n">time</span><span class="o">-</span><span class="n">dev</span> <span class="n">libboost</span><span class="o">-</span><span class="n">locale</span><span class="o">-</span><span class="n">dev</span> <span class="n">libboost</span><span class="o">-</span><span class="n">system</span><span class="o">-</span><span class="n">dev</span>
+</span></pre></div>
+</div>
+</section>
+<section id="locale">
+<h3>Locale<a class="headerlink" href="#locale" title="Link to this heading">¶</a></h3>
+<p>Make sure the local is setup appropriately.</p>
+<p>Example: Setting up an english locale</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">sed</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/&#39;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">locale</span><span class="o">.</span><span class="n">gen</span> <span class="o">&amp;&amp;</span> <span class="n">locale</span><span class="o">-</span><span class="n">gen</span>
+</span><span data-line="2"><span class="n">export</span> <span class="n">LANG</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+</span></pre></div>
+</div>
+</section>
+<section id="project-layout">
+<h3>Project Layout<a class="headerlink" href="#project-layout" title="Link to this heading">¶</a></h3>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Currently it is required that the <a class="reference external" href="https://github.com/exasol/integration-test-docker-environment">integration-test-docker-environment</a>  project is checked out in parallel to this
+project. For more details on this have a look at the <cite>Settings</cite> in <cite>noxfile.py</cite></p>
+<p>Expected Layout:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1">|-sqlalchemy-exasol/
+</span><span data-line="2">├─ ...
+</span><span data-line="3">|-integration-test-docker-environment
+</span><span data-line="4">├─ ...
+</span><span data-line="5">|
+</span><span data-line="6">...
+</span></pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="setup-your-workspace">
+<h2>Setup Your Workspace<a class="headerlink" href="#setup-your-workspace" title="Link to this heading">¶</a></h2>
+<section id="get-the-source">
+<h3>Get The Source<a class="headerlink" href="#get-the-source" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">exasol</span><span class="o">/</span><span class="n">sqlalchemy</span><span class="o">-</span><span class="n">exasol</span><span class="o">.</span><span class="n">git</span>
+</span></pre></div>
+</div>
+</section>
+<section id="setup-the-tooling-virtual-environment">
+<h3>Setup the Tooling &amp; Virtual Environment<a class="headerlink" href="#setup-the-tooling-virtual-environment" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">poetry</span> <span class="n">shell</span>
+</span><span data-line="2"><span class="n">poetry</span> <span class="n">install</span>
+</span></pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>make sure you have the poetry shell active whenever you want to work in the workspace</p>
+</div>
+</section>
+<section id="install-the-git-commit-hooks">
+<h3>Install the Git Commit Hooks<a class="headerlink" href="#install-the-git-commit-hooks" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">pre</span><span class="o">-</span><span class="n">commit</span> <span class="n">install</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This may need to be rerun if you want or do add non standard hook types, for further details
+see <cite>pre-commit install -h</cite>.</p>
+</div>
+</section>
+</section>
+<section id="task-runner-nox">
+<h2>Task Runner (Nox)<a class="headerlink" href="#task-runner-nox" title="Link to this heading">¶</a></h2>
+<p>Most repeating and complex tasks within this project are automated using the task runner <cite>nox</cite>.
+To get an overview about the available <cite>tasks</cite> just run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">nox</span> <span class="o">-</span><span class="n">l</span>
+</span></pre></div>
+</div>
+<p>All task(s) which will be run by default will have a leading <cite>*</cite>.
+In order to run a specific task execute the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">nox</span> <span class="o">-</span><span class="n">s</span> <span class="o">&lt;</span><span class="n">task</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
+</span></pre></div>
+</div>
+<p>You can modify or add new task by editing the file <cite>noxfile.py</cite>.</p>
+</section>
+<section id="tests">
+<h2>Tests<a class="headerlink" href="#tests" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p>Install all python dependencies needed for development</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># make sure you are using the virtual environment poetry has setup for this project</span>
+</span><span data-line="2"><span class="n">poetry</span> <span class="n">shell</span>
+</span></pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Run all tests with <cite>pyodbc</cite> connector</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">nox</span>
+</span></pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">nox</span> <span class="o">-</span><span class="n">s</span> <span class="s2">&quot;verify(connector=&#39;pyodbc&#39;)&quot;</span>
+</span></pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Run all tests with <cite>turbodbc</cite> connector</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">nox</span> <span class="o">-</span><span class="n">s</span> <span class="s2">&quot;verify(connector=&#39;turbodbc&#39;)&quot;</span>
+</span></pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>If something still is not working or unclear, you may want to look into the CI/CD <a class="reference external" href="https://github.com/exasol/sqlalchemy_exasol/actions">action</a> files.</p>
+</div>
+</section>
+<section id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h2>
+<p>Currently we keep our changelog in a single file <em>CHANGELOG.rst</em>.
+For every relevant change an entry in the <em>unreleased</em> section of the changelog is
+added. When a release is created the <em>unreleased</em> section is turned into the
+section for the release, by replacing the section title with the version number and the release date of the release.
+Afterwards a new empty unreleased section must be added at the top of the changelog.</p>
+<p>Example of <em>CHANGELOG.rst</em> before <em>5.0.0</em> release:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="p">..</span> <span class="nt">_changelog-unreleased:</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="gh">Unreleased</span>
+</span><span data-line="4"><span class="gh">==================</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="gh">✨ Added</span>
+</span><span data-line="7"><span class="gh">--------</span>
+</span><span data-line="8">
+</span><span data-line="9"><span class="m">*</span> Some more changes ...
+</span><span data-line="10">
+</span><span data-line="11">
+</span><span data-line="12"><span class="p">..</span> <span class="nt">_changelog-4.0.0:</span>
+</span><span data-line="13">
+</span><span data-line="14"><span class="gh">4.0.0 — 2022-12-01</span>
+</span><span data-line="15"><span class="gh">==================</span>
+</span><span data-line="16">
+</span><span data-line="17"><span class="gh">✨ Added</span>
+</span><span data-line="18"><span class="gh">--------</span>
+</span><span data-line="19">
+</span><span data-line="20"><span class="m">*</span> Some changes ...
+</span></pre></div>
+</div>
+<p>Example of <em>CHANGELOG.rst</em> after <em>5.0.0</em> release:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="p">..</span> <span class="nt">_changelog-unreleased:</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="gh">Unreleased</span>
+</span><span data-line="4"><span class="gh">==========</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="p">..</span> <span class="nt">_changelog-5.0.0:</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="gh">5.0.0 - 2023-01-01</span>
+</span><span data-line="9"><span class="gh">==================</span>
+</span><span data-line="10">
+</span><span data-line="11"><span class="gh">✨ Added</span>
+</span><span data-line="12"><span class="gh">--------</span>
+</span><span data-line="13">
+</span><span data-line="14"><span class="m">*</span> Some more changes ...
+</span><span data-line="15">
+</span><span data-line="16">
+</span><span data-line="17"><span class="p">..</span> <span class="nt">_changelog-4.0.0:</span>
+</span><span data-line="18">
+</span><span data-line="19"><span class="gh">4.0.0 — 2022-12-01</span>
+</span><span data-line="20"><span class="gh">==================</span>
+</span><span data-line="21">
+</span><span data-line="22"><span class="gh">✨ Added</span>
+</span><span data-line="23"><span class="gh">--------</span>
+</span><span data-line="24">
+</span><span data-line="25"><span class="m">*</span> Some changes ...
+</span></pre></div>
+</div>
+<p>For more general information on, why and for whom to create a changelog, have a
+look at <a class="reference external" href="https://keepachangelog.com/en/1.1.0/">keepachangelog</a>.</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="../changelog.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Changelog</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="integration_tests.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Integration Test</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2022, Exasol & Blue Yonder</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/exasol/sqlalchemy-exasol" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=2f20d6c1"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=e2e99575"></script></body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="grass" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Readme - sqlalchemy-exasol</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Changelog" href="changelog.html" /><link rel="prev" title="SQLAlchemy-Exasol" href="index.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=397bb51e" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=83eaa723" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    
+    <meta property="og:type" content="website"/><meta property="og:title" content="Readme"/>
+<meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      <img class="light-logo" src="_static/light-exasol-logo.svg" alt="sqlalchemy-exasol" height="28" loading="lazy" />
+      <img class="dark-logo" src="_static/dark-exasol-logo.svg" alt="sqlalchemy-exasol" height="28" loading="lazy" />
+      <strong>sqlalchemy-exasol</strong>
+    </a>
+    <div class="sy-head-nav" id="HeadNav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="nav-versions">
+    <button type="button" aria-label="Versions">
+      <span class="md:hidden">Versions</span>
+      <span class="hidden md:inline">4.5.1</span>
+      <i class="i-lucide chevron-down"></i>
+    </button>
+    <div class="nav-versions-choices"><ul><li><a href="../master/index.html">master</a></li><li><a href="../5.0.0/readme.html">5.0.0</a></li><li><a href="../4.6.3/readme.html">4.6.3</a></li><li><a href="../4.6.2/readme.html">4.6.2</a></li><li><a href="../4.6.1/readme.html">4.6.1</a></li><li><a href="../4.6.0/readme.html">4.6.0</a></li><li><a href="readme.html">4.5.1</a></li><li><a href="../4.5.0/readme.html">4.5.0</a></li><li><a href="../4.4.0/readme.html">4.4.0</a></li><li><a href="../4.0.0/readme.html">4.0.0</a></li><li><a href="../3.2.2/readme.html">3.2.2</a></li></ul></div>
+  </div><div class="sy-head-socials">
+  <a href="https://github.com/exasol/sqlalchemy-exasol" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="HeadNav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2 -translate-x-2"></span>
+          <span class="hamburger_3 -translate-x-1"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/index.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/integration_tests.html">Integration Test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/integration_tests.html#setup">Setup</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#sqlalchemy-dialect-for-exasol-db">SQLAlchemy Dialect for EXASOL DB</a><ul>
+<li><a class="reference internal" href="#how-to-get-started">How to get started</a><ul>
+<li><a class="reference internal" href="#turbodbc-support">Turbodbc support</a></li>
+<li><a class="reference internal" href="#meet-the-system-requirements">Meet the system requirements</a></li>
+<li><a class="reference internal" href="#setup-your-python-project-and-install-sqlalchemy-exasol">Setup your python project and install sqlalchemy-exasol</a></li>
+<li><a class="reference internal" href="#talk-to-the-exasol-db-using-sqlalchemy">Talk to the EXASOL DB using SQLAlchemy</a><ul>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6"><div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">sqlalchemy-exasol</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Readme</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="readme">
+<h1>Readme<a class="headerlink" href="#readme" title="Link to this heading">¶</a></h1>
+<section id="sqlalchemy-dialect-for-exasol-db">
+<h2>SQLAlchemy Dialect for EXASOL DB<a class="headerlink" href="#sqlalchemy-dialect-for-exasol-db" title="Link to this heading">¶</a></h2>
+<a class="reference external image-reference" href="https://github.com/exasol/sqlalchemy_exasol/actions?query=workflow%3ACI:alt:CIStatus"><img alt="https://github.com/exasol/sqlalchemy_exasol/workflows/CI/badge.svg?branch=master" src="https://github.com/exasol/sqlalchemy_exasol/workflows/CI/badge.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://pypi.org/project/sqlalchemy-exasol/"><img alt="PyPI Version" src="https://img.shields.io/pypi/v/sqlalchemy_exasol" /></a>
+<a class="reference external image-reference" href="https://pypi.org/project/sqlalchemy-exasol"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/sqlalchemy-exasol" /></a>
+<a class="reference external image-reference" href="https://www.exasol.com/"><img alt="Exasol - Supported Version(s)" src="https://img.shields.io/badge/exasol-7.1.9%20%7C%207.0.18-green" /></a>
+<a class="reference external image-reference" href="https://github.com/psf/black"><img alt="Formatter - Black" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
+<a class="reference external image-reference" href="https://pycqa.github.io/isort/"><img alt="Formatter - Isort" src="https://img.shields.io/badge/imports-isort-ef8336.svg" /></a>
+<a class="reference external image-reference" href="https://github.com/PyCQA/pylint"><img alt="Pylint" src="https://img.shields.io/badge/pylint-6.4-yellowgreen" /></a>
+<a class="reference external image-reference" href="https://opensource.org/licenses/BSD-2-Clause"><img alt="License" src="https://img.shields.io/pypi/l/sqlalchemy-exasol" /></a>
+<a class="reference external image-reference" href="https://pypi.org/project/sqlalchemy-exasol/"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/exasol/sqlalchemy-exasol" /></a>
+<a class="reference external image-reference" href="https://pypi.org/project/sqlalchemy-exasol"><img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/sqlalchemy-exasol" /></a>
+<section id="how-to-get-started">
+<h3>How to get started<a class="headerlink" href="#how-to-get-started" title="Link to this heading">¶</a></h3>
+<p>We assume you have a good understanding of (unix)ODBC. If not, make sure you
+read their documentation carefully - there are lot’s of traps 🪤 to step into.</p>
+<section id="turbodbc-support">
+<h4>Turbodbc support<a class="headerlink" href="#turbodbc-support" title="Link to this heading">¶</a></h4>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Maintenance of this feature is on hold. Also it is very likely that turbodbc support will be dropped in future versions.</p>
+</div>
+<ul class="simple">
+<li><p>You can use Turbodbc with sqlalchemy_exasol if you use a python version &gt;= 3.8.</p></li>
+<li><p>Multi row update is not supported, see
+<a class="reference external" href="test/test_update.py">test/test_update.py</a> for an example</p></li>
+</ul>
+</section>
+<section id="meet-the-system-requirements">
+<h4>Meet the system requirements<a class="headerlink" href="#meet-the-system-requirements" title="Link to this heading">¶</a></h4>
+<p>On Linux/Unix like systems you need:</p>
+<ul class="simple">
+<li><p>Python</p></li>
+<li><p>An Exasol DB (e.g. <a class="reference external" href="https://github.com/exasol/docker-db">docker-db</a> or a <a class="reference external" href="https://www.exasol.com/test-it-now/cloud/">cloud instance</a>)</p></li>
+<li><p>The packages unixODBC and unixODBC-dev &gt;= 2.2.14</p></li>
+<li><p>The Exasol <a class="reference external" href="https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm">ODBC driver</a></p></li>
+<li><p>The ODBC.ini and ODBCINST.ini configurations files setup</p></li>
+</ul>
+</section>
+<section id="setup-your-python-project-and-install-sqlalchemy-exasol">
+<h4>Setup your python project and install sqlalchemy-exasol<a class="headerlink" href="#setup-your-python-project-and-install-sqlalchemy-exasol" title="Link to this heading">¶</a></h4>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span data-line="1">$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>sqlalchemy-exasol
+</span></pre></div>
+</div>
+<p>for turbodbc support:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span data-line="1">$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>sqlalchemy-exasol<span class="o">[</span>turbodbc<span class="o">]</span>
+</span></pre></div>
+</div>
+</section>
+<section id="talk-to-the-exasol-db-using-sqlalchemy">
+<h4>Talk to the EXASOL DB using SQLAlchemy<a class="headerlink" href="#talk-to-the-exasol-db-using-sqlalchemy" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+</span><span data-line="2"><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&amp;driver=EXAODBC&quot;</span>
+</span><span data-line="3"><span class="n">e</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</span><span data-line="4"><span class="n">r</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select 42 from dual&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span></pre></div>
+</div>
+<p>to use turbodbc as driver:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+</span><span data-line="2"><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&amp;driver=EXAODBC&quot;</span>
+</span><span data-line="3"><span class="n">e</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</span><span data-line="4"><span class="n">r</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;select 42 from dual&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span></pre></div>
+</div>
+<p>The dialect supports two types of connection urls creating an engine. A DSN (Data Source Name) mode and a host mode:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>Type</p></td>
+<td><p>Example</p></td>
+</tr>
+<tr class="row-even"><td><p>DSN URL</p></td>
+<td><p>‘exa+pyodbc://USER:PWD&#64;exa_test’</p></td>
+</tr>
+<tr class="row-odd"><td><p>HOST URL</p></td>
+<td><p>‘exa+pyodbc://USER:PWD&#64;192.168.14.227..228:1234/my_schema?parameter’</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="features">
+<h5>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h5>
+<ul class="simple">
+<li><p>SELECT, INSERT, UPDATE, DELETE statements</p></li>
+</ul>
+</section>
+<section id="notes">
+<h5>Notes<a class="headerlink" href="#notes" title="Link to this heading">¶</a></h5>
+<ul class="simple">
+<li><p>Schema name and parameters are optional for the host url</p></li>
+<li><p>At least on Linux/Unix systems it has proven valuable to pass ‘CONNECTIONLCALL=en_US.UTF-8’ as a url parameter. This will make sure that the client process (Python) and the EXASOL driver (UTF-8 internal) know how to interpret code pages correctly.</p></li>
+<li><p>Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)</p></li>
+<li><p>As of Exasol client driver version 4.1.2 you can pass the flag ‘INTTYPESINRESULTSIFPOSSIBLE=y’ in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.</p></li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Home</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="changelog.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Changelog</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2022, Exasol & Blue Yonder</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/exasol/sqlalchemy-exasol" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=fa8d1881"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+      <script src="_static/shibuya.js?v=e2e99575"></script></body>
+</html>

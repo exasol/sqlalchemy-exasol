@@ -409,3 +409,38 @@ def check_links(session: Session) -> None:
             "\n"
             + "\n".join(f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors)
         )
+@nox.session(name="list-links", python=False)
+def list_links(session: Session) -> None:
+    """List all links within the documentation"""
+    for path, url in _urls(_documentation(PROJECT_ROOT)):
+        session.log(f"Url: {url}, File: {path}")
+
+
+# fmt: off
+from exasol.toolbox.nox._documentation import (
+    build_docs,
+    clean_docs,
+    open_docs,
+)
+
+
+def _build_multiversion_docs(session: nox.Session, config: Config) -> None:
+    from exasol.toolbox.nox._shared import DOCS_OUTPUT_DIR
+    session.run(
+        "poetry",
+        "run",
+        "sphinx-multiversion",
+        "--debug",
+        f"{config.doc}",
+        DOCS_OUTPUT_DIR,
+    )
+
+
+@nox.session(name="docs:multiversion", python=False)
+def build_multiversion(session: Session) -> None:
+    from noxconfig import PROJECT_CONFIG
+    """Builds the multiversion project documentation"""
+    _build_multiversion_docs(session, PROJECT_CONFIG)
+
+
+# fmt: on

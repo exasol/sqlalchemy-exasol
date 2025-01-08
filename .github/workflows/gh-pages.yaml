@@ -16,11 +16,8 @@ jobs:
         with:
           fetch-depth: 0
 
-
       - name: Setup Python & Poetry Environment
         uses: ./.github/actions/python-environment
-        with:
-          python-version: 3.9
 
       - name: Build Documentation
         run: |

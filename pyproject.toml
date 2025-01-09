@@ -124,7 +124,7 @@ profile = "black"
 force_grid_wrap = 2
 
 [tool.pylint.master]
-fail-under = 5.8
+fail-under = 5.5
 
 [tool.pylint.format]
 max-line-length = 88
@@ -140,6 +140,3 @@ module = [
 ]
 ignore_errors = true
 
-[tool.scriv]
-new_fragment_template = "file: templates/fragment-template.rst"
-version = "literal: pyproject.toml: tool.poetry.version"

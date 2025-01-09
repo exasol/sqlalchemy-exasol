@@ -135,6 +135,7 @@ module = [
     "noxfile",
     "noxconfig",
     "sqlalchemy_exasol.*", 
+    "exasol.odbc",
     "test.*",
 ]
 ignore_errors = true

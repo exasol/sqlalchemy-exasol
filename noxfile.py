@@ -66,8 +66,10 @@ def _python_files(path: Path) -> Iterator[Path]:
 
 
 from exasol.toolbox.nox._format import (
+    Mode,
     _code_format,
     _pyupgrade,
+    _version,
     fix,
 )
 from exasol.toolbox.nox._lint import (
@@ -76,26 +78,24 @@ from exasol.toolbox.nox._lint import (
 )
 
 
-@nox.session(python=False)
+@nox.session(name="project:check", python=False)
 def check(session: Session) -> None:
-    """Run all available source code checks against the code base (typecheck, linters, formatters, etc.)"""
+    """Runs all available checks on the project"""
+    from exasol.toolbox.nox._lint import (
+        _pylint,
+        _type_check,
+    )
+    from exasol.toolbox.nox._shared import _context
+    from exasol.toolbox.nox._test import _coverage
+    from noxconfig import PROJECT_CONFIG
 
-    def is_version_in_sync() -> bool:
-        return (
-            version_from_python_module(Settings.VERSION_FILE) == version_from_poetry()
-        )
-
-    if not is_version_in_sync():
-        session.error(
-            "Versions out of sync, version file:"
-            f"{version_from_python_module(Settings.VERSION_FILE)},"
-            f"poetry: {version_from_poetry()}."
-        )
-    session.notify("isort")
-    session.notify("pyupgrade")
-    session.notify("code-format")
-    session.notify("lint:code")
-    session.notify("lint:typing")
+    context = _context(session, coverage=True)
+    py_files = [f"{file}" for file in _python_files(PROJECT_CONFIG.root)]
+    _version(session, Mode.Check, PROJECT_CONFIG.version_file)
+    _code_format(session, Mode.Check, py_files)
+    _pylint(session, py_files)
+    _type_check(session, py_files)
+    _coverage(session, PROJECT_CONFIG, context)
 
 
 @nox.session(name="db:start", python=False)
@@ -409,6 +409,8 @@ def check_links(session: Session) -> None:
             "\n"
             + "\n".join(f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors)
         )
+
+
 @nox.session(name="list-links", python=False)
 def list_links(session: Session) -> None:
     """List all links within the documentation"""

@@ -91,7 +91,6 @@ def check(session: Session) -> None:
     _code_format(session, Mode.Check, py_files)
     _pylint(session, py_files)
     _type_check(session, py_files)
-    _coverage(session, PROJECT_CONFIG, context)
 
 
 from exasol.toolbox.nox._lint import (

@@ -384,8 +384,9 @@ def check_links(session: Session) -> None:
 # fmt: off
 from exasol.toolbox.nox._documentation import (
     build_docs,
+    build_multiversion,
     clean_docs,
     open_docs,
-    build_multiversion
 )
+
 # fmt: on

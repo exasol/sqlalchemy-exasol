@@ -38,7 +38,7 @@ from exasol.odbc import (
 )
 
 # default actions to be run if nothing is explicitly specified with the -s option
-nox.options.sessions = ["fix"]
+nox.options.sessions = ["project:fix"]
 
 
 class Settings:
@@ -65,59 +65,41 @@ def _python_files(path: Path) -> Iterator[Path]:
     return files
 
 
-@nox.session(python=False)
-def fix(session: Session) -> None:
-    """Run all available formatters and code upgrade tools against the code base"""
-
-    def apply_pyupgrade_fixes(session: Session) -> None:
-        files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
-        session.run(
-            "poetry",
-            "run",
-            "python",
-            "-m",
-            "pyupgrade",
-            "--py38-plus",
-            "--exit-zero-even-if-changed",
-            *files,
-        )
-
-    session.run(
-        "poetry",
-        "run",
-        "python",
-        f"{SCRIPTS / 'version_check.py'}",
-        "--fix",
-        f"{Settings.VERSION_FILE}",
-    )
-    apply_pyupgrade_fixes(session)
-    session.run("poetry", "run", "python", "-m", "isort", "-v", f"{PROJECT_ROOT}")
-    session.run("poetry", "run", "python", "-m", "black", f"{PROJECT_ROOT}")
+from exasol.toolbox.nox._format import (
+    Mode,
+    _code_format,
+    _pyupgrade,
+    _version,
+    fix,
+)
 
 
-@nox.session(python=False)
+@nox.session(name="project:check", python=False)
 def check(session: Session) -> None:
-    """Run all available source code checks against the code base (typecheck, linters, formatters, etc.)"""
+    """Runs all available checks on the project"""
+    from exasol.toolbox.nox._lint import (
+        _pylint,
+        _type_check,
+    )
+    from exasol.toolbox.nox._shared import _context
+    from exasol.toolbox.nox._test import _coverage
+    from noxconfig import PROJECT_CONFIG
 
-    def is_version_in_sync() -> bool:
-        return (
-            version_from_python_module(Settings.VERSION_FILE) == version_from_poetry()
-        )
-
-    if not is_version_in_sync():
-        session.error(
-            "Versions out of sync, version file:"
-            f"{version_from_python_module(Settings.VERSION_FILE)},"
-            f"poetry: {version_from_poetry()}."
-        )
-    session.notify("isort")
-    session.notify("pyupgrade")
-    session.notify("code-format")
-    session.notify("type-check")
-    session.notify("lint")
+    context = _context(session, coverage=True)
+    py_files = [f"{file}" for file in _python_files(PROJECT_CONFIG.root)]
+    _version(session, Mode.Check, PROJECT_CONFIG.version_file)
+    _code_format(session, Mode.Check, py_files)
+    _pylint(session, py_files)
+    _type_check(session, py_files)
 
 
-@nox.session(name="db-start", python=False)
+from exasol.toolbox.nox._lint import (
+    lint,
+    type_check,
+)
+
+
+@nox.session(name="db:start", python=False)
 def start_db(session: Session) -> None:
     """Start a test database. For more details append '-- -h'"""
 
@@ -155,13 +137,13 @@ def start_db(session: Session) -> None:
     start(args.db_version)
 
 
-@nox.session(name="db-stop", python=False)
+@nox.session(name="db:stop", python=False)
 def stop_db(session: Session) -> None:
     """Stop the test database"""
     session.run("docker", "kill", "db_container_test", external=True)
 
 
-@nox.session(name="sqla-tests", python=False)
+@nox.session(name="test:sqla", python=False)
 def sqlalchemy_tests(session: Session) -> None:
     """
     Run the sqlalchemy integration tests suite. For more details append '-- -h'
@@ -201,7 +183,7 @@ def sqlalchemy_tests(session: Session) -> None:
         )
 
 
-@nox.session(name="unit-tests", python=False)
+@nox.session(name="test:unit", python=False)
 def unit_tests(session: Session) -> None:
     """Run the unit tests"""
     session.run(
@@ -211,7 +193,7 @@ def unit_tests(session: Session) -> None:
     )
 
 
-@nox.session(name="exasol-tests", python=False)
+@nox.session(name="test:exasol", python=False)
 def exasol_tests(session: Session) -> None:
     """Run the integration tests with a specific connector. For more details append '-- -h'"""
 
@@ -242,13 +224,13 @@ def exasol_tests(session: Session) -> None:
         )
 
 
-@nox.session(name="regression-tests", python=False)
+@nox.session(name="test:regression", python=False)
 def regression_tests(session: Session) -> None:
     """Run regression tests"""
     session.run("pytest", f"{PROJECT_ROOT / 'test' / 'integration' / 'regression'}")
 
 
-@nox.session(name="integration-tests", python=False)
+@nox.session(name="test:integration", python=False)
 def integration_tests(session: Session) -> None:
     """Run integration tests with a specific configuration. For more details append '-- -h'"""
 
@@ -273,21 +255,21 @@ def integration_tests(session: Session) -> None:
 
     args = parser().parse_args(session.posargs)
     session.notify(
-        find_session_runner(session, "db-start"),
+        find_session_runner(session, "db:start"),
         posargs=["--db-version", f"{args.db_version}"],
     )
     session.notify(
-        find_session_runner(session, f"sqla-tests"),
+        find_session_runner(session, f"test:sqla"),
         posargs=["--connector", f"{args.connector}"],
     )
     session.notify(
-        find_session_runner(session, f"exasol-tests"),
+        find_session_runner(session, f"test:exasol"),
         posargs=["--connector", f"{args.connector}"],
     )
     session.notify(
-        find_session_runner(session, f"regression-tests"),
+        find_session_runner(session, f"test:regression"),
     )
-    session.notify(find_session_runner(session, "db-stop"))
+    session.notify(find_session_runner(session, "db:stop"))
 
 
 @nox.session(python=False)
@@ -331,69 +313,7 @@ def release(session: Session) -> None:
     )
 
 
-@nox.session(python=False)
-def pyupgrade(session: Session) -> None:
-    """Run pyupgrade against the code base"""
-    files = [f"{path}" for path in _python_files(PROJECT_ROOT)]
-    session.run("poetry", "run", "python", "-m", "pyupgrade", "--py38-plus", *files)
-
-
-@nox.session(name="code-format", python=False)
-def code_format(session: Session) -> None:
-    """Run the code formatter against the codebase"""
-    session.run(
-        "poetry",
-        "run",
-        "python",
-        "-m",
-        "black",
-        "--check",
-        "--diff",
-        "--color",
-        f"{PROJECT_ROOT}",
-    )
-
-
-@nox.session(python=False)
-def isort(session: Session) -> None:
-    """Run isort against the codebase"""
-    session.run(
-        "poetry", "run", "python", "-m", "isort", "-v", "--check", f"{PROJECT_ROOT}"
-    )
-
-
-@nox.session(python=False)
-def lint(session: Session) -> None:
-    """Run the linter against the codebase"""
-    session.run(
-        "poetry",
-        "run",
-        "python",
-        "-m",
-        "pylint",
-        f'{PROJECT_ROOT / "exasol"}',
-        f'{PROJECT_ROOT / "scripts"}',
-        f'{PROJECT_ROOT / "sqlalchemy_exasol"}',
-    )
-
-
-@nox.session(name="type-check", python=False)
-def type_check(session: Session) -> None:
-    """Run the type checker against the codebase"""
-    session.run(
-        "poetry",
-        "run",
-        "mypy",
-        "--strict",
-        "--show-error-codes",
-        "--pretty",
-        "--show-column-numbers",
-        "--show-error-context",
-        "--scripts-are-modules",
-    )
-
-
-@nox.session(name="report-skipped", python=False)
+@nox.session(name="test:skipped", python=False)
 def report_skipped(session: Session) -> None:
     """
     Runs all tests for all supported connectors and creates a csv report of skipped tests for each connector.
@@ -427,9 +347,27 @@ def report_skipped(session: Session) -> None:
                 )
 
 
-@nox.session(name="check-links", python=False)
+# fmt: off
+from exasol.toolbox.nox._documentation import (
+    build_docs,
+    build_multiversion,
+    clean_docs,
+    open_docs,
+)
+
+# fmt: on
+
+
+@nox.session(name="docs:links", python=False)
+def list_links(session: Session) -> None:
+    """List all the links within the documentation."""
+    for path, url in _urls(_documentation(PROJECT_ROOT)):
+        session.log(f"Url: {url}, File: {path}")
+
+
+@nox.session(name="docs:links:check", python=False)
 def check_links(session: Session) -> None:
-    """Checks weather or not all links in the documentation can be accessed"""
+    """Checks whether all links in the documentation are accessible."""
     errors = []
     for path, url in _urls(_documentation(PROJECT_ROOT)):
         status, details = _check(url)
@@ -443,38 +381,12 @@ def check_links(session: Session) -> None:
         )
 
 
-@nox.session(name="list-links", python=False)
-def list_links(session: Session) -> None:
-    """List all links within the documentation"""
-    for path, url in _urls(_documentation(PROJECT_ROOT)):
-        session.log(f"Url: {url}, File: {path}")
-
-
 # fmt: off
 from exasol.toolbox.nox._documentation import (
     build_docs,
+    build_multiversion,
     clean_docs,
     open_docs,
 )
-
-
-def _build_multiversion_docs(session: nox.Session, config: Config) -> None:
-    from exasol.toolbox.nox._shared import DOCS_OUTPUT_DIR
-    session.run(
-        "poetry",
-        "run",
-        "sphinx-multiversion",
-        "--debug",
-        f"{config.doc}",
-        DOCS_OUTPUT_DIR,
-    )
-
-
-@nox.session(name="docs:multiversion", python=False)
-def build_multiversion(session: Session) -> None:
-    from noxconfig import PROJECT_CONFIG
-    """Builds the multiversion project documentation"""
-    _build_multiversion_docs(session, PROJECT_CONFIG)
-
 
 # fmt: on

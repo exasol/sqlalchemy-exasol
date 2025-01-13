@@ -1,3 +1,5 @@
+.lint*
+.test-results.db
 .html-documentation
 odbcconfig/odbcinst.ini
 

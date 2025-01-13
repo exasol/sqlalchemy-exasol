@@ -47,7 +47,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Project Checks (Python-${{ matrix.python }})
-        run: poetry run nox -s check
+        run: poetry run nox -s project:check
 
   tests:
     runs-on: ubuntu-latest
@@ -86,8 +86,8 @@ jobs:
 
       - name: Run Test for Python ${{ matrix.python }} using ${{ matrix.connector }}
         run: |
-          poetry run nox -s unit-tests
-          poetry run nox -s integration-tests -- -- --connector ${{ matrix.connector }} --db-version ${{ matrix.exasol_version }}
+          poetry run nox -s test:unit
+          poetry run nox -s test:integration -- -- --connector ${{ matrix.connector }} --db-version ${{ matrix.exasol_version }}
 
   build_package:
     runs-on: ubuntu-latest

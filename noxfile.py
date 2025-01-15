@@ -400,7 +400,7 @@ def _connector_matrix(config: Config):
             attr,
             CONNECTORS,
         )
-    return {"connector": exasol_versions}
+    return {"connector": connectors}
 
 from exasol.toolbox.nox._ci import (
     exasol_matrix,
@@ -411,6 +411,8 @@ from exasol.toolbox.nox._ci import (
 @nox.session(name="matrix:all", python=False)
 def full_matrix(session: Session) -> None:
     """Output the full build matrix for Python & Exasol versions as JSON."""
+    import json
+
     from exasol.toolbox.nox._ci import (
         _exasol_matrix,
         _python_matrix,

@@ -390,3 +390,27 @@ from exasol.toolbox.nox._documentation import (
 )
 
 # fmt: on
+
+def _connector_matrix(config: Config):
+    CONNECTORS = ['websocket']
+    attr = "connectors"
+    connectors = getattr(config, attr, CONNECTORS)
+    if not hasattr(config, attr):
+        _log.warning(
+            "Config does not contain '%s' setting. Using default: %s",
+            attr,
+            CONNECTORS,
+        )
+    return {"connector": exasol_versions}
+
+
+@nox.session(name="matrix:all", python=False)
+def full_matrix(session: Session) -> None:
+    """Output the full build matrix for Python & Exasol versions as JSON."""
+    from exasol.toolbox.nox._ci import _python_matrix
+    from exasol.toolbox.nox._ci import _exasol_matrix
+    matrix = _python_matrix(PROJECT_CONFIG)
+    matrix.update(_exasol_matrix(PROJECT_CONFIG))
+    matrix.update(_connector_matrix(PROJECT_CONFIG))     
+    print(json.dumps(matrix))
+

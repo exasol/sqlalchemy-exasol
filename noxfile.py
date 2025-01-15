@@ -75,10 +75,6 @@ def check(session: Session) -> None:
         _pylint,
         _type_check,
     )
-    from exasol.toolbox.nox._shared import _context
-    from exasol.toolbox.nox._test import _coverage
-
-    context = _context(session, coverage=True)
     py_files = [f"{file}" for file in _python_files(PROJECT_CONFIG.root)]
     _version(session, Mode.Check, PROJECT_CONFIG.version_file)
     _code_format(session, Mode.Check, py_files)

@@ -389,7 +389,6 @@ from exasol.toolbox.nox._documentation import (
     open_docs,
 )
 
-# fmt: on
 
 def _connector_matrix(config: Config):
     CONNECTORS = ['websocket']
@@ -403,6 +402,7 @@ def _connector_matrix(config: Config):
         )
     return {"connector": exasol_versions}
 
+from exasol.toolbox.nox._ci import python_matrix, exasol_matrix
 
 @nox.session(name="matrix:all", python=False)
 def full_matrix(session: Session) -> None:
@@ -414,3 +414,4 @@ def full_matrix(session: Session) -> None:
     matrix.update(_connector_matrix(PROJECT_CONFIG))     
     print(json.dumps(matrix))
 
+# fmt: on

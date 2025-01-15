@@ -42,8 +42,7 @@ class StopDB:
 class Config:
     root: Path = Path(__file__).parent
     doc: Path = Path(__file__).parent / "doc"
-    version_file: Path = Path(__file__).parent / \
-        "sqlalchemy_exasol" / "version.py"
+    version_file: Path = Path(__file__).parent / "sqlalchemy_exasol" / "version.py"
     path_filters: Iterable[str] = (
         "dist",
         ".eggs",

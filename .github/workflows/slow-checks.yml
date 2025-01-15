@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/matrix-all.yml
 
   Tests:
-    name: Integration-Tests (Connector: ${{matrix.connector}}, Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
+    name: Integration-Tests (${{matrix.connector}}, Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
     needs: [ build-matrix ]
     runs-on: ubuntu-latest
     # Even though the environment "manual-approval" will be created automatically,

@@ -134,7 +134,6 @@ def stop_db(session: Session) -> None:
 
 
 def _coverage_command():
-    base_command = ["poetry", "run"]
     coverage_command = [
         "coverage",
         "run",

@@ -75,6 +75,7 @@ def check(session: Session) -> None:
         _pylint,
         _type_check,
     )
+
     py_files = [f"{file}" for file in _python_files(PROJECT_CONFIG.root)]
     _version(session, Mode.Check, PROJECT_CONFIG.version_file)
     _code_format(session, Mode.Check, py_files)
@@ -132,6 +133,18 @@ def stop_db(session: Session) -> None:
     session.run("docker", "kill", "db_container_test", external=True)
 
 
+def _coverage_command():
+    base_command = ["poetry", "run"]
+    coverage_command = [
+        "coverage",
+        "run",
+        "-a",
+        f"--rcfile={PROJECT_ROOT / 'pyproject.toml'}",
+        "-m",
+    ]
+    return coverage_command
+
+
 @nox.session(name="test:sqla", python=False)
 def sqlalchemy_tests(session: Session) -> None:
     """
@@ -162,6 +175,7 @@ def sqlalchemy_tests(session: Session) -> None:
         args = parser().parse_args(session.posargs)
         connector = args.connector
         session.run(
+            *_coverage_command(),
             "pytest",
             "--dropfirst",
             "--db",
@@ -203,6 +217,7 @@ def exasol_tests(session: Session) -> None:
         args = parser().parse_args(session.posargs)
         connector = args.connector
         session.run(
+            *_coverage_command(),
             "pytest",
             "--dropfirst",
             "--db",
@@ -216,7 +231,11 @@ def exasol_tests(session: Session) -> None:
 @nox.session(name="test:regression", python=False)
 def regression_tests(session: Session) -> None:
     """Run regression tests"""
-    session.run("pytest", f"{PROJECT_ROOT / 'test' / 'integration' / 'regression'}")
+    session.run(
+        *_coverage_command(),
+        "pytest",
+        f"{PROJECT_ROOT / 'test' / 'integration' / 'regression'}",
+    )
 
 
 @nox.session(name="test:integration", python=False)
@@ -240,7 +259,15 @@ def integration_tests(session: Session) -> None:
             default=PROJECT_CONFIG.exasol_versions[0],
             help="which will be used",
         )
+        p.add_argument(
+            "--coverage",
+            action="store_true",
+            help="This is only here for compatibility. Coverage will always be collected.",
+        )
         return p
+
+    coverage_file = PROJECT_ROOT / ".coverage"
+    coverage_file.unlink(missing_ok=True)
 
     args = parser().parse_args(session.posargs)
     session.notify(

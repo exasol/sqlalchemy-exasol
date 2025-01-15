@@ -105,7 +105,7 @@ def start_db(session: Session) -> None:
 
     def parser() -> ArgumentParser:
         p = ArgumentParser(
-            usage="nox -s start-db -- [-h] [--db-version]",
+            usage="nox -s db:start -- [-h] [--db-version]",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         p.add_argument(
@@ -158,7 +158,7 @@ def sqlalchemy_tests(session: Session) -> None:
 
     def parser() -> ArgumentParser:
         p = ArgumentParser(
-            usage="nox -s sqla-tests -- [-h] [--connector]",
+            usage="nox -s test:sqla -- [-h] [--connector]",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         p.add_argument(
@@ -199,7 +199,7 @@ def exasol_tests(session: Session) -> None:
 
     def parser() -> ArgumentParser:
         p = ArgumentParser(
-            usage="nox -s exasol-tests -- [-h] [--connector]",
+            usage="nox -s test:exasol -- [-h] [--connector]",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         p.add_argument(
@@ -236,7 +236,7 @@ def integration_tests(session: Session) -> None:
 
     def parser() -> ArgumentParser:
         p = ArgumentParser(
-            usage="nox -s integration-tests -- [-h] [--connector] [--db-version]",
+            usage="nox -s test:integration -- [-h] [--connector] [--db-version]",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         p.add_argument(
@@ -270,47 +270,6 @@ def integration_tests(session: Session) -> None:
         find_session_runner(session, f"test:regression"),
     )
     session.notify(find_session_runner(session, "db:stop"))
-
-
-@nox.session(python=False)
-def release(session: Session) -> None:
-    """Release a sqlalchemy-exasol package. For more details append '-- -h'"""
-
-    def create_parser() -> ArgumentParser:
-        p = ArgumentParser(
-            "Release a pypi package",
-            usage="nox -s release -- [-h] [-d]",
-        )
-        p.add_argument("-d", "--dry-run", action="store_true", help="just do a dry run")
-        return p
-
-    args = []
-    parser = create_parser()
-    cli_args = parser.parse_args(session.posargs)
-    if cli_args.dry_run:
-        args.append("--dry-run")
-
-    version_file = version_from_python_module(Settings.VERSION_FILE)
-    module_version = version_from_poetry()
-    git_version = version_from_string(list(tags())[-1])
-
-    if not (module_version == git_version == version_file):
-        session.error(
-            f"Versions out of sync, version file: {version_file}, poetry: {module_version}, tag: {git_version}."
-        )
-
-    session.run(
-        "poetry",
-        "build",
-        external=True,
-    )
-
-    session.run(
-        "poetry",
-        "publish",
-        *args,
-        external=True,
-    )
 
 
 @nox.session(name="test:skipped", python=False)

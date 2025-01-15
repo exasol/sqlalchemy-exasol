@@ -411,6 +411,7 @@ from exasol.toolbox.nox._ci import (
 @nox.session(name="matrix:all", python=False)
 def full_matrix(session: Session) -> None:
     """Output the full build matrix for Python & Exasol versions as JSON."""
+    from noxconfig import PROJECT_CONFIG
     from exasol.toolbox.nox._ci import (
         _exasol_matrix,
         _python_matrix,

@@ -41,13 +41,7 @@ from exasol.odbc import (
 nox.options.sessions = ["project:fix"]
 
 
-class Settings:
-    CONNECTORS = ("pyodbc", "turbodbc", "websocket")
-    ENVIRONMENT_NAME = "test"
-    DB_PORT = 8563
-    BUCKETFS_PORT = 2580
-    VERSION_FILE = PROJECT_ROOT / "sqlalchemy_exasol" / "version.py"
-    DB_VERSIONS = ("7.1.17",)
+from noxconfig import PROJECT_CONFIG
 
 
 def find_session_runner(session: Session, name: str) -> SessionRunner:
@@ -83,7 +77,6 @@ def check(session: Session) -> None:
     )
     from exasol.toolbox.nox._shared import _context
     from exasol.toolbox.nox._test import _coverage
-    from noxconfig import PROJECT_CONFIG
 
     context = _context(session, coverage=True)
     py_files = [f"{file}" for file in _python_files(PROJECT_CONFIG.root)]
@@ -110,8 +103,8 @@ def start_db(session: Session) -> None:
         )
         p.add_argument(
             "--db-version",
-            choices=Settings.DB_VERSIONS,
-            default=Settings.DB_VERSIONS[0],
+            choices=PROJECT_CONFIG.exasol_versions,
+            default=PROJECT_CONFIG.exasol_versions[0],
             help="which will be used",
         )
         return p
@@ -121,11 +114,11 @@ def start_db(session: Session) -> None:
             "itde",
             "spawn-test-environment",
             "--environment-name",
-            f"{Settings.ENVIRONMENT_NAME}",
+            f"{PROJECT_CONFIG.environment_name}",
             "--database-port-forward",
-            f"{Settings.DB_PORT}",
+            f"{PROJECT_CONFIG.db_port}",
             "--bucketfs-port-forward",
-            f"{Settings.BUCKETFS_PORT}",
+            f"{PROJECT_CONFIG.bucketfs_port}",
             "--docker-db-image-version",
             db_version,
             "--db-mem-size",
@@ -163,8 +156,8 @@ def sqlalchemy_tests(session: Session) -> None:
         )
         p.add_argument(
             "--connector",
-            choices=Settings.CONNECTORS,
-            default=Settings.CONNECTORS[0],
+            choices=PROJECT_CONFIG.connectors,
+            default=PROJECT_CONFIG.connectors[0],
             help="which will be used",
         )
         return p
@@ -204,8 +197,8 @@ def exasol_tests(session: Session) -> None:
         )
         p.add_argument(
             "--connector",
-            choices=Settings.CONNECTORS,
-            default=Settings.CONNECTORS[0],
+            choices=PROJECT_CONFIG.connectors,
+            default=PROJECT_CONFIG.connectors[0],
             help="which will be used",
         )
         return p
@@ -241,14 +234,14 @@ def integration_tests(session: Session) -> None:
         )
         p.add_argument(
             "--connector",
-            choices=Settings.CONNECTORS,
-            default=Settings.CONNECTORS[0],
+            choices=PROJECT_CONFIG.connectors,
+            default=PROJECT_CONFIG.connectors[0],
             help="which will be used",
         )
         p.add_argument(
             "--db-version",
-            choices=Settings.DB_VERSIONS,
-            default=Settings.DB_VERSIONS[0],
+            choices=PROJECT_CONFIG.exasol_versions,
+            default=PROJECT_CONFIG.exasol_versions[0],
             help="which will be used",
         )
         return p
@@ -280,7 +273,7 @@ def report_skipped(session: Session) -> None:
     Attention: This task expects a running test database (db-start).
     """
     with TemporaryDirectory() as tmp_dir:
-        for connector in Settings.CONNECTORS:
+        for connector in PROJECT_CONFIG.connectors:
             report = Path(tmp_dir) / f"test-report{connector}.json"
             with odbcconfig(ODBC_DRIVER) as (config, env):
                 session.run(
@@ -376,7 +369,6 @@ def full_matrix(session: Session) -> None:
         _exasol_matrix,
         _python_matrix,
     )
-    from noxconfig import PROJECT_CONFIG
     matrix = _python_matrix(PROJECT_CONFIG)
     matrix.update(_exasol_matrix(PROJECT_CONFIG))
     matrix.update(_connector_matrix(PROJECT_CONFIG))     

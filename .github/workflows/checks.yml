@@ -136,7 +136,7 @@ jobs:
         run: poetry run nox -s project:format
 
   Tests:
-    name: Unit-Tests (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
+    name: Unit-Tests (Python-${{ matrix.python-version }})
     needs: [ Documentation, Lint, Type-Check, Security, Format, build-matrix ]
     runs-on: ubuntu-latest
     env:

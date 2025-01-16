@@ -87,6 +87,7 @@ from exasol.toolbox.nox._lint import (
     lint,
     type_check,
 )
+from exasol.toolbox.nox._metrics import report
 
 
 @nox.session(name="db:start", python=False)

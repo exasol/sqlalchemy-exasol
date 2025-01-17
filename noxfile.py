@@ -41,13 +41,7 @@ from exasol.odbc import (
 nox.options.sessions = ["project:fix"]
 
 
-class Settings:
-    CONNECTORS = ("pyodbc", "turbodbc", "websocket")
-    ENVIRONMENT_NAME = "test"
-    DB_PORT = 8563
-    BUCKETFS_PORT = 2580
-    VERSION_FILE = PROJECT_ROOT / "sqlalchemy_exasol" / "version.py"
-    DB_VERSIONS = ("7.1.17",)
+from noxconfig import PROJECT_CONFIG
 
 
 def find_session_runner(session: Session, name: str) -> SessionRunner:
@@ -81,11 +75,7 @@ def check(session: Session) -> None:
         _pylint,
         _type_check,
     )
-    from exasol.toolbox.nox._shared import _context
-    from exasol.toolbox.nox._test import _coverage
-    from noxconfig import PROJECT_CONFIG
 
-    context = _context(session, coverage=True)
     py_files = [f"{file}" for file in _python_files(PROJECT_CONFIG.root)]
     _version(session, Mode.Check, PROJECT_CONFIG.version_file)
     _code_format(session, Mode.Check, py_files)
@@ -97,6 +87,7 @@ from exasol.toolbox.nox._lint import (
     lint,
     type_check,
 )
+from exasol.toolbox.nox._metrics import report
 
 
 @nox.session(name="db:start", python=False)
@@ -105,13 +96,13 @@ def start_db(session: Session) -> None:
 
     def parser() -> ArgumentParser:
         p = ArgumentParser(
-            usage="nox -s start-db -- [-h] [--db-version]",
+            usage="nox -s db:start -- [-h] [--db-version]",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         p.add_argument(
             "--db-version",
-            choices=Settings.DB_VERSIONS,
-            default=Settings.DB_VERSIONS[0],
+            choices=PROJECT_CONFIG.exasol_versions,
+            default=PROJECT_CONFIG.exasol_versions[0],
             help="which will be used",
         )
         return p
@@ -121,11 +112,11 @@ def start_db(session: Session) -> None:
             "itde",
             "spawn-test-environment",
             "--environment-name",
-            f"{Settings.ENVIRONMENT_NAME}",
+            f"{PROJECT_CONFIG.environment_name}",
             "--database-port-forward",
-            f"{Settings.DB_PORT}",
+            f"{PROJECT_CONFIG.db_port}",
             "--bucketfs-port-forward",
-            f"{Settings.BUCKETFS_PORT}",
+            f"{PROJECT_CONFIG.bucketfs_port}",
             "--docker-db-image-version",
             db_version,
             "--db-mem-size",
@@ -143,6 +134,17 @@ def stop_db(session: Session) -> None:
     session.run("docker", "kill", "db_container_test", external=True)
 
 
+def _coverage_command():
+    coverage_command = [
+        "coverage",
+        "run",
+        "-a",
+        f"--rcfile={PROJECT_ROOT / 'pyproject.toml'}",
+        "-m",
+    ]
+    return coverage_command
+
+
 @nox.session(name="test:sqla", python=False)
 def sqlalchemy_tests(session: Session) -> None:
     """
@@ -158,13 +160,13 @@ def sqlalchemy_tests(session: Session) -> None:
 
     def parser() -> ArgumentParser:
         p = ArgumentParser(
-            usage="nox -s sqla-tests -- [-h] [--connector]",
+            usage="nox -s test:sqla -- [-h] [--connector]",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         p.add_argument(
             "--connector",
-            choices=Settings.CONNECTORS,
-            default=Settings.CONNECTORS[0],
+            choices=PROJECT_CONFIG.connectors,
+            default=PROJECT_CONFIG.connectors[0],
             help="which will be used",
         )
         return p
@@ -173,6 +175,7 @@ def sqlalchemy_tests(session: Session) -> None:
         args = parser().parse_args(session.posargs)
         connector = args.connector
         session.run(
+            *_coverage_command(),
             "pytest",
             "--dropfirst",
             "--db",
@@ -199,13 +202,13 @@ def exasol_tests(session: Session) -> None:
 
     def parser() -> ArgumentParser:
         p = ArgumentParser(
-            usage="nox -s exasol-tests -- [-h] [--connector]",
+            usage="nox -s test:exasol -- [-h] [--connector]",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         p.add_argument(
             "--connector",
-            choices=Settings.CONNECTORS,
-            default=Settings.CONNECTORS[0],
+            choices=PROJECT_CONFIG.connectors,
+            default=PROJECT_CONFIG.connectors[0],
             help="which will be used",
         )
         return p
@@ -214,6 +217,7 @@ def exasol_tests(session: Session) -> None:
         args = parser().parse_args(session.posargs)
         connector = args.connector
         session.run(
+            *_coverage_command(),
             "pytest",
             "--dropfirst",
             "--db",
@@ -227,7 +231,11 @@ def exasol_tests(session: Session) -> None:
 @nox.session(name="test:regression", python=False)
 def regression_tests(session: Session) -> None:
     """Run regression tests"""
-    session.run("pytest", f"{PROJECT_ROOT / 'test' / 'integration' / 'regression'}")
+    session.run(
+        *_coverage_command(),
+        "pytest",
+        f"{PROJECT_ROOT / 'test' / 'integration' / 'regression'}",
+    )
 
 
 @nox.session(name="test:integration", python=False)
@@ -236,22 +244,30 @@ def integration_tests(session: Session) -> None:
 
     def parser() -> ArgumentParser:
         p = ArgumentParser(
-            usage="nox -s integration-tests -- [-h] [--connector] [--db-version]",
+            usage="nox -s test:integration -- [-h] [--connector] [--db-version]",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         p.add_argument(
             "--connector",
-            choices=Settings.CONNECTORS,
-            default=Settings.CONNECTORS[0],
+            choices=PROJECT_CONFIG.connectors,
+            default=PROJECT_CONFIG.connectors[0],
             help="which will be used",
         )
         p.add_argument(
             "--db-version",
-            choices=Settings.DB_VERSIONS,
-            default=Settings.DB_VERSIONS[0],
+            choices=PROJECT_CONFIG.exasol_versions,
+            default=PROJECT_CONFIG.exasol_versions[0],
             help="which will be used",
         )
+        p.add_argument(
+            "--coverage",
+            action="store_true",
+            help="This is only here for compatibility. Coverage will always be collected.",
+        )
         return p
+
+    coverage_file = PROJECT_ROOT / ".coverage"
+    coverage_file.unlink(missing_ok=True)
 
     args = parser().parse_args(session.posargs)
     session.notify(
@@ -272,47 +288,6 @@ def integration_tests(session: Session) -> None:
     session.notify(find_session_runner(session, "db:stop"))
 
 
-@nox.session(python=False)
-def release(session: Session) -> None:
-    """Release a sqlalchemy-exasol package. For more details append '-- -h'"""
-
-    def create_parser() -> ArgumentParser:
-        p = ArgumentParser(
-            "Release a pypi package",
-            usage="nox -s release -- [-h] [-d]",
-        )
-        p.add_argument("-d", "--dry-run", action="store_true", help="just do a dry run")
-        return p
-
-    args = []
-    parser = create_parser()
-    cli_args = parser.parse_args(session.posargs)
-    if cli_args.dry_run:
-        args.append("--dry-run")
-
-    version_file = version_from_python_module(Settings.VERSION_FILE)
-    module_version = version_from_poetry()
-    git_version = version_from_string(list(tags())[-1])
-
-    if not (module_version == git_version == version_file):
-        session.error(
-            f"Versions out of sync, version file: {version_file}, poetry: {module_version}, tag: {git_version}."
-        )
-
-    session.run(
-        "poetry",
-        "build",
-        external=True,
-    )
-
-    session.run(
-        "poetry",
-        "publish",
-        *args,
-        external=True,
-    )
-
-
 @nox.session(name="test:skipped", python=False)
 def report_skipped(session: Session) -> None:
     """
@@ -321,7 +296,7 @@ def report_skipped(session: Session) -> None:
     Attention: This task expects a running test database (db-start).
     """
     with TemporaryDirectory() as tmp_dir:
-        for connector in Settings.CONNECTORS:
+        for connector in PROJECT_CONFIG.connectors:
             report = Path(tmp_dir) / f"test-report{connector}.json"
             with odbcconfig(ODBC_DRIVER) as (config, env):
                 session.run(
@@ -388,5 +363,38 @@ from exasol.toolbox.nox._documentation import (
     clean_docs,
     open_docs,
 )
+
+
+def _connector_matrix(config: Config):
+    CONNECTORS = ['websocket']
+    attr = "connectors"
+    connectors = getattr(config, attr, CONNECTORS)
+    if not hasattr(config, attr):
+        _log.warning(
+            "Config does not contain '%s' setting. Using default: %s",
+            attr,
+            CONNECTORS,
+        )
+    return {"connector": connectors}
+
+from exasol.toolbox.nox._ci import (
+    exasol_matrix,
+    python_matrix,
+)
+
+
+@nox.session(name="matrix:all", python=False)
+def full_matrix(session: Session) -> None:
+    """Output the full build matrix for Python & Exasol versions as JSON."""
+    import json
+
+    from exasol.toolbox.nox._ci import (
+        _exasol_matrix,
+        _python_matrix,
+    )
+    matrix = _python_matrix(PROJECT_CONFIG)
+    matrix.update(_exasol_matrix(PROJECT_CONFIG))
+    matrix.update(_connector_matrix(PROJECT_CONFIG))
+    print(json.dumps(matrix))
 
 # fmt: on

@@ -1,34 +1,31 @@
-name: GH-Pages
+name: Publish Documentation
+
 on:
-  push:
-    branches:
-      - master
-    tags:
-      - "*"
-    workflow_dispatch:
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+
+  documentation-job:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: SCM Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: ./.github/actions/python-environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
 
       - name: Build Documentation
         run: |
-          poetry run python -m nox -vvv -s docs:multiversion
-          touch .html-documentation/.nojekyll
+          poetry run nox -s docs:multiversion
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        uses: JamesIves/github-pages-deploy-action@v4.6.0
         with:
           branch: gh-pages
           folder: .html-documentation
           git-config-name: Github Action
           git-config-email: opensource@exasol.com
-

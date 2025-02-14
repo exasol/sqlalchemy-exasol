@@ -34,6 +34,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
         with:
           python-version: ${{ matrix.python-version }}
+          poetry-version: 2.0.1
 
       - name: Install via apt
         run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev

@@ -21,6 +21,8 @@ jobs:
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        with:
+          poetry-version: 2.0.1
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4.1.8

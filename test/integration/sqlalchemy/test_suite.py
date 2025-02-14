@@ -245,9 +245,9 @@ class LongNameBlowoutTest(_LongNameBlowoutTest):
         assert len(actual_name) > 255
 
         if reflected_name is not None:
-            overlap = actual_name[0: len(reflected_name)]
+            overlap = actual_name[0 : len(reflected_name)]
             if len(overlap) < len(actual_name):
-                eq_(overlap[0:-5], reflected_name[0: len(overlap) - 5])
+                eq_(overlap[0:-5], reflected_name[0 : len(overlap) - 5])
             else:
                 eq_(overlap, reflected_name)
 
@@ -265,11 +265,12 @@ class CompoundSelectTest(_CompoundSelectTest):
 
 
 class ExceptionTest(_ExceptionTest):
-    RATIONALE = "This is likely a driver issue. We will investigate it in " \
-                "https://github.com/exasol/sqlalchemy-exasol/issues/539."
+    RATIONALE = (
+        "This is likely a driver issue. We will investigate it in "
+        "https://github.com/exasol/sqlalchemy-exasol/issues/539."
+    )
 
-    @pytest.mark.xfail("odbc" in testing.db.dialect.driver,
-                       reason=RATIONALE)
+    @pytest.mark.xfail("odbc" in testing.db.dialect.driver, reason=RATIONALE)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error(self):
         # Note: autocommit currently is needed to force error evaluation,

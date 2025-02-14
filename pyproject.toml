@@ -10,7 +10,7 @@ packages = [
     { include = "sqlalchemy_exasol" },
     { include = "exasol" }
 ]
-version = "5.0.0"
+version = "5.1.0"
 description = "EXASOL dialect for SQLAlchemy"
 readme = "README.rst"
 authors = [
@@ -59,7 +59,7 @@ exclude = []
 
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.9.2,<4.0"
 packaging = ">=21.3"
 pyexasol = ">=0.26.0,<1"
 sqlalchemy = ">=1.4,<2"

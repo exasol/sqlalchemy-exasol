@@ -94,6 +94,7 @@ exasol-integration-test-docker-environment = "^3.1.0"
 pytest-history = ">=0.2.0"
 pyodbc = ">=4.0.34,<6"
 exasol-toolbox = "^0.20.0"
+pytest-exasol-backend = "^0.3.3"
 
 [tool.poetry.extras]
 pyodbc = ["pyodbc"]

@@ -19,8 +19,7 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
                 user="{config.username}",
                 pw="{config.password}",
                 host="{config.host}",
-                port={config.port},
-                schema="TEST",
+                port={config.port}
             )
             engine = create_engine(url)
             query = "SELECT 42;"

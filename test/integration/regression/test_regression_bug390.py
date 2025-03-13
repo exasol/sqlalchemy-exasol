@@ -14,7 +14,7 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
         from sqlalchemy import create_engine
         
         def test():
-            url = "exa+websocket://{{user}}:{{pw}}@{{host}}:{{port}}/{{schema}}?SSLCertificate=SSL_VERIFY_NONE"
+            url = "exa+websocket://{{user}}:{{pw}}@{{host}}:{{port}}?SSLCertificate=SSL_VERIFY_NONE"
             url = url.format(
                 user="{config.username}",
                 pw="{config.password}",

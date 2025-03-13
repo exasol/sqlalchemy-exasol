@@ -93,7 +93,6 @@ rich = "^13.3.1"
 exasol-integration-test-docker-environment = "^3.1.0"
 pytest-history = ">=0.2.0"
 pyodbc = ">=4.0.34,<6"
-pytest-exasol-itde = ">=0.2.0,<1"
 exasol-toolbox = "^0.20.0"
 
 [tool.poetry.extras]

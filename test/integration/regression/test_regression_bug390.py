@@ -10,31 +10,26 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
     pytester.makepyfile(
         # fmt: off
         cleandoc(
-            f"""
-        # import warnings
-        # 
-        # warnings.filterwarnings("ignore", category=ResourceWarning)
-        #                         
-        # from sqlalchemy import create_engine
-        # 
+            f"""                                
+        from sqlalchemy import create_engine
+        
         def test():
-            pass
-            # url = "exa+websocket://{{user}}:{{pw}}@{{host}}:{{port}}?SSLCertificate=SSL_VERIFY_NONE"
-            # url = url.format(
-            #     user="{config.username}",
-            #     pw="{config.password}",
-            #     host="{config.host}",
-            #     port={config.port}
-            # )
-            # engine = create_engine(url)
-            # query = "SELECT 42;"
-            # with engine.connect() as con:
-            #     result = con.execute(query).fetchall()
+            url = "exa+websocket://{{user}}:{{pw}}@{{host}}:{{port}}?SSLCertificate=SSL_VERIFY_NONE"
+            url = url.format(
+                user="{config.username}",
+                pw="{config.password}",
+                host="{config.host}",
+                port={config.port}
+            )
+            engine = create_engine(url)
+            query = "SELECT 42;"
+            with engine.connect() as con:
+                result = con.execute(query).fetchall()
         """
         ),
         # fmt: on
     )
-    r = pytester.runpytest_subprocess()
+    r = pytester.runpytest_subprocess("--disable-warnings")
     expected = ""
     actual = str(r.stderr)
 

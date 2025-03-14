@@ -13,8 +13,7 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
             f"""
         import warnings
 
-        warnings.filterwarnings("ignore", category=ResourceWarning,
-                                module="importlib._bootstrap_external")
+        warnings.filterwarnings("ignore", category=ResourceWarning)
                                 
         from sqlalchemy import create_engine
         

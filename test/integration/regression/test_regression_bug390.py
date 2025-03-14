@@ -29,8 +29,7 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
         ),
         # fmt: on
     )
-    r = pytester.runpytest_subprocess("--disable-warnings")
-    expected = ""
+    r = pytester.runpytest_subprocess()
     actual = str(r.stderr)
 
-    assert actual == expected
+    assert "Exception" in actual

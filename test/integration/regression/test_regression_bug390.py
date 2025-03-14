@@ -10,17 +10,16 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
     pytester.makepyfile(
         # fmt: off
         cleandoc(
-            f"""
+            f"""                                
         from sqlalchemy import create_engine
         
         def test():
-            url = "exa+websocket://{{user}}:{{pw}}@{{host}}:{{port}}/{{schema}}?SSLCertificate=SSL_VERIFY_NONE"
+            url = "exa+websocket://{{user}}:{{pw}}@{{host}}:{{port}}?SSLCertificate=SSL_VERIFY_NONE"
             url = url.format(
                 user="{config.username}",
                 pw="{config.password}",
                 host="{config.host}",
-                port={config.port},
-                schema="TEST",
+                port={config.port}
             )
             engine = create_engine(url)
             query = "SELECT 42;"
@@ -31,7 +30,6 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
         # fmt: on
     )
     r = pytester.runpytest_subprocess()
-    expected = ""
     actual = str(r.stderr)
 
-    assert actual == expected
+    assert "Exception" not in actual

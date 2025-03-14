@@ -32,4 +32,4 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
     r = pytester.runpytest_subprocess()
     actual = str(r.stderr)
 
-    assert "Exception" in actual
+    assert "Exception" not in actual

@@ -20,7 +20,7 @@ jobs:
 
       - name: Check Version(s)
         run: |
-          poetry run version-check `poetry run python -c "from noxconfig import PROJECT_CONFIG; print(PROJECT_CONFIG.version_file)"`
+          poetry run version-check `poetry run -- python -c "from noxconfig import PROJECT_CONFIG; print(PROJECT_CONFIG.version_file)"`
 
   Documentation:
     name: Docs

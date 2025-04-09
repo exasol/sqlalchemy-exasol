@@ -7,16 +7,14 @@ jobs:
   check-tag-version-job:
 
     name: Check Tag Version
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
-        with:
-          poetry-version: 2.0.1
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
 
       - name: Check Tag Version
         # make sure the pushed/created tag matched the project version

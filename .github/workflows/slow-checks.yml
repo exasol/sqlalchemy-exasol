@@ -2,9 +2,6 @@ name: Slow-Checks
 
 on:
   workflow_call:
-    secrets:
-      ALTERNATIVE_GITHUB_TOKEN:
-        required: false
 
 jobs:
 
@@ -15,13 +12,13 @@ jobs:
   Tests:
     name: Integration-Tests (${{matrix.connector}}, Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
     needs: [ build-matrix ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Even though the environment "manual-approval" will be created automatically,
     # it still needs to be configured to require interactive review.
     # See project settings on GitHub (Settings / Environments / manual-approval).
     environment: manual-approval
     env:
-      GITHUB_TOKEN: ${{ secrets.ALTERNATIVE_GITHUB_TOKEN ||  secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
@@ -31,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
         with:
           python-version: ${{ matrix.python-version }}
           poetry-version: 2.0.1
@@ -40,10 +37,10 @@ jobs:
         run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
 
       - name: Run Tests and Collect Coverage
-        run: poetry run nox -s test:integration -- -- --coverage --db-version ${{ matrix.exasol-version }}
+        run: poetry run -- nox -s test:integration -- --coverage --db-version ${{ matrix.exasol-version }}
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: coverage-python${{ matrix.python-version }}-${{matrix.connector}}-slow
           path: .coverage

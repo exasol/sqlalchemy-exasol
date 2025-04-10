@@ -37,6 +37,9 @@ from exasol.odbc import (
     odbcconfig,
 )
 
+# imports all nox task provided by the toolbox
+from exasol.toolbox.nox.tasks import *  # type: ignore
+
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]
 
@@ -57,37 +60,6 @@ def _python_files(path: Path) -> Iterator[Path]:
     files = filter(lambda path: ".eggs" not in path.parts, files)
     files = filter(lambda path: "venv" not in path.parts, files)
     return files
-
-
-from exasol.toolbox.nox._format import (
-    Mode,
-    _code_format,
-    _pyupgrade,
-    _version,
-    fix,
-)
-
-
-@nox.session(name="project:check", python=False)
-def check(session: Session) -> None:
-    """Runs all available checks on the project"""
-    from exasol.toolbox.nox._lint import (
-        _pylint,
-        _type_check,
-    )
-
-    py_files = [f"{file}" for file in _python_files(PROJECT_CONFIG.root)]
-    _version(session, Mode.Check, PROJECT_CONFIG.version_file)
-    _code_format(session, Mode.Check, py_files)
-    _pylint(session, py_files)
-    _type_check(session, py_files)
-
-
-from exasol.toolbox.nox._lint import (
-    lint,
-    type_check,
-)
-from exasol.toolbox.nox._metrics import report
 
 
 @nox.session(name="db:start", python=False)

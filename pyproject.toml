@@ -1,24 +1,40 @@
+[project]
+name = "sqlalchemy_exasol"
+version = "5.1.0"
+description = "EXASOL dialect for SQLAlchemy"
+authors = [
+    {name="Exasol AG", email="opensource@exasol.com"},
+    {name="Blue Yonder GmbH"},
+]
+readme = "README.rst"
+license = "BSD"
+keywords = [
+    "exasol",
+    "sql",
+    "sqlalchemy",
+    "data science",
+    "database",
+]
+dynamic = ["classifiers"]
+
+[project.urls]
+Homepage = "https://www.exasol.com/"
+Documentation = "https://exasol.github.io/sqlalchemy-exasol/"
+Source = "https://github.com/exasol/sqlalchemy-exasol"
+Issues = "https://github.com/exasol/sqlalchemy-exasol/issues"
+Changelog = "https://exasol.github.io/sqlalchemy-exasol/changelog.html"
+
 [build-system]
 requires = [
-    "poetry>=1.0.0",
+    "poetry>=2.0.0",
 ]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "sqlalchemy_exasol"
 packages = [
     { include = "sqlalchemy_exasol" },
     { include = "exasol" }
 ]
-version = "5.1.0"
-description = "EXASOL dialect for SQLAlchemy"
-readme = "README.rst"
-authors = [
-    "Exasol AG <opensource@exasol.com>",
-    "Blue Yonder GmbH",
-]
-license = "BSD"
-
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Operating System :: POSIX :: Linux",
@@ -36,26 +52,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Scientific/Engineering :: Information Analysis",
 ]
-keywords = [
-    "exasol",
-    "sql",
-    "sqlalchemy",
-    "data science",
-    "database",
-]
 include = [
     "README.rst",
     "CHANGELOG.rst",
     "LICENSE",
 ]
 exclude = []
-
-[tool.poetry.urls]
-"Homepage" = "https://www.exasol.com/"
-"Documentation" = "https://exasol.github.io/sqlalchemy-exasol/"
-"Source" = "https://github.com/exasol/sqlalchemy-exasol"
-"Issues" = "https://github.com/exasol/sqlalchemy-exasol/issues"
-"Changelog" = "https://exasol.github.io/sqlalchemy-exasol/changelog.html"
 
 
 [tool.poetry.dependencies]
@@ -64,13 +66,12 @@ packaging = ">=21.3"
 pyexasol = ">=0.26.0,<1"
 sqlalchemy = ">=1.4,<2"
 
-[tool.poetry.dependencies.turbodbc]
-version = "==4.5.4"
-optional = true
+turbodbc = { version = "==4.5.4", optional = true }
+pyodbc = { version = ">=4.0.34,<6", optional = true }
 
-[tool.poetry.dependencies.pyodbc]
-version = ">=4.0.34,<6"
-optional = true
+[tool.poetry.extras]
+pyodbc = ["pyodbc"]
+turbodbc = ["turbodbc"]
 
 [tool.poetry.group.dev.dependencies]
 nox = ">=2022.1.7"
@@ -93,12 +94,8 @@ rich = "^13.3.1"
 exasol-integration-test-docker-environment = "^3.1.0"
 pytest-history = ">=0.2.0"
 pyodbc = ">=4.0.34,<6"
-exasol-toolbox = "^0.20.0"
-pytest-exasol-backend = "^0.3.3"
-
-[tool.poetry.extras]
-pyodbc = ["pyodbc"]
-turbodbc = ["turbodbc"]
+pytest-exasol-backend = ">=0.3.3,<1"
+exasol-toolbox = "^1.0.0"
 
 [tool.poetry.plugins."sqlalchemy.dialects"]
 "exa.pyodbc" = "sqlalchemy_exasol.pyodbc:EXADialect_pyodbc"
@@ -134,9 +131,8 @@ max-module-lines = 800
 module = [
     "noxfile",
     "noxconfig",
-    "sqlalchemy_exasol.*", 
+    "sqlalchemy_exasol.*",
     "exasol.odbc",
     "test.*",
 ]
 ignore_errors = true
-

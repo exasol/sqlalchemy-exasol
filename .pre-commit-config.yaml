@@ -16,7 +16,7 @@ repos:
           types: [python]
           pass_filenames: false
           language: system
-          entry: poetry run python -m nox -s isort
+          entry: poetry run -- python -m nox -s isort
 
 -   repo: local
     hooks:
@@ -25,7 +25,7 @@ repos:
           types: [python]
           pass_filenames: false
           language: system
-          entry: poetry run python -m nox -s pyupgrade
+          entry: poetry run -- python -m nox -s pyupgrade
 
 -   repo: local
     hooks:
@@ -34,7 +34,7 @@ repos:
           types: [python]
           pass_filenames: false
           language: system
-          entry: poetry run python -m nox -s code-format
+          entry: poetry run -- python -m nox -s code-format
 
 -   repo: local
     hooks:
@@ -43,7 +43,7 @@ repos:
           types: [python]
           pass_filenames: false
           language: system
-          entry: poetry run python -m nox -s type-check
+          entry: poetry run -- python -m nox -s type-check
 
 -   repo: local
     hooks:
@@ -52,4 +52,4 @@ repos:
           types: [python]
           pass_filenames: false
           language: system
-          entry: poetry run python -m nox -s lint
+          entry: poetry run -- python -m nox -s lint

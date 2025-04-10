@@ -8,8 +8,8 @@ If you want to engage in development of this project you should have the followi
 
 Tools
 +++++
-* python_ >= 3.8
-* poetry_ >= 1.1.0
+* python_
+* poetry_
 * git_
 * Docker_
 * integration-test-docker-environment_

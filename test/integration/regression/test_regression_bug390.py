@@ -32,4 +32,14 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
     r = pytester.runpytest_subprocess()
     actual = str(r.stderr)
 
+    # We can't assert here actual != "", because runpytest_subprocess prints warnings
+    # that can't be caught for Python 3.13 independent of the backend (pyodbc, turboodbc, websockets)
+    # since we moved from pytest-itde plugin to the pytest-backend plugin.
+    # The warnings look like the following:
+    #   <frozen importlib._bootstrap_external>:784: ResourceWarning: unclosed database in
+    #   <sqlite3.Connection object at 0x7faa81955b70>
+    #   ResourceWarning: Enable tracemalloc to get the object allocation traceback
+    #
+    # One possible reason could be that pytest-backend the integration-test-docker-environment
+    # asynchronous in a subprocess starts.
     assert "Exception" not in actual

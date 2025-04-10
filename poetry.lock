@@ -3341,6 +3341,7 @@ description = "turbodbc is a Python DB API 2.0 compatible ODBC driver"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"turbodbc\""
 files = [
     {file = "turbodbc-4.5.4.tar.gz", hash = "sha256:ceb717749cc85f845d2564bfdb993480428bbc32bf80464c1ddb34a1b419ae7f"},
 ]
@@ -3599,7 +3600,11 @@ enabler = ["pytest-enabler (>=2.2)"]
 test = ["big-O", "importlib-resources ; python_version < \"3.9\"", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-itertools", "pytest (>=6,!=8.1.*)", "pytest-ignore-flaky"]
 type = ["pytest-mypy"]
 
+[extras]
+pyodbc = ["pyodbc"]
+turbodbc = ["turbodbc"]
+
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.2,<4.0"
-content-hash = "997307737c3642c1e3a7c68c35cfdbd8b8bcaf3b6b0994b89e5894231df2a625"
+content-hash = "dbeb8c8387994be17593be511409fcbd274a66844673a0183bc2d752a609c0f5"

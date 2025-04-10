@@ -69,6 +69,10 @@ sqlalchemy = ">=1.4,<2"
 turbodbc = { version = "==4.5.4", optional = true }
 pyodbc = { version = ">=4.0.34,<6", optional = true }
 
+[tool.poetry.extras]
+pyodbc = ["pyodbc"]
+turbodbc = ["turbodbc"]
+
 [tool.poetry.group.dev.dependencies]
 nox = ">=2022.1.7"
 urlscan = ">=0.9.9"

@@ -10,16 +10,14 @@ jobs:
 
   cd-job:
     name: Continuous Delivery
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
 
       - name: SCM Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
-        with:
-          poetry-version: 2.0.1
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
 
       - name: Build Artifacts
         run: poetry build

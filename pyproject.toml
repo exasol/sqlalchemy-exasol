@@ -94,7 +94,7 @@ rich = "^13.3.1"
 exasol-integration-test-docker-environment = "^3.1.0"
 pytest-history = ">=0.2.0"
 pyodbc = ">=4.0.34,<6"
-pytest-exasol-itde = ">=0.2.0,<1"
+pytest-exasol-backend = ">=0.3.3,<1"
 exasol-toolbox = "^1.0.0"
 
 [tool.poetry.plugins."sqlalchemy.dialects"]

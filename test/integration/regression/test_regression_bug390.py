@@ -40,6 +40,6 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
     #   <sqlite3.Connection object at 0x7faa81955b70>
     #   ResourceWarning: Enable tracemalloc to get the object allocation traceback
     #
-    # One possible reason could be that pytest-backend the integration-test-docker-environment
-    # asynchronous in a subprocess starts.
+    # One possible reason could be that pytest-backend starts the integration-test-docker-environment
+    # asynchronous in a subprocess.
     assert "Exception" not in actual

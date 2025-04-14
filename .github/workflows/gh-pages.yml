@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.0.1
 
       - name: Build Documentation
         run: |

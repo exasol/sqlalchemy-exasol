@@ -15,7 +15,6 @@ DOC_BUILD = DOC / "build"
 sys.path.append(f"{SCRIPTS}")
 # fmt: on
 
-from typing import Iterator
 
 import nox
 from git_helpers import tags
@@ -51,13 +50,6 @@ def find_session_runner(session: Session, name: str) -> SessionRunner:
         if name in s.signatures:
             return s
     session.error(f"Could not find a nox session by the name {name!r}")
-
-
-def _python_files(path: Path) -> Iterator[Path]:
-    files = filter(lambda path: "dist" not in path.parts, PROJECT_ROOT.glob("**/*.py"))
-    files = filter(lambda path: ".eggs" not in path.parts, files)
-    files = filter(lambda path: "venv" not in path.parts, files)
-    return files
 
 
 @nox.session(name="db:start", python=False)
@@ -306,7 +298,7 @@ def check_links(session: Session) -> None:
 
 
 def _connector_matrix(config: Config):
-    CONNECTORS = ['websocket']
+    CONNECTORS = ["websocket"]
     attr = "connectors"
     connectors = getattr(config, attr, CONNECTORS)
     if not hasattr(config, attr):
@@ -327,8 +319,8 @@ def full_matrix(session: Session) -> None:
         _exasol_matrix,
         _python_matrix,
     )
+
     matrix = _python_matrix(PROJECT_CONFIG)
     matrix.update(_exasol_matrix(PROJECT_CONFIG))
     matrix.update(_connector_matrix(PROJECT_CONFIG))
     print(json.dumps(matrix))
-

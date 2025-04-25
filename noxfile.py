@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
@@ -41,7 +42,12 @@ from exasol.toolbox.nox.tasks import *  # type: ignore
 nox.options.sessions = ["project:fix"]
 
 
-from noxconfig import PROJECT_CONFIG
+from noxconfig import (
+    PROJECT_CONFIG,
+    Config,
+)
+
+_log = logging.getLogger(__name__)
 
 
 def find_session_runner(session: Session, name: str) -> SessionRunner:

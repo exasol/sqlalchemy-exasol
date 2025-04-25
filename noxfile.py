@@ -339,11 +339,6 @@ def _connector_matrix(config: Config):
         )
     return {"connector": connectors}
 
-from exasol.toolbox.nox._ci import (
-    exasol_matrix,
-    python_matrix,
-)
-
 
 @nox.session(name="matrix:all", python=False)
 def full_matrix(session: Session) -> None:
@@ -359,4 +354,3 @@ def full_matrix(session: Session) -> None:
     matrix.update(_connector_matrix(PROJECT_CONFIG))
     print(json.dumps(matrix))
 
-# fmt: on

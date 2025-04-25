@@ -8,4 +8,5 @@
 ## 🧰 Internal
 
 - #548: Replaced pytest-exasol-itde with pytest-backend
+- Replaced nox test:unit with that from exasol-toolbox
 

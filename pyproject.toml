@@ -25,12 +25,11 @@ Issues = "https://github.com/exasol/sqlalchemy-exasol/issues"
 Changelog = "https://exasol.github.io/sqlalchemy-exasol/changelog.html"
 
 [build-system]
-requires = [
-    "poetry>=2.0.0",
-]
+requires = ["poetry_core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
+requires-poetry = ">=2.1.0"
 packages = [
     { include = "sqlalchemy_exasol" },
     { include = "exasol" }

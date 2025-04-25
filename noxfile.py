@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import argparse
 import sys
-import webbrowser
 from argparse import ArgumentParser
 from pathlib import Path
-from shutil import rmtree
 from tempfile import TemporaryDirectory
 
 # fmt: off

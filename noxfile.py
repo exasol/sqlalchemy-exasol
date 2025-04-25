@@ -18,7 +18,6 @@ sys.path.append(f"{SCRIPTS}")
 
 
 import nox
-from git_helpers import tags
 from links import check as _check
 from links import documentation as _documentation
 from links import urls as _urls

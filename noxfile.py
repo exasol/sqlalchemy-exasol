@@ -23,11 +23,6 @@ from links import documentation as _documentation
 from links import urls as _urls
 from nox import Session
 from nox.sessions import SessionRunner
-from version_check import (
-    version_from_poetry,
-    version_from_python_module,
-    version_from_string,
-)
 
 from exasol.odbc import (
     ODBC_DRIVER,

@@ -18,9 +18,6 @@ sys.path.append(f"{SCRIPTS}")
 
 
 import nox
-from links import check as _check
-from links import documentation as _documentation
-from links import urls as _urls
 from nox import Session
 from nox.sessions import SessionRunner
 
@@ -31,6 +28,9 @@ from exasol.odbc import (
 
 # imports all nox task provided by the toolbox
 from exasol.toolbox.nox.tasks import *  # type: ignore
+from scripts.links import check as _check
+from scripts.links import documentation as _documentation
+from scripts.links import urls as _urls
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]

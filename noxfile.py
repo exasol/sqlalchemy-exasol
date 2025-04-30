@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
-import webbrowser
 from argparse import ArgumentParser
 from pathlib import Path
-from shutil import rmtree
 from tempfile import TemporaryDirectory
 
 # fmt: off
@@ -17,20 +16,10 @@ DOC_BUILD = DOC / "build"
 sys.path.append(f"{SCRIPTS}")
 # fmt: on
 
-from typing import Iterator
 
 import nox
-from git_helpers import tags
-from links import check as _check
-from links import documentation as _documentation
-from links import urls as _urls
 from nox import Session
 from nox.sessions import SessionRunner
-from version_check import (
-    version_from_poetry,
-    version_from_python_module,
-    version_from_string,
-)
 
 from exasol.odbc import (
     ODBC_DRIVER,
@@ -39,12 +28,20 @@ from exasol.odbc import (
 
 # imports all nox task provided by the toolbox
 from exasol.toolbox.nox.tasks import *  # type: ignore
+from scripts.links import check as _check
+from scripts.links import documentation as _documentation
+from scripts.links import urls as _urls
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]
 
 
-from noxconfig import PROJECT_CONFIG
+from noxconfig import (
+    PROJECT_CONFIG,
+    Config,
+)
+
+_log = logging.getLogger(__name__)
 
 
 def find_session_runner(session: Session, name: str) -> SessionRunner:
@@ -53,13 +50,6 @@ def find_session_runner(session: Session, name: str) -> SessionRunner:
         if name in s.signatures:
             return s
     session.error(f"Could not find a nox session by the name {name!r}")
-
-
-def _python_files(path: Path) -> Iterator[Path]:
-    files = filter(lambda path: "dist" not in path.parts, PROJECT_ROOT.glob("**/*.py"))
-    files = filter(lambda path: ".eggs" not in path.parts, files)
-    files = filter(lambda path: "venv" not in path.parts, files)
-    return files
 
 
 @nox.session(name="db:start", python=False)
@@ -156,16 +146,6 @@ def sqlalchemy_tests(session: Session) -> None:
             external=True,
             env=env,
         )
-
-
-@nox.session(name="test:unit", python=False)
-def unit_tests(session: Session) -> None:
-    """Run the unit tests"""
-    session.run(
-        "pytest",
-        f"{PROJECT_ROOT / 'test' / 'unit'}",
-        external=True,
-    )
 
 
 @nox.session(name="test:exasol", python=False)
@@ -294,17 +274,6 @@ def report_skipped(session: Session) -> None:
                 )
 
 
-# fmt: off
-from exasol.toolbox.nox._documentation import (
-    build_docs,
-    build_multiversion,
-    clean_docs,
-    open_docs,
-)
-
-# fmt: on
-
-
 @nox.session(name="docs:links", python=False)
 def list_links(session: Session) -> None:
     """List all the links within the documentation."""
@@ -328,17 +297,8 @@ def check_links(session: Session) -> None:
         )
 
 
-# fmt: off
-from exasol.toolbox.nox._documentation import (
-    build_docs,
-    build_multiversion,
-    clean_docs,
-    open_docs,
-)
-
-
 def _connector_matrix(config: Config):
-    CONNECTORS = ['websocket']
+    CONNECTORS = ["websocket"]
     attr = "connectors"
     connectors = getattr(config, attr, CONNECTORS)
     if not hasattr(config, attr):
@@ -348,11 +308,6 @@ def _connector_matrix(config: Config):
             CONNECTORS,
         )
     return {"connector": connectors}
-
-from exasol.toolbox.nox._ci import (
-    exasol_matrix,
-    python_matrix,
-)
 
 
 @nox.session(name="matrix:all", python=False)
@@ -364,9 +319,8 @@ def full_matrix(session: Session) -> None:
         _exasol_matrix,
         _python_matrix,
     )
+
     matrix = _python_matrix(PROJECT_CONFIG)
     matrix.update(_exasol_matrix(PROJECT_CONFIG))
     matrix.update(_connector_matrix(PROJECT_CONFIG))
     print(json.dumps(matrix))
-
-# fmt: on

@@ -191,7 +191,7 @@ def regression_tests(session: Session) -> None:
 
 
 @nox.session(name="test:integration", python=False)
-def integration_tests(session: Session) -> None:
+def integration_tests_for_sqlalchemy_exasol(session: Session) -> None:
     """Run integration tests with a specific configuration. For more details append '-- -h'"""
 
     def parser() -> ArgumentParser:

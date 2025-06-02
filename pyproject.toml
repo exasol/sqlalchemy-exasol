@@ -117,10 +117,12 @@ max-module-lines = 800
 
 [[tool.mypy.overrides]]
 module = [
-    "noxfile",
-    "noxconfig",
-    "sqlalchemy_exasol.*",
     "exasol.odbc",
+    "sqlalchemy_exasol.base",
+    "sqlalchemy_exasol.pyodbc",
+    # not supporting mypy > 1.10.0; https://docs.sqlalchemy.org/en/20/orm/extensions/mypy.html
+    "sqlalchemy.*",
     "test.*",
 ]
 ignore_errors = true
+follow_untyped_imports = true

@@ -7,7 +7,7 @@ from sqlalchemy_exasol.version import VERSION
 __version__ = VERSION
 
 # default dialect
-base.dialect = pyodbc.dialect # type: ignore
+base.dialect = pyodbc.dialect  # type: ignore
 
 __all__ = (
     "BLOB",

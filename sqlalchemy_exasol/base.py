@@ -56,7 +56,9 @@ from sqlalchemy import (
     sql,
 )
 from sqlalchemy import types as sqltypes
-from sqlalchemy import util
+from sqlalchemy import (
+    util,
+)
 from sqlalchemy.engine import (
     default,
     reflection,

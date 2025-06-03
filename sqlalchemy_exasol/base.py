@@ -48,11 +48,6 @@ representation (all uppercase).
 import logging
 import re
 from contextlib import closing
-from datetime import (
-    date,
-    datetime,
-)
-from decimal import Decimal
 
 import sqlalchemy.exc
 from sqlalchemy import (
@@ -551,7 +546,8 @@ ischema_names = {
     "CLOB": sqltypes.TEXT,
     "DATE": sqltypes.DATE,
     "DECIMAL": sqltypes.DECIMAL,
-    "DOUBLE": sqltypes.FLOAT,  # EXASOL mapps DOUBLE, DOUBLE PRECISION, FLOAT to DOUBLE PRECISION
+    "DOUBLE": sqltypes.FLOAT,
+    # EXASOL mapps DOUBLE, DOUBLE PRECISION, FLOAT to DOUBLE PRECISION
     # internally but returns 'DOUBLE' as type when asking the DB catalog
     # INTERVAL DAY [(p)] TO SECOND [(fp)] TODO: missing support for EXA Datatype, check Oracle Engine
     # INTERVAL YEAR[(p)] TO MONTH         TODO: missing support for EXA Datatype, check Oracle Engine

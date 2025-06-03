@@ -1,10 +1,12 @@
 import subprocess
 import urllib.error
+from collections.abc import (
+    Container,
+    Iterable,
+)
 from itertools import repeat
 from pathlib import Path
 from typing import (
-    Container,
-    Iterable,
     Optional,
     Tuple,
 )
@@ -21,7 +23,7 @@ def documentation(root: Path) -> Iterable[Path]:
     return filter(lambda path: _deny_filter(path), docs)
 
 
-def urls(files: Iterable[Path]) -> Iterable[Tuple[Path, str]]:
+def urls(files: Iterable[Path]) -> Iterable[tuple[Path, str]]:
     """Returns an iterable over all urls contained in the provided files"""
 
     def should_filter(url: str) -> bool:
@@ -41,7 +43,7 @@ def urls(files: Iterable[Path]) -> Iterable[Tuple[Path, str]]:
         yield from zip(repeat(file), filter(lambda url: not should_filter(url), _urls))
 
 
-def check(url: str) -> Tuple[Optional[int], str]:
+def check(url: str) -> tuple[Optional[int], str]:
     """Checks if an url is still working (can be accessed)"""
     try:
         # User-Agent needs to be faked otherwise some webpages will deny access with a 403

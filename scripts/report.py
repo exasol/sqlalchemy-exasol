@@ -7,11 +7,13 @@ from argparse import (
     FileType,
 )
 from collections import namedtuple
+from collections.abc import (
+    Generator,
+    Iterable,
+)
 from typing import (
     Any,
     Dict,
-    Generator,
-    Iterable,
     TextIO,
 )
 
@@ -27,7 +29,7 @@ Test = namedtuple(
 )
 
 
-def skipped_test_from(obj: Dict[str, Any]) -> Test:
+def skipped_test_from(obj: dict[str, Any]) -> Test:
     for stage in ("setup", "call", "teardown"):
         try:
             filename, _, details = eval(obj[stage]["longrepr"])
@@ -74,7 +76,7 @@ def _human(tests: Iterable[Test], output: TextIO) -> None:
 def _csv(tests: Iterable[Test], output: TextIO) -> None:
     fields = ("test-case", "status", "details")
 
-    def test_to_entry(t: Test) -> Dict[str, Any]:
+    def test_to_entry(t: Test) -> dict[str, Any]:
         return {
             "test-case": t.nodeid,
             "status": t.outcome,
@@ -88,7 +90,7 @@ def _csv(tests: Iterable[Test], output: TextIO) -> None:
 
 
 def main(
-    test_results: str, output: TextIO, format: str, **kwargs: Dict[str, Any]
+    test_results: str, output: TextIO, format: str, **kwargs: dict[str, Any]
 ) -> int:
     skipped_tests = all_skipped_tests(test_results)
     dispatcher = {"human": _human, "csv": _csv}

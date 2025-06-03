@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import os
-from contextlib import contextmanager
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from textwrap import dedent
-from typing import (
+from collections.abc import (
     Iterable,
     Iterator,
     MutableMapping,
 )
+from contextlib import contextmanager
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from textwrap import dedent
 
 from pyodbc import Connection
 

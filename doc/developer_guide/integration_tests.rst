@@ -60,7 +60,7 @@ This workflow will be executed anytime there's a commit pushed to any branch tha
 
 To run it just commit and push to any non-master branch and watch the workflow run in:
 
-`<https://github.com/exasol/sqlalchemy_exasol/actions>`_
+`<https://github.com/exasol/sqlalchemy-exasol/actions>`_
 
 CI-CD
 -----
@@ -75,6 +75,6 @@ This workflow will be executed anytime there's a commit pushed to **master**, or
 
 To run it just commit and push to master (*Optional:* push a tag in case you want PyPI upload) and watch the workflow run in:
 
-`<https://github.com/exasol/sqlalchemy_exasol/actions>`_
+`<https://github.com/exasol/sqlalchemy-exasol/actions>`_
 
 The status of the CI-CD workflow will always be reflected in the badge called "build" in the README.rst and Home Page of this repository

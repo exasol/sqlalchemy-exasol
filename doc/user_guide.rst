@@ -8,7 +8,7 @@ SQLAlchemy-Exasol is a dialect extension for SQLAlchemy, implementing support fo
 Getting Started
 ~~~~~~~~~~~~~~~
 
-#. Install the `SQLAlchemy-Exasol extension <https://pypi.org/project/sqlalchemy-exasol/>`_
+#. Install the `SQLAlchemy-Exasol extension <https://pypi.org/project/sqlalchemy_exasol/>`_
 
     .. code-block:: shell
 

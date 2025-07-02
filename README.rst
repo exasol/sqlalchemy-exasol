@@ -2,16 +2,16 @@ SQLAlchemy Dialect for EXASOL DB
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-.. image:: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml/badge.svg?branch=master&event=push
-    :target: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/ci-cd.yml
+.. image:: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/pr-merge.yml/badge.svg?branch=master&event=push
+    :target: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/pr-merge.yml
      :alt: CI Status
 
 .. image:: https://img.shields.io/pypi/v/sqlalchemy_exasol
-     :target: https://pypi.org/project/sqlalchemy-exasol/
+     :target: https://pypi.org/project/sqlalchemy_exasol/
      :alt: PyPI Version
 
 .. image:: https://img.shields.io/pypi/pyversions/sqlalchemy-exasol
-    :target: https://pypi.org/project/sqlalchemy-exasol
+    :target: https://pypi.org/project/sqlalchemy_exasol
     :alt: PyPI - Python Version
 
 .. image:: https://img.shields.io/badge/exasol-7.1.9%20%7C%207.0.18-green
@@ -27,19 +27,19 @@ SQLAlchemy Dialect for EXASOL DB
     :alt: Formatter - Isort
 
 .. image:: https://img.shields.io/badge/pylint-5.9-yellow
-    :target: https://github.com/PyCQA/pylint
+    :target: https://github.com/pylint-dev/pylint
     :alt: Pylint
 
 .. image:: https://img.shields.io/pypi/l/sqlalchemy-exasol
-     :target: https://opensource.org/licenses/BSD-2-Clause
+     :target: https://opensource.org/license/BSD-2-Clause
      :alt: License
 
 .. image:: https://img.shields.io/github/last-commit/exasol/sqlalchemy-exasol
-     :target: https://pypi.org/project/sqlalchemy-exasol/
+     :target: https://pypi.org/project/sqlalchemy_exasol/
      :alt: Last Commit
 
 .. image:: https://img.shields.io/pypi/dm/sqlalchemy-exasol
-    :target: https://pypi.org/project/sqlalchemy-exasol
+    :target: https://pypi.org/project/sqlalchemy_exasol
     :alt: PyPI - Downloads
 
 

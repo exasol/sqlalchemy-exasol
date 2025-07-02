@@ -6,6 +6,6 @@
 
 ## 🐞 Fixed
 
-- Fixed performance problems for large tables/databases. For more details see [PR](https://github.com/blue-yonder/sqlalchemy_exasol/pull/101)
+- Fixed performance problems for large tables/databases. For more details see [PR](https://github.com/exasol/sqlalchemy-exasol/pull/101)
 
 

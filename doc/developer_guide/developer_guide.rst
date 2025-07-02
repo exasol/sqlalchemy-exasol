@@ -217,7 +217,7 @@ For more general information on, why and for whom to create a changelog, have a
 look at keepachangelog_.
 
 .. _keepachangelog: https://keepachangelog.com/en/1.1.0/
-.. _action: https://github.com/exasol/sqlalchemy_exasol/actions
+.. _action: https://github.com/exasol/sqlalchemy-exasol/actions
 .. _python: https://www.python.org/
 .. _poetry: https://python-poetry.org/
 .. _git: https://git-scm.com/

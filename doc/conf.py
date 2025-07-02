@@ -76,3 +76,15 @@ html_theme_options = {
     "github_url": "https://github.com/exasol/sqlalchemy-exasol",
     "accent_color": "grass",
 }
+# -- Configure link checking behavior  ----------------------------------------
+linkcheck_rate_limit_timeout = 60
+linkcheck_timeout = 15
+linkcheck_delay = 30
+linkcheck_retries = 2
+linkcheck_anchors = False
+linkcheck_ignore: list[str] = []
+linkcheck_allowed_redirects = {
+    # All HTTP redirections from the source URI to
+    # the canonical URI will be treated as "working".
+    r"https://github\.com/.*": r"https://github\.com/login*"
+}

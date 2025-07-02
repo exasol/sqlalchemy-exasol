@@ -7,3 +7,4 @@
 - - Relocked dependencies to resolve CVE-2025-43859
 - #564: Replaced nox test:unit with that from exasol-toolbox
 - Reformatted files to meet project specifications
+- #588: Updated to exasol-toolbox 1.6.0 and relocked dependencies to resolve CVE-2025-50182, CVE-2025-50181, & CVE-2024-47081

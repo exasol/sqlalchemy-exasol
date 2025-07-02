@@ -28,13 +28,9 @@ from exasol.odbc import (
 
 # imports all nox task provided by the toolbox
 from exasol.toolbox.nox.tasks import *  # type: ignore
-from scripts.links import check as _check
-from scripts.links import documentation as _documentation
-from scripts.links import urls as _urls
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]
-
 
 from noxconfig import (
     PROJECT_CONFIG,
@@ -272,29 +268,6 @@ def report_skipped(session: Session) -> None:
                     f"{connector}",
                     f"{report}",
                 )
-
-
-@nox.session(name="docs:links", python=False)
-def list_links(session: Session) -> None:
-    """List all the links within the documentation."""
-    for path, url in _urls(_documentation(PROJECT_ROOT)):
-        session.log(f"Url: {url}, File: {path}")
-
-
-@nox.session(name="docs:links:check", python=False)
-def check_links(session: Session) -> None:
-    """Checks whether all links in the documentation are accessible."""
-    errors = []
-    for path, url in _urls(_documentation(PROJECT_ROOT)):
-        status, details = _check(url)
-        if status != 200:
-            errors.append((path, url, status, details))
-
-    if errors:
-        session.error(
-            "\n"
-            + "\n".join(f"Url: {e[1]}, File: {e[0]}, Error: {e[3]}" for e in errors)
-        )
 
 
 def _connector_matrix(config: Config):

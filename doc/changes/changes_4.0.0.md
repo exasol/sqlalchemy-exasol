@@ -9,7 +9,7 @@
     This upgrade is not backwards compatible with SQLA < 1.4
 
     This version may impact the performance (see also [SQLAlchemy docs](https://docs.sqlalchemy.org/en/14/faq/performance.html#why-is-my-application-slow-after-upgrading-to-1-4-and-or-2-x)).
-    If you are not willing or able to pay those potential performance hits, you should wait until the [tracking-issue #190](https://github.com/exasol/sqlalchemy-exasol/issues/190>) is resolved.
+    If you are not willing or able to pay those potential performance hits, you should wait until the [tracking-issue #190](https://github.com/exasol/sqlalchemy-exasol/issues/190) is resolved.
 
 
 ## 🗑️ Removed
@@ -28,7 +28,7 @@
         Checked dependencies:
 
         * Nox (Code search)
-        * Pytest (Code search + [tracking-issue #10392](https://github.com/pytest-dev/pytest/issues/10392>))
+        * Pytest (Code search + [tracking-issue #10392](https://github.com/pytest-dev/pytest/issues/10392))
 
 ## 🔧 Changed
 

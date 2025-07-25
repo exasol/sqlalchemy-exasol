@@ -115,7 +115,7 @@ Examples:
     from sqlalchemy import create_engine
 
     # ATTENTION:
-    # In terms of security it is NEVER a good idea to turn of certificate validation!!
+    # In terms of security it is NEVER a good idea to disable certificate validation!!
     # In rare cases it may be handy for non-security related reasons.
     # That said, if you are not a 100% sure about your scenario, stick with the
     # secure defaults.

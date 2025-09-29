@@ -1,7 +1,7 @@
 ---
-name: 🔧 Refactoring
+name: Refactoring
 about: Refactoring 
-title: 🔧 <Insert Title>
+title: <Insert Title>
 labels: refactoring
 assignees: ''
 

@@ -89,14 +89,8 @@ exasol-toolbox = "^1.9.0"
 "exa.turbodbc" = "sqlalchemy_exasol.turbodbc:EXADialect_turbodbc"
 "exa.websocket" = "sqlalchemy_exasol.websocket:EXADialect_websocket"
 
-
 [tool.pytest.ini_options]
 addopts = "--tb native -v -r fxX"
-filterwarnings = [
-    "error::DeprecationWarning",
-    "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",
-    "ignore::DeprecationWarning:sqlalchemy_exasol.*",
-]
 
 [tool.black]
 line-length = 88

@@ -35,7 +35,9 @@ jobs:
         run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
 
       - name: Run Tests and Collect Coverage
-        run: poetry run -- nox -s test:integration -- --coverage --db-version ${{ matrix.exasol-version }}
+        run: |
+          export SQLALCHEMY_WARN_20=1
+          poetry run -- nox -s test:integration -- --coverage --db-version ${{ matrix.exasol-version }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4.6.2

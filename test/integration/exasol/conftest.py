@@ -1,8 +1,8 @@
 from contextlib import contextmanager
 
 import pyexasol
-import pytest
 from sqlalchemy.dialects import registry
+
 
 registry.register("exa.pyodbc", "sqlalchemy_exasol.pyodbc", "EXADialect_pyodbc")
 registry.register("exa.turbodbc", "sqlalchemy_exasol.turbodbc", "EXADialect_turbodbc")
@@ -11,7 +11,7 @@ registry.register(
 )
 
 # Suppress spurious warning from pytest
-pytest.register_assert_rewrite("sqlalchemy.testing.assertions")
+# pytest.register_assert_rewrite("sqlalchemy.testing.assertions")
 
 # Attention:
 # The code duplication in regard to `/test/sqlalchemy/conftest.py` # can be removed

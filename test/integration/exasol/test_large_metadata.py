@@ -4,10 +4,12 @@ from sqlalchemy import (
     MetaData,
     Table,
 )
+from sqlalchemy.sql.ddl import DropSchema, CreateSchema
 from sqlalchemy.testing import (
     config,
     fixtures,
 )
+from sqlalchemy import sql
 
 table_counts = [1, 50, 100]
 column_counts = [3, 30, 300]
@@ -16,7 +18,7 @@ column_counts = [3, 30, 300]
 class LargeMetadataTest(fixtures.TablesTest):
     __backend__ = True
 
-    def create_table_ddl(self, schema, name, column_count):
+    def create_table_ddl(self, schema, name, column_count) -> str:
         table_template = "CREATE TABLE {schema}.{table} ({columns})"
         columns = ["column_column_%s int" % i for i in range(column_count)]
         columns_str = ",".join(columns)
@@ -37,52 +39,53 @@ class LargeMetadataTest(fixtures.TablesTest):
             for column_count in column_counts:
                 with config.db.begin() as c:
                     try:
-                        c.execute("DROP SCHEMA %s CASCADE" % self.schema)
+                        c.execute(DropSchema(self.schema, cascade=True))
                     except Exception as e:
                         print(e)
                         pass
-                    c.execute("CREATE SCHEMA %s" % self.schema)
+                    c.execute(CreateSchema(self.schema))
                     for i in range(table_count):
                         table_name = self.get_table_name(table_count, column_count, i)
                         table_ddl = self.create_table_ddl(
                             self.schema, table_name, column_count
                         )
-                        c.execute(table_ddl)
+                        c.execute(sql.text(table_ddl))
 
                 meta = MetaData(bind=config.db)
                 table_name = self.get_table_name(table_count, column_count, 0)
                 start = time.time()
-                users_table = Table(table_name, meta, autoload=True, schema=self.schema)
+                # insert into table
+                Table(table_name, meta, autoload=True, schema=self.schema)
                 end = time.time()
                 print(
                     "table load timer: attempt: 1, table_count: %s, column_count: %s, time: %s"
                     % (table_count, column_count, (end - start))
                 )
                 start = time.time()
-                users_table = Table(table_name, meta, autoload=True, schema=self.schema)
+                # insert into table
+                Table(table_name, meta, autoload=True, schema=self.schema)
                 end = time.time()
                 print(
                     "table load timer: attempt: 2, table_count: %s, column_count: %s, time: %s"
                     % (table_count, column_count, (end - start))
                 )
-                meta = None
 
     def test_reflect_metadata_object(self):
         for table_count in table_counts:
             for column_count in column_counts:
                 with config.db.begin() as c:
                     try:
-                        c.execute("DROP SCHEMA %s CASCADE" % self.schema)
+                        c.execute(DropSchema(self.schema, cascade=True))
                     except Exception as e:
                         print(e)
                         pass
-                    c.execute("CREATE SCHEMA %s" % self.schema)
+                    c.execute(CreateSchema(self.schema))
                     for i in range(table_count):
                         table_name = self.get_table_name(table_count, column_count, i)
                         table_ddl = self.create_table_ddl(
                             self.schema, table_name, column_count
                         )
-                        c.execute(table_ddl)
+                        c.execute(sql.text(table_ddl))
                 meta = MetaData(bind=config.db)
                 start = time.time()
                 meta.reflect()

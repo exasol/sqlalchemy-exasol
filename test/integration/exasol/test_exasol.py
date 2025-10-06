@@ -12,6 +12,7 @@ from sqlalchemy import (
     or_,
     testing,
 )
+from sqlalchemy import sql
 from sqlalchemy.schema import (
     AddConstraint,
     DropConstraint,
@@ -21,7 +22,7 @@ from sqlalchemy.testing import (
     fixtures,
 )
 
-from sqlalchemy_exasol.base import EXAExecutionContext
+from sqlalchemy_exasol.base import EXAExecutionContext, RESERVED_WORDS
 from sqlalchemy_exasol.constraints import DistributeByConstraint
 from sqlalchemy_exasol.util import raw_sql
 
@@ -53,11 +54,16 @@ class KeywordTest(fixtures.TablesTest):
 
     def test_keywords(self):
         keywords = config.db.execute(
-            "select distinct(lower(keyword)) as keyword "
-            + "from SYS.EXA_SQL_KEYWORDS where reserved = True order by keyword"
+            sql.text(
+                "select distinct(lower(keyword)) as keyword "
+                + "from SYS.EXA_SQL_KEYWORDS where reserved = True order by keyword"
+            )
         ).fetchall()
         db_keywords = {k[0] for k in keywords}
-        # assert db_keywords <= RESERVED_WORDS
+
+        extra_keywords = db_keywords - RESERVED_WORDS
+        # TODO comment to clarify if ok and where comes from
+        assert extra_keywords == {"current_cluster", "current_cluster_uid", "endif", "hashtype", "qualify", "hashtype_format", "impersonate", "scope_user"}
 
 
 class AutocommitTest(fixtures.TablesTest):

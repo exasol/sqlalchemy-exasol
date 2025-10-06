@@ -894,7 +894,7 @@ class EXADialect(default.DefaultDialect):
     @staticmethod
     def _get_current_schema(connection):
         sql_statement = "SELECT CURRENT_SCHEMA"
-        current_schema = connection.execute(sql_statement).fetchone()[0]
+        current_schema = connection.execute(sql.text(sql_statement)).fetchone()[0]
         return current_schema
 
     @reflection.cache
@@ -905,7 +905,7 @@ class EXADialect(default.DefaultDialect):
         )
         if schema is None:
             sql_statement += "CURRENT_SCHEMA ORDER BY table_name"
-            result = connection.execute(sql_statement)
+            result = connection.execute(sql.text(sql_statement))
         else:
             sql_statement += ":schema ORDER BY table_name"
             result = connection.execute(

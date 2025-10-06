@@ -40,7 +40,7 @@ class CertificateTest(TestBase):
         engine = create_engine(url)
         with pytest.raises(sqlalchemy.exc.DBAPIError) as exec_info:
             # we expect connect call to fail, but want to close it in case it succeeds
-            with engine.connect() as conn:
+            with engine.connect():
                 pass
 
         actual_message = f"{exec_info.value}"

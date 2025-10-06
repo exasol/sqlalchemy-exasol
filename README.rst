@@ -97,8 +97,10 @@ Using SQLAlchemy with EXASOL DB
 
 	from sqlalchemy import create_engine
 	url = "exa+websocket://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8"
-	e = create_engine(url)
-	r = e.execute("select 42 from dual").fetchall()
+    e = create_engine(url)
+    query = "select 42 from dual"
+    with engine.connect() as con:
+        result = con.execute(sql.text(query)).fetchall()
 
 Examples:
 
@@ -132,8 +134,10 @@ Examples:
 
 	from sqlalchemy import create_engine
 	url = "exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
-	e = create_engine(url)
-	r = e.execute("select 42 from dual").fetchall()
+    e = create_engine(url)
+    query = "select 42 from dual"
+    with engine.connect() as con:
+        result = con.execute(sql.text(query)).fetchall()
 
 **Turbodbc (ODBC based Dialect):**
 
@@ -141,8 +145,10 @@ Examples:
 
 	from sqlalchemy import create_engine
 	url = "exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
-	e = create_engine(url)
-	r = e.execute("select 42 from dual").fetchall()
+    e = create_engine(url)
+    query = "select 42 from dual"
+    with engine.connect() as con:
+        result = con.execute(sql.text(query)).fetchall()
 
 
 Features

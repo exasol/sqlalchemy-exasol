@@ -61,7 +61,6 @@ def start_db(session: Session) -> None:
             "--db-version",
             choices=PROJECT_CONFIG.exasol_versions,
             default=PROJECT_CONFIG.exasol_versions[0],
-            help="which will be used",
         )
         return p
 
@@ -125,7 +124,6 @@ def sqlalchemy_tests(session: Session) -> None:
             "--connector",
             choices=PROJECT_CONFIG.connectors,
             default=PROJECT_CONFIG.connectors[0],
-            help="which will be used",
         )
         return p
 
@@ -157,7 +155,6 @@ def exasol_tests(session: Session) -> None:
             "--connector",
             choices=PROJECT_CONFIG.connectors,
             default=PROJECT_CONFIG.connectors[0],
-            help="which will be used",
         )
         return p
 
@@ -199,13 +196,11 @@ def integration_tests_for_sqlalchemy_exasol(session: Session) -> None:
             "--connector",
             choices=PROJECT_CONFIG.connectors,
             default=PROJECT_CONFIG.connectors[0],
-            help="which will be used",
         )
         p.add_argument(
             "--db-version",
             choices=PROJECT_CONFIG.exasol_versions,
             default=PROJECT_CONFIG.exasol_versions[0],
-            help="which will be used",
         )
         p.add_argument(
             "--coverage",
@@ -223,15 +218,15 @@ def integration_tests_for_sqlalchemy_exasol(session: Session) -> None:
         posargs=["--db-version", f"{args.db_version}"],
     )
     session.notify(
-        find_session_runner(session, f"test:sqla"),
+        find_session_runner(session, "test:sqla"),
         posargs=["--connector", f"{args.connector}"],
     )
     session.notify(
-        find_session_runner(session, f"test:exasol"),
+        find_session_runner(session, "test:exasol"),
         posargs=["--connector", f"{args.connector}"],
     )
     session.notify(
-        find_session_runner(session, f"test:regression"),
+        find_session_runner(session, "test:regression"),
     )
     session.notify(find_session_runner(session, "db:stop"))
 
@@ -271,14 +266,14 @@ def report_skipped(session: Session) -> None:
 
 
 def _connector_matrix(config: Config):
-    CONNECTORS = ["websocket"]
+    connectors_list = ["websocket"]
     attr = "connectors"
-    connectors = getattr(config, attr, CONNECTORS)
+    connectors = getattr(config, attr, connectors_list)
     if not hasattr(config, attr):
         _log.warning(
             "Config does not contain '%s' setting. Using default: %s",
             attr,
-            CONNECTORS,
+            connectors_list,
         )
     return {"connector": connectors}
 

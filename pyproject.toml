@@ -91,6 +91,14 @@ exasol-toolbox = "^1.9.0"
 
 [tool.pytest.ini_options]
 addopts = "--tb native -v -r fxX"
+filterwarnings = [
+# activate when working on fixes to make clearer what is still broken
+#    "error",
+# this is used for turbodbc and pyodbc as we'd like to remove them.
+# thus far, it seems like this is not a strict requirement for the migration,
+# so we will ignore them
+    "ignore::sqlalchemy_exasol.warnings.SqlaExasolDeprecationWarning"
+]
 
 [tool.black]
 line-length = 88

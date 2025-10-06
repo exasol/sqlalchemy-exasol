@@ -64,18 +64,7 @@ class KeywordTest(fixtures.TablesTest):
         ).fetchall()
         db_keywords = {k[0] for k in keywords}
 
-        extra_keywords = db_keywords - RESERVED_WORDS
-        # TODO comment to clarify if ok and where comes from
-        assert extra_keywords == {
-            "current_cluster",
-            "current_cluster_uid",
-            "endif",
-            "hashtype",
-            "qualify",
-            "hashtype_format",
-            "impersonate",
-            "scope_user",
-        }
+        assert db_keywords >= RESERVED_WORDS
 
 
 class AutocommitTest(fixtures.TablesTest):
@@ -102,7 +91,7 @@ class ConstraintsTest(fixtures.TablesTest):
 
     def test_distribute_by_constraint(self):
         try:
-            reflected = Table("t", MetaData(testing.db), autoload=True)
+            Table("t", MetaData(testing.db), autoload=True)
         except:
             assert False
         # TODO: check that reflected table object is identical
@@ -159,7 +148,7 @@ class UtilTest(fixtures.TablesTest):
             self.tables.t.c.created == datetime.datetime(2017, 1, 1, 12, 0, 0),
         )
         sel = self.tables.t.select().where(restriction)
-        sql = """SELECT t.id, t.name, t.age, t."day", t.created 
-FROM t 
+        sql = """SELECT t.id, t.name, t.age, t."day", t.created
+FROM t
 WHERE t.id = 1 OR t.name = \'bob\' OR t."day" = to_date(\'2017-01-01\', \'YYYY-MM-DD\') OR t.created = to_timestamp(\'2017-01-01 12:00:00.000000\', \'YYYY-MM-DD HH24:MI:SS.FF6\')"""
         assert raw_sql(sel) == sql

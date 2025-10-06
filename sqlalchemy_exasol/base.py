@@ -53,7 +53,7 @@ import sqlalchemy.exc
 from sqlalchemy import (
     event,
     schema,
-    sql,
+    sql, select,
 )
 from sqlalchemy import types as sqltypes
 from sqlalchemy import (
@@ -800,7 +800,7 @@ class EXADialect(default.DefaultDialect):
                 "select PARAM_VALUE from SYS.EXA_METADATA"
                 " where PARAM_NAME = 'databaseProductVersion'"
             )
-            result = connection.execute(query).fetchone()[0].split(".")
+            result = connection.execute(sql.text(query)).fetchone()[0].split(".")
             major, minor, patch = 0, 0, 0
             major = int(result[0])
             minor = int(result[1])

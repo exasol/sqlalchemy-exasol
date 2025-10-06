@@ -250,7 +250,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
         sql_statement = sql_statement.format(
             schema=quoted_schema_string, table=quoted_table_string
         )
-        response = connection.execute(sql_statement)
+        response = connection.execute(sql.text(sql_statement))
 
         return list(response)
 
@@ -295,7 +295,7 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
                 quoted_schema_string, quoted_table_string, "FOREIGN KEY"
             )
         )
-        response = connection.execute(sql_statement)
+        response = connection.execute(sql.text(sql_statement))
 
         return list(response)
 

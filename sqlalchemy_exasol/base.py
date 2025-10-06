@@ -53,7 +53,8 @@ import sqlalchemy.exc
 from sqlalchemy import (
     event,
     schema,
-    sql, select,
+    select,
+    sql,
 )
 from sqlalchemy import types as sqltypes
 from sqlalchemy import (

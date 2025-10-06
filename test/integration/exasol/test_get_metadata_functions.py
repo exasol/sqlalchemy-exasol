@@ -2,10 +2,13 @@ import pytest
 from sqlalchemy import (
     create_engine,
     inspect,
+    sql,
 )
-from sqlalchemy import sql
 from sqlalchemy.engine.url import URL
-from sqlalchemy.sql.ddl import DropSchema, CreateSchema
+from sqlalchemy.sql.ddl import (
+    CreateSchema,
+    DropSchema,
+)
 from sqlalchemy.sql.sqltypes import (
     INTEGER,
     VARCHAR,
@@ -35,15 +38,18 @@ class MetadataTest(fixtures.TablesTest):
                 print(e)
                 pass
             c.execute(CreateSchema(cls.schema))
-            c.execute(sql.text(
-                "CREATE TABLE %s.t (pid1 int, pid2 int, name VARCHAR(20), age int, PRIMARY KEY (pid1,pid2))"
-                % cls.schema
+            c.execute(
+                sql.text(
+                    "CREATE TABLE %s.t (pid1 int, pid2 int, name VARCHAR(20), age int, PRIMARY KEY (pid1,pid2))"
+                    % cls.schema
+                )
             )
-            )
-            c.execute(sql.text(
-                "CREATE TABLE {schema}.s (id1 int primary key, fid1 int, fid2 int, age int, CONSTRAINT fk_test FOREIGN KEY (fid1,fid2) REFERENCES {schema}.t(pid1,pid2))".format(
-                    schema=cls.schema
-                ))
+            c.execute(
+                sql.text(
+                    "CREATE TABLE {schema}.s (id1 int primary key, fid1 int, fid2 int, age int, CONSTRAINT fk_test FOREIGN KEY (fid1,fid2) REFERENCES {schema}.t(pid1,pid2))".format(
+                        schema=cls.schema
+                    )
+                )
             )
             cls.view_defintion = (
                 "CREATE VIEW {schema}.v AS select * from {schema}.t".format(
@@ -60,14 +66,16 @@ class MetadataTest(fixtures.TablesTest):
             c.execute(CreateSchema(cls.schema_2))
             c.execute(
                 sql.text(
-                "CREATE TABLE %s.t_2 (pid1 int, pid2 int, name VARCHAR(20), age int, PRIMARY KEY (pid1,pid2))"
-                % cls.schema_2
-            ))
+                    "CREATE TABLE %s.t_2 (pid1 int, pid2 int, name VARCHAR(20), age int, PRIMARY KEY (pid1,pid2))"
+                    % cls.schema_2
+                )
+            )
             c.execute(
                 sql.text(
-                "CREATE VIEW {schema}.v_2 AS select * from {schema}.t_2".format(
-                    schema=cls.schema_2
-                ))
+                    "CREATE VIEW {schema}.v_2 AS select * from {schema}.t_2".format(
+                        schema=cls.schema_2
+                    )
+                )
             )
             c.execute(sql.text("COMMIT"))
 
@@ -186,7 +194,7 @@ class MetadataTest(fixtures.TablesTest):
                 use_sql_fallback=use_sql_fallback,
             )
             assert not has_table, (
-                    "Table %s.not_exist was found, but should not exist" % self.schema
+                "Table %s.not_exist was found, but should not exist" % self.schema
             )
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
@@ -204,7 +212,7 @@ class MetadataTest(fixtures.TablesTest):
                 connection=c, schema=schema, table_name="t"
             )
             assert has_table_fallback == has_table_odbc, (
-                    "Expected table %s.t with odbc and fallback" % schema
+                "Expected table %s.t with odbc and fallback" % schema
             )
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
@@ -340,7 +348,7 @@ class MetadataTest(fixtures.TablesTest):
             assert str(columns_odbc) == str(columns_fallback)
 
     def make_columns_comparable(
-            self, column_list
+        self, column_list
     ):  # object equality doesn't work for sqltypes
         return sorted(
             ({k: str(v) for k, v in column.items()} for column in column_list),
@@ -419,7 +427,7 @@ class MetadataTest(fixtures.TablesTest):
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
     def test_compare_get_pk_constraint_for_sql_and_odbc(
-            self, schema, table, engine_name
+        self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
@@ -475,7 +483,7 @@ class MetadataTest(fixtures.TablesTest):
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
     def test_compare_get_foreign_keys_for_sql_and_odbc(
-            self, schema, table, engine_name
+        self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:

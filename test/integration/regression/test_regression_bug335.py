@@ -6,9 +6,13 @@ from sqlalchemy import (
     String,
     Table,
     create_engine,
-    insert, )
-from sqlalchemy import sql
-from sqlalchemy.sql.ddl import CreateSchema, DropSchema
+    insert,
+    sql,
+)
+from sqlalchemy.sql.ddl import (
+    CreateSchema,
+    DropSchema,
+)
 
 from exasol.odbc import (
     ODBC_DRIVER,
@@ -43,14 +47,15 @@ def users_table(pyexasol_connection, test_schema):
     table_name = "users"
     connection.execute(
         sql.text(
-            f"create table {test_schema}.{table_name} (id DECIMAL(18) identity primary key, name VARCHAR(2000) UTF8)")
+            f"create table {test_schema}.{table_name} (id DECIMAL(18) identity primary key, name VARCHAR(2000) UTF8)"
+        )
     )
     connection.commit()
     yield test_schema, table_name
 
 
 def test_lastrowid_does_not_create_extra_commit(
-        exasol_config, users_table, pyodbc_connection_string
+    exasol_config, users_table, pyodbc_connection_string
 ):
     """
     For further details on this regression see `Issue-335 <https://github.com/exasol/sqlalchemy-exasol/issues/335>`_.

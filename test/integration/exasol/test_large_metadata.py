@@ -3,13 +3,16 @@ import time
 from sqlalchemy import (
     MetaData,
     Table,
+    sql,
 )
-from sqlalchemy.sql.ddl import DropSchema, CreateSchema
+from sqlalchemy.sql.ddl import (
+    CreateSchema,
+    DropSchema,
+)
 from sqlalchemy.testing import (
     config,
     fixtures,
 )
-from sqlalchemy import sql
 
 table_counts = [1, 50, 100]
 column_counts = [3, 30, 300]

@@ -6,13 +6,16 @@ import sqlalchemy.testing as testing
 from sqlalchemy import (
     create_engine,
     inspect,
+    sql,
 )
-from sqlalchemy.sql.ddl import DropSchema, CreateSchema
+from sqlalchemy.sql.ddl import (
+    CreateSchema,
+    DropSchema,
+)
 from sqlalchemy.testing import (
     config,
     fixtures,
 )
-from sqlalchemy import sql
 
 
 # TODO: get_schema_names, get_view_names and get_view_definition didn't cause deadlocks in this scenario
@@ -174,10 +177,14 @@ class MetadataTest(fixtures.TablesTest):
             pass
         session0.execute(CreateSchema(schema))
         session0.execute(
-            sql.text(f"CREATE OR REPLACE TABLE {schema}.deadlock_test1 (id int PRIMARY KEY)")
+            sql.text(
+                f"CREATE OR REPLACE TABLE {schema}.deadlock_test1 (id int PRIMARY KEY)"
+            )
         )
         session0.execute(
-            sql.text(f"CREATE OR REPLACE TABLE {schema}.deadlock_test2 (id int PRIMARY KEY, fk int REFERENCES {schema}.deadlock_test1(id))")
+            sql.text(
+                f"CREATE OR REPLACE TABLE {schema}.deadlock_test2 (id int PRIMARY KEY, fk int REFERENCES {schema}.deadlock_test1(id))"
+            )
         )
         session0.execute(sql.text(f"INSERT INTO {schema}.deadlock_test1 VALUES 1"))
         session0.execute(sql.text(f"INSERT INTO {schema}.deadlock_test2 VALUES (1,1)"))
@@ -194,7 +201,9 @@ class MetadataTest(fixtures.TablesTest):
 
             engine3, session3 = self.create_transaction(url, "transaction3")
             session3.execute(sql.text("SELECT 1"))
-            session3.execute(sql.text(f"DELETE FROM {schema}.deadlock_test2 WHERE false"))
+            session3.execute(
+                sql.text(f"DELETE FROM {schema}.deadlock_test2 WHERE false")
+            )
             session3.execute(sql.text("commit"))
 
             engine2, session2 = self.create_transaction(url, "transaction2")
@@ -225,8 +234,10 @@ class MetadataTest(fixtures.TablesTest):
             sql.text(f"CREATE OR REPLACE TABLE {schema}.deadlock_test_table (id int)")
         )
         session0.execute(
-            sql.text(f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_1 AS SELECT * FROM {schema}.deadlock_test_table"
-        ))
+            sql.text(
+                f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_1 AS SELECT * FROM {schema}.deadlock_test_table"
+            )
+        )
         session0.execute(sql.text("commit"))
         self.watchdog_run = True
         t1 = Thread(target=self.watchdog, args=(session0, schema))
@@ -237,8 +248,10 @@ class MetadataTest(fixtures.TablesTest):
 
             session1.execute(sql.text(f"SELECT * FROM {schema}.deadlock_test_view_1"))
             session1.execute(
-                sql.text(f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_2 AS SELECT * FROM {schema}.deadlock_test_table"
-            ))
+                sql.text(
+                    f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_2 AS SELECT * FROM {schema}.deadlock_test_table"
+                )
+            )
 
             engine3, session3 = self.create_transaction(url, "transaction3")
             session3.execute(sql.text("SELECT 1"))

@@ -9,6 +9,7 @@ from sqlalchemy import (
     Table,
     create_engine,
     inspect,
+    sql,
 )
 from sqlalchemy.pool import (
     AssertionPool,
@@ -23,7 +24,6 @@ from sqlalchemy.schema import (
 )
 from sqlalchemy.testing import fixtures
 from sqlalchemy.testing.fixtures import config
-from sqlalchemy import sql
 
 
 class TranslateMap(fixtures.TestBase):
@@ -99,7 +99,8 @@ class Introspection(fixtures.TestBase):
                 for name in views:
                     conn.execute(
                         sql.text(
-                        f"CREATE OR REPLACE VIEW {schema}.{name} AS SELECT 1 as COLUMN_1;")
+                            f"CREATE OR REPLACE VIEW {schema}.{name} AS SELECT 1 as COLUMN_1;"
+                        )
                     )
 
         cls.schema = "test"

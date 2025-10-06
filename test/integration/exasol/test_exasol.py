@@ -10,9 +10,9 @@ from sqlalchemy import (
     Table,
     inspect,
     or_,
+    sql,
     testing,
 )
-from sqlalchemy import sql
 from sqlalchemy.schema import (
     AddConstraint,
     DropConstraint,
@@ -22,7 +22,10 @@ from sqlalchemy.testing import (
     fixtures,
 )
 
-from sqlalchemy_exasol.base import EXAExecutionContext, RESERVED_WORDS
+from sqlalchemy_exasol.base import (
+    RESERVED_WORDS,
+    EXAExecutionContext,
+)
 from sqlalchemy_exasol.constraints import DistributeByConstraint
 from sqlalchemy_exasol.util import raw_sql
 
@@ -63,7 +66,16 @@ class KeywordTest(fixtures.TablesTest):
 
         extra_keywords = db_keywords - RESERVED_WORDS
         # TODO comment to clarify if ok and where comes from
-        assert extra_keywords == {"current_cluster", "current_cluster_uid", "endif", "hashtype", "qualify", "hashtype_format", "impersonate", "scope_user"}
+        assert extra_keywords == {
+            "current_cluster",
+            "current_cluster_uid",
+            "endif",
+            "hashtype",
+            "qualify",
+            "hashtype_format",
+            "impersonate",
+            "scope_user",
+        }
 
 
 class AutocommitTest(fixtures.TablesTest):

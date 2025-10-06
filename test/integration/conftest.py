@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.fixture
-def control_connection(exasol_config):
+def pyexasol_connection(exasol_config):
     """
     Returns a db connection which can be used to interact with the test database.
     """

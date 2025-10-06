@@ -29,8 +29,8 @@ def pyodbc_connection_string(exasol_config):
 
 
 @pytest.fixture()
-def test_schema(control_connection):
-    connection = control_connection
+def test_schema(pyexasol_connection):
+    connection = pyexasol_connection
     schema = "REGRESSION_335"
     connection.execute(f"CREATE SCHEMA {schema}")
     connection.commit()
@@ -40,8 +40,8 @@ def test_schema(control_connection):
 
 
 @pytest.fixture()
-def users_table(control_connection, test_schema):
-    connection = control_connection
+def users_table(pyexasol_connection, test_schema):
+    connection = pyexasol_connection
     table_name = "users"
     connection.execute(
         f"create table {test_schema}.{table_name} (id DECIMAL(18) identity primary key, name VARCHAR(2000) UTF8)"

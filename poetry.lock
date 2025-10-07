@@ -522,28 +522,11 @@ files = [
 
 [[package]]
 name = "click"
-version = "8.1.8"
-description = "Composable command line interface toolkit"
-optional = false
-python-versions = ">=3.7"
-groups = ["dev"]
-markers = "python_version < \"3.11\""
-files = [
-    {file = "click-8.1.8-py3-none-any.whl", hash = "sha256:63c132bbbed01578a06712a2d1f497bb62d9c1c0d329b7903a866228027263b2"},
-    {file = "click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a"},
-]
-
-[package.dependencies]
-colorama = {version = "*", markers = "platform_system == \"Windows\""}
-
-[[package]]
-name = "click"
 version = "8.2.1"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
-markers = "python_version >= \"3.11\""
 files = [
     {file = "click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b"},
     {file = "click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202"},
@@ -884,21 +867,21 @@ files = [
 
 [[package]]
 name = "exasol-integration-test-docker-environment"
-version = "3.4.0"
+version = "4.3.0"
 description = "Integration Test Docker Environment for Exasol"
 optional = false
-python-versions = "<4,>=3.9"
+python-versions = "<4,>=3.9.2"
 groups = ["dev"]
 files = [
-    {file = "exasol_integration_test_docker_environment-3.4.0-py3-none-any.whl", hash = "sha256:4976a78c63a8d8591c0fad6968a5ca3d36f1fcd07805abe9a9fbe65b99961155"},
-    {file = "exasol_integration_test_docker_environment-3.4.0.tar.gz", hash = "sha256:6e654e5c0b853a07d102293800ba629d9401424eb0508a923fa8ebe9d918470c"},
+    {file = "exasol_integration_test_docker_environment-4.3.0-py3-none-any.whl", hash = "sha256:0f694a2c723617c189b84c145a18154e2a40f2fb58f98c73b39277af740de7c6"},
+    {file = "exasol_integration_test_docker_environment-4.3.0.tar.gz", hash = "sha256:2c82bd667be4b654d48ea5c43617c31608f3ec73312c8b6b51b2bb324a75ced6"},
 ]
 
 [package.dependencies]
 click = ">=7.0"
 docker = {version = ">=4.0.0,<7.0.0 || >7.0.0", markers = "sys_platform != \"win32\""}
 docutils = ">=0.21.2"
-exasol-error-reporting = ">=0.4.0"
+exasol-error-reporting = ">=1.0.0,<2.0.0"
 fabric = ">=3.0.1,<4.0.0"
 gitpython = ">=2.1.0"
 humanfriendly = ">=4.18"
@@ -910,31 +893,9 @@ netaddr = ">=0.7.19"
 networkx = ">=2.3"
 portalocker = ">=2.7.0,<3.0.0"
 pydot = ">=1.4.0"
-requests = ">=2.21.0"
+requests = ">=2.32.4"
 simplejson = ">=3.16.0"
 "stopwatch.py" = ">=1.0.0"
-
-[[package]]
-name = "exasol-saas-api"
-version = "0.7.0"
-description = "API enabling Python applications connecting to Exasol database SaaS instances and using their SaaS services"
-optional = false
-python-versions = "<4.0,>=3.8.0"
-groups = ["dev"]
-markers = "python_version < \"3.11\""
-files = [
-    {file = "exasol_saas_api-0.7.0-py3-none-any.whl", hash = "sha256:7ffe1a05aa419099bcafa3984af5f750dc2234c8b18170ccda5336b95bac7c09"},
-    {file = "exasol_saas_api-0.7.0.tar.gz", hash = "sha256:8d69780cdc876dc206797fea5b2f964a06248f0a087b611ae06ac3646f84a846"},
-]
-
-[package.dependencies]
-attrs = ">=21.3.0"
-httpx = ">=0.20.0,<0.28.0"
-ifaddr = ">=0.2.0,<0.3.0"
-python-dateutil = ">=2.8.0,<3.0.0"
-requests = ">=2.31.0,<3.0.0"
-tenacity = ">=8.2.3,<9.0.0"
-types-requests = ">=2.31.0.6,<3.0.0.0"
 
 [[package]]
 name = "exasol-saas-api"
@@ -943,7 +904,6 @@ description = "API enabling Python applications connecting to Exasol database Sa
 optional = false
 python-versions = "<4.0.0,>=3.10.0"
 groups = ["dev"]
-markers = "python_version >= \"3.11\""
 files = [
     {file = "exasol_saas_api-1.1.1-py3-none-any.whl", hash = "sha256:b92983fe149541f3c32904118ea3293498fe20610c8d69a17c8cbfb26bbd4579"},
     {file = "exasol_saas_api-1.1.1.tar.gz", hash = "sha256:a4d759e3f68793d0c8a2c1c4676de70e40402d4f8c4dd89af2284a65eeec6534"},
@@ -1005,7 +965,7 @@ description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 groups = ["dev"]
-markers = "python_version < \"3.11\""
+markers = "python_version == \"3.10\""
 files = [
     {file = "exceptiongroup-1.3.0-py3-none-any.whl", hash = "sha256:4d111e6e0c13d0644cad6ddaa7ed0261a0b36971f6d23e7ec9b4b9097da78a10"},
     {file = "exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88"},
@@ -1333,39 +1293,11 @@ trio = ["trio (>=0.22.0,<1.0)"]
 
 [[package]]
 name = "httpx"
-version = "0.27.2"
-description = "The next generation HTTP client."
-optional = false
-python-versions = ">=3.8"
-groups = ["dev"]
-markers = "python_version < \"3.11\""
-files = [
-    {file = "httpx-0.27.2-py3-none-any.whl", hash = "sha256:7bb2708e112d8fdd7829cd4243970f0c223274051cb35ee80c03301ee29a3df0"},
-    {file = "httpx-0.27.2.tar.gz", hash = "sha256:f7c2be1d2f3c3c3160d441802406b206c2b76f5947b11115e6df10c6c65e66c2"},
-]
-
-[package.dependencies]
-anyio = "*"
-certifi = "*"
-httpcore = "==1.*"
-idna = "*"
-sniffio = "*"
-
-[package.extras]
-brotli = ["brotli ; platform_python_implementation == \"CPython\"", "brotlicffi ; platform_python_implementation != \"CPython\""]
-cli = ["click (==8.*)", "pygments (==2.*)", "rich (>=10,<14)"]
-http2 = ["h2 (>=3,<5)"]
-socks = ["socksio (==1.*)"]
-zstd = ["zstandard (>=0.18.0)"]
-
-[[package]]
-name = "httpx"
 version = "0.28.1"
 description = "The next generation HTTP client."
 optional = false
 python-versions = ">=3.8"
 groups = ["dev"]
-markers = "python_version >= \"3.11\""
 files = [
     {file = "httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad"},
     {file = "httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc"},
@@ -1472,31 +1404,6 @@ tomli = {version = ">=1.2.1", markers = "python_version < \"3.11\""}
 typing-extensions = ">=3.10.0.0"
 
 [[package]]
-name = "importlib-metadata"
-version = "8.7.0"
-description = "Read metadata from Python packages"
-optional = false
-python-versions = ">=3.9"
-groups = ["dev"]
-markers = "python_version < \"3.10\""
-files = [
-    {file = "importlib_metadata-8.7.0-py3-none-any.whl", hash = "sha256:e5dd1551894c77868a30651cef00984d50e1002d06942a7101d34870c5f02afd"},
-    {file = "importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000"},
-]
-
-[package.dependencies]
-zipp = ">=3.20"
-
-[package.extras]
-check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\""]
-cover = ["pytest-cov"]
-doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
-enabler = ["pytest-enabler (>=2.2)"]
-perf = ["ipython"]
-test = ["flufl.flake8", "importlib_resources (>=1.3) ; python_version < \"3.9\"", "jaraco.test (>=5.4)", "packaging", "pyfakefs", "pytest (>=6,!=8.1.*)", "pytest-perf (>=0.9.2)"]
-type = ["pytest-mypy"]
-
-[[package]]
 name = "importlib-resources"
 version = "6.5.2"
 description = "Read resources from Python packages"
@@ -1507,9 +1414,6 @@ files = [
     {file = "importlib_resources-6.5.2-py3-none-any.whl", hash = "sha256:789cfdc3ed28c78b67a06acb8126751ced69a3d5f79c095a98298cd8a760ccec"},
     {file = "importlib_resources-6.5.2.tar.gz", hash = "sha256:185f87adef5bcc288449d98fb4fba07cea78bc036455dd44c5fc4a2fe78fed2c"},
 ]
-
-[package.dependencies]
-zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\""]
@@ -2000,7 +1904,7 @@ description = "Python package for creating and manipulating graphs and networks"
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
-markers = "python_version < \"3.11\""
+markers = "python_version == \"3.10\""
 files = [
     {file = "networkx-3.2.1-py3-none-any.whl", hash = "sha256:f18c69adc97877c42332c170849c96cefa91881c99a7cb3e95b7c659ebdc1ec2"},
     {file = "networkx-3.2.1.tar.gz", hash = "sha256:9f1bb5cf3409bf324e0a722c20bdb4c20ee39bf1c30ce8ae499c8502b0b5e0c6"},
@@ -2610,7 +2514,6 @@ mccabe = ">=0.6,<0.8"
 platformdirs = ">=2.2"
 tomli = {version = ">=1.1", markers = "python_version < \"3.11\""}
 tomlkit = ">=0.10.1"
-typing-extensions = {version = ">=3.10", markers = "python_version < \"3.10\""}
 
 [package.extras]
 spelling = ["pyenchant (>=3.2,<4.0)"]
@@ -2785,38 +2688,19 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "pytest-exasol-backend"
-version = "0.3.3"
-description = ""
-optional = false
-python-versions = "<4,>=3.9"
-groups = ["dev"]
-markers = "python_version < \"3.11\""
-files = [
-    {file = "pytest_exasol_backend-0.3.3-py3-none-any.whl", hash = "sha256:35d5d383e2ca95fd25da6b0c43e7e4d10cb6137720c07e5d1de6b9bc8f939c9d"},
-    {file = "pytest_exasol_backend-0.3.3.tar.gz", hash = "sha256:0ad7a43c96da951ee22af0e962c28faab7f49cd7b7a35022b7a43cfbe8a5098c"},
-]
-
-[package.dependencies]
-exasol-integration-test-docker-environment = ">=3.1.0,<4.0.0"
-exasol-saas-api = ">=0.6.0,<1.0.0"
-pytest = ">=7,<9"
-
-[[package]]
-name = "pytest-exasol-backend"
-version = "0.4.0"
+version = "1.1.0"
 description = ""
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["dev"]
-markers = "python_version >= \"3.11\""
 files = [
-    {file = "pytest_exasol_backend-0.4.0-py3-none-any.whl", hash = "sha256:771c7bdb6d083b248adde5fd4289c3ee921b9631b50b006673fa3e83d1c58434"},
-    {file = "pytest_exasol_backend-0.4.0.tar.gz", hash = "sha256:def40966b39b6c03872ac2fe71632038480799657b251d452926551e2011d909"},
+    {file = "pytest_exasol_backend-1.1.0-py3-none-any.whl", hash = "sha256:89c8f74d5e092595e92a9a5e4cfbd9182d8748246822355bd3179e97cb1fd899"},
+    {file = "pytest_exasol_backend-1.1.0.tar.gz", hash = "sha256:ae00ab25078fc56b727e74b80c622b2e0053de84bbebb78e04118826abb733fc"},
 ]
 
 [package.dependencies]
-exasol-integration-test-docker-environment = ">=3.1.0,<4.0.0"
-exasol-saas-api = ">=1.1.0,<2"
+exasol-integration-test-docker-environment = ">=4,<5"
+exasol-saas-api = ">=1.1.0,<3"
 pytest = ">=7,<9"
 
 [[package]]
@@ -3330,7 +3214,6 @@ babel = ">=2.13"
 colorama = {version = ">=0.4.6", markers = "sys_platform == \"win32\""}
 docutils = ">=0.20,<0.22"
 imagesize = ">=1.3"
-importlib-metadata = {version = ">=6.0", markers = "python_version < \"3.10\""}
 Jinja2 = ">=3.1"
 packaging = ">=23.0"
 Pygments = ">=2.17"
@@ -3812,7 +3695,7 @@ files = [
     {file = "typing_extensions-4.14.0-py3-none-any.whl", hash = "sha256:a1514509136dd0b477638fc68d6a91497af5076466ad0fa6c338e44e359944af"},
     {file = "typing_extensions-4.14.0.tar.gz", hash = "sha256:8676b788e32f02ab42d9e7c61324048ae4c6d844a399eebace3d4979d75ceef4"},
 ]
-markers = {main = "python_version < \"3.13\""}
+markers = {main = "python_version <= \"3.12\""}
 
 [[package]]
 name = "typing-inspection"
@@ -3986,32 +3869,11 @@ files = [
     {file = "wrapt-1.17.2.tar.gz", hash = "sha256:41388e9d4d1522446fe79d3213196bd9e3b301a336965b9e27ca2788ebd122f3"},
 ]
 
-[[package]]
-name = "zipp"
-version = "3.23.0"
-description = "Backport of pathlib-compatible object wrapper for zip files"
-optional = false
-python-versions = ">=3.9"
-groups = ["dev"]
-markers = "python_version < \"3.10\""
-files = [
-    {file = "zipp-3.23.0-py3-none-any.whl", hash = "sha256:071652d6115ed432f5ce1d34c336c0adfd6a884660d1e9712a256d3d3bd4b14e"},
-    {file = "zipp-3.23.0.tar.gz", hash = "sha256:a07157588a12518c9d4034df3fbbee09c814741a33ff63c05fa29d26a2404166"},
-]
-
-[package.extras]
-check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\""]
-cover = ["pytest-cov"]
-doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
-enabler = ["pytest-enabler (>=2.2)"]
-test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more_itertools", "pytest (>=6,!=8.1.*)", "pytest-ignore-flaky"]
-type = ["pytest-mypy"]
-
 [extras]
 pyodbc = ["pyodbc"]
 turbodbc = ["turbodbc"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.9.2,<4.0"
-content-hash = "1b22eb2938b17702146a23d6becffddcbad2e8a7daa97442c28350d41894650e"
+python-versions = ">=3.10,<4"
+content-hash = "f9186634f2f4fbb2007db925bba06f96e2abec07221f9b9bb3f51cdca41502f6"

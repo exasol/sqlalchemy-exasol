@@ -11,6 +11,7 @@ This allows us to use the latest dependencies, which do not have open vulnerabil
 
 - #610: Altered string input into `Connection.execute()` to be handled properly with `sql.text()`
 - #614: Altered params input into `Connection.execute()` to be handled properly with `dict`
+- #616: Altered usage of MetaData which was binding to a connection to instead bind in the needed object or function
 
 ## Internal
 

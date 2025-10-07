@@ -115,10 +115,11 @@ class Introspection(fixtures.TestBase):
         engine = config.db
 
         def _drop_tables(schema):
-            metadata = MetaData(engine, schema=schema)
-            metadata.reflect()
-            to_be_deleted = [metadata.tables[name] for name in metadata.tables]
-            metadata.drop_all(engine, to_be_deleted)
+            metadata = MetaData(schema=schema)
+            with engine.connect() as conn:
+                metadata.reflect(bind=conn)
+                to_be_deleted = [metadata.tables[name] for name in metadata.tables]
+                metadata.drop_all(engine, to_be_deleted)
 
         def _drop_views(schema, views):
             with engine.connect() as conn:

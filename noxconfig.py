@@ -54,7 +54,7 @@ class Config:
     bucketfs_port = 2580
     connectors = ["pyodbc", "turbodbc", "websocket"]
     python_versions = ["3.9", "3.10", "3.11", "3.12", "3.13"]
-    exasol_versions = ["7.1.17"]
+    exasol_versions = ["7.1.30", "8.29.6"]
 
     plugins = [StartDB, StopDB]
 

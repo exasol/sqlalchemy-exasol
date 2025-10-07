@@ -1,5 +1,9 @@
 # Unreleased
 
+## Feature
+
+- #612: Updated CI tests to run against Exasol DB versions 7.1.30 and 8.29.6
+
 ## 🧰 Internal
 
 - #558 Updated to poetry 2.1.2 & relocked dependencies to resolve CVE-2025-27516

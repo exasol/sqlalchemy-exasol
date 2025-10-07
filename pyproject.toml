@@ -96,6 +96,7 @@ filterwarnings = [
 "error:.*Passing a string.*",
 "error:.* a single dictionary.*",
 "error:.*The MetaData.bind argument.*",
+"error:.*The autoload parameter.*",
 # this is used for turbodbc and pyodbc as historically we'd like to remove them.
 # thus far, it seems like this is not a strict requirement for the migration,
 # so we will ignore them.

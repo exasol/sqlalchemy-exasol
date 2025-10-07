@@ -148,7 +148,8 @@ class UtilTest(fixtures.TablesTest):
             self.tables.t.c.created == datetime.datetime(2017, 1, 1, 12, 0, 0),
         )
         sel = self.tables.t.select().where(restriction)
-        sql = """SELECT t.id, t.name, t.age, t."day", t.created
-FROM t
-WHERE t.id = 1 OR t.name = \'bob\' OR t."day" = to_date(\'2017-01-01\', \'YYYY-MM-DD\') OR t.created = to_timestamp(\'2017-01-01 12:00:00.000000\', \'YYYY-MM-DD HH24:MI:SS.FF6\')"""
-        assert raw_sql(sel) == sql
+        assert raw_sql(sel) == (
+            'SELECT t.id, t.name, t.age, t."day", t.created \n'
+            "FROM t \n"
+            "WHERE t.id = 1 OR t.name = 'bob' OR t.\"day\" = to_date('2017-01-01', 'YYYY-MM-DD') OR t.created = to_timestamp('2017-01-01 12:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6')"
+        )

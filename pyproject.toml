@@ -1,7 +1,7 @@
 [project]
 name = "sqlalchemy_exasol"
 version = "5.1.0"
-requires-python = ">=3.9.2,<4"
+requires-python = ">=3.10,<4"
 description = "EXASOL dialect for SQLAlchemy"
 authors = [
     {name="Exasol AG", email="opensource@exasol.com"},
@@ -79,9 +79,9 @@ pytest-json-report = ">=1.5.0"
 # The limitation/issue pytest <6 is tracked in https://github.com/exasol/sqlalchemy-exasol/issues/144
 pytest = ">=6,<9"
 rich = "^13.3.1"
-exasol-integration-test-docker-environment = "^3.1.0"
+exasol-integration-test-docker-environment = "^4.0.0"
 pyodbc = ">=4.0.34,<6"
-pytest-exasol-backend = ">=0.3.3,<1"
+pytest-exasol-backend = "^1.0.0"
 exasol-toolbox = "^1.9.0"
 
 [tool.poetry.plugins."sqlalchemy.dialects"]

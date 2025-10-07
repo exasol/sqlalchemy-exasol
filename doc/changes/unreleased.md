@@ -1,5 +1,12 @@
 # Unreleased
 
+Due to an EOL for [Python 3.9 in 2025-10](https://devguide.python.org/versions/), we dropped support for it.
+This allows us to use the latest dependencies, which do not have open vulnerabilities.
+
+## Feature
+
+- #612: Updated CI tests to run against Exasol DB versions 7.1.30, 8.34.0, and 2025.1.0. Dropped support for Python 3.9.
+
 ## 🧰 Internal
 
 - #558 Updated to poetry 2.1.2 & relocked dependencies to resolve CVE-2025-27516

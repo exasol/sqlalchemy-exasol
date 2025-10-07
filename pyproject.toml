@@ -43,7 +43,6 @@ classifiers = [
     "Intended Audience :: Information Technology",
     "Programming Language :: SQL",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Topic :: Database",
     "Topic :: Software Development",

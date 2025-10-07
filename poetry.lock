@@ -4013,5 +4013,5 @@ turbodbc = ["turbodbc"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.9.2,<4.0"
-content-hash = "1b22eb2938b17702146a23d6becffddcbad2e8a7daa97442c28350d41894650e"
+python-versions = ">=3.9.2,<4"
+content-hash = "0df8d0d5b36479141b0ecc804d343d28494e28a6fd2fa342b9a7bba8dbd0653e"

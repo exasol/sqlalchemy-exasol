@@ -1,6 +1,7 @@
 [project]
 name = "sqlalchemy_exasol"
 version = "5.1.0"
+requires-python = ">=3.9.2,<4"
 description = "EXASOL dialect for SQLAlchemy"
 authors = [
     {name="Exasol AG", email="opensource@exasol.com"},
@@ -15,7 +16,7 @@ keywords = [
     "data science",
     "database",
 ]
-dynamic = ["classifiers"]
+dynamic = ["classifiers", "dependencies"]
 
 [project.urls]
 Homepage = "https://www.exasol.com/"
@@ -60,7 +61,6 @@ exclude = []
 
 
 [tool.poetry.dependencies]
-python = ">=3.9.2,<4.0"
 packaging = ">=21.3"
 pyexasol = ">=0.26.0,<1"
 sqlalchemy = ">=1.4,<2"

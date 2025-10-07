@@ -53,7 +53,6 @@ import sqlalchemy.exc
 from sqlalchemy import (
     event,
     schema,
-    select,
     sql,
 )
 from sqlalchemy import types as sqltypes
@@ -910,7 +909,7 @@ class EXADialect(default.DefaultDialect):
         else:
             sql_statement += ":schema ORDER BY table_name"
             result = connection.execute(
-                sql.text(sql_statement), schema=self.denormalize_name(schema)
+                sql.text(sql_statement), {"schema": self.denormalize_name(schema)}
             )
         tables = [self.normalize_name(row[0]) for row in result]
         return tables
@@ -944,7 +943,7 @@ class EXADialect(default.DefaultDialect):
         else:
             sql_statement += ":schema ORDER BY view_name"
             result = connection.execute(
-                sql.text(sql_statement), schema=self.denormalize_name(schema)
+                sql.text(sql_statement), {"schema": self.denormalize_name(schema)}
             )
         return [self.normalize_name(row[0]) for row in result]
 
@@ -958,8 +957,10 @@ class EXADialect(default.DefaultDialect):
             sql_stmnt += ":schema"
         result = connection.execute(
             sql.text(sql_stmnt),
-            view_name=self.denormalize_name(view_name),
-            schema=self.denormalize_name(schema),
+            {
+                "view_name": self.denormalize_name(view_name),
+                "schema": self.denormalize_name(schema),
+            },
         ).scalar()
         return result if result else None
 
@@ -999,8 +1000,10 @@ class EXADialect(default.DefaultDialect):
         )
         result = connection.execute(
             sql.text(sql_statement),
-            schema=self.denormalize_name(schema),
-            table=self.denormalize_name(table_name),
+            {
+                "schema": self.denormalize_name(schema),
+                "table": self.denormalize_name(table_name),
+            },
         )
         return list(result)
 
@@ -1103,8 +1106,10 @@ class EXADialect(default.DefaultDialect):
         )
         result = connection.execute(
             sql.text(sql_statement),
-            schema=self.denormalize_name(schema),
-            table=table_name,
+            {
+                "schema": self.denormalize_name(schema),
+                "table": self.denormalize_name(table_name),
+            },
         )
         pkeys = []
         constraint_name = None
@@ -1132,8 +1137,10 @@ class EXADialect(default.DefaultDialect):
         )
         result = connection.execute(
             sql.text(sql_statement),
-            schema=self.denormalize_name(schema),
-            table=self.denormalize_name(table_name),
+            {
+                "schema": self.denormalize_name(schema),
+                "table": self.denormalize_name(table_name),
+            },
         )
         return list(result)
 

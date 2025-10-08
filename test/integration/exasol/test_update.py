@@ -1,10 +1,10 @@
 import pytest
 from sqlalchemy import *
-from sqlalchemy import testing
 from sqlalchemy.testing import (
     eq_,
     fixtures,
 )
+from sqlalchemy.testing.fixtures import config
 from sqlalchemy.testing.schema import (
     Column,
     Table,
@@ -82,7 +82,7 @@ class _UpdateTestBase:
 
 
 @pytest.mark.skipif(
-    testing.db.dialect.driver == "turbodbc", reason="not supported by turbodbc"
+    config.db.dialect.driver == "turbodbc", reason="not supported by turbodbc"
 )
 class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
     __backend__ = True
@@ -91,7 +91,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
         """test simple update and assert that exasol returns the right rowcount"""
         users = self.tables[f"{self.schema}.users"]
 
-        with testing.db.begin() as conn:
+        with config.db.begin() as conn:
             result = conn.execute(
                 users.update().values(name="peter").where(users.c.id == 10)
             )
@@ -103,7 +103,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
         """test simple update and assert that exasol returns the right rowcount"""
         users = self.tables[f"{self.schema}.users"]
 
-        with testing.db.begin() as conn:
+        with config.db.begin() as conn:
             result = conn.execute(
                 users.update().values(name="peter").where(users.c.id >= 9)
             )
@@ -126,7 +126,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
             {"oldname": "fred", "newname": "fred2"},
         ]
 
-        with testing.db.begin() as conn:
+        with config.db.begin() as conn:
             result = conn.execute(stmt, values)
 
         # Depending on the dialect it either reports that the affected rows information
@@ -142,9 +142,9 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
 
     def _assert_addresses(self, addresses, expected):
         stmt = addresses.select().order_by(addresses.c.id)
-        eq_(testing.db.execute(stmt).fetchall(), expected)
+        eq_(config.db.execute(stmt).fetchall(), expected)
 
     def _assert_users(self, users, expected):
         stmt = users.select().order_by(users.c.id)
-        with testing.db.connect() as conn:
+        with config.db.connect() as conn:
             eq_(conn.execute(stmt).fetchall(), expected)

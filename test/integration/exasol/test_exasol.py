@@ -91,7 +91,8 @@ class ConstraintsTest(fixtures.TablesTest):
 
     def test_distribute_by_constraint(self):
         try:
-            Table("t", MetaData(testing.db), autoload=True)
+            with testing.db.connect() as conn:
+                Table("t", MetaData(), autoload_with=conn)
         except:
             assert False
         # TODO: check that reflected table object is identical

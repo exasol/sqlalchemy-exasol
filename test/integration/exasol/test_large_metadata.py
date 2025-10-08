@@ -54,24 +54,25 @@ class LargeMetadataTest(fixtures.TablesTest):
                         )
                         c.execute(sql.text(table_ddl))
 
-                meta = MetaData(bind=config.db)
-                table_name = self.get_table_name(table_count, column_count, 0)
-                start = time.time()
-                # insert into table
-                Table(table_name, meta, autoload=True, schema=self.schema)
-                end = time.time()
-                print(
-                    "table load timer: attempt: 1, table_count: %s, column_count: %s, time: %s"
-                    % (table_count, column_count, (end - start))
-                )
-                start = time.time()
-                # insert into table
-                Table(table_name, meta, autoload=True, schema=self.schema)
-                end = time.time()
-                print(
-                    "table load timer: attempt: 2, table_count: %s, column_count: %s, time: %s"
-                    % (table_count, column_count, (end - start))
-                )
+                with config.db.connect() as conn:
+                    meta = MetaData()
+                    table_name = self.get_table_name(table_count, column_count, 0)
+                    start = time.time()
+                    # insert into table
+                    Table(table_name, meta, autoload_with=conn, schema=self.schema)
+                    end = time.time()
+                    print(
+                        "table load timer: attempt: 1, table_count: %s, column_count: %s, time: %s"
+                        % (table_count, column_count, (end - start))
+                    )
+                    start = time.time()
+                    # insert into table
+                    Table(table_name, meta, autoload_with=conn, schema=self.schema)
+                    end = time.time()
+                    print(
+                        "table load timer: attempt: 2, table_count: %s, column_count: %s, time: %s"
+                        % (table_count, column_count, (end - start))
+                    )
 
     def test_reflect_metadata_object(self):
         for table_count in table_counts:
@@ -89,9 +90,10 @@ class LargeMetadataTest(fixtures.TablesTest):
                             self.schema, table_name, column_count
                         )
                         c.execute(sql.text(table_ddl))
-                meta = MetaData(bind=config.db)
+                meta = MetaData()
                 start = time.time()
-                meta.reflect()
+                with config.db.connect() as conn:
+                    meta.reflect(bind=conn)
                 end = time.time()
                 print(
                     "all tables (MetaData.reflect) load timer: table_count: %s, column_count: %s, time: %s"

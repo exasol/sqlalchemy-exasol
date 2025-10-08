@@ -94,6 +94,10 @@ addopts = "--tb native -v -r fxX"
 filterwarnings = [
 # before end of #413, switch this from a text specific issue to a general error on a warning to ensure known deprecation issues have been resolved
 "error:.*Passing a string.*",
+"error:.* a single dictionary.*",
+"error:.*The MetaData.bind argument.*",
+"error:.*The autoload parameter.*",
+"error:.*schema methods that invoke SQL against.*",
 # this is used for turbodbc and pyodbc as historically we'd like to remove them.
 # thus far, it seems like this is not a strict requirement for the migration,
 # so we will ignore them.

@@ -47,8 +47,12 @@ class DefaultsTest(fixtures.TablesTest):
     def test_insert_with_default_value(self):
         t = self.tables.t
 
-        config.db.execute(t.insert(), [{"name": "Henrik"}])
-        (_, _, active_from) = config.db.execute(t.select()).fetchone()
+        with config.db.begin() as conn:
+            conn.execute(t.insert(), [{"name": "Henrik"}])
+
+        with config.db.connect() as conn:
+            (_, _, active_from) = conn.execute(t.select()).fetchone()
+
         assert active_from == datetime.date(1900, 1, 1)
 
 
@@ -56,12 +60,14 @@ class KeywordTest(fixtures.TablesTest):
     __backend__ = True
 
     def test_keywords(self):
-        keywords = config.db.execute(
-            sql.text(
-                "select distinct(lower(keyword)) as keyword "
-                + "from SYS.EXA_SQL_KEYWORDS where reserved = True order by keyword"
-            )
-        ).fetchall()
+        with config.db.connect() as conn:
+            keywords = conn.execute(
+                sql.text(
+                    "select distinct(lower(keyword)) as keyword "
+                    + "from SYS.EXA_SQL_KEYWORDS where reserved = True order by keyword"
+                )
+            ).fetchall()
+
         db_keywords = {k[0] for k in keywords}
 
         assert db_keywords >= RESERVED_WORDS
@@ -108,13 +114,15 @@ class ConstraintsTest(fixtures.TablesTest):
         dbc = DistributeByConstraint("a", "b")
         self.tables.t.append_constraint(dbc)
 
-        config.db.execute(DropConstraint(dbc))
+        with config.db.begin() as conn:
+            conn.execute(DropConstraint(dbc))
 
         insp = inspect(testing.db)
         for c in insp.get_columns("t"):
             assert c["is_distribution_key"] == False
 
-        config.db.execute(AddConstraint(dbc))
+        with config.db.begin() as conn:
+            conn.execute(AddConstraint(dbc))
 
         insp = inspect(testing.db)
         for c in insp.get_columns("t"):

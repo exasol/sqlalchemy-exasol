@@ -90,22 +90,25 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
     def test_update_simple(self):
         """test simple update and assert that exasol returns the right rowcount"""
         users = self.tables[f"{self.schema}.users"]
-        result = testing.db.execute(
-            users.update().values(name="peter").where(users.c.id == 10)
-        )
-        expected = [(7, "jack"), (8, "ed"), (9, "fred"), (10, "peter")]
+
+        with testing.db.begin() as conn:
+            result = conn.execute(
+                users.update().values(name="peter").where(users.c.id == 10)
+            )
+
         assert result.rowcount == 1
-        self._assert_users(users, expected)
+        self._assert_users(users, [(7, "jack"), (8, "ed"), (9, "fred"), (10, "peter")])
 
     def test_update_simple_multiple_rows_rowcount(self):
         """test simple update and assert that exasol returns the right rowcount"""
         users = self.tables[f"{self.schema}.users"]
-        result = testing.db.execute(
-            users.update().values(name="peter").where(users.c.id >= 9)
-        )
-        expected = [(7, "jack"), (8, "ed"), (9, "peter"), (10, "peter")]
+
+        with testing.db.begin() as conn:
+            result = conn.execute(
+                users.update().values(name="peter").where(users.c.id >= 9)
+            )
         assert result.rowcount == 2
-        self._assert_users(users, expected)
+        self._assert_users(users, [(7, "jack"), (8, "ed"), (9, "peter"), (10, "peter")])
 
     def test_update_executemany(self):
         """test that update with executemany work as well, but rowcount
@@ -123,8 +126,8 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
             {"oldname": "fred", "newname": "fred2"},
         ]
 
-        result = testing.db.execute(stmt, values)
-        expected = [(7, "jack2"), (8, "ed"), (9, "fred2"), (10, "chuck")]
+        with testing.db.begin() as conn:
+            result = conn.execute(stmt, values)
 
         # Depending on the dialect it either reports that the affected rows information
         # is not available (-1) or it reports the actual number of updated/affected rows(2)
@@ -133,7 +136,9 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
         expected_rowcount = [expected_rowcount_odbc, expected_rowcount_wss]
         assert result.rowcount in expected_rowcount
 
-        self._assert_users(users, expected)
+        self._assert_users(
+            users, [(7, "jack2"), (8, "ed"), (9, "fred2"), (10, "chuck")]
+        )
 
     def _assert_addresses(self, addresses, expected):
         stmt = addresses.select().order_by(addresses.c.id)
@@ -141,4 +146,5 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
 
     def _assert_users(self, users, expected):
         stmt = users.select().order_by(users.c.id)
-        eq_(testing.db.execute(stmt).fetchall(), expected)
+        with testing.db.connect() as conn:
+            eq_(conn.execute(stmt).fetchall(), expected)

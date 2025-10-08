@@ -31,8 +31,7 @@ class TranslateMap(fixtures.TestBase):
     def setup_class(cls):
         cls.table_name = "my_table"
         cls.tenant_schema_name = "tenant_schema"
-        engine = config.db
-        with config.db.connect() as conn:
+        with config.db.begin() as conn:
             conn.execute(CreateSchema(cls.tenant_schema_name))
             metadata = MetaData()
             Table(
@@ -42,15 +41,16 @@ class TranslateMap(fixtures.TestBase):
                 Column("name", String(1000), nullable=False),
                 schema=cls.tenant_schema_name,
             )
-            metadata.create_all(engine)
+            metadata.create_all(conn)
 
     @classmethod
     def teardown_class(cls):
-        with config.db.connect() as conn:
+        with config.db.begin() as conn:
             conn.execute(DropSchema(cls.tenant_schema_name, cascade=True))
 
     def test_use_schema_translate_map_in_get_last_row_id(self):
         """See also: https://github.com/exasol/sqlalchemy-exasol/issues/104"""
+        pass
         schema_name = "some_none_existent_schema"
         options = {"schema_translate_map": {schema_name: self.tenant_schema_name}}
         metadata = MetaData()
@@ -62,7 +62,7 @@ class TranslateMap(fixtures.TestBase):
             schema=schema_name,
         )
         engine = create_engine(config.db.url, execution_options=options)
-        with engine.connect() as conn:
+        with engine.begin() as conn:
             conn.execute(my_table.insert().values(name="John Doe"))
 
 
@@ -80,8 +80,7 @@ class Introspection(fixtures.TestBase):
     @classmethod
     def setup_class(cls):
         def _create_tables(schema, tables):
-            engine = config.db
-            with engine.connect():
+            with config.db.begin() as conn:
                 metadata = MetaData()
                 for name in tables:
                     Table(
@@ -91,11 +90,10 @@ class Introspection(fixtures.TestBase):
                         Column("random_field", String(1000)),
                         schema=schema,
                     )
-                metadata.create_all(engine)
+                metadata.create_all(conn)
 
         def _create_views(schema, views):
-            engine = config.db
-            with engine.connect() as conn:
+            with config.db.begin() as conn:
                 for name in views:
                     conn.execute(
                         sql.text(
@@ -112,17 +110,15 @@ class Introspection(fixtures.TestBase):
 
     @classmethod
     def teardown_class(cls):
-        engine = config.db
-
         def _drop_tables(schema):
             metadata = MetaData(schema=schema)
-            with engine.connect() as conn:
+            with config.db.begin() as conn:
                 metadata.reflect(bind=conn)
                 to_be_deleted = [metadata.tables[name] for name in metadata.tables]
-                metadata.drop_all(engine, to_be_deleted)
+                metadata.drop_all(conn, to_be_deleted)
 
         def _drop_views(schema, views):
-            with engine.connect() as conn:
+            with config.db.begin() as conn:
                 for name in views:
                     conn.execute(sql.text(f"DROP VIEW {schema}.{name};"))
 
@@ -143,4 +139,4 @@ class Introspection(fixtures.TestBase):
         engine = create_engine(config.db.url, poolclass=pool_type)
         inspector = inspect(engine)
         tables = inspector.get_view_names(schema=self.schema)
-        assert expected == tables
+        assert tables == expected

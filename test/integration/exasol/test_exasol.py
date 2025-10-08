@@ -10,6 +10,7 @@ from sqlalchemy import (
     Table,
     inspect,
     or_,
+    sql,
     testing,
 )
 from sqlalchemy.schema import (
@@ -21,7 +22,10 @@ from sqlalchemy.testing import (
     fixtures,
 )
 
-from sqlalchemy_exasol.base import EXAExecutionContext
+from sqlalchemy_exasol.base import (
+    RESERVED_WORDS,
+    EXAExecutionContext,
+)
 from sqlalchemy_exasol.constraints import DistributeByConstraint
 from sqlalchemy_exasol.util import raw_sql
 
@@ -53,11 +57,14 @@ class KeywordTest(fixtures.TablesTest):
 
     def test_keywords(self):
         keywords = config.db.execute(
-            "select distinct(lower(keyword)) as keyword "
-            + "from SYS.EXA_SQL_KEYWORDS where reserved = True order by keyword"
+            sql.text(
+                "select distinct(lower(keyword)) as keyword "
+                + "from SYS.EXA_SQL_KEYWORDS where reserved = True order by keyword"
+            )
         ).fetchall()
         db_keywords = {k[0] for k in keywords}
-        # assert db_keywords <= RESERVED_WORDS
+
+        assert db_keywords >= RESERVED_WORDS
 
 
 class AutocommitTest(fixtures.TablesTest):
@@ -84,7 +91,7 @@ class ConstraintsTest(fixtures.TablesTest):
 
     def test_distribute_by_constraint(self):
         try:
-            reflected = Table("t", MetaData(testing.db), autoload=True)
+            Table("t", MetaData(testing.db), autoload=True)
         except:
             assert False
         # TODO: check that reflected table object is identical
@@ -141,7 +148,8 @@ class UtilTest(fixtures.TablesTest):
             self.tables.t.c.created == datetime.datetime(2017, 1, 1, 12, 0, 0),
         )
         sel = self.tables.t.select().where(restriction)
-        sql = """SELECT t.id, t.name, t.age, t."day", t.created 
-FROM t 
-WHERE t.id = 1 OR t.name = \'bob\' OR t."day" = to_date(\'2017-01-01\', \'YYYY-MM-DD\') OR t.created = to_timestamp(\'2017-01-01 12:00:00.000000\', \'YYYY-MM-DD HH24:MI:SS.FF6\')"""
-        assert raw_sql(sel) == sql
+        assert raw_sql(sel) == (
+            'SELECT t.id, t.name, t.age, t."day", t.created \n'
+            "FROM t \n"
+            "WHERE t.id = 1 OR t.name = 'bob' OR t.\"day\" = to_date('2017-01-01', 'YYYY-MM-DD') OR t.created = to_timestamp('2017-01-01 12:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6')"
+        )

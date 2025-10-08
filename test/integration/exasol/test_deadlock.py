@@ -6,6 +6,11 @@ import sqlalchemy.testing as testing
 from sqlalchemy import (
     create_engine,
     inspect,
+    sql,
+)
+from sqlalchemy.sql.ddl import (
+    CreateSchema,
+    DropSchema,
 )
 from sqlalchemy.testing import (
     config,
@@ -139,7 +144,7 @@ class MetadataTest(fixtures.TablesTest):
 
     def watchdog(self, session0, schema):
         while self.watchdog_run:
-            rs = session0.execute("SELECT * FROM SYS.EXA_ALL_SESSIONS")
+            rs = session0.execute(sql.text("SELECT * FROM SYS.EXA_ALL_SESSIONS"))
             rs = [row for row in rs]
             if self.WATCHDOG_ECHO:
                 print()
@@ -152,7 +157,7 @@ class MetadataTest(fixtures.TablesTest):
                 if row[7] is not None and "Waiting for" in row[7]:
                     if self.WATCHDOG_ECHO:
                         print(f"Killing session: {row[0]}")
-                    session0.execute(f"kill session {row[0]}")
+                    session0.execute(sql.text(f"kill session {row[0]}"))
             if self.WATCHDOG_ECHO:
                 print("===========================================")
                 print()
@@ -167,40 +172,46 @@ class MetadataTest(fixtures.TablesTest):
         schema = "deadlock_get_table_names_test_schema"
         engine0, session0 = self.create_transaction(url, "transaction0")
         try:
-            session0.execute(f"DROP SCHEMA {schema} cascade")
+            session0.execute(DropSchema(schema, cascade=True))
         except:
             pass
-        session0.execute(f"CREATE SCHEMA {schema}")
+        session0.execute(CreateSchema(schema))
         session0.execute(
-            f"CREATE OR REPLACE TABLE {schema}.deadlock_test1 (id int PRIMARY KEY)"
+            sql.text(
+                f"CREATE OR REPLACE TABLE {schema}.deadlock_test1 (id int PRIMARY KEY)"
+            )
         )
         session0.execute(
-            f"CREATE OR REPLACE TABLE {schema}.deadlock_test2 (id int PRIMARY KEY, fk int REFERENCES {schema}.deadlock_test1(id))"
+            sql.text(
+                f"CREATE OR REPLACE TABLE {schema}.deadlock_test2 (id int PRIMARY KEY, fk int REFERENCES {schema}.deadlock_test1(id))"
+            )
         )
-        session0.execute(f"INSERT INTO {schema}.deadlock_test1 VALUES 1")
-        session0.execute(f"INSERT INTO {schema}.deadlock_test2 VALUES (1,1)")
-        session0.execute("commit")
+        session0.execute(sql.text(f"INSERT INTO {schema}.deadlock_test1 VALUES 1"))
+        session0.execute(sql.text(f"INSERT INTO {schema}.deadlock_test2 VALUES (1,1)"))
+        session0.execute(sql.text("commit"))
         self.watchdog_run = True
         t1 = Thread(target=self.watchdog, args=(session0, schema))
         t1.start()
         try:
             engine1, session1 = self.create_transaction(url, "transaction1")
-            session1.execute("SELECT 1")
+            session1.execute(sql.text("SELECT 1"))
 
-            session1.execute(f"SELECT * FROM {schema}.deadlock_test2")
-            session1.execute(f"INSERT INTO {schema}.deadlock_test1 VALUES 2")
+            session1.execute(sql.text(f"SELECT * FROM {schema}.deadlock_test2"))
+            session1.execute(sql.text(f"INSERT INTO {schema}.deadlock_test1 VALUES 2"))
 
             engine3, session3 = self.create_transaction(url, "transaction3")
-            session3.execute("SELECT 1")
-            session3.execute(f"DELETE FROM {schema}.deadlock_test2 WHERE false")
-            session3.execute("commit")
+            session3.execute(sql.text("SELECT 1"))
+            session3.execute(
+                sql.text(f"DELETE FROM {schema}.deadlock_test2 WHERE false")
+            )
+            session3.execute(sql.text("commit"))
 
             engine2, session2 = self.create_transaction(url, "transaction2")
-            session2.execute("SELECT 1")
+            session2.execute(sql.text("SELECT 1"))
             function(session2, schema, "deadlock_test2")
 
-            session2.execute("commit")
-            session1.execute("commit")
+            session2.execute(sql.text("commit"))
+            session1.execute(sql.text("commit"))
         except Exception as e:
             self.watchdog_run = False
             t1.join()
@@ -215,40 +226,44 @@ class MetadataTest(fixtures.TablesTest):
         schema = "deadlock_get_view_names_test_schema"
         engine0, session0 = self.create_transaction(url, "transaction0")
         try:
-            session0.execute(f"DROP SCHEMA {schema} cascade")
+            session0.execute(DropSchema(schema, cascade=True))
         except:
             pass
-        session0.execute(f"CREATE SCHEMA {schema}")
+        session0.execute(CreateSchema(schema))
         session0.execute(
-            f"CREATE OR REPLACE TABLE {schema}.deadlock_test_table (id int)"
+            sql.text(f"CREATE OR REPLACE TABLE {schema}.deadlock_test_table (id int)")
         )
         session0.execute(
-            f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_1 AS SELECT * FROM {schema}.deadlock_test_table"
+            sql.text(
+                f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_1 AS SELECT * FROM {schema}.deadlock_test_table"
+            )
         )
-        session0.execute("commit")
+        session0.execute(sql.text("commit"))
         self.watchdog_run = True
         t1 = Thread(target=self.watchdog, args=(session0, schema))
         t1.start()
         try:
             engine1, session1 = self.create_transaction(url, "transaction1")
-            session1.execute("SELECT 1")
+            session1.execute(sql.text("SELECT 1"))
 
-            session1.execute(f"SELECT * FROM {schema}.deadlock_test_view_1")
+            session1.execute(sql.text(f"SELECT * FROM {schema}.deadlock_test_view_1"))
             session1.execute(
-                f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_2 AS SELECT * FROM {schema}.deadlock_test_table"
+                sql.text(
+                    f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_2 AS SELECT * FROM {schema}.deadlock_test_table"
+                )
             )
 
             engine3, session3 = self.create_transaction(url, "transaction3")
-            session3.execute("SELECT 1")
-            session3.execute(f"DROP VIEW {schema}.deadlock_test_view_1")
-            session3.execute("commit")
+            session3.execute(sql.text("SELECT 1"))
+            session3.execute(sql.text(f"DROP VIEW {schema}.deadlock_test_view_1"))
+            session3.execute(sql.text("commit"))
 
             engine2, session2 = self.create_transaction(url, "transaction2")
-            session2.execute("SELECT 1")
+            session2.execute(sql.text("SELECT 1"))
             function(session2, schema)
 
-            session2.execute("commit")
-            session1.execute("commit")
+            session2.execute(sql.text("commit"))
+            session1.execute(sql.text("commit"))
         except Exception as e:
             self.watchdog_run = False
             t1.join()

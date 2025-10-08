@@ -180,7 +180,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Run Tests and Collect Coverage
-        run: poetry run -- nox -s test:unit -- --coverage
+        run: |
+          export SQLALCHEMY_WARN_20=1
+          poetry run -- nox -s test:unit -- --coverage
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4.6.2

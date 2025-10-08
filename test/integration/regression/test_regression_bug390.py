@@ -11,7 +11,7 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
         # fmt: off
         cleandoc(
             f"""                                
-        from sqlalchemy import create_engine
+        from sqlalchemy import create_engine, sql
         
         def test():
             url = "exa+websocket://{{user}}:{{pw}}@{{host}}:{{port}}?SSLCertificate=SSL_VERIFY_NONE"
@@ -24,7 +24,7 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
             engine = create_engine(url)
             query = "SELECT 42;"
             with engine.connect() as con:
-                result = con.execute(query).fetchall()
+                result = con.execute(sql.text(query)).fetchall()
         """
         ),
         # fmt: on

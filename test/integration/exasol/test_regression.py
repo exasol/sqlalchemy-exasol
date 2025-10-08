@@ -9,6 +9,7 @@ from sqlalchemy import (
     Table,
     create_engine,
     inspect,
+    sql,
 )
 from sqlalchemy.pool import (
     AssertionPool,
@@ -97,7 +98,9 @@ class Introspection(fixtures.TestBase):
             with engine.connect() as conn:
                 for name in views:
                     conn.execute(
-                        f"CREATE OR REPLACE VIEW {schema}.{name} AS SELECT 1 as COLUMN_1;"
+                        sql.text(
+                            f"CREATE OR REPLACE VIEW {schema}.{name} AS SELECT 1 as COLUMN_1;"
+                        )
                     )
 
         cls.schema = "test"
@@ -120,7 +123,7 @@ class Introspection(fixtures.TestBase):
         def _drop_views(schema, views):
             with engine.connect() as conn:
                 for name in views:
-                    conn.execute(f"DROP VIEW {schema}.{name};")
+                    conn.execute(sql.text(f"DROP VIEW {schema}.{name};"))
 
         _drop_tables(cls.schema)
         _drop_views(cls.schema, cls.views)

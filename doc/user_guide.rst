@@ -22,13 +22,15 @@ Getting Started
 
     .. code-block:: python
 
-        from sqlalchemy import create_engine
+        from sqlalchemy import create_engine, sql
         url = "exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
         e = create_engine(url)
-        r = e.execute("select 42 from dual").fetchall()
+        query = "select 42 from dual"
+        with engine.connect() as con:
+            result = con.execute(sql.text(query)).fetchall()
 
 
-For more details on SQLAlchemy consult it's `documenation <https://docs.sqlalchemy.org/en/13/>`_.
+For more details on SQLAlchemy consult it's `documentation <https://docs.sqlalchemy.org/en/13/>`_.
 
 Readme
 ~~~~~~

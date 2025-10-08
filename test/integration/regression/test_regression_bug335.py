@@ -1,7 +1,4 @@
-import warnings
-
 import pytest
-import sqlalchemy.exc
 from sqlalchemy import (
     Column,
     Integer,
@@ -10,6 +7,11 @@ from sqlalchemy import (
     Table,
     create_engine,
     insert,
+    sql,
+)
+from sqlalchemy.sql.ddl import (
+    CreateSchema,
+    DropSchema,
 )
 
 from exasol.odbc import (
@@ -29,22 +31,24 @@ def pyodbc_connection_string(exasol_config):
 
 
 @pytest.fixture()
-def test_schema(control_connection):
-    connection = control_connection
+def test_schema(pyexasol_connection):
+    connection = pyexasol_connection
     schema = "REGRESSION_335"
-    connection.execute(f"CREATE SCHEMA {schema}")
+    connection.execute(CreateSchema(schema))
     connection.commit()
     yield schema
-    connection.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+    connection.execute(DropSchema(schema, cascade=True))
     connection.commit()
 
 
 @pytest.fixture()
-def users_table(control_connection, test_schema):
-    connection = control_connection
+def users_table(pyexasol_connection, test_schema):
+    connection = pyexasol_connection
     table_name = "users"
     connection.execute(
-        f"create table {test_schema}.{table_name} (id DECIMAL(18) identity primary key, name VARCHAR(2000) UTF8)"
+        sql.text(
+            f"create table {test_schema}.{table_name} (id DECIMAL(18) identity primary key, name VARCHAR(2000) UTF8)"
+        )
     )
     connection.commit()
     yield test_schema, table_name
@@ -68,21 +72,16 @@ def test_lastrowid_does_not_create_extra_commit(
         schema=schema_name,
     )
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=sqlalchemy.exc.RemovedIn20Warning)
-        with odbcconfig(ODBC_DRIVER):
-            conn = engine.connect()
-            trans = conn.begin()
+    with odbcconfig(ODBC_DRIVER):
+        with engine.connect() as connection:
+            with connection.begin() as transaction:
+                # Insert without an explicit ID will trigger a call to `get_lastrowid`
+                # which in turn cause the unintended autocommit
+                insert_statement = insert(table).values(name="Gandalf")
+                connection.execute(insert_statement)
+                transaction.rollback()
 
-            # Insert without an explicit ID will trigger a call to `get_lastrowid`
-            # which in turn cause the unintended autocommit
-            insert_statement = insert(table).values(name="Gandalf")
-            conn.execute(insert_statement)
-            trans.rollback()
-
-            result = conn.execute(
-                f"SELECT * FROM {schema_name}.{table_name};"
+            result = connection.execute(
+                sql.text(f"SELECT * FROM {schema_name}.{table_name};")
             ).fetchall()
-            conn.close()
-
-            assert len(result) == 0
+    assert len(result) == 0

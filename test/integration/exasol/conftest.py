@@ -28,7 +28,7 @@ _TEST_SCHEMA = "TEST"
 
 
 @contextmanager
-def _connection(dsn="localhost:8563", user="SYS", password="exasol"):
+def _pyexasol_connection(dsn="localhost:8563", user="SYS", password="exasol"):
     connection = pyexasol.connect(
         dsn=dsn,
         user=user,
@@ -39,7 +39,7 @@ def _connection(dsn="localhost:8563", user="SYS", password="exasol"):
 
 
 def pytest_sessionstart(session):
-    with _connection() as con:
+    with _pyexasol_connection() as con:
         con.execute(f"DROP SCHEMA IF EXISTS {_TEST_SCHEMA} CASCADE;")
         con.execute(f"CREATE SCHEMA {_TEST_SCHEMA};")
         con.commit()
@@ -48,7 +48,7 @@ def pytest_sessionstart(session):
 
 
 def pytest_sessionfinish(session):
-    with _connection() as con:
+    with _pyexasol_connection() as con:
         con.execute(f"DROP SCHEMA IF EXISTS {_TEST_SCHEMA} CASCADE;")
         con.commit()
 

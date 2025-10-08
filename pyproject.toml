@@ -92,9 +92,12 @@ exasol-toolbox = "^1.9.0"
 [tool.pytest.ini_options]
 addopts = "--tb native -v -r fxX"
 filterwarnings = [
-    "error::DeprecationWarning",
-    "ignore::DeprecationWarning:sqlalchemy.testing.plugin.*",
-    "ignore::DeprecationWarning:sqlalchemy_exasol.*",
+# before end of #413, switch this from a text specific issue to a general error on a warning to ensure known deprecation issues have been resolved
+"error:.*Passing a string.*",
+# this is used for turbodbc and pyodbc as historically we'd like to remove them.
+# thus far, it seems like this is not a strict requirement for the migration,
+# so we will ignore them.
+"ignore::sqlalchemy_exasol.warnings.SqlaExasolDeprecationWarning"
 ]
 
 [tool.black]

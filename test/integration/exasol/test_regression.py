@@ -50,7 +50,6 @@ class TranslateMap(fixtures.TestBase):
 
     def test_use_schema_translate_map_in_get_last_row_id(self):
         """See also: https://github.com/exasol/sqlalchemy-exasol/issues/104"""
-        pass
         schema_name = "some_none_existent_schema"
         options = {"schema_translate_map": {schema_name: self.tenant_schema_name}}
         metadata = MetaData()

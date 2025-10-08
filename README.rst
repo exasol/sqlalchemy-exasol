@@ -95,8 +95,8 @@ Using SQLAlchemy with EXASOL DB
 
 .. code-block:: python
 
-	from sqlalchemy import create_engine
-	url = "exa+websocket://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8"
+    from sqlalchemy import create_engine
+    url = "exa+websocket://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8"
     e = create_engine(url)
     query = "select 42 from dual"
     with engine.connect() as con:
@@ -109,6 +109,12 @@ Examples:
     from sqlalchemy import create_engine
 
     engine = create_engine("exa+websocket://sys:exasol@127.0.0.1:8888")
+
+    # don't rely on autocommit for DML and DDL
+    with engine.begin() as con:
+        ...
+
+    # for non-DML or non-DDL queries
     with engine.connect() as con:
         ...
 
@@ -132,8 +138,8 @@ Examples:
 
 .. code-block:: python
 
-	from sqlalchemy import create_engine
-	url = "exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
+    from sqlalchemy import create_engine
+    url = "exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
     e = create_engine(url)
     query = "select 42 from dual"
     with engine.connect() as con:
@@ -143,8 +149,8 @@ Examples:
 
 .. code-block:: python
 
-	from sqlalchemy import create_engine
-	url = "exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
+    from sqlalchemy import create_engine
+    url = "exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
     e = create_engine(url)
     query = "select 42 from dual"
     with engine.connect() as con:
@@ -166,7 +172,7 @@ General Notes
 
 .. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
 .. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
-.. _test_drive: https://cloud.exasol.com/signup 
+.. _test_drive: https://cloud.exasol.com/signup
 .. _test_docker_image: https://github.com/exasol/docker-db
 
 Known Issues
@@ -177,5 +183,3 @@ Known Issues
 Development & Testing
 ---------------------
 See `developer guide`_
-
-

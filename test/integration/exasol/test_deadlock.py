@@ -31,7 +31,10 @@ class MetadataTest(fixtures.TablesTest):
 
     def create_transaction(self, url, con_name):
         engine = create_engine(
-            config.db.url, echo=self.CONNECTION_ECHO, logging_name="engine" + con_name
+            config.db.url,
+            echo=self.CONNECTION_ECHO,
+            logging_name="engine" + con_name,
+            future=True,
         )
         session = engine.connect().execution_options(autocommit=False)
         return engine, session
@@ -188,7 +191,7 @@ class MetadataTest(fixtures.TablesTest):
         )
         session0.execute(sql.text(f"INSERT INTO {schema}.deadlock_test1 VALUES 1"))
         session0.execute(sql.text(f"INSERT INTO {schema}.deadlock_test2 VALUES (1,1)"))
-        session0.execute(sql.text("commit"))
+        session0.commit()
         self.watchdog_run = True
         t1 = Thread(target=self.watchdog, args=(session0, schema))
         t1.start()
@@ -204,14 +207,14 @@ class MetadataTest(fixtures.TablesTest):
             session3.execute(
                 sql.text(f"DELETE FROM {schema}.deadlock_test2 WHERE false")
             )
-            session3.execute(sql.text("commit"))
+            session3.commit()
 
             engine2, session2 = self.create_transaction(url, "transaction2")
             session2.execute(sql.text("SELECT 1"))
             function(session2, schema, "deadlock_test2")
 
-            session2.execute(sql.text("commit"))
-            session1.execute(sql.text("commit"))
+            session2.commit()
+            session1.commit()
         except Exception as e:
             self.watchdog_run = False
             t1.join()
@@ -238,7 +241,7 @@ class MetadataTest(fixtures.TablesTest):
                 f"CREATE OR REPLACE VIEW {schema}.deadlock_test_view_1 AS SELECT * FROM {schema}.deadlock_test_table"
             )
         )
-        session0.execute(sql.text("commit"))
+        session0.commit()
         self.watchdog_run = True
         t1 = Thread(target=self.watchdog, args=(session0, schema))
         t1.start()
@@ -256,14 +259,14 @@ class MetadataTest(fixtures.TablesTest):
             engine3, session3 = self.create_transaction(url, "transaction3")
             session3.execute(sql.text("SELECT 1"))
             session3.execute(sql.text(f"DROP VIEW {schema}.deadlock_test_view_1"))
-            session3.execute(sql.text("commit"))
+            session3.commit()
 
             engine2, session2 = self.create_transaction(url, "transaction2")
             session2.execute(sql.text("SELECT 1"))
             function(session2, schema)
 
-            session2.execute(sql.text("commit"))
-            session1.execute(sql.text("commit"))
+            session2.commit()
+            session1.commit()
         except Exception as e:
             self.watchdog_run = False
             t1.join()

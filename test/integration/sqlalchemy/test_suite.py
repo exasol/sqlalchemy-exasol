@@ -276,7 +276,9 @@ class ExceptionTest(_ExceptionTest):
         # Note: autocommit currently is needed to force error evaluation,
         #       otherwise errors will be swallowed.
         #       see also https://github.com/exasol/sqlalchemy-exasol/issues/120
-        engine = create_engine(config.db.url, connect_args={"autocommit": True})
+        engine = create_engine(
+            config.db.url, connect_args={"autocommit": True}, future=True
+        )
         with engine.connect() as conn:
             trans = conn.begin()
             conn.execute(self.tables.manual_pk.insert(), {"id": 1, "data": "d1"})

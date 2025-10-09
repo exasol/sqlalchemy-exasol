@@ -62,7 +62,7 @@ def test_lastrowid_does_not_create_extra_commit(
     """
     schema_name, table_name = users_table
     metadata = MetaData()
-    engine = create_engine(pyodbc_connection_string)
+    engine = create_engine(pyodbc_connection_string, future=True)
 
     table = Table(
         table_name,

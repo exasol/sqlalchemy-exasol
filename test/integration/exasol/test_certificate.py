@@ -37,7 +37,7 @@ class CertificateTest(TestBase):
     ):
         url = self.remove_ssl_settings(config.db.url)
 
-        engine = create_engine(url)
+        engine = create_engine(url, future=True)
         with pytest.raises(sqlalchemy.exc.DBAPIError) as exec_info:
             # we expect connect call to fail, but want to close it in case it succeeds
             with engine.connect():

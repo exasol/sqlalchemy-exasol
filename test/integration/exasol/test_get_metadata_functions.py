@@ -105,7 +105,7 @@ class MetadataTest(fixtures.TablesTest):
     @classmethod
     def create_engine_with_database_name(cls, connection, new_database_name):
         url = cls.generate_url_with_database_name(connection, new_database_name)
-        engine = create_engine(url)
+        engine = create_engine(url, future=True)
         return engine
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])

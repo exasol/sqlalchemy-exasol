@@ -276,7 +276,8 @@ class ExceptionTest(_ExceptionTest):
         #       otherwise errors will be swallowed.
         #       see also https://github.com/exasol/sqlalchemy-exasol/issues/120
         engine = create_engine(
-            config.db.url, connect_args={"autocommit": True}, future=True
+            config.db.url,
+            connect_args={"autocommit": True},
         )
         with engine.connect() as conn:
             trans = conn.begin()

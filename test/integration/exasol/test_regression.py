@@ -62,7 +62,7 @@ class TranslateMap(fixtures.TestBase):
             Column("name", String(1000), nullable=False),
             schema=schema_name,
         )
-        engine = create_engine(config.db.url, execution_options=options, future=True)
+        engine = create_engine(config.db.url, execution_options=options)
         with engine.begin() as conn:
             conn.execute(my_table.insert().values(name="John Doe"))
 
@@ -129,7 +129,7 @@ class Introspection(fixtures.TestBase):
     @pytest.mark.parametrize("pool_type", POOL_TYPES)
     def test_introspection_of_tables_works_with(self, pool_type):
         expected = self.tables
-        engine = create_engine(config.db.url, poolclass=pool_type, future=True)
+        engine = create_engine(config.db.url, poolclass=pool_type)
         inspector = inspect(engine)
         tables = inspector.get_table_names(schema=self.schema)
         assert expected == tables
@@ -137,7 +137,7 @@ class Introspection(fixtures.TestBase):
     @pytest.mark.parametrize("pool_type", POOL_TYPES)
     def test_introspection_of_views_works_with(self, pool_type):
         expected = self.views
-        engine = create_engine(config.db.url, poolclass=pool_type, future=True)
+        engine = create_engine(config.db.url, poolclass=pool_type)
         inspector = inspect(engine)
         tables = inspector.get_view_names(schema=self.schema)
         assert tables == expected

@@ -34,7 +34,6 @@ class MetadataTest(fixtures.TablesTest):
             config.db.url,
             echo=self.CONNECTION_ECHO,
             logging_name="engine" + con_name,
-            future=True,
         )
         session = engine.connect().execution_options(autocommit=False)
         return engine, session

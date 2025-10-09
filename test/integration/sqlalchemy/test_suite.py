@@ -19,6 +19,7 @@ from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgume
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
+from sqlalchemy.testing.suite import testing
 from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
@@ -165,13 +166,6 @@ class RowCountTest(_RowCountTest):
     )
     def test_delete_rowcount(self, connection):
         super().test_delete_rowcount(connection)
-
-    @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
-    )
-    @testing.requires.sane_rowcount_w_returning
-    def test_update_rowcount_return_defaults(self, connection):
-        super().test_update_rowcount_return_defaults(connection)
 
 
 class DifficultParametersTest(_DifficultParametersTest):

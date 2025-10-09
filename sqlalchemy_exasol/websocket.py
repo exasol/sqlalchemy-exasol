@@ -96,7 +96,7 @@ class EXADialect_websocket(EXADialect):
     }
 
     @classmethod
-    def dbapi(cls):
+    def import_dbapi(cls):
         return __import__(
             "exasol.driver.websocket.dbapi2", fromlist="exasol.driver.websocket"
         )

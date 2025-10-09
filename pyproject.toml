@@ -62,7 +62,7 @@ exclude = []
 [tool.poetry.dependencies]
 packaging = ">=21.3"
 pyexasol = ">=0.26.0,<1"
-sqlalchemy = ">=1.4,<2"
+sqlalchemy = "^2.0.0"
 
 turbodbc = { version = "==4.5.4", optional = true }
 pyodbc = { version = ">=4.0.34,<6", optional = true }
@@ -98,6 +98,9 @@ filterwarnings = [
 # thus far, it seems like this is not a strict requirement for the migration,
 # so we will ignore them.
 "ignore::sqlalchemy_exasol.warnings.SqlaExasolDeprecationWarning"
+]
+markers = [
+    "backend: backend tests.",
 ]
 
 [tool.black]

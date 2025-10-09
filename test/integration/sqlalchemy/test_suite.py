@@ -4,7 +4,6 @@ from inspect import cleandoc
 import pytest
 from sqlalchemy import (
     create_engine,
-    testing,
 )
 from sqlalchemy.schema import DDL
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest

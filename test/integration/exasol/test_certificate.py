@@ -1,15 +1,11 @@
-import copy
-
 import pytest
 import sqlalchemy.exc
 from sqlalchemy import (
     create_engine,
     testing,
 )
-from sqlalchemy.testing.fixtures import (
-    TestBase,
-    config,
-)
+from sqlalchemy.testing import config
+from sqlalchemy.testing.fixtures import TestBase
 
 
 class CertificateTest(TestBase):
@@ -37,7 +33,7 @@ class CertificateTest(TestBase):
     ):
         url = self.remove_ssl_settings(config.db.url)
 
-        engine = create_engine(url, future=True)
+        engine = create_engine(url)
         with pytest.raises(sqlalchemy.exc.DBAPIError) as exec_info:
             # we expect connect call to fail, but want to close it in case it succeeds
             with engine.connect():

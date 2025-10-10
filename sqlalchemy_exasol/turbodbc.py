@@ -83,7 +83,7 @@ class EXADialect_turbodbc(EXADialect):
         super().__init__(**kw)
 
     @classmethod
-    def dbapi(cls):
+    def import_dbapi(cls):
         return __import__("turbodbc")
 
     def create_connect_args(self, url):

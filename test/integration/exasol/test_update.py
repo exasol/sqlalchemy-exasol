@@ -1,10 +1,10 @@
 import pytest
 from sqlalchemy import *
 from sqlalchemy.testing import (
+    config,
     eq_,
     fixtures,
 )
-from sqlalchemy.testing.fixtures import config
 from sqlalchemy.testing.schema import (
     Column,
     Table,

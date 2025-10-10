@@ -37,12 +37,11 @@ class Decimal(sqltypes.DECIMAL):
         def to_decimal(value):
             if value is None:
                 return None
-            elif isinstance(value, decimal.Decimal):
+            if isinstance(value, decimal.Decimal):
                 return value
-            elif isinstance(value, float):
+            if isinstance(value, float):
                 return decimal.Decimal(fstring % value)
-            else:
-                return decimal.Decimal(value)
+            return decimal.Decimal(value)
 
         return to_decimal
 

@@ -7,7 +7,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.schema import DDL
 from sqlalchemy.sql import sqltypes
-from sqlalchemy.testing.suite import ArgSignatureTest as _ArgSignatureTest
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
@@ -38,12 +37,6 @@ from sqlalchemy.testing.suite.test_ddl import (
 RATIONALE_MIGRATION_2x = (
     "Need to look into for 2.x migration; new method which is failing"
 )
-
-
-class ArgSignatureTest(_ArgSignatureTest):
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
-    def test_all_visit_methods_accept_kw(self):
-        super().test_all_visit_methods_accept_kw()
 
 
 class ReturningGuardsTest(_ReturningGuardsTest):

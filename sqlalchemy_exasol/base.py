@@ -590,7 +590,7 @@ class EXACompiler(compiler.SQLCompiler):
 
         return text
 
-    def for_update_clause(self, select):
+    def for_update_clause(self, select, **kw):
         # Exasol has no "FOR UPDATE"
         util.warn("EXASolution does not support SELECT ... FOR UPDATE")
         return ""
@@ -601,7 +601,7 @@ class EXACompiler(compiler.SQLCompiler):
         """
         return " FROM DUAL"
 
-    def visit_empty_set_expr(self, type_):
+    def visit_empty_set_expr(self, type_, **kw):
         return "SELECT 1 FROM DUAL WHERE 1!=1"
 
 
@@ -640,37 +640,35 @@ class EXADDLCompiler(compiler.DDLCompiler):
             event.listen(table, "after_create", AddConstraint(c))
         return super().create_table_constraints(table)
 
-    def visit_add_constraint(self, create):
+    def visit_add_constraint(self, create, **kw):
         if isinstance(create.element, DistributeByConstraint):
             return "ALTER TABLE {} {}".format(
                 self.preparer.format_table(create.element.table),
                 self.process(create.element),
             )
-        else:
-            return super().visit_add_constraint(create)
+        return super().visit_add_constraint(create)
 
-    def visit_drop_constraint(self, drop):
+    def visit_drop_constraint(self, drop, **kw):
         if isinstance(drop.element, DistributeByConstraint):
             return "ALTER TABLE %s DROP DISTRIBUTION KEYS" % (
                 self.preparer.format_table(drop.element.table)
             )
-        else:
-            return super().visit_drop_constraint(drop)
+        return super().visit_drop_constraint(drop)
 
-    def visit_distribute_by_constraint(self, constraint):
+    def visit_distribute_by_constraint(self, constraint, **kw):
         return "DISTRIBUTE BY " + ",".join(c.name for c in constraint.columns)
 
     def define_constraint_remote_table(self, constraint, table, preparer):
         """Format the remote table clause of a CREATE CONSTRAINT clause."""
         return preparer.format_table(table, use_schema=True)
 
-    def visit_create_index(self, create):
+    def visit_create_index(self, create, **kw):
         """Exasol manages indexes internally"""
         raise sqlalchemy.exc.CompileError(
             "Not Supported: " + self.visit_create_index.__doc__
         )
 
-    def visit_drop_index(self, drop):
+    def visit_drop_index(self, drop, **kw):
         """Exasol manages indexes internally"""
         raise sqlalchemy.exc.CompileError(
             "Not Supported: " + self.visit_drop_index.__doc__

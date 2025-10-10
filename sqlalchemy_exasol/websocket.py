@@ -116,7 +116,7 @@ class EXADialect_websocket(EXADialect):
             return mapping[value]
 
         def certificate_validation(value):
-            return True if not value == "SSL_VERIFY_NONE" else False
+            return True if value != "SSL_VERIFY_NONE" else False
 
         def autocommit(value):
             value = value.lower()

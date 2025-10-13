@@ -14,6 +14,11 @@ This allows us to use the latest dependencies, which do not have open vulnerabil
 - #616: Altered usage of MetaData which was binding to a connection to instead bind in the needed object or function
 - #617: Enacted warning for the deprecation of the `autoload` parameter and requirement of `bind`
 - #618: Switched DML & DDL executions from `engine.connect()` to `engine.begin()` usage
+- #621: Added `future=true` to `create_engine` to use the 2.0 API
+- #623: Started switch to `sqlalchemy` 2.x (CI tested with 2.0.43)
+  - All unit, `exasol`, and `regression` tests are working
+  - Several tests from `sqlalchemy` are failing, have been marked as skipped, and require investigation
+  - Reinstated the ArgSignatureTest which ensures that all visit_XYZ() in `_sql.Compiler` subclasses have `**kw`
 
 ## Internal
 

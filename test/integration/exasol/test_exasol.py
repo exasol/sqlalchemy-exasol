@@ -135,8 +135,6 @@ class ConstraintsTest(fixtures.TablesTest):
 class UtilTest(fixtures.TablesTest):
     __backend__ = True
 
-    __engine_options__ = {"implicit_returning": False}
-
     @classmethod
     def define_tables(cls, metadata):
         Table(

@@ -28,6 +28,8 @@ Getting Started
         query = "select 42 from dual"
         with engine.connect() as con:
             result = con.execute(sql.text(query)).fetchall()
+            # you can choose to commit as you go
+            con.commit()
 
 
 For more details on SQLAlchemy consult it's `documentation <https://docs.sqlalchemy.org/en/13/>`_.

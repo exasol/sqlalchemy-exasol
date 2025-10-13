@@ -37,12 +37,11 @@ class Decimal(sqltypes.DECIMAL):
         def to_decimal(value):
             if value is None:
                 return None
-            elif isinstance(value, decimal.Decimal):
+            if isinstance(value, decimal.Decimal):
                 return value
-            elif isinstance(value, float):
+            if isinstance(value, float):
                 return decimal.Decimal(fstring % value)
-            else:
-                return decimal.Decimal(value)
+            return decimal.Decimal(value)
 
         return to_decimal
 
@@ -96,7 +95,7 @@ class EXADialect_websocket(EXADialect):
     }
 
     @classmethod
-    def dbapi(cls):
+    def import_dbapi(cls):
         return __import__(
             "exasol.driver.websocket.dbapi2", fromlist="exasol.driver.websocket"
         )
@@ -116,7 +115,7 @@ class EXADialect_websocket(EXADialect):
             return mapping[value]
 
         def certificate_validation(value):
-            return True if not value == "SSL_VERIFY_NONE" else False
+            return True if value != "SSL_VERIFY_NONE" else False
 
         def autocommit(value):
             value = value.lower()

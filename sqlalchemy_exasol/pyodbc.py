@@ -95,13 +95,13 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             connectors = ["DRIVER={%s}" % keys.pop("driver", None)]
 
         port = ""
-        if "port" in keys and not "port" in query:
+        if "port" in keys and "port" not in query:
             port = ":%d" % int(keys.pop("port"))
 
         connectors.extend(
             [
-                "EXAHOST={}{}".format(keys.pop("host", ""), port),
-                "EXASCHEMA=%s" % keys.pop("database", ""),
+                f'EXAHOST={keys.pop("host", "")}{port}',
+                f'EXASCHEMA={keys.pop("database", "")}',
             ]
         )
 

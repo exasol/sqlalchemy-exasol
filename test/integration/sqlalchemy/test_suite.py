@@ -363,49 +363,66 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
 
 
 class NumericTest(_NumericTest):
-    @pytest.mark.skipif(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=cleandoc(
-            """FIXME: test skipped to allow upgrading to SQLAlchemy 1.3.x due
+    RATIONALE_PYODBC_DECIMAL = cleandoc(
+        """FIXME: test skipped to allow upgrading to SQLAlchemy 1.3.x due
         to vulnerability in 1.2.x. Need to understand reason for this.
         Hypothesis is that the data type is not correctly coerced between
         EXASOL and pyodbc."""
-        ),
+    )
+
+    @pytest.mark.skipif(
+        "pyodbc" in testing.db.dialect.driver,
+        reason=RATIONALE_PYODBC_DECIMAL,
     )
     @testing.requires.implicit_decimal_binds
     @testing.emits_warning(r".*does \*not\* support Decimal objects natively")
     def test_decimal_coerce_round_trip(self, connection):
         super().test_decimal_coerce_round_trip(connection)
 
+    @pytest.mark.skipif(
+        "pyodbc" in testing.db.dialect.driver,
+        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+    )
+    @testing.requires.precision_numerics_general
+    def test_precision_decimal(self, do_numeric_test):
+        super().test_precision_decimal(do_numeric_test)
+
+    @pytest.mark.skipif(
+        "pyodbc" in testing.db.dialect.driver,
+        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+    )
+    @testing.requires.precision_numerics_enotation_large
+    def test_enotation_decimal(self, do_numeric_test):
+        super().test_enotation_decimal(do_numeric_test)
+
+    @pytest.mark.skipif(
+        "pyodbc" in testing.db.dialect.driver,
+        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+    )
+    @testing.requires.precision_numerics_enotation_large
+    def test_enotation_decimal_large(self, do_numeric_test):
+        super().test_enotation_decimal_large(do_numeric_test)
+
+    @pytest.mark.skipif(
+        "pyodbc" in testing.db.dialect.driver,
+        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+    )
+    def test_numeric_as_decimal(self, do_numeric_test):
+        super().test_numeric_as_decimal(do_numeric_test)
+
+    @pytest.mark.skipif(
+        "pyodbc" in testing.db.dialect.driver,
+        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+    )
+    @testing.requires.fetch_null_from_numeric
+    def test_numeric_null_as_decimal(self, do_numeric_test):
+        super().test_numeric_null_as_decimal(do_numeric_test)
+
     @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
     @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
     @testing.requires.float_is_numeric
     def test_float_is_not_numeric(self, connection, cls_):
         super().test_float_is_not_numeric()
-
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
-    @testing.requires.precision_numerics_enotation_large
-    def test_enotation_decimal(self):
-        super().test_enotation_decimal()
-
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
-    @testing.requires.precision_numerics_enotation_large
-    def test_enotation_decimal_large(self):
-        super().test_enotation_decimal_large()
-
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
-    def test_numeric_as_decimal(self):
-        super().test_numeric_as_decimal()
-
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
-    @testing.requires.fetch_null_from_numeric
-    def test_numeric_null_as_decimal(self):
-        super().test_numeric_null_as_decimal()
-
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
-    @testing.requires.precision_numerics_general
-    def test_precision_decimal(self):
-        super().test_precision_decimal()
 
 
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):

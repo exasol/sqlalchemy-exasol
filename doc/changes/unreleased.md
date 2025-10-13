@@ -19,6 +19,8 @@ This allows us to use the latest dependencies, which do not have open vulnerabil
   - All unit, `exasol`, and `regression` tests are working
   - Several tests from `sqlalchemy` are failing, have been marked as skipped, and require investigation
   - Reinstated the ArgSignatureTest which ensures that all visit_XYZ() in `_sql.Compiler` subclasses have `**kw`
+- #626: Reinstated `sqlalchemy` tests:
+  - `TrueDivTest.test_floordiv_integer` and `TrueDivTest.test_floordiv_integer_bound` by providing an override in `EXACompiler.visit_floordiv_binary`
 
 ## Internal
 

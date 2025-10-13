@@ -56,18 +56,14 @@ class ReturningGuardsTest(_ReturningGuardsTest):
 
 
 class TrueDivTest(_TrueDivTest):
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_floordiv_integer(self):
-        super().test_floordiv_integer()
-
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_floordiv_integer_bound(self):
-        super().test_floordiv_integer_bound()
-
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
+    @pytest.mark.skipif(
+        # only true atm for pyodbc -> need to investigate
+        "pyodbc" in testing.db.dialect.driver,
+        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x,
+    )
     @testing.combinations(("5.52", "2.4", "2.3"), argnames="left, right, expected")
-    def test_truediv_numeric(self, left, right, expected):
-        super().test_truediv_numeric()
+    def test_truediv_numeric(self, connection, left, right, expected):
+        super().test_truediv_numeric(connection, left, right, expected)
 
 
 class RowFetchTest(_RowFetchTest):

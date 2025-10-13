@@ -34,35 +34,37 @@ from sqlalchemy.testing.suite.test_ddl import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
 
-RATIONALE_MIGRATION_2x = (
-    "Need to look into for 2.x migration; new method which is failing"
+# Tests marked with xfail and this reason are failing after updating to SQLAlchemy 2.x.
+# We will investigate and fix as many as possible in next PRs.
+BREAKING_CHANGES_SQL_ALCHEMY_2x = (
+    "Failing test after updating to SQLAlchemy 2.x. To be investigated."
 )
 
 
 class ReturningGuardsTest(_ReturningGuardsTest):
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_delete_single(self):
         super().test_delete_single()
 
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_insert_single(self):
         super().test_delete_single()
 
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_update_single(self):
         super().test_update_single()
 
 
 class TrueDivTest(_TrueDivTest):
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_floordiv_integer(self):
         super().test_floordiv_integer()
 
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_floordiv_integer_bound(self):
         super().test_floordiv_integer_bound()
 
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     @testing.combinations(("5.52", "2.4", "2.3"), argnames="left, right, expected")
     def test_truediv_numeric(self, left, right, expected):
         super().test_truediv_numeric()
@@ -88,14 +90,14 @@ class HasTableTest(_HasTableTest):
     @classmethod
     def define_views(cls, metadata):
         """Should be mostly identical to _HasTableTest, except where noted"""
-        # "data" needs to be in quotes as protected value
+        # column name "data" needs to be quoted as "data" is a reserved word
         query = 'CREATE VIEW vv AS SELECT id, "data" FROM test_table'
 
         event.listen(metadata, "after_create", DDL(query))
         event.listen(metadata, "before_drop", DDL("DROP VIEW vv"))
 
         if testing.requires.schemas.enabled:
-            # "data" needs to be in quotes as protected value
+            # column name "data" needs to be quoted as "data" is a reserved word
             query = (
                 'CREATE VIEW {}.vv AS SELECT id, "data" FROM {}.test_table_s'.format(
                     config.test_schema,
@@ -132,7 +134,7 @@ class HasTableTest(_HasTableTest):
     def test_has_table_view_schema(self, connection):
         super().test_has_table_view_schema(connection)
 
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_has_table_cache(self, connection):
         super().test_has_table_cache(connection)
 
@@ -217,7 +219,7 @@ class RowCountTest(_RowCountTest):
     def test_delete_rowcount(self, connection):
         super().test_delete_rowcount(connection)
 
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_non_rowcount_scenarios_no_raise(self):
         # says cursor already closed so very likely need to fix!
         super().test_non_rowcount_scenarios_no_raise()
@@ -254,7 +256,7 @@ class DifficultParametersTest(_DifficultParametersTest):
 
 
 # 700+ tests have errors now (many are combination tests); skip for now and handle later
-@pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+@pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
 class ComponentReflectionTest(_ComponentReflectionTest):
     @pytest.mark.skip(reason="EXASOL has no explicit indexes")
     def test_get_indexes(self, connection, use_schema):
@@ -381,7 +383,7 @@ class NumericTest(_NumericTest):
 
     @pytest.mark.skipif(
         "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
     )
     @testing.requires.precision_numerics_general
     def test_precision_decimal(self, do_numeric_test):
@@ -389,7 +391,7 @@ class NumericTest(_NumericTest):
 
     @pytest.mark.skipif(
         "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
     )
     @testing.requires.precision_numerics_enotation_large
     def test_enotation_decimal(self, do_numeric_test):
@@ -397,7 +399,7 @@ class NumericTest(_NumericTest):
 
     @pytest.mark.skipif(
         "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
     )
     @testing.requires.precision_numerics_enotation_large
     def test_enotation_decimal_large(self, do_numeric_test):
@@ -405,20 +407,20 @@ class NumericTest(_NumericTest):
 
     @pytest.mark.skipif(
         "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
     )
     def test_numeric_as_decimal(self, do_numeric_test):
         super().test_numeric_as_decimal(do_numeric_test)
 
     @pytest.mark.skipif(
         "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_MIGRATION_2x + RATIONALE_PYODBC_DECIMAL,
+        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
     )
     @testing.requires.fetch_null_from_numeric
     def test_numeric_null_as_decimal(self, do_numeric_test):
         super().test_numeric_null_as_decimal(do_numeric_test)
 
-    @pytest.mark.xfail(reason=RATIONALE_MIGRATION_2x, strict=True)
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
     @testing.requires.float_is_numeric
     def test_float_is_not_numeric(self, connection, cls_):

@@ -1,10 +1,10 @@
-import decimal
 from warnings import warn
 
 from sqlalchemy import types as sqltypes
 from sqlalchemy import util
 
 from sqlalchemy_exasol.base import EXADialect
+from sqlalchemy_exasol.types import ExaDecimal
 from sqlalchemy_exasol.warnings import SqlaExasolDeprecationWarning
 
 DEFAULT_CONNECTION_PARAMS = {
@@ -25,29 +25,6 @@ TURBODBC_TRANSLATED_PARAMS = {
     "limit_varchar_results_to_max",
     "autocommit",
 }
-
-
-class _ExaDecimal(sqltypes.DECIMAL):
-    def bind_processor(self, dialect):
-        return super().bind_processor(dialect)
-
-    def result_processor(self, dialect, coltype):
-        if self.asdecimal:
-            fstring = "%%.%df" % self._effective_decimal_return_scale
-
-            def to_decimal(value):
-                if value is None:
-                    return None
-                elif isinstance(value, decimal.Decimal):
-                    return value
-                elif isinstance(value, float):
-                    return decimal.Decimal(fstring % value)
-                else:
-                    return decimal.Decimal(value)
-
-            return to_decimal
-        else:
-            return None
 
 
 class _ExaInteger(sqltypes.INTEGER):
@@ -72,7 +49,7 @@ class EXADialect_turbodbc(EXADialect):
     supports_native_decimal = False
     supports_sane_multi_rowcount = False
 
-    colspecs = {sqltypes.Numeric: _ExaDecimal, sqltypes.Integer: _ExaInteger}
+    colspecs = {sqltypes.Numeric: ExaDecimal, sqltypes.Integer: _ExaInteger}
 
     def __init__(self, **kw):
         message = (

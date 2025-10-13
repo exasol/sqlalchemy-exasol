@@ -20,7 +20,6 @@ from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgume
 from sqlalchemy.testing.suite import ReturningGuardsTest as _ReturningGuardsTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
-from sqlalchemy.testing.suite import TrueDivTest as _TrueDivTest
 
 """
 Here, all tests are imported from the testing suite of sqlalchemy to ensure that the
@@ -53,17 +52,6 @@ class ReturningGuardsTest(_ReturningGuardsTest):
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_update_single(self):
         super().test_update_single()
-
-
-class TrueDivTest(_TrueDivTest):
-    @pytest.mark.skipif(
-        # only true atm for pyodbc -> need to investigate
-        "pyodbc" in testing.db.dialect.driver,
-        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x,
-    )
-    @testing.combinations(("5.52", "2.4", "2.3"), argnames="left, right, expected")
-    def test_truediv_numeric(self, connection, left, right, expected):
-        super().test_truediv_numeric(connection, left, right, expected)
 
 
 class RowFetchTest(_RowFetchTest):

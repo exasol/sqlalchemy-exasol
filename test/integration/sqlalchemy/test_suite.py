@@ -3,6 +3,7 @@ from inspect import cleandoc
 
 import pytest
 import sqlalchemy as sa
+from pyexasol import ExaQueryError
 from sqlalchemy import create_engine
 from sqlalchemy.schema import (
     DDL,
@@ -43,17 +44,32 @@ BREAKING_CHANGES_SQL_ALCHEMY_2x = (
 
 
 class ReturningGuardsTest(_ReturningGuardsTest):
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_delete_single(self):
-        super().test_delete_single()
+    """
+    Exasol does not support the RETURNING clause. This is already the assumption
+    per the DefaultDialect.
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_insert_single(self):
-        super().test_delete_single()
+    The single tests of class sqlalchemy.testing.suite.ReturningGuardsTest are
+    overridden, as they are written to send the request to the DB and receive an
+    error from the DB itself. For the websocket driver (based on PyExasol), the
+    exception raised is an ExaQueryError and not a DBAPIError.
+    """
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_update_single(self):
-        super().test_update_single()
+    @staticmethod
+    def _run_test(test_method, connection, run_stmt):
+        if "websocket" in testing.db.dialect.driver:
+            with pytest.raises(ExaQueryError):
+                test_method(connection, run_stmt)
+        else:
+            test_method(connection, run_stmt)
+
+    def test_delete_single(self, connection, run_stmt):
+        self._run_test(super().test_delete_single, connection, run_stmt)
+
+    def test_insert_single(self, connection, run_stmt):
+        self._run_test(super().test_insert_single, connection, run_stmt)
+
+    def test_update_single(self, connection, run_stmt):
+        self._run_test(super().test_update_single, connection, run_stmt)
 
 
 class RowFetchTest(_RowFetchTest):

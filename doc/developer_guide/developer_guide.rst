@@ -1,6 +1,8 @@
 Development
 ============
 This chapter contains information helpful when you want to engage in development of this project.
+``sqlalchemy-exasol`` provides an Exasol dialect for ``sqlalchemy``. For further information
+on the creation of a dialect, see `SQLAlchemy's README.dialects.rst <https://github.com/sqlalchemy/sqlalchemy/blob/main/README.dialects.rst>`__.
 
 Prerequisites
 -------------

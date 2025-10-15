@@ -883,6 +883,12 @@ class EXADialect(default.DefaultDialect):
         result = connection.execute(sql.text(sql_statement))
         return [self.normalize_name(row[0]) for row in result]
 
+    @staticmethod
+    def _get_schema_replacement_string(schema_name) -> str:
+        if schema_name is None:
+            return "CURRENT_SCHEMA"
+        return ":schema"
+
     def _get_schema_for_input_or_current(self, connection, schema):
         schema = self._get_schema_for_input(connection, schema)
         if schema is None:
@@ -995,17 +1001,18 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def _get_columns(self, connection, table_name, schema=None, **kw):
-        schema = self._get_schema_for_input(connection, schema)
-        schema_str = "CURRENT_SCHEMA" if schema is None else ":schema"
-        table_name_str = ":table"
+        schema_name = self._get_schema_for_input(connection, schema)
+        table_name = self.denormalize_name(table_name)
+
         sql_statement = self.get_column_sql_query_str().format(
-            schema=schema_str, table=table_name_str
+            schema=self._get_schema_replacement_string(schema_name=schema_name),
+            table=":table",
         )
         result = connection.execute(
             sql.text(sql_statement),
             {
-                "schema": self.denormalize_name(schema),
-                "table": self.denormalize_name(table_name),
+                "schema": self.denormalize_name(schema_name),
+                "table": table_name,
             },
         )
         return list(result)
@@ -1097,21 +1104,19 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def _get_pk_constraint(self, connection, table_name, schema, **kw):
-        schema = self._get_schema_for_input(connection, schema)
+        schema_name = self._get_schema_for_input(connection, schema)
         table_name = self.denormalize_name(table_name)
-        table_name_string = ":table"
-        if schema is None:
-            schema_string = "CURRENT_SCHEMA "
-        else:
-            schema_string = ":schema "
+
         sql_statement = self._get_constraint_sql_str(
-            schema_string, table_name_string, "PRIMARY KEY"
+            schema=self._get_schema_replacement_string(schema_name=schema_name),
+            table_name=":table",
+            contraint_type="PRIMARY KEY",
         )
         result = connection.execute(
             sql.text(sql_statement),
             {
-                "schema": self.denormalize_name(schema),
-                "table": self.denormalize_name(table_name),
+                "schema": schema_name,
+                "table": table_name,
             },
         )
         pkeys = []
@@ -1133,16 +1138,19 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
-        table_name_string = ":table"
-        schema_string = "CURRENT_SCHEMA " if schema is None else ":schema "
+        schema_name = self._get_schema_for_input(connection, schema)
+        table_name = self.denormalize_name(table_name)
+
         sql_statement = self._get_constraint_sql_str(
-            schema_string, table_name_string, "FOREIGN KEY"
+            schema=self._get_schema_replacement_string(schema_name=schema_name),
+            table_name=":table",
+            contraint_type="FOREIGN KEY",
         )
         result = connection.execute(
             sql.text(sql_statement),
             {
-                "schema": self.denormalize_name(schema),
-                "table": self.denormalize_name(table_name),
+                "schema": schema_name,
+                "table": table_name,
             },
         )
         return list(result)

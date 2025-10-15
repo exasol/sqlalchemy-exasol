@@ -1,4 +1,4 @@
-"""Support for the EXASOL database.
+"""Support for the Exasol database.
 
 Auto Increment Behavior
 -----------------------
@@ -30,17 +30,17 @@ The autoincrement flag for Column Objects is not supported by exadialect.
 Identifier Casing
 -----------------
 
-EXASol mimics the behavior of Oracle. Thus, for this dialect implementation
+Exasol mimics the behavior of Oracle. Thus, for this dialect implementation
 the Oracle dialect was taken as a reference.
-In EXASol, the data dictionary represents all case insensitive identifier names
+In Exasol, the data dictionary represents all case insensitive identifier names
 using UPPERCASE text.SQLAlchemy on the other hand considers an all-lower case
-identifiers to be case insensitive. The Oracle dialect converts identifier to
+identifiers to be case-insensitive. The Oracle dialect converts identifier to
 and from those two formats during schema level communication, such as reflection
 of tables and indexes.
 
 It is recommended to work with all lowercase identifiers on the SQLAlchemy side.
-These are treated as case insensitve identifiers by SQLAlchemy. The EXASol
-dialect takes care of converting them to the internal case insensitive
+These are treated as case-insensitive identifiers by SQLAlchemy. The Exasol
+dialect takes care of converting them to the internal case-insensitive
 representation (all uppercase).
 
 """
@@ -549,7 +549,7 @@ ischema_names = {
     "DATE": sqltypes.DATE,
     "DECIMAL": sqltypes.DECIMAL,
     "DOUBLE": sqltypes.FLOAT,
-    # EXASOL mapps DOUBLE, DOUBLE PRECISION, FLOAT to DOUBLE PRECISION
+    # Exasol maps DOUBLE, DOUBLE PRECISION, FLOAT to DOUBLE PRECISION
     # internally but returns 'DOUBLE' as type when asking the DB catalog
     # INTERVAL DAY [(p)] TO SECOND [(fp)] TODO: missing support for EXA Datatype, check Oracle Engine
     # INTERVAL YEAR[(p)] TO MONTH         TODO: missing support for EXA Datatype, check Oracle Engine
@@ -632,7 +632,7 @@ class EXADDLCompiler(compiler.DDLCompiler):
         return colspec
 
     def create_table_constraints(self, table, _include_foreign_key_constraints=None):
-        # EXASOL does not support FK constraints that reference
+        # Exasol does not support FK constraints that reference
         # the table being created. Thus, these need to be created
         # via ALTER TABLE after table creation
         # TODO: FKs that reference other tables could be inlined
@@ -839,8 +839,8 @@ class EXADialect(default.DefaultDialect):
 
     def normalize_name(self, name):
         """
-        Converting EXASol case insensitive identifiers (upper case)
-        to  SQLAlchemy case insensitive identifiers (lower case)
+        Converting Exasol case-insensitive identifiers (upper case)
+        to  SQLAlchemy case-insensitive identifiers (lower case)
         """
         if name is None:
             return None
@@ -855,8 +855,8 @@ class EXADialect(default.DefaultDialect):
 
     def denormalize_name(self, name):
         """
-        Converting SQLAlchemy case insensitive identifiers (lower case)
-        to  EXASol case insensitive identifiers (upper case)
+        Converting SQLAlchemy case-insensitive identifiers (lower case)
+        to  Exasol case-insensitive identifiers (upper case)
         """
         if name is None or len(name) == 0:
             return None
@@ -1200,5 +1200,5 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):
-        """EXASolution has no explicit indexes"""
+        """Exasol has no explicit indexes"""
         return []

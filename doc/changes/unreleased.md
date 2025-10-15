@@ -25,6 +25,7 @@ This allows us to use the latest dependencies, which do not have open vulnerabil
   - a few tests from `ComponentReflectionTest` as `define_reflected_tables` is overridden based on what Exasol supports
 - #631: Updated `EXADialect.has_table` to search for both tables and views and reinstated `sqlalchemy` tests:
   - `ReturningGuardsTest` are used to indicate that the Exasol dialect, which does not natively support the [RETURNING clause](https://docs.sqlalchemy.org/en/20/glossary.html#term-RETURNING), is set up per the API specifications
+  - `ComponentReflectionTest.test_not_existing_table` is used to indicate that specific `EXADialect` methods (i.e. `get_columns`) check to see if the requested table/view exists and if not, they will now toss a `NoSuchTableError` exception
 
 ## Internal
 

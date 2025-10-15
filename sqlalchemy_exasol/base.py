@@ -1000,10 +1000,21 @@ class EXADialect(default.DefaultDialect):
             "ORDER BY column_ordinal_position"
         )
 
+    def _verify_table_exists(self, connection, table_name, schema_name):
+        if not self.has_table(
+            connection=connection, table_name=table_name, schema=schema_name
+        ):
+            raise sqlalchemy.exc.NoSuchTableError(
+                f"{schema_name}.{table_name}" if schema_name else table_name
+            ) from None
+
     @reflection.cache
     def _get_columns(self, connection, table_name, schema=None, **kw):
         schema_name = self._get_schema_for_input(connection, schema)
         table_name = self.denormalize_name(table_name)
+        self._verify_table_exists(
+            connection=connection, table_name=table_name, schema_name=schema_name
+        )
 
         sql_statement = self.get_column_sql_query_str().format(
             schema=self._get_schema_replacement_string(schema_name=schema_name),
@@ -1107,6 +1118,9 @@ class EXADialect(default.DefaultDialect):
     def _get_pk_constraint(self, connection, table_name, schema, **kw):
         schema_name = self._get_schema_for_input(connection, schema)
         table_name = self.denormalize_name(table_name)
+        self._verify_table_exists(
+            connection=connection, table_name=table_name, schema_name=schema_name
+        )
 
         sql_statement = self._get_constraint_sql_str(
             schema=self._get_schema_replacement_string(schema_name=schema_name),
@@ -1141,6 +1155,9 @@ class EXADialect(default.DefaultDialect):
     def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
         schema_name = self._get_schema_for_input(connection, schema)
         table_name = self.denormalize_name(table_name)
+        self._verify_table_exists(
+            connection=connection, table_name=table_name, schema_name=schema_name
+        )
 
         sql_statement = self._get_constraint_sql_str(
             schema=self._get_schema_replacement_string(schema_name=schema_name),

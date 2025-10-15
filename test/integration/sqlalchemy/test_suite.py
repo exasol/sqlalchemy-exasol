@@ -244,7 +244,14 @@ class DifficultParametersTest(_DifficultParametersTest):
 class ComponentReflectionTest(_ComponentReflectionTest):
     @classmethod
     def define_reflected_tables(cls, metadata, schema):
-        """Should be mostly identical to define_reflected_tables, except where noted"""
+        """
+        Default implementation of define_reflected_tables in
+        class sqlalchemy.testing.suite.ComponentReflectionTest
+        needs to be overridden here as Exasol does not support column constraints
+        and manages indexes on its own. The code given in this overriding class
+        method was directly copied. See notes, marked with 'Commented out', highlighting
+        the changed places.
+        """
         if schema:
             schema_prefix = schema + "."
         else:
@@ -263,7 +270,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
             Column("test1", sa.CHAR(5), nullable=False),
             Column("test2", sa.Float(), nullable=False),
             Column("parent_user_id", sa.Integer, *parent_id_args),
-            # Exasol does not support table constraints
+            # Commented out, as Exasol does not support column constraints
             # sa.CheckConstraint(
             #     "test2 > 0",
             #     name="zz_test2_gt_zero",
@@ -292,9 +299,9 @@ class ComponentReflectionTest(_ComponentReflectionTest):
                 sa.Integer,
                 ForeignKey("%susers.user_id" % schema_prefix),
             ),
-            # Exasol does not support the unique constraint for non-primary keys
+            # Commented out, as Exasol does not support unique constraints beyond primary keys
             Column("data", sa.String(30)),  # , unique=True),
-            # Exasol does not support table constraints
+            # Commented out, as Exasol does not support column constraints
             # sa.CheckConstraint(
             #     "address_id > 0 AND address_id < 1000",
             #     name="address_id_gt_zero",
@@ -313,7 +320,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
             metadata,
             Column("address_id", sa.Integer),
             Column("remote_user_id", sa.Integer, ForeignKey(users.c.user_id)),
-            # Exasol manages indices internally
+            # Commented out, as Exasol manages indices internally
             Column("email_address", sa.String(20)),  # , index=True),
             sa.PrimaryKeyConstraint(
                 "address_id", name="email_ad_pk", comment="ea pk comment"
@@ -386,7 +393,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
             Index("users_all_idx", users.c.user_id, users.c.test2, users.c.test1)
 
             if not schema:
-                # (existing comment) test_needs_fk is at the moment to force MySQL InnoDB
+                # test_needs_fk is at the moment to force MySQL InnoDB
                 noncol_idx_test_nopk = Table(
                     "noncol_idx_test_nopk",
                     metadata,

@@ -23,7 +23,7 @@ This allows us to use the latest dependencies, which do not have open vulnerabil
   - `TrueDivTest.test_floordiv_integer` and `TrueDivTest.test_floordiv_integer_bound` by providing an override in `EXACompiler.visit_floordiv_binary`
   - `TrueDivTest.test_truediv_numeric` by providing `ExaDecimal` to the `EXADialect_pyodbc.colspecs` list
   - a few tests from `ComponentReflectionTest` as `define_reflected_tables` is overridden based on what Exasol supports
-- #631: Reinstated `sqlalchemy` tests:
+- #631: Updated `EXADialect.has_table` to search for both tables and views and reinstated `sqlalchemy` tests:
   - `ReturningGuardsTest` are used to indicate that the Exasol dialect, which does not natively support the [RETURNING clause](https://docs.sqlalchemy.org/en/20/glossary.html#term-RETURNING), is set up per the API specifications
 
 ## Internal

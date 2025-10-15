@@ -89,15 +89,20 @@ class RowFetchTest(_RowFetchTest):
 class HasTableTest(_HasTableTest):
     @classmethod
     def define_views(cls, metadata):
-        """Should be mostly identical to _HasTableTest, except where noted"""
-        # column name "data" needs to be quoted as "data" is a reserved word
+        """
+        Default implementation of define_views in
+        class sqlalchemy.testing.suite.HasTableTest
+        needs to be overridden here as Exasol treats data as a reserved word &
+        requires quoting. See notes, marked with 'Note:', highlighting
+        """
+        # Note: column name "data" needs to be quoted as "data" is a reserved word
         query = 'CREATE VIEW vv AS SELECT id, "data" FROM test_table'
 
         event.listen(metadata, "after_create", DDL(query))
         event.listen(metadata, "before_drop", DDL("DROP VIEW vv"))
 
         if testing.requires.schemas.enabled:
-            # column name "data" needs to be quoted as "data" is a reserved word
+            # Note: column name "data" needs to be quoted as "data" is a reserved word
             query = (
                 'CREATE VIEW {}.vv AS SELECT id, "data" FROM {}.test_table_s'.format(
                     config.test_schema,
@@ -111,24 +116,25 @@ class HasTableTest(_HasTableTest):
                 DDL("DROP VIEW %s.vv" % (config.test_schema)),
             )
 
-    RATIONALE = cleandoc(
+    RATIONALE_PYODBC = cleandoc(
         """
-    The Exasol dialect does not check against views for `has_table`, see also `Inspector.has_table()`.
+    The Exasol PyODBC dialect does not check against views for `has_table`, see also `Inspector.has_table()`.
 
-    This behaviour is subject to change with sqlalchemy 2.0.
-    See also:
-    * https://github.com/sqlalchemy/sqlalchemy/blob/3fc6c40ea77c971d3067dab0fdf57a5b5313b69b/lib/sqlalchemy/engine/reflection.py#L415
-    * https://github.com/sqlalchemy/sqlalchemy/discussions/8678
-    * https://github.com/sqlalchemy/sqlalchemy/commit/f710836488162518dcf2dc1006d90ecd77a2a178
+    This is due to historic differences between PyODBC and the other Exasol dialects.
+    As PyODBC is marked as deprecated, it is not prioritized to fix this.
     """
     )
 
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @pytest.mark.xfail(
+        "pyodbc" in testing.db.dialect.driver, reason=RATIONALE_PYODBC, strict=True
+    )
     @testing.requires.views
     def test_has_table_view(self, connection):
         super().test_has_table_view(connection)
 
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @pytest.mark.xfail(
+        "pyodbc" in testing.db.dialect.driver, reason=RATIONALE_PYODBC, strict=True
+    )
     @testing.requires.views
     @testing.requires.schemas
     def test_has_table_view_schema(self, connection):

@@ -926,11 +926,12 @@ class EXADialect(default.DefaultDialect):
     def has_table(self, connection, table_name, schema=None, **kw):
         schema = self._get_schema_for_input(connection, schema)
         sql_statement = (
-            "SELECT table_name from SYS.EXA_ALL_TABLES "
-            "WHERE table_name = :table_name "
+            "SELECT OBJECT_NAME FROM SYS.EXA_ALL_OBJECTS "
+            "WHERE OBJECT_TYPE IN ('TABLE', 'VIEW') "
+            "AND OBJECT_NAME = :table_name "
         )
         if schema is not None:
-            sql_statement += "AND table_schema = :schema"
+            sql_statement += "AND ROOT_NAME = :schema"
 
         result = connection.execute(
             sql.text(sql_statement),

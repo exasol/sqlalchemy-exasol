@@ -604,6 +604,11 @@ class EXACompiler(compiler.SQLCompiler):
     def visit_empty_set_expr(self, type_, **kw):
         return "SELECT 1 FROM DUAL WHERE 1!=1"
 
+    def visit_floordiv_binary(self, binary, operator, **kw):
+        return "FLOOR(%s)" % (
+            self.process(binary.left, **kw) + " / " + self.process(binary.right, **kw)
+        )
+
 
 class EXADDLCompiler(compiler.DDLCompiler):
     def get_column_specification(self, column, **kwargs):

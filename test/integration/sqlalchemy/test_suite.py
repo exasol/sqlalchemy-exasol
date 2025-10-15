@@ -2,10 +2,12 @@
 from inspect import cleandoc
 
 import pytest
-from sqlalchemy import (
-    create_engine,
+import sqlalchemy as sa
+from sqlalchemy import create_engine
+from sqlalchemy.schema import (
+    DDL,
+    Index,
 )
-from sqlalchemy.schema import DDL
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
@@ -20,7 +22,6 @@ from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgume
 from sqlalchemy.testing.suite import ReturningGuardsTest as _ReturningGuardsTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
-from sqlalchemy.testing.suite import TrueDivTest as _TrueDivTest
 
 """
 Here, all tests are imported from the testing suite of sqlalchemy to ensure that the
@@ -53,21 +54,6 @@ class ReturningGuardsTest(_ReturningGuardsTest):
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_update_single(self):
         super().test_update_single()
-
-
-class TrueDivTest(_TrueDivTest):
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_floordiv_integer(self):
-        super().test_floordiv_integer()
-
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_floordiv_integer_bound(self):
-        super().test_floordiv_integer_bound()
-
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    @testing.combinations(("5.52", "2.4", "2.3"), argnames="left, right, expected")
-    def test_truediv_numeric(self, left, right, expected):
-        super().test_truediv_numeric()
 
 
 class RowFetchTest(_RowFetchTest):
@@ -255,12 +241,209 @@ class DifficultParametersTest(_DifficultParametersTest):
         super().test_round_trip_same_named_column(paramname, connection, metadata)
 
 
-# 700+ tests have errors now (many are combination tests); skip for now and handle later
-@pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
 class ComponentReflectionTest(_ComponentReflectionTest):
+    @classmethod
+    def define_reflected_tables(cls, metadata, schema):
+        """
+        Default implementation of define_reflected_tables in
+        class sqlalchemy.testing.suite.ComponentReflectionTest
+        needs to be overridden here as Exasol does not support column constraints
+        and manages indexes on its own. The code given in this overriding class
+        method was directly copied. See notes, marked with 'Commented out', highlighting
+        the changed places.
+        """
+        if schema:
+            schema_prefix = schema + "."
+        else:
+            schema_prefix = ""
+
+        if testing.requires.self_referential_foreign_keys.enabled:
+            parent_id_args = (
+                ForeignKey("%susers.user_id" % schema_prefix, name="user_id_fk"),
+            )
+        else:
+            parent_id_args = ()
+        users = Table(
+            "users",
+            metadata,
+            Column("user_id", sa.INT, primary_key=True),
+            Column("test1", sa.CHAR(5), nullable=False),
+            Column("test2", sa.Float(), nullable=False),
+            Column("parent_user_id", sa.Integer, *parent_id_args),
+            # Commented out, as Exasol does not support column constraints
+            # sa.CheckConstraint(
+            #     "test2 > 0",
+            #     name="zz_test2_gt_zero",
+            #     comment="users check constraint",
+            # ),
+            # sa.CheckConstraint("test2 <= 1000"),
+            schema=schema,
+            test_needs_fk=True,
+        )
+
+        Table(
+            "dingalings",
+            metadata,
+            Column("dingaling_id", sa.Integer, primary_key=True),
+            Column(
+                "address_id",
+                sa.Integer,
+                ForeignKey(
+                    "%semail_addresses.address_id" % schema_prefix,
+                    name="zz_email_add_id_fg",
+                    comment="di fk comment",
+                ),
+            ),
+            Column(
+                "id_user",
+                sa.Integer,
+                ForeignKey("%susers.user_id" % schema_prefix),
+            ),
+            # Commented out, as Exasol does not support unique constraints beyond primary keys
+            Column("data", sa.String(30)),  # , unique=True),
+            # Commented out, as Exasol does not support column constraints
+            # sa.CheckConstraint(
+            #     "address_id > 0 AND address_id < 1000",
+            #     name="address_id_gt_zero",
+            # ),
+            # sa.UniqueConstraint(
+            #     "address_id",
+            #     "dingaling_id",
+            #     name="zz_dingalings_multiple",
+            #     comment="di unique comment",
+            # ),
+            schema=schema,
+            test_needs_fk=True,
+        )
+        Table(
+            "email_addresses",
+            metadata,
+            Column("address_id", sa.Integer),
+            Column("remote_user_id", sa.Integer, ForeignKey(users.c.user_id)),
+            # Commented out, as Exasol manages indices internally
+            Column("email_address", sa.String(20)),  # , index=True),
+            sa.PrimaryKeyConstraint(
+                "address_id", name="email_ad_pk", comment="ea pk comment"
+            ),
+            schema=schema,
+            test_needs_fk=True,
+        )
+        Table(
+            "comment_test",
+            metadata,
+            Column("id", sa.Integer, primary_key=True, comment="id comment"),
+            Column("data", sa.String(20), comment="data % comment"),
+            Column(
+                "d2",
+                sa.String(20),
+                comment=r"""Comment types type speedily ' " \ '' Fun!""",
+            ),
+            Column("d3", sa.String(42), comment="Comment\nwith\rescapes"),
+            schema=schema,
+            comment=r"""the test % ' " \ table comment""",
+        )
+        Table(
+            "no_constraints",
+            metadata,
+            Column("data", sa.String(20)),
+            schema=schema,
+            comment="no\nconstraints\rhas\fescaped\vcomment",
+        )
+
+        if testing.requires.cross_schema_fk_reflection.enabled:
+            if schema is None:
+                Table(
+                    "local_table",
+                    metadata,
+                    Column("id", sa.Integer, primary_key=True),
+                    Column("data", sa.String(20)),
+                    Column(
+                        "remote_id",
+                        ForeignKey("%s.remote_table_2.id" % testing.config.test_schema),
+                    ),
+                    test_needs_fk=True,
+                    schema=config.db.dialect.default_schema_name,
+                )
+            else:
+                Table(
+                    "remote_table",
+                    metadata,
+                    Column("id", sa.Integer, primary_key=True),
+                    Column(
+                        "local_id",
+                        ForeignKey(
+                            "%s.local_table.id" % config.db.dialect.default_schema_name
+                        ),
+                    ),
+                    Column("data", sa.String(20)),
+                    schema=schema,
+                    test_needs_fk=True,
+                )
+                Table(
+                    "remote_table_2",
+                    metadata,
+                    Column("id", sa.Integer, primary_key=True),
+                    Column("data", sa.String(20)),
+                    schema=schema,
+                    test_needs_fk=True,
+                )
+
+        if testing.requires.index_reflection.enabled:
+            Index("users_t_idx", users.c.test1, users.c.test2, unique=True)
+            Index("users_all_idx", users.c.user_id, users.c.test2, users.c.test1)
+
+            if not schema:
+                # test_needs_fk is at the moment to force MySQL InnoDB
+                noncol_idx_test_nopk = Table(
+                    "noncol_idx_test_nopk",
+                    metadata,
+                    Column("q", sa.String(5)),
+                    test_needs_fk=True,
+                )
+
+                noncol_idx_test_pk = Table(
+                    "noncol_idx_test_pk",
+                    metadata,
+                    Column("id", sa.Integer, primary_key=True),
+                    Column("q", sa.String(5)),
+                    test_needs_fk=True,
+                )
+
+                if (
+                    testing.requires.indexes_with_ascdesc.enabled
+                    and testing.requires.reflect_indexes_with_ascdesc.enabled
+                ):
+                    Index("noncol_idx_nopk", noncol_idx_test_nopk.c.q.desc())
+                    Index("noncol_idx_pk", noncol_idx_test_pk.c.q.desc())
+
+        if testing.requires.view_column_reflection.enabled:
+            cls.define_views(metadata, schema)
+        if not schema and testing.requires.temp_table_reflection.enabled:
+            cls.define_temp_tables(metadata)
+
     @pytest.mark.skip(reason="EXASOL has no explicit indexes")
     def test_get_indexes(self, connection, use_schema):
         super().test_get_indexes()
+
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
+    def test_get_multi_columns(self):
+        super().test_get_multi_columns()
+
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
+    def test_get_multi_foreign_keys(self):
+        super().test_get_multi_foreign_keys()
+
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
+    def test_get_multi_pk_constraint(self):
+        super().test_get_multi_pk_constraint()
+
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
+    def test_get_view_definition_does_not_exist(self):
+        super().test_get_view_definition_does_not_exist()
+
+    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
+    def test_not_existing_table(self):
+        super().test_not_existing_table()
 
 
 class HasIndexTest(_HasIndexTest):
@@ -365,61 +548,6 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
 
 
 class NumericTest(_NumericTest):
-    RATIONALE_PYODBC_DECIMAL = cleandoc(
-        """FIXME: test skipped to allow upgrading to SQLAlchemy 1.3.x due
-        to vulnerability in 1.2.x. Need to understand reason for this.
-        Hypothesis is that the data type is not correctly coerced between
-        EXASOL and pyodbc."""
-    )
-
-    @pytest.mark.skipif(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_PYODBC_DECIMAL,
-    )
-    @testing.requires.implicit_decimal_binds
-    @testing.emits_warning(r".*does \*not\* support Decimal objects natively")
-    def test_decimal_coerce_round_trip(self, connection):
-        super().test_decimal_coerce_round_trip(connection)
-
-    @pytest.mark.skipif(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
-    )
-    @testing.requires.precision_numerics_general
-    def test_precision_decimal(self, do_numeric_test):
-        super().test_precision_decimal(do_numeric_test)
-
-    @pytest.mark.skipif(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
-    )
-    @testing.requires.precision_numerics_enotation_large
-    def test_enotation_decimal(self, do_numeric_test):
-        super().test_enotation_decimal(do_numeric_test)
-
-    @pytest.mark.skipif(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
-    )
-    @testing.requires.precision_numerics_enotation_large
-    def test_enotation_decimal_large(self, do_numeric_test):
-        super().test_enotation_decimal_large(do_numeric_test)
-
-    @pytest.mark.skipif(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
-    )
-    def test_numeric_as_decimal(self, do_numeric_test):
-        super().test_numeric_as_decimal(do_numeric_test)
-
-    @pytest.mark.skipif(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=BREAKING_CHANGES_SQL_ALCHEMY_2x + RATIONALE_PYODBC_DECIMAL,
-    )
-    @testing.requires.fetch_null_from_numeric
-    def test_numeric_null_as_decimal(self, do_numeric_test):
-        super().test_numeric_null_as_decimal(do_numeric_test)
-
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
     @testing.requires.float_is_numeric

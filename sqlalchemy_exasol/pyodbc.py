@@ -15,12 +15,14 @@ from packaging import version
 from sqlalchemy import sql
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.engine import reflection
+from sqlalchemy.sql import sqltypes
 from sqlalchemy.util.langhelpers import asbool
 
 from sqlalchemy_exasol.base import (
     EXADialect,
     EXAExecutionContext,
 )
+from sqlalchemy_exasol.types import ExaDecimal
 from sqlalchemy_exasol.warnings import SqlaExasolDeprecationWarning
 
 logger = logging.getLogger("sqlalchemy_exasol")
@@ -30,6 +32,9 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
     supports_statement_cache = False
     execution_ctx_cls = EXAExecutionContext
     driver_version = None
+    colspecs = {
+        sqltypes.Numeric: ExaDecimal,
+    }
 
     def __init__(self, **kw):
         message = (
@@ -95,13 +100,13 @@ class EXADialect_pyodbc(EXADialect, PyODBCConnector):
             connectors = ["DRIVER={%s}" % keys.pop("driver", None)]
 
         port = ""
-        if "port" in keys and not "port" in query:
+        if "port" in keys and "port" not in query:
             port = ":%d" % int(keys.pop("port"))
 
         connectors.extend(
             [
-                "EXAHOST={}{}".format(keys.pop("host", ""), port),
-                "EXASCHEMA=%s" % keys.pop("database", ""),
+                f'EXAHOST={keys.pop("host", "")}{port}',
+                f'EXASCHEMA={keys.pop("database", "")}',
             ]
         )
 

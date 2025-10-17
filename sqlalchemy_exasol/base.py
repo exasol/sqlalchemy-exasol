@@ -896,9 +896,14 @@ class EXADialect(default.DefaultDialect):
         return self.denormalize_name(schema)
 
     def _get_schema_for_input(self, connection, schema):
-        return self.denormalize_name(
-            schema or self._get_schema_from_url(connection, schema)
-        )
+        if not schema:
+            backup_schema = self._get_schema_from_url(connection, schema)
+            if backup_schema:
+                # need to convert to str as quoted text cannot be modified with
+                # the denormalize_name operations
+                schema = str(backup_schema)
+
+        return self.denormalize_name(schema)
 
     @staticmethod
     def _get_current_schema(connection):

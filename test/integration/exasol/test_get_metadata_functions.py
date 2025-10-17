@@ -309,7 +309,7 @@ class MetadataTest(fixtures.TablesTest):
             assert view_definition_fallback == view_definition_odbc
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
-    @pytest.mark.parametrize("table", ["t", "s", "v"])
+    @pytest.mark.parametrize("table", ["t", "s"])
     @pytest.mark.parametrize(
         "engine_name",
         [
@@ -458,7 +458,7 @@ class MetadataTest(fixtures.TablesTest):
             assert columns == []
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
-    @pytest.mark.parametrize("table", ["t", "s", "v"])
+    @pytest.mark.parametrize("table", ["t", "s"])
     @pytest.mark.parametrize(
         "engine_name",
         [

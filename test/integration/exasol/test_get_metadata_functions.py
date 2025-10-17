@@ -5,6 +5,7 @@ from sqlalchemy import (
     sql,
 )
 from sqlalchemy.engine.url import URL
+from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.sql.ddl import (
     CreateSchema,
     DropSchema,
@@ -308,15 +309,25 @@ class MetadataTest(fixtures.TablesTest):
             assert view_definition_fallback == view_definition_odbc
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
-    @pytest.mark.parametrize("table", ["t", "s", "unknown"])
+    @pytest.mark.parametrize("table", ["t", "s", "v"])
     @pytest.mark.parametrize(
         "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
+        [
+            ENGINE_NONE_DATABASE,
+            ENGINE_SCHEMA_DATABASE,
+            # This does not work as the schema is taken from the URL. Changes
+            # would need to be made to the get_columns implementation
+            # to handle this. See Issue #633.
+            # ENGINE_SCHEMA_2_DATABASE
+        ],
     )
     def test_compare_get_columns_for_sql_and_odbc(self, schema, table, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             if schema is None:
+                # Note: this should change the CURRENT_SCHEMA for Exasol connections
+                # However, as our default is to first use the URL, this doesn't work as expected
+                # for ENGINE_SCHEMA_2_DATABASE.
                 c.execute(sql.text("OPEN SCHEMA %s" % self.schema))
             columns_fallback = dialect.get_columns(
                 connection=c, table_name=table, schema=schema, use_sql_fallback=True
@@ -327,6 +338,32 @@ class MetadataTest(fixtures.TablesTest):
             assert str(columns_fallback) == str(
                 columns_odbc
             )  # object equality doesn't work for sqltypes
+
+    @pytest.mark.parametrize(
+        "engine_name",
+        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
+    )
+    @pytest.mark.parametrize(
+        "schema,table",
+        [
+            pytest.param(
+                TEST_GET_METADATA_FUNCTIONS_SCHEMA, "unknown", id="not existing table"
+            ),
+            pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
+        ],
+    )
+    def test_get_columns_for_sql_and_odbc_raise_exception(
+        self, schema, table, engine_name
+    ):
+        with self.engine_map[engine_name].begin() as c:
+            dialect = inspect(c).dialect
+            with pytest.raises(NoSuchTableError) as ex1:
+                dialect.get_columns(
+                    connection=c, table_name=table, schema=schema, use_sql_fallback=True
+                )
+            with pytest.raises(NoSuchTableError) as ex2:
+                dialect.get_columns(connection=c, table_name=table, schema=schema)
+        assert str(ex1) == str(ex2)
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
     @pytest.mark.parametrize(
@@ -421,16 +458,26 @@ class MetadataTest(fixtures.TablesTest):
             assert columns == []
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
-    @pytest.mark.parametrize("table", ["t", "s"])
+    @pytest.mark.parametrize("table", ["t", "s", "v"])
     @pytest.mark.parametrize(
         "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
+        [
+            ENGINE_NONE_DATABASE,
+            ENGINE_SCHEMA_DATABASE,
+            # This does not work as the schema is taken from the URL. Changes
+            # would need to be made to the get_pk_constraint implementation
+            # to handle this. See Issue #633.
+            # ENGINE_SCHEMA_2_DATABASE
+        ],
     )
     def test_compare_get_pk_constraint_for_sql_and_odbc(
         self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
             if schema is None:
+                # Note: this should change the CURRENT_SCHEMA for Exasol connections
+                # However, as our default is to first use the URL, this doesn't work as expected
+                # for ENGINE_SCHEMA_2_DATABASE.
                 c.execute(sql.text("OPEN SCHEMA %s" % self.schema))
             dialect = inspect(c).dialect
             pk_constraint_fallback = dialect.get_pk_constraint(
@@ -440,6 +487,32 @@ class MetadataTest(fixtures.TablesTest):
                 connection=c, table_name=table, schema=schema
             )
             assert str(pk_constraint_fallback) == str(pk_constraint_odbc)
+
+    @pytest.mark.parametrize(
+        "engine_name",
+        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
+    )
+    @pytest.mark.parametrize(
+        "schema,table",
+        [
+            pytest.param(
+                TEST_GET_METADATA_FUNCTIONS_SCHEMA, "unknown", id="not existing table"
+            ),
+            pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
+        ],
+    )
+    def test_get_pk_constraint_for_sql_and_odbc_raise_exception(
+        self, schema, table, engine_name
+    ):
+        with self.engine_map[engine_name].begin() as c:
+            dialect = inspect(c).dialect
+            with pytest.raises(NoSuchTableError) as ex1:
+                dialect.get_pk_constraint(
+                    connection=c, table_name=table, schema=schema, use_sql_fallback=True
+                )
+            with pytest.raises(NoSuchTableError) as ex2:
+                dialect.get_pk_constraint(connection=c, table_name=table, schema=schema)
+        assert str(ex1) == str(ex2)
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
@@ -476,26 +549,70 @@ class MetadataTest(fixtures.TablesTest):
             )
             assert pk_constraint is None
 
-    @pytest.mark.parametrize("table", ["t", "s"])
-    @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
+    @pytest.mark.parametrize(
+        "schema",
+        [
+            pytest.param(TEST_GET_METADATA_FUNCTIONS_SCHEMA, id="defined schema"),
+            pytest.param(None, id="undefined schema (CURRENT_SCHEMA)"),
+        ],
+    )
     @pytest.mark.parametrize(
         "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
+        [
+            ENGINE_NONE_DATABASE,
+            ENGINE_SCHEMA_DATABASE,
+            # This does not work as the schema is taken from the URL. Changes
+            # would need to be made to the get_foreign_keys implementation
+            # to handle this. See Issue #633
+            # ENGINE_SCHEMA_2_DATABASE
+        ],
     )
-    def test_compare_get_foreign_keys_for_sql_and_odbc(
-        self, schema, table, engine_name
-    ):
+    def test_compare_get_foreign_keys_for_sql_and_odbc(self, schema, engine_name):
+        table = "t"
         with self.engine_map[engine_name].begin() as c:
+            c.info["current_schema"] = TEST_GET_METADATA_FUNCTIONS_SCHEMA
             if schema is None:
-                c.execute(sql.text("OPEN SCHEMA %s" % self.schema_2))
+                # Note: this should change the CURRENT_SCHEMA for Exasol connections
+                # However, as our default is to first use the URL, this doesn't work as expected
+                # for ENGINE_SCHEMA_2_DATABASE.
+                c.execute(sql.text(f"OPEN SCHEMA {TEST_GET_METADATA_FUNCTIONS_SCHEMA}"))
             dialect = inspect(c).dialect
             foreign_keys_fallback = dialect.get_foreign_keys(
-                connection=c, table_name=table, schema=schema, use_sql_fallback=True
+                connection=c,
+                table_name=table,
+                schema=schema,
+                use_sql_fallback=True,
             )
             foreign_keys_odbc = dialect.get_foreign_keys(
                 connection=c, table_name=table, schema=schema
             )
-            assert str(foreign_keys_fallback) == str(foreign_keys_odbc)
+        assert str(foreign_keys_fallback) == str(foreign_keys_odbc)
+
+    @pytest.mark.parametrize(
+        "engine_name",
+        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
+    )
+    @pytest.mark.parametrize(
+        "schema,table",
+        [
+            pytest.param(
+                TEST_GET_METADATA_FUNCTIONS_SCHEMA, "unknown", id="not existing table"
+            ),
+            pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
+        ],
+    )
+    def test_get_foreign_keys_for_sql_and_odbc_raise_exception(
+        self, schema, table, engine_name
+    ):
+        with self.engine_map[engine_name].begin() as c:
+            dialect = inspect(c).dialect
+            with pytest.raises(NoSuchTableError) as ex1:
+                dialect.get_foreign_keys(
+                    connection=c, table_name=table, schema=schema, use_sql_fallback=True
+                )
+            with pytest.raises(NoSuchTableError) as ex2:
+                dialect.get_foreign_keys(connection=c, table_name=table, schema=schema)
+        assert str(ex1) == str(ex2)
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(

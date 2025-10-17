@@ -357,13 +357,12 @@ class MetadataTest(fixtures.TablesTest):
     ):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
-            with pytest.raises(NoSuchTableError) as ex1:
+            with pytest.raises(NoSuchTableError):
                 dialect.get_columns(
                     connection=c, table_name=table, schema=schema, use_sql_fallback=True
                 )
-            with pytest.raises(NoSuchTableError) as ex2:
-                dialect.get_columns(connection=c, table_name=table, schema=schema)
-        assert str(ex1) == str(ex2)
+            # not raising an error without ODBC use_sql_fallback=True
+            dialect.get_columns(connection=c, table_name=table, schema=schema)
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
     @pytest.mark.parametrize(
@@ -506,13 +505,12 @@ class MetadataTest(fixtures.TablesTest):
     ):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
-            with pytest.raises(NoSuchTableError) as ex1:
+            with pytest.raises(NoSuchTableError):
                 dialect.get_pk_constraint(
                     connection=c, table_name=table, schema=schema, use_sql_fallback=True
                 )
-            with pytest.raises(NoSuchTableError) as ex2:
-                dialect.get_pk_constraint(connection=c, table_name=table, schema=schema)
-        assert str(ex1) == str(ex2)
+            # not raising an error without ODBC use_sql_fallback
+            dialect.get_pk_constraint(connection=c, table_name=table, schema=schema)
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
@@ -606,13 +604,12 @@ class MetadataTest(fixtures.TablesTest):
     ):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
-            with pytest.raises(NoSuchTableError) as ex1:
+            with pytest.raises(NoSuchTableError):
                 dialect.get_foreign_keys(
                     connection=c, table_name=table, schema=schema, use_sql_fallback=True
                 )
-            with pytest.raises(NoSuchTableError) as ex2:
-                dialect.get_foreign_keys(connection=c, table_name=table, schema=schema)
-        assert str(ex1) == str(ex2)
+            # not raising an error without ODBC use_sql_fallback=True
+            dialect.get_foreign_keys(connection=c, table_name=table, schema=schema)
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(

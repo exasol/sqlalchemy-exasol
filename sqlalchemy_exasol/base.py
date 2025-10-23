@@ -48,6 +48,7 @@ representation (all uppercase).
 import logging
 import re
 from contextlib import closing
+from datetime import datetime
 
 import sqlalchemy.exc
 from sqlalchemy import (
@@ -801,7 +802,28 @@ class EXAExecutionContext(default.DefaultExecutionContext):
     def should_autocommit_text(self, statement):
         return AUTOCOMMIT_REGEXP.match(statement)
 
+class EXATimestamp(sqltypes.TypeDecorator):
+    """Coerce Python datetime to a JSON-serializable wire value for pyexasol.
 
+    Exasol TIMESTAMP has no timezone; we format naive/UTC datetimes accordingly.
+    """
+    impl = sqltypes.TIMESTAMP
+    cache_ok = True
+
+    def bind_processor(self, dialect):
+        def process(value):
+            if value is None:
+                return None
+            # Normal case: a Python datetime instance
+            if isinstance(value, datetime):
+                # Keep microseconds; Exasol accepts 'YYYY-MM-DD HH:MM:SS.ffffff'
+                return value.strftime("%Y-%m-%d %H:%M:%S.%f")
+            # Defensive: if a SA DateTime *type* accidentally lands here as a value
+            if isinstance(value, sqltypes.DateTime):
+                return None
+            return value
+        return process
+    
 class EXADialect(default.DefaultDialect):
     name = "exasol"
     max_identifier_length = 128
@@ -1243,3 +1265,12 @@ class EXADialect(default.DefaultDialect):
     def get_indexes(self, connection, table_name, schema=None, **kw):
         """EXASolution has no explicit indexes"""
         return []
+
+    def type_descriptor(self, typeobj):
+        """Return a DB-specific TypeEngine for a generic SA type.
+
+        We wrap DateTime columns so their Python values serialize cleanly for pyexasol.
+        """
+        if isinstance(typeobj, sqltypes.DateTime):
+            return EXATimestamp()
+        return super().type_descriptor(typeobj)

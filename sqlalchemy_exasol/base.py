@@ -692,8 +692,52 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
     def visit_large_binary(self, type_):
         return self.visit_BLOB(type_)
 
-    def visit_datetime(self, type_):
-        return self.visit_TIMESTAMP(type_)
+    # --- Date/time ---
+
+    # Some SQLAlchemy versions dispatch DateTime() to 'DATETIME' (upper-case)
+    def visit_DATETIME(self, type_, **kw):
+        return "TIMESTAMP"
+
+    # Others dispatch to 'datetime' (lower-case) — keep both for safety
+    def visit_datetime(self, type_, **kw):
+        return "TIMESTAMP"
+
+    # If anything ever uses an explicit TIMESTAMP type, make it consistent
+    def visit_TIMESTAMP(self, type_, **kw):
+        return "TIMESTAMP"
+    
+    # --- Strings / Text ---
+
+     # SA String(length) -> VARCHAR(n); String() -> CLOB (Exasol requires length)
+    def visit_string(self, type_, **kw):
+        if type_.length:
+            return f"VARCHAR({int(type_.length)})"
+        return "CLOB"
+
+    # SA Text() -> Exasol CLOB (Exasol has no TEXT; VARCHAR requires a length)
+    def visit_text(self, type_, **kw):
+        return "CLOB"
+
+    # (optional) SA UnicodeText() -> CLOB as well
+    def visit_unicode_text(self, type_, **kw):
+        return "CLOB"
+
+    # --- Numeric / Decimal ---
+
+    # Ensure Numeric/DECIMAL always renders with an explicit scale
+    def visit_numeric(self, type_, **kw):
+        # SA may pass scale as None or -1 when only precision was given
+        p = type_.precision
+        s = 0 if (type_.scale in (None, -1)) else type_.scale
+        if p is not None:
+            return f"DECIMAL({p},{s})"
+        # sensible fallback if nothing provided
+        return "DECIMAL(18,0)"
+
+    # Some code paths use DECIMAL directly rather than numeric
+    def visit_DECIMAL(self, type_, **kw):
+        return self.visit_numeric(type_, **kw)
+    
 
 
 class EXAIdentifierPreparer(compiler.IdentifierPreparer):

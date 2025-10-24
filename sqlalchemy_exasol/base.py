@@ -824,6 +824,20 @@ class EXATimestamp(sqltypes.TypeDecorator):
             return value
         return process
     
+    
+from sqlalchemy import exc as sa_exc
+
+_PYEXA_TO_SA = {
+    "ExaQueryError": sa_exc.ProgrammingError,
+    "ExaAuthError": sa_exc.OperationalError,
+    "ExaRequestError": sa_exc.OperationalError,
+    "ExaCommunicationError": sa_exc.OperationalError,
+    "ExaRuntimeError": sa_exc.DatabaseError,
+    "ExaConstraintViolationError": sa_exc.IntegrityError,
+    "ExaIntegrityError": sa_exc.IntegrityError,
+    "ExaError": sa_exc.DatabaseError,
+}
+
 class EXADialect(default.DefaultDialect):
     name = "exasol"
     max_identifier_length = 128
@@ -1274,3 +1288,24 @@ class EXADialect(default.DefaultDialect):
         if isinstance(typeobj, sqltypes.DateTime):
             return EXATimestamp()
         return super().type_descriptor(typeobj)
+    
+    # leave this for true DB-API remapping (ODBC etc.)
+    dbapi_exception_translation_map = {}
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+        # print("TRIGGERED DO EXECUTE")
+        try:
+            return super().do_execute(cursor, statement, parameters, context)
+        except Exception as e:
+            mapped = _PYEXA_TO_SA.get(e.__class__.__name__)
+            if mapped:
+                # simplest: construct the SA exception directly
+                try:
+                    raise mapped(statement, parameters, e) from e
+                except TypeError:
+                    # handle minor signature differences across SA versions
+                    try:
+                        raise mapped(statement, parameters, e, False) from e
+                    except TypeError:
+                        raise mapped(str(e)) from e
+            raise

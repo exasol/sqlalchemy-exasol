@@ -103,8 +103,9 @@ class HasTableTest(_HasTableTest):
         """
         Default implementation of define_views in
         class sqlalchemy.testing.suite.HasTableTest
-        needs to be overridden here as Exasol treats data as a reserved word &
-        requires quoting. See notes, marked with 'Note:', highlighting
+        needs to be overridden here as Exasol treats "data" as a reserved word &
+        requires quoting. Changes to the original implementation are marked with
+        'Note:'.
         """
         # Note: column name "data" needs to be quoted as "data" is a reserved word
         query = 'CREATE VIEW vv AS SELECT id, "data" FROM test_table'

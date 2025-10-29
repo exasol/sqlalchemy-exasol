@@ -10,6 +10,7 @@ from sqlalchemy.schema import (
     DDL,
     Index,
 )
+from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
@@ -18,6 +19,7 @@ from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTe
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
+from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import ReturningGuardsTest as _ReturningGuardsTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
@@ -664,3 +666,16 @@ class QuotedNameArgumentTest(_QuotedNameArgumentTest):
     @pytest.mark.skip(reason=RATIONAL)
     def test_get_check_constraints(self, name):
         return
+
+
+class NumericTest(_NumericTest):
+    RATIONALE = """
+    The Exasol target backend maps Numeric to Decimal. Decimal is also used for both
+    Float & Double. Thus, we expect this test to fail.
+    """
+
+    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
+    @testing.requires.float_is_numeric
+    def test_float_is_not_numeric(self, connection, cls_):
+        super().test_float_is_not_numeric()

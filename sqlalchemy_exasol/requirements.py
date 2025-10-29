@@ -242,13 +242,3 @@ class Requirements(SuiteRequirements):
         - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <count> OFFSET <expr>;
         """
         return skip_if(BooleanPredicate(True, """Not Implemented Yet"""))
-
-    @property
-    def float_is_numeric(self):
-        """
-        The Exasol target backend maps Numeric to Decimal. Decimal is also used for both
-        Float & Double. Thus, we set this to `exclusions.closed()` to skip the test
-        `sqlalchemy.testing.suite.NumericTest.test_float_is_not_numeric`.
-        """
-
-        return exclusions.closed()

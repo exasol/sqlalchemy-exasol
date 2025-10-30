@@ -1011,7 +1011,7 @@ class EXADialect(default.DefaultDialect):
         ):
             raise sqlalchemy.exc.NoSuchTableError(
                 f"{schema_name}.{table_name}" if schema_name else table_name
-            ) from None
+            )
 
     @reflection.cache
     def _get_columns(self, connection, table_name, schema=None, **kw):

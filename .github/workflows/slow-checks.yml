@@ -10,7 +10,7 @@ jobs:
     permissions:
       contents: read
 
-  Tests:
+  tests:
     name: Integration-Tests (${{matrix.connector}}, Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
     needs: [ build-matrix ]
     runs-on: ubuntu-24.04
@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v1
@@ -40,7 +40,7 @@ jobs:
           poetry run -- nox -s test:integration -- --coverage --db-version ${{ matrix.exasol-version }}
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v5
         with:
           name: coverage-python${{ matrix.python-version }}-${{matrix.connector}}-exasol${{ matrix.exasol-version }}slow
           path: .coverage

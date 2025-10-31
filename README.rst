@@ -117,6 +117,8 @@ Examples:
     # for non-DML or non-DDL queries
     with engine.connect() as con:
         ...
+        # you can choose to commit as you go
+        con.commit()
 
 .. code-block:: python
 

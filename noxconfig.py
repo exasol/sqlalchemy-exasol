@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from dataclasses import dataclass
 from pathlib import Path
 
+from exasol.toolbox.config import BaseConfig
 from exasol.toolbox.nox.plugin import hookimpl
 
 
@@ -12,7 +12,7 @@ class StartDB:
     @hookimpl
     def pre_integration_tests_hook(self, session, config, context):
         port = context.get("port", 8563)
-        db_version = context.get("db_version", "7.1.17")
+        db_version = context.get("db_version", "2025.1.0")
         session.run(
             "itde",
             "spawn-test-environment",
@@ -38,8 +38,7 @@ class StopDB:
         session.run("docker", "kill", "db_container_test", external=True)
 
 
-@dataclass(frozen=True)
-class Config:
+class Config(BaseConfig):
     root: Path = Path(__file__).parent
     doc: Path = Path(__file__).parent / "doc"
     source: Path = Path("sqlalchemy_exasol")
@@ -49,14 +48,14 @@ class Config:
         ".eggs",
         "venv",
     )
-    environment_name = "test"
-    db_port = 8563
-    bucketfs_port = 2580
-    connectors = ["pyodbc", "turbodbc", "websocket"]
-    python_versions = ["3.10", "3.11", "3.12", "3.13"]
-    exasol_versions = ["7.1.30", "8.34.0", "2025.1.0"]
-
-    plugins = [StartDB, StopDB]
+    environment_name: str = "test"
+    db_port: int = 8563
+    bucketfs_port: int = 2580
+    connectors: list[str] = ["pyodbc", "turbodbc", "websocket"]
+    plugins: list = [StartDB, StopDB]
 
 
-PROJECT_CONFIG = Config()
+PROJECT_CONFIG = Config(
+    # PTB 1.12.0 still supports Python 3.9, so we override the python_versions
+    python_versions=("3.10", "3.11", "3.12", "3.13"),
+)

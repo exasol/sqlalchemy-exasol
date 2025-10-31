@@ -3,7 +3,9 @@ from inspect import cleandoc
 
 import pytest
 import sqlalchemy as sa
+from pyexasol import ExaQueryError
 from sqlalchemy import create_engine
+from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import (
     DDL,
     Index,
@@ -40,20 +42,43 @@ from sqlalchemy.testing.suite.test_ddl import (
 BREAKING_CHANGES_SQL_ALCHEMY_2x = (
     "Failing test after updating to SQLAlchemy 2.x. To be investigated."
 )
+RATIONALE_PYODBC_HAS_TABLE = cleandoc(
+    """
+The Exasol PyODBC dialect does not check against views for `has_table`, see also `Inspector.has_table()`.
+
+This is due to historic differences between PyODBC and the other Exasol dialects.
+As PyODBC is marked as deprecated, it is not a priority to fix this.
+"""
+)
 
 
 class ReturningGuardsTest(_ReturningGuardsTest):
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_delete_single(self):
-        super().test_delete_single()
+    """
+    Exasol does not support the RETURNING clause. This is already the assumption
+    per the DefaultDialect.
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_insert_single(self):
-        super().test_delete_single()
+    The single tests of class sqlalchemy.testing.suite.ReturningGuardsTest are
+    overridden, as they are written to send the request to the DB and receive an
+    error from the DB itself. For the websocket driver (based on PyExasol), the
+    exception raised is an ExaQueryError and not a DBAPIError.
+    """
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_update_single(self):
-        super().test_update_single()
+    @staticmethod
+    def _run_test(test_method, connection, run_stmt):
+        if "websocket" in testing.db.dialect.driver:
+            with pytest.raises(ExaQueryError):
+                test_method(connection, run_stmt)
+        else:
+            test_method(connection, run_stmt)
+
+    def test_delete_single(self, connection, run_stmt):
+        self._run_test(super().test_delete_single, connection, run_stmt)
+
+    def test_insert_single(self, connection, run_stmt):
+        self._run_test(super().test_insert_single, connection, run_stmt)
+
+    def test_update_single(self, connection, run_stmt):
+        self._run_test(super().test_update_single, connection, run_stmt)
 
 
 class RowFetchTest(_RowFetchTest):
@@ -75,15 +100,21 @@ class RowFetchTest(_RowFetchTest):
 class HasTableTest(_HasTableTest):
     @classmethod
     def define_views(cls, metadata):
-        """Should be mostly identical to _HasTableTest, except where noted"""
-        # column name "data" needs to be quoted as "data" is a reserved word
+        """
+        Default implementation of define_views in
+        class sqlalchemy.testing.suite.HasTableTest
+        needs to be overridden here as Exasol treats "data" as a reserved word &
+        requires quoting. Changes to the original implementation are marked with
+        'Note:'.
+        """
+        # Note: column name "data" needs to be quoted as "data" is a reserved word
         query = 'CREATE VIEW vv AS SELECT id, "data" FROM test_table'
 
         event.listen(metadata, "after_create", DDL(query))
         event.listen(metadata, "before_drop", DDL("DROP VIEW vv"))
 
         if testing.requires.schemas.enabled:
-            # column name "data" needs to be quoted as "data" is a reserved word
+            # Note: column name "data" needs to be quoted as "data" is a reserved word
             query = (
                 'CREATE VIEW {}.vv AS SELECT id, "data" FROM {}.test_table_s'.format(
                     config.test_schema,
@@ -97,24 +128,20 @@ class HasTableTest(_HasTableTest):
                 DDL("DROP VIEW %s.vv" % (config.test_schema)),
             )
 
-    RATIONALE = cleandoc(
-        """
-    The Exasol dialect does not check against views for `has_table`, see also `Inspector.has_table()`.
-
-    This behaviour is subject to change with sqlalchemy 2.0.
-    See also:
-    * https://github.com/sqlalchemy/sqlalchemy/blob/3fc6c40ea77c971d3067dab0fdf57a5b5313b69b/lib/sqlalchemy/engine/reflection.py#L415
-    * https://github.com/sqlalchemy/sqlalchemy/discussions/8678
-    * https://github.com/sqlalchemy/sqlalchemy/commit/f710836488162518dcf2dc1006d90ecd77a2a178
-    """
+    @pytest.mark.xfail(
+        "pyodbc" in testing.db.dialect.driver,
+        reason=RATIONALE_PYODBC_HAS_TABLE,
+        strict=True,
     )
-
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
     @testing.requires.views
     def test_has_table_view(self, connection):
         super().test_has_table_view(connection)
 
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @pytest.mark.xfail(
+        "pyodbc" in testing.db.dialect.driver,
+        reason=RATIONALE_PYODBC_HAS_TABLE,
+        strict=True,
+    )
     @testing.requires.views
     @testing.requires.schemas
     def test_has_table_view_schema(self, connection):
@@ -441,9 +468,58 @@ class ComponentReflectionTest(_ComponentReflectionTest):
     def test_get_view_definition_does_not_exist(self):
         super().test_get_view_definition_does_not_exist()
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_not_existing_table(self):
-        super().test_not_existing_table()
+    @pytest.mark.xfail(
+        "pyodbc" in testing.db.dialect.driver,
+        reason=RATIONALE_PYODBC_HAS_TABLE,
+        strict=True,
+    )
+    @testing.combinations(
+        ("get_table_options", testing.requires.reflect_table_options),
+        "get_columns",
+        (
+            "get_pk_constraint",
+            testing.requires.primary_key_constraint_reflection,
+        ),
+        (
+            "get_foreign_keys",
+            testing.requires.foreign_key_constraint_reflection,
+        ),
+        ("get_indexes", testing.requires.index_reflection),
+        (
+            "get_unique_constraints",
+            testing.requires.unique_constraint_reflection,
+        ),
+        (
+            "get_check_constraints",
+            testing.requires.check_constraint_reflection,
+        ),
+        ("get_table_comment", testing.requires.comment_reflection),
+        argnames="method",
+    )
+    def test_not_existing_table(self, method, connection):
+        """
+        This test is copied over instead of using super().test_not_existing_table
+        due to some issues related to propagating the custom pytest plugin from
+        sqlalchemy. It has been difficult to ascertain how to fix it. Yes, as PyODBC
+        support would be removed, this override would not be necessary in the future,
+        and the pytest plugin issue would not be present.
+
+        Essentially, by using super().test_not_existing_table, these tests fail with:
+            TypeError: test_not_existing_table() missing 3 required positional
+            arguments: 'method', 'connection', and '_exclusions_0`
+        The _exclusions_0 comes from an additional parameterization that is associated
+        with the sqlalchemy.testing.combinations usage which is overridden via
+        sqlalchemy.testing.plugin.pytestplugin::PytestFixtureFunctions.combinations
+        (see the variable `current_exclusion_name`) by using
+        sqlalchemy.testing.plugin.pytestplugin::pytest_configure. The usage
+        of super().test_not_existing_table() does not have an explicit argument
+        for passing in _exclusions_0, etc., so it is unclear at this time how to
+        resolve this mismatch in expectations.
+        """
+        insp = inspect(connection)
+        meth = getattr(insp, method)
+        with expect_raises(NoSuchTableError):
+            meth("table_does_not_exists")
 
 
 class HasIndexTest(_HasIndexTest):
@@ -547,14 +623,6 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
         return
 
 
-class NumericTest(_NumericTest):
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
-    @testing.requires.float_is_numeric
-    def test_float_is_not_numeric(self, connection, cls_):
-        super().test_float_is_not_numeric()
-
-
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):
     RATIONAL = cleandoc(
         """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
@@ -599,3 +667,16 @@ class QuotedNameArgumentTest(_QuotedNameArgumentTest):
     @pytest.mark.skip(reason=RATIONAL)
     def test_get_check_constraints(self, name):
         return
+
+
+class NumericTest(_NumericTest):
+    RATIONALE = """
+    The Exasol target backend maps Numeric to Decimal. Decimal is also used for both
+    Float & Double. Thus, we expect this test to fail.
+    """
+
+    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
+    @testing.requires.float_is_numeric
+    def test_float_is_not_numeric(self, connection, cls_):
+        super().test_float_is_not_numeric()

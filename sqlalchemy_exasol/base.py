@@ -1,4 +1,4 @@
-"""Support for the EXASOL database.
+"""Support for the Exasol database.
 
 Auto Increment Behavior
 -----------------------
@@ -30,17 +30,17 @@ The autoincrement flag for Column Objects is not supported by exadialect.
 Identifier Casing
 -----------------
 
-EXASol mimics the behavior of Oracle. Thus, for this dialect implementation
+Exasol mimics the behavior of Oracle. Thus, for this dialect implementation
 the Oracle dialect was taken as a reference.
-In EXASol, the data dictionary represents all case insensitive identifier names
+In Exasol, the data dictionary represents all case insensitive identifier names
 using UPPERCASE text.SQLAlchemy on the other hand considers an all-lower case
-identifiers to be case insensitive. The Oracle dialect converts identifier to
+identifiers to be case-insensitive. The Oracle dialect converts identifier to
 and from those two formats during schema level communication, such as reflection
 of tables and indexes.
 
 It is recommended to work with all lowercase identifiers on the SQLAlchemy side.
-These are treated as case insensitve identifiers by SQLAlchemy. The EXASol
-dialect takes care of converting them to the internal case insensitive
+These are treated as case-insensitive identifiers by SQLAlchemy. The Exasol
+dialect takes care of converting them to the internal case-insensitive
 representation (all uppercase).
 
 """
@@ -549,7 +549,7 @@ ischema_names = {
     "DATE": sqltypes.DATE,
     "DECIMAL": sqltypes.DECIMAL,
     "DOUBLE": sqltypes.FLOAT,
-    # EXASOL mapps DOUBLE, DOUBLE PRECISION, FLOAT to DOUBLE PRECISION
+    # Exasol maps DOUBLE, DOUBLE PRECISION, FLOAT to DOUBLE PRECISION
     # internally but returns 'DOUBLE' as type when asking the DB catalog
     # INTERVAL DAY [(p)] TO SECOND [(fp)] TODO: missing support for EXA Datatype, check Oracle Engine
     # INTERVAL YEAR[(p)] TO MONTH         TODO: missing support for EXA Datatype, check Oracle Engine
@@ -632,7 +632,7 @@ class EXADDLCompiler(compiler.DDLCompiler):
         return colspec
 
     def create_table_constraints(self, table, _include_foreign_key_constraints=None):
-        # EXASOL does not support FK constraints that reference
+        # Exasol does not support FK constraints that reference
         # the table being created. Thus, these need to be created
         # via ALTER TABLE after table creation
         # TODO: FKs that reference other tables could be inlined
@@ -839,8 +839,8 @@ class EXADialect(default.DefaultDialect):
 
     def normalize_name(self, name):
         """
-        Converting EXASol case insensitive identifiers (upper case)
-        to  SQLAlchemy case insensitive identifiers (lower case)
+        Converting Exasol case-insensitive identifiers (upper case)
+        to  SQLAlchemy case-insensitive identifiers (lower case)
         """
         if name is None:
             return None
@@ -855,8 +855,8 @@ class EXADialect(default.DefaultDialect):
 
     def denormalize_name(self, name):
         """
-        Converting SQLAlchemy case insensitive identifiers (lower case)
-        to  EXASol case insensitive identifiers (upper case)
+        Converting SQLAlchemy case-insensitive identifiers (lower case)
+        to  Exasol case-insensitive identifiers (upper case)
         """
         if name is None or len(name) == 0:
             return None
@@ -883,6 +883,12 @@ class EXADialect(default.DefaultDialect):
         result = connection.execute(sql.text(sql_statement))
         return [self.normalize_name(row[0]) for row in result]
 
+    @staticmethod
+    def _get_schema_replacement_string(schema_name) -> str:
+        if schema_name is None:
+            return "CURRENT_SCHEMA"
+        return ":schema"
+
     def _get_schema_for_input_or_current(self, connection, schema):
         schema = self._get_schema_for_input(connection, schema)
         if schema is None:
@@ -890,9 +896,14 @@ class EXADialect(default.DefaultDialect):
         return self.denormalize_name(schema)
 
     def _get_schema_for_input(self, connection, schema):
-        return self.denormalize_name(
-            schema or self._get_schema_from_url(connection, schema)
-        )
+        if not schema:
+            backup_schema = self._get_schema_from_url(connection, schema)
+            if backup_schema:
+                # need to convert to str as quoted text cannot be modified with
+                # the denormalize_name operations
+                schema = str(backup_schema)
+
+        return self.denormalize_name(schema)
 
     @staticmethod
     def _get_current_schema(connection):
@@ -920,11 +931,12 @@ class EXADialect(default.DefaultDialect):
     def has_table(self, connection, table_name, schema=None, **kw):
         schema = self._get_schema_for_input(connection, schema)
         sql_statement = (
-            "SELECT table_name from SYS.EXA_ALL_TABLES "
-            "WHERE table_name = :table_name "
+            "SELECT OBJECT_NAME FROM SYS.EXA_ALL_OBJECTS "
+            "WHERE OBJECT_TYPE IN ('TABLE', 'VIEW') "
+            "AND OBJECT_NAME = :table_name "
         )
         if schema is not None:
-            sql_statement += "AND table_schema = :schema"
+            sql_statement += "AND ROOT_NAME = :schema"
 
         result = connection.execute(
             sql.text(sql_statement),
@@ -993,19 +1005,31 @@ class EXADialect(default.DefaultDialect):
             "ORDER BY column_ordinal_position"
         )
 
+    def _verify_table_exists(self, connection, table_name, schema_name):
+        if not self.has_table(
+            connection=connection, table_name=table_name, schema=schema_name
+        ):
+            raise sqlalchemy.exc.NoSuchTableError(
+                f"{schema_name}.{table_name}" if schema_name else table_name
+            )
+
     @reflection.cache
     def _get_columns(self, connection, table_name, schema=None, **kw):
-        schema = self._get_schema_for_input(connection, schema)
-        schema_str = "CURRENT_SCHEMA" if schema is None else ":schema"
-        table_name_str = ":table"
+        schema_name = self._get_schema_for_input(connection, schema)
+        table_name = self.denormalize_name(table_name)
+        self._verify_table_exists(
+            connection=connection, table_name=table_name, schema_name=schema_name
+        )
+
         sql_statement = self.get_column_sql_query_str().format(
-            schema=schema_str, table=table_name_str
+            schema=self._get_schema_replacement_string(schema_name=schema_name),
+            table=":table",
         )
         result = connection.execute(
             sql.text(sql_statement),
             {
-                "schema": self.denormalize_name(schema),
-                "table": self.denormalize_name(table_name),
+                "schema": self.denormalize_name(schema_name),
+                "table": table_name,
             },
         )
         return list(result)
@@ -1097,21 +1121,22 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def _get_pk_constraint(self, connection, table_name, schema, **kw):
-        schema = self._get_schema_for_input(connection, schema)
+        schema_name = self._get_schema_for_input(connection, schema)
         table_name = self.denormalize_name(table_name)
-        table_name_string = ":table"
-        if schema is None:
-            schema_string = "CURRENT_SCHEMA "
-        else:
-            schema_string = ":schema "
+        self._verify_table_exists(
+            connection=connection, table_name=table_name, schema_name=schema_name
+        )
+
         sql_statement = self._get_constraint_sql_str(
-            schema_string, table_name_string, "PRIMARY KEY"
+            schema=self._get_schema_replacement_string(schema_name=schema_name),
+            table_name=":table",
+            contraint_type="PRIMARY KEY",
         )
         result = connection.execute(
             sql.text(sql_statement),
             {
-                "schema": self.denormalize_name(schema),
-                "table": self.denormalize_name(table_name),
+                "schema": schema_name,
+                "table": table_name,
             },
         )
         pkeys = []
@@ -1133,16 +1158,22 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
-        table_name_string = ":table"
-        schema_string = "CURRENT_SCHEMA " if schema is None else ":schema "
+        schema_name = self._get_schema_for_input(connection, schema)
+        table_name = self.denormalize_name(table_name)
+        self._verify_table_exists(
+            connection=connection, table_name=table_name, schema_name=schema_name
+        )
+
         sql_statement = self._get_constraint_sql_str(
-            schema_string, table_name_string, "FOREIGN KEY"
+            schema=self._get_schema_replacement_string(schema_name=schema_name),
+            table_name=":table",
+            contraint_type="FOREIGN KEY",
         )
         result = connection.execute(
             sql.text(sql_statement),
             {
-                "schema": self.denormalize_name(schema),
-                "table": self.denormalize_name(table_name),
+                "schema": schema_name,
+                "table": table_name,
             },
         )
         return list(result)
@@ -1200,5 +1231,5 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):
-        """EXASolution has no explicit indexes"""
+        """Exasol has no explicit indexes"""
         return []

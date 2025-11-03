@@ -1,3 +1,5 @@
+import ssl
+
 import pyexasol
 import pytest
 
@@ -12,6 +14,7 @@ def pyexasol_connection(exasol_config):
         dsn=f"{config.host}:{config.port}",
         user=config.username,
         password=config.password,
+        websocket_sslopt={"cert_reqs": ssl.CERT_NONE},
     )
     yield connection
     connection.close()

@@ -1,3 +1,4 @@
+import ssl
 from contextlib import contextmanager
 
 import pyexasol
@@ -33,6 +34,7 @@ def _pyexasol_connection(dsn="localhost:8563", user="SYS", password="exasol"):
         dsn=dsn,
         user=user,
         password=password,
+        websocket_sslopt={"cert_reqs": ssl.CERT_NONE},
     )
     yield connection
     connection.close()

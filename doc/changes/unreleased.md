@@ -9,7 +9,7 @@ the connection URL to take advantage of an additional security feature in PyExas
 
 ```python
 from sqlalchemy import create_engine
-    url = "exa+websocket://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&FINGERPRINT=C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028"
+    url = "exa+websocket://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?FINGERPRINT=C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028"
     engine = create_engine(url)
     query = "select 42 from dual"
     with engine.connect() as con:

@@ -45,141 +45,40 @@ SQLAlchemy Dialect for EXASOL DB
 
 Getting Started with SQLAlchemy-Exasol
 --------------------------------------
-SQLAlchemy-Exasol supports multiple dialects, primarily differentiated by whether they are ODBC or Websocket based.
+SQLAlchemy-Exasol supports multiple dialects, primarily differentiated by whether they are ODBC or Websocket-based.
 
 Choosing a Dialect
 ++++++++++++++++++
 
-We recommend using the Websocket-based dialect due to its simplicity. ODBC-based dialects demand a thorough understanding of (Unix)ODBC, and the setup is considerably more complex.
+We recommend using the Websocket-based dialect due to its simplicity.
+ODBC-based dialects demand a thorough understanding of (Unix)ODBC, and the setup is considerably more complex.
 
 .. warning::
 
-    The maintenance of Turbodbc support is currently paused, and it may be phased out in future versions.
-    We are also planning to phase out the pyodbc support in the future.
-
+    The maintenance of Turbodbc & pyodbc support is currently paused, and it is planned to be phased out in future versions.
 
 
 System Requirements
 -------------------
-- Python
-- An Exasol DB (e.g. `docker-db <test_docker_image_>`_ or a `cloud instance <test_drive_>`_)
+- Exasol >= 7.1 (e.g. `docker-db <test_docker_image_>`_ or a `cloud instance <test_drive_>`_)
+- Python >= 3.10
 
 .. note::
 
    For ODBC-Based Dialects, additional libraries required for ODBC are necessary
    (for further details, checkout the `developer guide`_).
 
-Setting Up Your Python Project
-------------------------------
-
-Install SQLAlchemy-Exasol:
-
-.. code-block:: shell
-
-    $ pip install sqlalchemy-exasol
-
-.. note::
-
-   To use an ODBC-based dialect, you must specify it as an extra during installation.
-
-   .. code-block:: shell
-
-      pip install "sqlalchemy-exasol[pydobc]"
-      pip install "sqlalchemy-exasol[turbodbc]"
-
-
-Using SQLAlchemy with EXASOL DB
--------------------------------
-
-**Websocket based Dialect:**
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine
-    url = "exa+websocket://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8"
-    e = create_engine(url)
-    query = "select 42 from dual"
-    with engine.connect() as con:
-        result = con.execute(sql.text(query)).fetchall()
-
-Examples:
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine
-
-    engine = create_engine("exa+websocket://sys:exasol@127.0.0.1:8888")
-
-    # don't rely on autocommit for DML and DDL
-    with engine.begin() as con:
-        ...
-
-    # for non-DML or non-DDL queries
-    with engine.connect() as con:
-        ...
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine
-
-    # ATTENTION:
-    # In terms of security it is NEVER a good idea to disable certificate validation!!
-    # In rare cases it may be handy for non-security related reasons.
-    # That said, if you are not a 100% sure about your scenario, stick with the
-    # secure defaults.
-    # In most cases, having a valid certificate and/or configuring the truststore(s)
-    # appropriately is the best/correct solution.
-    engine = create_engine("exa+websocket://sys:exasol@127.0.0.1:8888?SSLCertificate=SSL_VERIFY_NONE")
-    with engine.connect() as con:
-        ...
-
-
-**Pyodbc (ODBC based Dialect):**
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine
-    url = "exa+pyodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
-    e = create_engine(url)
-    query = "select 42 from dual"
-    with engine.connect() as con:
-        result = con.execute(sql.text(query)).fetchall()
-
-**Turbodbc (ODBC based Dialect):**
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine
-    url = "exa+turbodbc://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
-    e = create_engine(url)
-    query = "select 42 from dual"
-    with engine.connect() as con:
-        result = con.execute(sql.text(query)).fetchall()
-
-
 Features
 --------
 
 - SELECT, INSERT, UPDATE, DELETE statements
 
-General Notes
--------------
+Getting Started
+---------------
 
-- Schema name and parameters are optional for the host url
-- At least on Linux/Unix systems it has proven valuable to pass 'CONNECTIONLCALL=en_US.UTF-8' as a url parameter. This will make sure that the client process (Python) and the EXASOL driver (UTF-8 internal) know how to interpret code pages correctly.
-- Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
-- As of Exasol client driver version 4.1.2 you can pass the flag 'INTTYPESINRESULTSIFPOSSIBLE=y' in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
+Check out sqlalchemy-exasols's [User Guide(https://exasol.github.io/sqlalchemy-exasol/master/user_guide.html) page for your first steps.
 
 .. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
+.. _test_docker_image: https://github.com/exasol/docker-db
 .. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
 .. _test_drive: https://cloud.exasol.com/signup
-.. _test_docker_image: https://github.com/exasol/docker-db
-
-Known Issues
-------------
-* Insert
-    - Insert multiple empty rows via prepared statements does not work in all cases
-
-Development & Testing
----------------------
-See `developer guide`_

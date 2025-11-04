@@ -1,3 +1,5 @@
+from typing import Union
+
 import pytest
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
@@ -6,31 +8,33 @@ from sqlalchemy_exasol.version import VERSION
 from sqlalchemy_exasol.websocket import EXADialect_websocket
 
 
+def set_kwargs(
+    dsn: str = "localhost:8888",
+    tls: bool = True,
+    certificate_validation: bool = True,
+    **kwargs,
+) -> dict[str, Union[str, bool]]:
+    return {
+        "dsn": dsn,
+        "tls": tls,
+        "certificate_validation": certificate_validation,
+        "client_name": "EXASOL:SQLA:WS",
+        "client_version": VERSION,
+        **kwargs,
+    }
+
+
 @pytest.mark.parametrize(
     "url,expected_kwargs",
     [
         pytest.param(
             make_url("exa+websocket://localhost:8888"),
-            {
-                "dsn": "localhost:8888",
-                "tls": True,
-                "certificate_validation": True,
-                "client_name": "EXASOL:SQLA:WS",
-                "client_version": VERSION,
-            },
+            set_kwargs(),
             id="default_settings",
         ),
         pytest.param(
             make_url("exa+websocket://sys:exasol@localhost:8888"),
-            {
-                "dsn": "localhost:8888",
-                "password": "exasol",
-                "username": "sys",
-                "tls": True,
-                "certificate_validation": True,
-                "client_name": "EXASOL:SQLA:WS",
-                "client_version": VERSION,
-            },
+            set_kwargs(username="sys", password="exasol"),
             id="with_username_and_password",
         ),
         pytest.param(
@@ -39,16 +43,12 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                 "CONNECTIONCALL=en_US.UTF-8&DRIVER=EXAODBC"
                 "&SSLCertificate=SSL_VERIFY_NONE"
             ),
-            {
-                "dsn": "localhost:8888",
-                "password": "exasol",
-                "username": "sys",
-                "tls": True,
-                "certificate_validation": False,
-                "schema": "TEST",
-                "client_name": "EXASOL:SQLA:WS",
-                "client_version": VERSION,
-            },
+            set_kwargs(
+                certificate_validation=False,
+                schema="TEST",
+                username="sys",
+                password="exasol",
+            ),
             id="with_ssl_verify_none",
         ),
         pytest.param(
@@ -58,32 +58,25 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                 "&SSLCertificate=SSL_VERIFY_NONE"
                 "&ENCRYPTION=N"
             ),
-            {
-                "dsn": "localhost:8888",
-                "password": "exasol",
-                "username": "sys",
-                "tls": False,
-                "certificate_validation": False,
-                "schema": "TEST",
-                "client_name": "EXASOL:SQLA:WS",
-                "client_version": VERSION,
-            },
+            set_kwargs(
+                certificate_validation=False,
+                tls=False,
+                schema="TEST",
+                username="sys",
+                password="exasol",
+            ),
             id="with_ssl_verify_none_and_no_encryption",
         ),
         pytest.param(
             make_url(
                 "exa+websocket://sys:exasol@localhost:8888?FINGERPRINT=C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028"
             ),
-            {
-                "dsn": "localhost/C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028:8888",
-                "password": "exasol",
-                "username": "sys",
-                "tls": True,
-                # if using fingerprint, this should be FALSE
-                "certificate_validation": False,
-                "client_name": "EXASOL:SQLA:WS",
-                "client_version": VERSION,
-            },
+            set_kwargs(
+                dsn="localhost/C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028:8888",
+                certificate_validation=False,
+                username="sys",
+                password="exasol",
+            ),
             id="with_fingerprint",
         ),
     ],

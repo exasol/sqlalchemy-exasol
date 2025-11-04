@@ -1,6 +1,6 @@
 # 5.2.0 - 2025-11-04
-Due to an EOL for [Python 3.9 in 2025-10](https://devguide.python.org/versions/), we dropped support for it.
-This allows us to use the latest dependencies, which do not have open vulnerabilities.
+
+This release drops the support for Python 3.9 as this Python version has reached its [end-of-life](https://devguide.python.org/versions/) in 2025-10. In consequence, the release also fixes security vulnerabilities by updating the dependencies.
 
 With this release, in the Websocket-based dialect, it is possible for users to pass `FINGERPRINT` into
 the connection URL to take advantage of an additional security feature in PyExasol version

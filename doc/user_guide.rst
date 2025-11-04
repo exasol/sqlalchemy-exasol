@@ -6,7 +6,7 @@
 SQLAlchemy-Exasol is a dialect extension for SQLAlchemy, implementing support for Exasol databases.
 
 .. note::
-    For more details on SQLAlchemy, please consult it's `documentation <https://docs.sqlalchemy.org/en/14/>`_.
+    For more details on SQLAlchemy, please consult its `documentation <https://docs.sqlalchemy.org/en/14/>`_.
 
 Getting Started
 ~~~~~~~~~~~~~~~
@@ -33,10 +33,10 @@ Getting Started
         port = "8563
         schema = "my_schema"
 
-        # At least on Linux/Unix systems it has proven valuable to pass
-        # `CONNECTIONLCALL=en_US.UTF-8` as a URL parameter. This will
-        # make sure that the client process (Python) and the EXASOL
-        # driver (UTF-8 internal) know how to interpret code pages correctly.
+        # At least on Unix systems you can pass URL parameter
+        # `CONNECTIONLCALL=en_US.UTF-8` to avoid errors
+        # due to different code pages used by the client process (Python)
+        # and the EXASOL driver.
         url = f"exa+websocket://{user}:{password}@{host}:{port}/{schema}?CONNECTIONLCALL=en_US.UTF-8"
         engine = create_engine(url)
 
@@ -94,7 +94,7 @@ Websocket-based Dialect
     ATTENTION:
     In terms of security it is NEVER a good idea to disable certificate validation!
     In rare cases, it may be handy for non-security related reasons.
-    That said, if you are not a 100% sure about your scenario, stick with the secure defaults.
+    That said, if you are not 100% sure about your scenario, stick with the secure defaults.
     In most cases, having a valid fingerprint, certificate and/or configuring the truststore(s)
     appropriately is the best/correct solution.
     """
@@ -165,9 +165,9 @@ General Notes
 ~~~~~~~~~~~~~
 
 - Schema name and parameters are optional for the host URL
-- At least on Linux/Unix systems it has proven valuable to pass `CONNECTIONLCALL=en_US.UTF-8` as a URL parameter. This will make sure that the client process (Python) and the EXASOL driver (UTF-8 internal) know how to interpret code pages correctly.
+- At least on Unix systems you can pass URL parameter `CONNECTIONLCALL=en_US.UTF-8` to avoid errors due to different code pages used by the client process (Python) and the EXASOL driver.
 - Always use all lower-case identifiers for schema, table and column names. SQLAlchemy treats all lower-case identifiers as case-insensitive, the dialect takes care of transforming the identifier into a case-insensitive representation of the specific database (in case of EXASol this is upper-case as for Oracle)
-- As of Exasol client driver version 4.1.2 you can pass the flag `INTTYPESINRESULTSIFPOSSIBLE=y` in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers is a factor three faster in Python than creating Decimals.
+- As of Exasol client driver version 4.1.2 you can pass the flag `INTTYPESINRESULTSIFPOSSIBLE=y` in the connection string (or configure it in your DSN). This will convert DECIMAL data types to Integer-like data types. Creating integers takes on about 30% of the time compared to Decimals.
 
 Known Issues
 ~~~~~~~~~~~~

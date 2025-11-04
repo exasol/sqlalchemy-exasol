@@ -48,6 +48,7 @@ representation (all uppercase).
 import logging
 import re
 from contextlib import closing
+from datetime import datetime
 
 import sqlalchemy.exc
 from sqlalchemy import (
@@ -692,8 +693,52 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
     def visit_large_binary(self, type_):
         return self.visit_BLOB(type_)
 
-    def visit_datetime(self, type_):
-        return self.visit_TIMESTAMP(type_)
+    # --- Date/time ---
+
+    # Some SQLAlchemy versions dispatch DateTime() to 'DATETIME' (upper-case)
+    def visit_DATETIME(self, type_, **kw):
+        return "TIMESTAMP"
+
+    # Others dispatch to 'datetime' (lower-case) — keep both for safety
+    def visit_datetime(self, type_, **kw):
+        return "TIMESTAMP"
+
+    # If anything ever uses an explicit TIMESTAMP type, make it consistent
+    def visit_TIMESTAMP(self, type_, **kw):
+        return "TIMESTAMP"
+    
+    # --- Strings / Text ---
+
+     # SA String(length) -> VARCHAR(n); String() -> CLOB (Exasol requires length)
+    def visit_string(self, type_, **kw):
+        if type_.length:
+            return f"VARCHAR({int(type_.length)})"
+        return "CLOB"
+
+    # SA Text() -> Exasol CLOB (Exasol has no TEXT; VARCHAR requires a length)
+    def visit_text(self, type_, **kw):
+        return "CLOB"
+
+    # (optional) SA UnicodeText() -> CLOB as well
+    def visit_unicode_text(self, type_, **kw):
+        return "CLOB"
+
+    # --- Numeric / Decimal ---
+
+    # Ensure Numeric/DECIMAL always renders with an explicit scale
+    def visit_numeric(self, type_, **kw):
+        # SA may pass scale as None or -1 when only precision was given
+        p = type_.precision
+        s = 0 if (type_.scale in (None, -1)) else type_.scale
+        if p is not None:
+            return f"DECIMAL({p},{s})"
+        # sensible fallback if nothing provided
+        return "DECIMAL(18,0)"
+
+    # Some code paths use DECIMAL directly rather than numeric
+    def visit_DECIMAL(self, type_, **kw):
+        return self.visit_numeric(type_, **kw)
+    
 
 
 class EXAIdentifierPreparer(compiler.IdentifierPreparer):
@@ -757,6 +802,41 @@ class EXAExecutionContext(default.DefaultExecutionContext):
     def should_autocommit_text(self, statement):
         return AUTOCOMMIT_REGEXP.match(statement)
 
+class EXATimestamp(sqltypes.TypeDecorator):
+    """Coerce Python datetime to a JSON-serializable wire value for pyexasol.
+
+    Exasol TIMESTAMP has no timezone; we format naive/UTC datetimes accordingly.
+    """
+    impl = sqltypes.TIMESTAMP
+    cache_ok = True
+
+    def bind_processor(self, dialect):
+        def process(value):
+            if value is None:
+                return None
+            # Normal case: a Python datetime instance
+            if isinstance(value, datetime):
+                # Keep microseconds; Exasol accepts 'YYYY-MM-DD HH:MM:SS.ffffff'
+                return value.strftime("%Y-%m-%d %H:%M:%S.%f")
+            # Defensive: if a SA DateTime *type* accidentally lands here as a value
+            if isinstance(value, sqltypes.DateTime):
+                return None
+            return value
+        return process
+    
+    
+from sqlalchemy import exc as sa_exc
+
+_PYEXA_TO_SA = {
+    "ExaQueryError": sa_exc.ProgrammingError,
+    "ExaAuthError": sa_exc.OperationalError,
+    "ExaRequestError": sa_exc.OperationalError,
+    "ExaCommunicationError": sa_exc.OperationalError,
+    "ExaRuntimeError": sa_exc.DatabaseError,
+    "ExaConstraintViolationError": sa_exc.IntegrityError,
+    "ExaIntegrityError": sa_exc.IntegrityError,
+    "ExaError": sa_exc.DatabaseError,
+}
 
 class EXADialect(default.DefaultDialect):
     name = "exasol"
@@ -1199,3 +1279,33 @@ class EXADialect(default.DefaultDialect):
     def get_indexes(self, connection, table_name, schema=None, **kw):
         """EXASolution has no explicit indexes"""
         return []
+
+    def type_descriptor(self, typeobj):
+        """Return a DB-specific TypeEngine for a generic SA type.
+
+        We wrap DateTime columns so their Python values serialize cleanly for pyexasol.
+        """
+        if isinstance(typeobj, sqltypes.DateTime):
+            return EXATimestamp()
+        return super().type_descriptor(typeobj)
+    
+    # leave this for true DB-API remapping (ODBC etc.)
+    dbapi_exception_translation_map = {}
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+        # print("TRIGGERED DO EXECUTE")
+        try:
+            return super().do_execute(cursor, statement, parameters, context)
+        except Exception as e:
+            mapped = _PYEXA_TO_SA.get(e.__class__.__name__)
+            if mapped:
+                # simplest: construct the SA exception directly
+                try:
+                    raise mapped(statement, parameters, e) from e
+                except TypeError:
+                    # handle minor signature differences across SA versions
+                    try:
+                        raise mapped(statement, parameters, e, False) from e
+                    except TypeError:
+                        raise mapped(str(e)) from e
+            raise

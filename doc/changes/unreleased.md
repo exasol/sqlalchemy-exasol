@@ -3,9 +3,23 @@
 Due to an EOL for [Python 3.9 in 2025-10](https://devguide.python.org/versions/), we dropped support for it.
 This allows us to use the latest dependencies, which do not have open vulnerabilities.
 
+With this release, in the Websocket-based dialect, it is possible for users to pass `FINGERPRINT` into
+the connection URL to take advantage of an additional security feature in PyExasol version
+1.x.
+
+```python
+from sqlalchemy import create_engine
+    url = "exa+websocket://A_USER:A_PASSWORD@192.168.1.2..8:1234/my_schema?CONNECTIONLCALL=en_US.UTF-8&FINGERPRINT=C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028"
+    engine = create_engine(url)
+    query = "select 42 from dual"
+    with engine.connect() as con:
+        result = con.execute(sql.text(query)).fetchall()
+```
+
 ## Feature
 
 - #612: Updated CI tests to run against Exasol DB versions 7.1.30, 8.34.0, and 2025.1.0. Dropped support for Python 3.9.
+- #637: Added option to `exa-websocket` (Websocket-based dialect) to pass `FINGERPRINT` in the connection URL for additional security
 
 ## Refactoring
 

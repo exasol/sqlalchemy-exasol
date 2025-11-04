@@ -9,7 +9,7 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
 @pytest.mark.parametrize(
     "url,expected_kwargs",
     [
-        (
+        pytest.param(
             make_url("exa+websocket://localhost:8888"),
             {
                 "dsn": "localhost:8888",
@@ -18,8 +18,9 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                 "client_name": "EXASOL:SQLA:WS",
                 "client_version": VERSION,
             },
+            id="default_settings",
         ),
-        (
+        pytest.param(
             make_url("exa+websocket://sys:exasol@localhost:8888"),
             {
                 "dsn": "localhost:8888",
@@ -30,8 +31,9 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                 "client_name": "EXASOL:SQLA:WS",
                 "client_version": VERSION,
             },
+            id="with_username_and_password",
         ),
-        (
+        pytest.param(
             make_url(
                 "exa+websocket://sys:exasol@localhost:8888/TEST?"
                 "CONNECTIONCALL=en_US.UTF-8&DRIVER=EXAODBC"
@@ -47,8 +49,9 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                 "client_name": "EXASOL:SQLA:WS",
                 "client_version": VERSION,
             },
+            id="with_ssl_verify_none",
         ),
-        (
+        pytest.param(
             make_url(
                 "exa+websocket://sys:exasol@localhost:8888/TEST?"
                 "CONNECTIONCALL=en_US.UTF-8&DRIVER=EXAODBC"
@@ -65,6 +68,23 @@ from sqlalchemy_exasol.websocket import EXADialect_websocket
                 "client_name": "EXASOL:SQLA:WS",
                 "client_version": VERSION,
             },
+            id="with_ssl_verify_none_and_no_encryption",
+        ),
+        pytest.param(
+            make_url(
+                "exa+websocket://sys:exasol@localhost:8888?FINGERPRINT=C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028"
+            ),
+            {
+                "dsn": "localhost/C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028:8888",
+                "password": "exasol",
+                "username": "sys",
+                "tls": True,
+                # if using fingerprint, this should be FALSE
+                "certificate_validation": False,
+                "client_name": "EXASOL:SQLA:WS",
+                "client_version": VERSION,
+            },
+            id="with_fingerprint",
         ),
     ],
 )

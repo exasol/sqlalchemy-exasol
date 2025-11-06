@@ -19,9 +19,8 @@ from sqlalchemy.testing import (
 
 
 # TODO: get_schema_names, get_view_names and get_view_definition didn't cause deadlocks in this scenario
-@pytest.mark.skipif(
-    "pyodbc" not in str(testing.db.url),
-    reason="We currently only support snapshot metadata requests in the pyodbc based dialect",
+@pytest.mark.xfail(
+    reason="We do not currently support snapshot metadata",
 )
 class MetadataTest(fixtures.TablesTest):
     __backend__ = True

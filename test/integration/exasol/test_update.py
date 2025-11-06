@@ -1,4 +1,3 @@
-import pytest
 from sqlalchemy import *
 from sqlalchemy.testing import (
     config,
@@ -81,9 +80,6 @@ class _UpdateTestBase:
         }
 
 
-@pytest.mark.skipif(
-    config.db.dialect.driver == "turbodbc", reason="not supported by turbodbc"
-)
 class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
     __backend__ = True
 

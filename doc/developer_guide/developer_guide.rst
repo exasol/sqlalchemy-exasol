@@ -36,7 +36,7 @@ Example: Install of required system libraries on Ubuntu
 
 Locale
 +++++++
-Make sure the local is setup appropriately.
+Make sure the local is set up appropriately.
 
 Example: Setting up an english locale
 
@@ -125,21 +125,8 @@ Tests
 
     .. code-block::
 
-        # make sure you are using the virtual environment poetry has setup for this project
+        # make sure you are using the virtual environment poetry has set up for this project
         poetry shell
-
-
-#. Run all tests with `pyodbc` connector
-
-    .. code-block::
-
-        nox
-
-    or
-
-    .. code-block::
-
-        nox -s "verify(connector='pyodbc')"
 
 
 .. attention::

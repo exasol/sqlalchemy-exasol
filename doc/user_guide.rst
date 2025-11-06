@@ -52,21 +52,8 @@ Getting Started
         ...
 
 
-.. warning::
-
-   To use an ODBC-based dialect, you must specify it as an extra during installation.
-   Maintenance for these ODBC-based dialects is paused, and it is planned to remove them
-   in future versions.
-
-   .. code-block:: shell
-
-      pip install "sqlalchemy-exasol[pydobc]"
-
 Further Examples
 ~~~~~~~~~~~~~~~~
-
-Websocket-based Dialect
-------------------------
 
 .. code-block:: python
 
@@ -115,30 +102,6 @@ Websocket-based Dialect
     with engine.connect() as con:
         ...
 
-
-.. note::
-   Validation with fingerprint is only supported in the Websocket-based dialect, and not
-   the ODBC-based dialect (Pyodbc).
-
-
-Pyodbc-based Dialect
----------------------
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine, sql
-
-    user = "sys"
-    password = "exasol"
-    host = "127.0.0.1"
-    port = "8563
-    schema = "my_schema
-
-    url = f"exa+pyodbc://{user}:{password}@{host}:{port}/{schema}?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
-    engine = create_engine(url)
-    query = "select 42 from dual"
-    with engine.connect() as con:
-        result = con.execute(sql.text(query)).fetchall()
 
 General Notes
 ~~~~~~~~~~~~~

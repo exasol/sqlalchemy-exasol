@@ -128,25 +128,6 @@ class HasTableTest(_HasTableTest):
                 DDL("DROP VIEW %s.vv" % (config.test_schema)),
             )
 
-    @pytest.mark.xfail(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_PYODBC_HAS_TABLE,
-        strict=True,
-    )
-    @testing.requires.views
-    def test_has_table_view(self, connection):
-        super().test_has_table_view(connection)
-
-    @pytest.mark.xfail(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_PYODBC_HAS_TABLE,
-        strict=True,
-    )
-    @testing.requires.views
-    @testing.requires.schemas
-    def test_has_table_view_schema(self, connection):
-        super().test_has_table_view_schema(connection)
-
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_has_table_cache(self, connection):
         super().test_has_table_cache(connection)
@@ -164,29 +145,6 @@ class InsertBehaviorTest(_InsertBehaviorTest):
 
 
 class RowCountTest(_RowCountTest):
-    PYODBC_RATIONALE = cleandoc(
-        """
-        pyodbc does not support returning the actual affected rows when executemany is used,
-        the cursor result always will be set to the rowcount = -1 in this case.
-        This also is a valid behaviour according to the python DBAPI specification.
-        For more details see also:
-        * https://peps.python.org/pep-0249/
-        * https://peps.python.org/pep-0249/#rowcount
-        * https://peps.python.org/pep-0249/#id21
-        * https://peps.python.org/pep-0249/#executemany
-        """
-    )
-
-    @pytest.mark.skipif("pyodbc" in testing.db.dialect.driver, reason=PYODBC_RATIONALE)
-    @testing.requires.sane_multi_rowcount
-    def test_multi_update_rowcount(self, connection):
-        super().test_multi_update_rowcount(connection)
-
-    @pytest.mark.skipif("pyodbc" in testing.db.dialect.driver, reason=PYODBC_RATIONALE)
-    @testing.requires.sane_multi_rowcount
-    def test_multi_delete_rowcount(self, connection):
-        super().test_multi_delete_rowcount(connection)
-
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_non_rowcount_scenarios_no_raise(self):
         # says cursor already closed so very likely need to fix!

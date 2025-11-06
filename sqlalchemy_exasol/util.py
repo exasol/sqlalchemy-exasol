@@ -1,7 +1,7 @@
 import datetime
 
 from sqlalchemy_exasol import base
-from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
+from sqlalchemy_exasol.websocket import EXADialect_websocket
 
 
 def raw_sql(query):
@@ -14,7 +14,7 @@ def raw_sql(query):
     :returns: A string of raw SQL
     :rtype: string
     """
-    dialect = EXADialect_pyodbc()
+    dialect = EXADialect_websocket()
 
     class LiteralCompiler(base.EXACompiler):
         def visit_bindparam(

@@ -51,7 +51,7 @@ class Config(BaseConfig):
     environment_name: str = "test"
     db_port: int = 8563
     bucketfs_port: int = 2580
-    connectors: list[str] = ["pyodbc", "websocket"]
+    connectors: list[str] = ["websocket"]
     plugins: list = [StartDB, StopDB]
 
 

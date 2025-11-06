@@ -13,7 +13,6 @@ from collections.abc import (
 )
 from typing import (
     Any,
-    Dict,
     TextIO,
 )
 
@@ -41,7 +40,7 @@ def skipped_test_from(obj: dict[str, Any]) -> Test:
                 filename=filename,
                 lineno=obj["lineno"],
             )
-        except KeyError as ex:
+        except KeyError:
             pass
     # Assumption: Every skipped test should have at least one 'longrepr' in a stage
     assert False

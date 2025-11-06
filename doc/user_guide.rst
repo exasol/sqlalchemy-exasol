@@ -61,8 +61,6 @@ Getting Started
    .. code-block:: shell
 
       pip install "sqlalchemy-exasol[pydobc]"
-      pip install "sqlalchemy-exasol[turbodbc]"
-
 
 Further Examples
 ~~~~~~~~~~~~~~~~
@@ -120,7 +118,7 @@ Websocket-based Dialect
 
 .. note::
    Validation with fingerprint is only supported in the Websocket-based dialect, and not
-   the ODBC-based dialects (Pyodbc, Turbodbc).
+   the ODBC-based dialect (Pyodbc).
 
 
 Pyodbc-based Dialect
@@ -137,26 +135,6 @@ Pyodbc-based Dialect
     schema = "my_schema
 
     url = f"exa+pyodbc://{user}:{password}@{host}:{port}/{schema}?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
-    engine = create_engine(url)
-    query = "select 42 from dual"
-    with engine.connect() as con:
-        result = con.execute(sql.text(query)).fetchall()
-
-
-Turbo-based Dialect
----------------------
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine, sql
-
-    user = "sys"
-    password = "exasol"
-    host = "127.0.0.1"
-    port = "8563
-    schema = "my_schema
-
-    url = f"exa+turbodbc://{user}:{password}@{host}:{port}/{schema}?CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
     engine = create_engine(url)
     query = "select 42 from dual"
     with engine.connect() as con:

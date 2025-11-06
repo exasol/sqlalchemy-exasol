@@ -122,7 +122,14 @@ class EXADialect_websocket(EXADialect):
             converters[name].name: converters[name].map(value)
             for name, value in known_options.items()
         }
-        kwargs["dsn"] = f'{kwargs.pop("host")}:{kwargs.pop("port")}'
+
+        fingerprint = url.query.get("FINGERPRINT", None)
+        if fingerprint:
+            kwargs["dsn"] = f'{kwargs.pop("host")}/{fingerprint}:{kwargs.pop("port")}'
+            user_settings["certificate_validation"] = False
+        else:
+            kwargs["dsn"] = f'{kwargs.pop("host")}:{kwargs.pop("port")}'
+
         kwargs = dict(**ChainMap(user_settings, kwargs, defaults))
 
         if not kwargs["tls"] and kwargs["certificate_validation"]:

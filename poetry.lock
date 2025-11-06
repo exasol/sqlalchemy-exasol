@@ -2955,27 +2955,29 @@ types = ["mypy"]
 
 [[package]]
 name = "pyexasol"
-version = "0.27.0"
+version = "1.2.1"
 description = "Exasol python driver with extra features"
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "<4,>=3.9.2"
 groups = ["main"]
 files = [
-    {file = "pyexasol-0.27.0-py3-none-any.whl", hash = "sha256:041e1db1ae8f26fa24876056ce8da5830e346fc47734847a95cc960ac056d0c6"},
-    {file = "pyexasol-0.27.0.tar.gz", hash = "sha256:795490cd810617bf927e0e90b88347facb5e66f58e0e16378fef5d22fadacd60"},
+    {file = "pyexasol-1.2.1-py3-none-any.whl", hash = "sha256:7998d90940b3c54d0d97702bc30294a398c7dd8844efd9063d54644640df9e10"},
+    {file = "pyexasol-1.2.1.tar.gz", hash = "sha256:31b2a950ab5ab90a4670697835c42efdbfe879b0665b91b0fc7fb3e1e7ef076e"},
 ]
 
 [package.dependencies]
+cryptography = ">=45.0.7"
 packaging = "*"
-pyopenssl = "*"
 rsa = "*"
-websocket-client = ">=1.0.1"
+websocket-client = ">=1.0.1,<1.9.0"
 
 [package.extras]
+all = ["orjson (>=3.6)", "pandas (>=2,<3)", "polars (>=1.10,<2.0)", "pproxy", "pyarrow (>=21.0.0,<22.0.0)", "python-rapidjson", "ujson"]
 examples = ["pproxy"]
-numpy = ["numpy (>1.26.0,<2)"]
 orjson = ["orjson (>=3.6)"]
-pandas = ["pandas[numpy] (>=2,<3)"]
+pandas = ["pandas (>=2,<3)"]
+polars = ["polars (>=1.10,<2.0)"]
+pyarrow = ["pyarrow (>=21.0.0,<22.0.0)"]
 rapidjson = ["python-rapidjson"]
 ujson = ["ujson"]
 
@@ -3171,26 +3173,6 @@ files = [
     {file = "pyodbc-5.3.0-cp39-cp39-win_arm64.whl", hash = "sha256:101313a21d2654df856a60e4a13763e4d9f6c5d3fd974bcf3fc6b4e86d1bbe8e"},
     {file = "pyodbc-5.3.0.tar.gz", hash = "sha256:2fe0e063d8fb66efd0ac6dc39236c4de1a45f17c33eaded0d553d21c199f4d05"},
 ]
-
-[[package]]
-name = "pyopenssl"
-version = "25.3.0"
-description = "Python wrapper module around the OpenSSL library"
-optional = false
-python-versions = ">=3.7"
-groups = ["main"]
-files = [
-    {file = "pyopenssl-25.3.0-py3-none-any.whl", hash = "sha256:1fda6fc034d5e3d179d39e59c1895c9faeaf40a79de5fc4cbbfbe0d36f4a77b6"},
-    {file = "pyopenssl-25.3.0.tar.gz", hash = "sha256:c981cb0a3fd84e8602d7afc209522773b94c1c2446a3c710a75b06fe1beae329"},
-]
-
-[package.dependencies]
-cryptography = ">=45.0.7,<47"
-typing-extensions = {version = ">=4.9", markers = "python_version < \"3.13\" and python_version >= \"3.8\""}
-
-[package.extras]
-docs = ["sphinx (!=5.2.0,!=5.2.0.post0,!=7.2.5)", "sphinx_rtd_theme"]
-test = ["pretend", "pytest (>=3.0.1)", "pytest-rerunfailures"]
 
 [[package]]
 name = "pyparsing"
@@ -4712,20 +4694,20 @@ files = [
 
 [[package]]
 name = "websocket-client"
-version = "1.9.0"
+version = "1.8.0"
 description = "WebSocket client for Python with low level API options"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "websocket_client-1.9.0-py3-none-any.whl", hash = "sha256:af248a825037ef591efbf6ed20cc5faa03d3b47b9e5a2230a529eeee1c1fc3ef"},
-    {file = "websocket_client-1.9.0.tar.gz", hash = "sha256:9e813624b6eb619999a97dc7958469217c3176312b3a16a4bd1bc7e08a46ec98"},
+    {file = "websocket_client-1.8.0-py3-none-any.whl", hash = "sha256:17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526"},
+    {file = "websocket_client-1.8.0.tar.gz", hash = "sha256:3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da"},
 ]
 
 [package.extras]
-docs = ["Sphinx (>=6.0)", "myst-parser (>=2.0.0)", "sphinx_rtd_theme (>=1.1.0)"]
+docs = ["Sphinx (>=6.0)", "myst-parser (>=2.0.0)", "sphinx-rtd-theme (>=1.1.0)"]
 optional = ["python-socks", "wsaccel"]
-test = ["pytest", "websockets"]
+test = ["websockets"]
 
 [[package]]
 name = "wrapt"
@@ -4875,4 +4857,4 @@ turbodbc = ["turbodbc"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "8941bdb73ef769ac2de1fde088b102cb25475fd92c82550e4b8f9f04eac04071"
+content-hash = "b2dc254e5a30023d266d34978e5ece56ea855c22ee0fee0256193fbbbc137aa6"

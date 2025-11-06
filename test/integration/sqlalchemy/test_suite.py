@@ -214,24 +214,6 @@ class RowCountTest(_RowCountTest):
     def test_multi_delete_rowcount(self, connection):
         super().test_multi_delete_rowcount(connection)
 
-    @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
-    )
-    def test_update_rowcount1(self, connection):
-        super().test_update_rowcount1(connection)
-
-    @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
-    )
-    def test_update_rowcount2(self, connection):
-        super().test_update_rowcount2(connection)
-
-    @pytest.mark.xfail(
-        "turbodbc" in testing.db.dialect.driver, reason=TURBODBC_RATIONALE, strict=True
-    )
-    def test_delete_rowcount(self, connection):
-        super().test_delete_rowcount(connection)
-
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_non_rowcount_scenarios_no_raise(self):
         # says cursor already closed so very likely need to fix!

@@ -5,7 +5,6 @@ import pytest
 import sqlalchemy as sa
 from pyexasol import ExaQueryError
 from sqlalchemy import create_engine
-from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import (
     DDL,
     Index,
@@ -41,14 +40,6 @@ from sqlalchemy.testing.suite.test_ddl import (
 # We will investigate and fix as many as possible in next PRs.
 BREAKING_CHANGES_SQL_ALCHEMY_2x = (
     "Failing test after updating to SQLAlchemy 2.x. To be investigated."
-)
-RATIONALE_PYODBC_HAS_TABLE = cleandoc(
-    """
-The Exasol PyODBC dialect does not check against views for `has_table`, see also `Inspector.has_table()`.
-
-This is due to historic differences between PyODBC and the other Exasol dialects.
-As PyODBC is marked as deprecated, it is not a priority to fix this.
-"""
 )
 
 
@@ -380,59 +371,6 @@ class ComponentReflectionTest(_ComponentReflectionTest):
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_get_view_definition_does_not_exist(self):
         super().test_get_view_definition_does_not_exist()
-
-    @pytest.mark.xfail(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_PYODBC_HAS_TABLE,
-        strict=True,
-    )
-    @testing.combinations(
-        ("get_table_options", testing.requires.reflect_table_options),
-        "get_columns",
-        (
-            "get_pk_constraint",
-            testing.requires.primary_key_constraint_reflection,
-        ),
-        (
-            "get_foreign_keys",
-            testing.requires.foreign_key_constraint_reflection,
-        ),
-        ("get_indexes", testing.requires.index_reflection),
-        (
-            "get_unique_constraints",
-            testing.requires.unique_constraint_reflection,
-        ),
-        (
-            "get_check_constraints",
-            testing.requires.check_constraint_reflection,
-        ),
-        ("get_table_comment", testing.requires.comment_reflection),
-        argnames="method",
-    )
-    def test_not_existing_table(self, method, connection):
-        """
-        This test is copied over instead of using super().test_not_existing_table
-        due to some issues related to propagating the custom pytest plugin from
-        sqlalchemy. It has been difficult to ascertain how to fix it. Yes, as PyODBC
-        support would be removed, this override would not be necessary in the future,
-        and the pytest plugin issue would not be present.
-
-        Essentially, by using super().test_not_existing_table, these tests fail with:
-            TypeError: test_not_existing_table() missing 3 required positional
-            arguments: 'method', 'connection', and '_exclusions_0`
-        The _exclusions_0 comes from an additional parameterization that is associated
-        with the sqlalchemy.testing.combinations usage which is overridden via
-        sqlalchemy.testing.plugin.pytestplugin::PytestFixtureFunctions.combinations
-        (see the variable `current_exclusion_name`) by using
-        sqlalchemy.testing.plugin.pytestplugin::pytest_configure. The usage
-        of super().test_not_existing_table() does not have an explicit argument
-        for passing in _exclusions_0, etc., so it is unclear at this time how to
-        resolve this mismatch in expectations.
-        """
-        insp = inspect(connection)
-        meth = getattr(insp, method)
-        with expect_raises(NoSuchTableError):
-            meth("table_does_not_exists")
 
 
 class HasIndexTest(_HasIndexTest):

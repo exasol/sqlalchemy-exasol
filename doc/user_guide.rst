@@ -46,8 +46,13 @@ Getting Started
             # sqlalchemy 2.x, be passed through `sqlalchemy.sql.text`.
             result = con.execute(sql.text("select 42 from dual")).fetchall()
 
-        # engine.begin() is for DML & DDL, as we don't want to rely on autocommit
-        # but you can with `engine.connect()` commit as you go with `con.commit()`
+        # For simpler transaction, you can use engine.begin() for DML & DDL,
+        # as we don't want to rely on autocommit. However, you can with
+        # `engine.connect()` commit as you go with `con.commit()` or use, for more
+        # complex scenarios:
+        #   with engine.connect() as con:
+        #      with conn.begin():
+        #        ...
         with engine.begin() as con:
         ...
 

@@ -280,4 +280,5 @@ def full_matrix(session: Session) -> None:
     matrix = _python_matrix(PROJECT_CONFIG)
     matrix.update(_exasol_matrix(PROJECT_CONFIG))
     matrix.update(_connector_matrix(PROJECT_CONFIG))
+    matrix["integration-group"] = ["exasol", "regression", "sqla"]
     print(json.dumps(matrix))

@@ -11,7 +11,7 @@ jobs:
       contents: read
 
   tests:
-    name: Integration-Tests (${{matrix.connector}}, Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
+    name: Integration-Tests (Python-${{ matrix.python-version }}, test:${{ matrix.integration-group }}, Exasol-${{ matrix.exasol-version}}, ${{matrix.connector}})
     needs: [ build-matrix ]
     runs-on: ubuntu-24.04
     permissions:
@@ -31,14 +31,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Start test db
+        run: poetry run -- nox -s db:start -- --db-version ${{ matrix.exasol-version }}
+
       - name: Run Tests and Collect Coverage
         run: |
           export SQLALCHEMY_WARN_20=1
-          poetry run -- nox -s test:integration -- --coverage --db-version ${{ matrix.exasol-version }}
+          poetry run -- nox -s test:${{ matrix.integration-group }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: coverage-python${{ matrix.python-version }}-${{matrix.connector}}-exasol${{ matrix.exasol-version }}slow
+          name: coverage-python${{ matrix.python-version }}-${{ matrix.integration-group }}-exasol${{ matrix.exasol-version }}-${{matrix.connector}}-slow
           path: .coverage
           include-hidden-files: true
+
+      - name: Stop test db
+        run: poetry run -- nox -s db:stop

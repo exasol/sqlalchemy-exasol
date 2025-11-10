@@ -106,8 +106,6 @@ max-module-lines = 800
 [[tool.mypy.overrides]]
 module = [
     "sqlalchemy_exasol.base",
-    # not supporting mypy > 1.10.0; https://docs.sqlalchemy.org/en/20/orm/extensions/mypy.html
-    "sqlalchemy.*",
     "test.*",
 ]
 ignore_errors = true

@@ -4,8 +4,8 @@ version = "5.2.0"
 requires-python = ">=3.10,<4"
 description = "EXASOL dialect for SQLAlchemy"
 authors = [
-    {name="Exasol AG", email="opensource@exasol.com"},
-    {name="Blue Yonder GmbH"},
+    { name = "Exasol AG", email = "opensource@exasol.com" },
+    { name = "Blue Yonder GmbH" },
 ]
 readme = "README.rst"
 license = "BSD"
@@ -33,7 +33,6 @@ build-backend = "poetry.core.masonry.api"
 requires-poetry = ">=2.1.0"
 packages = [
     { include = "sqlalchemy_exasol" },
-    { include = "exasol" }
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -58,16 +57,10 @@ include = [
 ]
 exclude = []
 
-
 [tool.poetry.dependencies]
 packaging = ">=21.3"
 pyexasol = ">=0.26.0,<2"
 sqlalchemy = "^2.0.0"
-
-pyodbc = { version = ">=4.0.34,<6", optional = true }
-
-[tool.poetry.extras]
-pyodbc = ["pyodbc"]
 
 [tool.poetry.group.dev.dependencies]
 nox = ">=2022.1.7"
@@ -77,7 +70,6 @@ pytest-json-report = ">=1.5.0"
 pytest = ">=6,<9"
 rich = "^13.3.1"
 exasol-integration-test-docker-environment = "^4.0.0"
-pyodbc = ">=4.0.34,<6"
 pytest-exasol-backend = "^1.0.0"
 exasol-toolbox = "^1.12.0"
 
@@ -88,8 +80,8 @@ exasol-toolbox = "^1.12.0"
 [tool.pytest.ini_options]
 addopts = "--tb native -v -r fxX"
 filterwarnings = [
-"error",
-"ignore::pytest.PytestUnraisableExceptionWarning",
+    "error",
+    "ignore::pytest.PytestUnraisableExceptionWarning",
 ]
 markers = [
     "backend: backend tests.",
@@ -113,7 +105,6 @@ max-module-lines = 800
 
 [[tool.mypy.overrides]]
 module = [
-    "exasol.odbc",
     "sqlalchemy_exasol.base",
     # not supporting mypy > 1.10.0; https://docs.sqlalchemy.org/en/20/orm/extensions/mypy.html
     "sqlalchemy.*",

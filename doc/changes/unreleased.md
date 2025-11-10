@@ -1,6 +1,8 @@
 # Unreleased
 
-In this release, the ODBC-dialect Turbodbc was dropped.
+In this release, the ODBC-based dialects pyodbc and Turbodbc were dropped. Please
+switch over to using the remaining dialect provided by websocket. Connection
+strings should be altered to start with `exa+websocket://`.
 
 ## Refactoring
 
@@ -17,3 +19,4 @@ In this release, the ODBC-dialect Turbodbc was dropped.
   - `ReturningGuardsTest` are used to indicate that the Exasol dialect, which does not natively support the [RETURNING clause](https://docs.sqlalchemy.org/en/20/glossary.html#term-RETURNING), is set up per the API specifications
   - `ComponentReflectionTest.test_not_existing_table` is used to indicate that specific `EXADialect` methods (i.e. `get_columns`) check to see if the requested table/view exists and if not, they will now toss a `NoSuchTableError` exception
 - #403: Dropped support for Turbodbc
+- #404: Dropped support for pyodbc

@@ -159,61 +159,51 @@ class MetadataTest(fixtures.TablesTest):
                 not has_table
             ), f"Table {self.schema}.not_exist was found, but should not exist"
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_view_names(self, use_sql_fallback, engine_name):
+    def test_get_view_names(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
-            view_names = dialect.get_view_names(
-                connection=c, schema=self.schema, use_sql_fallback=use_sql_fallback
-            )
-            assert "v" in view_names
+            view_names = dialect.get_view_names(connection=c, schema=self.schema)
+            assert view_names == ["v"]
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_view_names_for_sys(self, use_sql_fallback, engine_name):
+    def test_get_view_names_for_sys(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
-            view_names = dialect.get_view_names(
-                connection=c, schema="sys", use_sql_fallback=use_sql_fallback
-            )
-            assert len(view_names) == 0
+            view_names = dialect.get_view_names(connection=c, schema="sys")
+            assert view_names == []
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_view_definition(self, use_sql_fallback, engine_name):
+    def test_get_view_definition(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             view_definition = dialect.get_view_definition(
                 connection=c,
                 schema=self.schema,
                 view_name="v",
-                use_sql_fallback=use_sql_fallback,
             )
-            assert self.view_defintion == view_definition
+            assert view_definition == self.view_defintion
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_view_definition_view_name_none(self, use_sql_fallback, engine_name):
+    def test_get_view_definition_view_name_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             view_definition = dialect.get_view_definition(
                 connection=c,
                 schema=self.schema,
                 view_name=None,
-                use_sql_fallback=use_sql_fallback,
             )
             assert view_definition is None
 

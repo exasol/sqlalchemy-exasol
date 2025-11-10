@@ -47,7 +47,12 @@ representation (all uppercase).
 
 import logging
 import re
+from collections.abc import MutableMapping
 from contextlib import closing
+from typing import (
+    Any,
+    Type,
+)
 
 import sqlalchemy.exc
 from sqlalchemy import (
@@ -69,6 +74,7 @@ from sqlalchemy.schema import (
 )
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql.elements import quoted_name
+from sqlalchemy.sql.type_api import TypeEngine
 
 from .constraints import DistributeByConstraint
 
@@ -540,7 +546,7 @@ RESERVED_WORDS = {
     "zone",
 }
 
-colspecs = {}
+colspecs: MutableMapping[type[TypeEngine[Any]], type[TypeEngine[Any]]] = {}
 
 ischema_names = {
     "BOOLEAN": sqltypes.BOOLEAN,

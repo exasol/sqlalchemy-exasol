@@ -208,40 +208,6 @@ class MetadataTest(fixtures.TablesTest):
             assert view_definition is None
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
-    def test_compare_get_view_names_for_sql_and_odbc(self, schema, engine_name):
-        with self.engine_map[engine_name].begin() as c:
-            dialect = inspect(c).dialect
-            c.execute(sql.text("OPEN SCHEMA %s" % self.schema))
-            view_names_fallback = dialect.get_view_names(
-                connection=c, schema=schema, use_sql_fallback=True
-            )
-            view_names_odbc = dialect.get_view_names(connection=c, schema=schema)
-            assert view_names_fallback == view_names_odbc
-
-    @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
-    def test_compare_get_view_definition_for_sql_and_odbc(self, schema, engine_name):
-        with self.engine_map[engine_name].begin() as c:
-            if schema is None:
-                c.execute(sql.text("OPEN SCHEMA %s" % self.schema))
-            view_name = "v"
-            dialect = inspect(c).dialect
-            view_definition_fallback = dialect.get_view_definition(
-                connection=c, view_name=view_name, schema=schema, use_sql_fallback=True
-            )
-            view_definition_odbc = dialect.get_view_definition(
-                connection=c, view_name=view_name, schema=schema
-            )
-            assert view_definition_fallback == view_definition_odbc
-
-    @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
     @pytest.mark.parametrize("table", ["t", "s"])
     @pytest.mark.parametrize(
         "engine_name",

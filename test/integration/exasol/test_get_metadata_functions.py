@@ -352,17 +352,13 @@ class MetadataTest(fixtures.TablesTest):
             pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
         ],
     )
-    def test_get_columns_for_sql_and_odbc_raise_exception(
+    def test_get_columns_raises_exception_for_no_table(
         self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             with pytest.raises(NoSuchTableError):
-                dialect.get_columns(
-                    connection=c, table_name=table, schema=schema, use_sql_fallback=True
-                )
-            # not raising an error without ODBC use_sql_fallback=True
-            dialect.get_columns(connection=c, table_name=table, schema=schema)
+                dialect.get_columns(connection=c, table_name=table, schema=schema)
 
     @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
     @pytest.mark.parametrize(
@@ -500,17 +496,13 @@ class MetadataTest(fixtures.TablesTest):
             pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
         ],
     )
-    def test_get_pk_constraint_for_sql_and_odbc_raise_exception(
+    def test_get_pk_constraint_raises_exception_for_no_table(
         self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             with pytest.raises(NoSuchTableError):
-                dialect.get_pk_constraint(
-                    connection=c, table_name=table, schema=schema, use_sql_fallback=True
-                )
-            # not raising an error without ODBC use_sql_fallback
-            dialect.get_pk_constraint(connection=c, table_name=table, schema=schema)
+                dialect.get_pk_constraint(connection=c, table_name=table, schema=schema)
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
@@ -599,17 +591,13 @@ class MetadataTest(fixtures.TablesTest):
             pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
         ],
     )
-    def test_get_foreign_keys_for_sql_and_odbc_raise_exception(
+    def test_get_foreign_keys_raises_exception_for_no_table(
         self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             with pytest.raises(NoSuchTableError):
-                dialect.get_foreign_keys(
-                    connection=c, table_name=table, schema=schema, use_sql_fallback=True
-                )
-            # not raising an error without ODBC use_sql_fallback=True
-            dialect.get_foreign_keys(connection=c, table_name=table, schema=schema)
+                dialect.get_foreign_keys(connection=c, table_name=table, schema=schema)
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(

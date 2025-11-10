@@ -125,12 +125,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
         with config.db.begin() as conn:
             result = conn.execute(stmt, values)
 
-        # Depending on the dialect it either reports that the affected rows information
-        # is not available (-1) or it reports the actual number of updated/affected rows(2)
-        expected_rowcount_odbc = -1
-        expected_rowcount_wss = 2
-        expected_rowcount = [expected_rowcount_odbc, expected_rowcount_wss]
-        assert result.rowcount in expected_rowcount
+        assert result.rowcount == 2
 
         self._assert_users(
             users, [(7, "jack2"), (8, "ed"), (9, "fred2"), (10, "chuck")]

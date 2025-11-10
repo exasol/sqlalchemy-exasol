@@ -109,31 +109,15 @@ class MetadataTest(fixtures.TablesTest):
         engine = create_engine(url)
         return engine
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_schema_names(self, engine_name, use_sql_fallback):
+    def test_get_schema_names(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
-            schema_names = dialect.get_schema_names(
-                connection=c, use_sql_fallback=use_sql_fallback
-            )
+            schema_names = dialect.get_schema_names(connection=c)
             assert self.schema in schema_names and self.schema_2 in schema_names
-
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
-    def test_compare_get_schema_names_for_sql_and_odbc(self, engine_name):
-        with self.engine_map[engine_name].begin() as c:
-            dialect = inspect(c).dialect
-            schema_names_fallback = dialect.get_schema_names(
-                connection=c, use_sql_fallback=True
-            )
-            schema_names_odbc = dialect.get_schema_names(connection=c)
-            assert sorted(schema_names_fallback) == sorted(schema_names_odbc)
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(

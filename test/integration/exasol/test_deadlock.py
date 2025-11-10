@@ -44,7 +44,6 @@ class MetadataTest(fixtures.TablesTest):
 
         self.run_deadlock_for_table(without_fallback)
 
-    # NOTE: If a DB >= 7.1.0 still deadlocks here, it may due to the usage of an old ODBC driver version
     @pytest.mark.skipif(
         testing.db.dialect.server_version_info >= (7, 1, 0),
         reason="DB version(s) after 7.1.0 should not deadlock here",

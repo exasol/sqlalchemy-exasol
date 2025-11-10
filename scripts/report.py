@@ -48,7 +48,7 @@ def skipped_test_from(obj: dict[str, Any]) -> Test:
 
 def _create_parser() -> ArgumentParser:
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("connector", choices=["pyodbc"])
+    parser.add_argument("connector", choices=["websocket"])
     parser.add_argument("test_results")
     parser.add_argument("-o", "--output", type=FileType("w"), default="-")
     parser.add_argument("-f", "--format", choices=["human", "csv"], default="csv")

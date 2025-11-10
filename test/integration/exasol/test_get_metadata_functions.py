@@ -119,34 +119,15 @@ class MetadataTest(fixtures.TablesTest):
             schema_names = dialect.get_schema_names(connection=c)
             assert self.schema in schema_names and self.schema_2 in schema_names
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_table_names(self, use_sql_fallback, engine_name):
+    def test_get_table_names(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
-            table_names = dialect.get_table_names(
-                connection=c, schema=self.schema, use_sql_fallback=use_sql_fallback
-            )
-            assert "t" in table_names and "s" in table_names
-
-    @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
-    def test_compare_get_table_names_for_sql_and_odbc(self, schema, engine_name):
-        with self.engine_map[engine_name].begin() as c:
-            if schema is None:
-                c.execute(sql.text("OPEN SCHEMA %s" % self.schema))
-            dialect = inspect(c).dialect
-            table_names_fallback = dialect.get_table_names(
-                connection=c, schema=schema, use_sql_fallback=True
-            )
-            table_names_odbc = dialect.get_table_names(connection=c, schema=schema)
-            assert table_names_fallback == table_names_odbc
+            table_names = dialect.get_table_names(connection=c, schema=self.schema)
+            assert table_names == ["s", "t"]
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(

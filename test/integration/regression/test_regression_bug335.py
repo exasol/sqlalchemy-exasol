@@ -14,19 +14,14 @@ from sqlalchemy.sql.ddl import (
     DropSchema,
 )
 
-from exasol.odbc import (
-    ODBC_DRIVER,
-    odbcconfig,
-)
-
 
 @pytest.fixture
-def pyodbc_connection_string(exasol_config):
+def connection_string(exasol_config):
     config = exasol_config
     return (
-        f"exa+pyodbc://{config.username}:{config.password}@{config.host}:{config.port}/"
+        f"exa+websocket://{config.username}:{config.password}@{config.host}:{config.port}/"
         f"?DEFAULTPARAMSIZE=200&INTTYPESINRESULTSIFPOSSIBLE=y"
-        "&FINGERPRINT=NOCERTCHECK&CONNECTIONLCALL=en_US.UTF-8&driver=EXAODBC"
+        "&FINGERPRINT=NOCERTCHECK&CONNECTIONLCALL=en_US.UTF-8"
     )
 
 
@@ -55,14 +50,14 @@ def users_table(pyexasol_connection, test_schema):
 
 
 def test_lastrowid_does_not_create_extra_commit(
-    exasol_config, users_table, pyodbc_connection_string
+    exasol_config, users_table, connection_string
 ):
     """
     For further details on this regression see `Issue-335 <https://github.com/exasol/sqlalchemy-exasol/issues/335>`_.
     """
     schema_name, table_name = users_table
     metadata = MetaData()
-    engine = create_engine(pyodbc_connection_string)
+    engine = create_engine(connection_string)
 
     table = Table(
         table_name,
@@ -72,16 +67,15 @@ def test_lastrowid_does_not_create_extra_commit(
         schema=schema_name,
     )
 
-    with odbcconfig(ODBC_DRIVER):
-        with engine.connect() as connection:
-            with connection.begin() as transaction:
-                # Insert without an explicit ID will trigger a call to `get_lastrowid`
-                # which in turn cause the unintended autocommit
-                insert_statement = insert(table).values(name="Gandalf")
-                connection.execute(insert_statement)
-                transaction.rollback()
+    with engine.connect() as connection:
+        with connection.begin() as transaction:
+            # Insert without an explicit ID will trigger a call to `get_lastrowid`
+            # which in turn cause the unintended autocommit
+            insert_statement = insert(table).values(name="Gandalf")
+            connection.execute(insert_statement)
+            transaction.rollback()
 
-            result = connection.execute(
-                sql.text(f"SELECT * FROM {schema_name}.{table_name};")
-            ).fetchall()
+        result = connection.execute(
+            sql.text(f"SELECT * FROM {schema_name}.{table_name};")
+        ).fetchall()
     assert len(result) == 0

@@ -427,35 +427,11 @@ class CompoundSelectTest(_CompoundSelectTest):
 
 
 class ExceptionTest(_ExceptionTest):
-    RATIONALE = (
-        "This is likely a driver issue. We will investigate it in "
-        "https://github.com/exasol/sqlalchemy-exasol/issues/539."
-    )
-
-    @pytest.mark.xfail("odbc" in testing.db.dialect.driver, reason=RATIONALE)
-    @requirements.duplicate_key_raises_integrity_error
-    def test_integrity_error(self):
-        # Note: autocommit currently is needed to force error evaluation,
-        #       otherwise errors will be swallowed.
-        #       see also https://github.com/exasol/sqlalchemy-exasol/issues/120
-        engine = create_engine(
-            config.db.url,
-            connect_args={"autocommit": True},
-        )
-        with engine.connect() as conn:
-            trans = conn.begin()
-            conn.execute(self.tables.manual_pk.insert(), {"id": 1, "data": "d1"})
-
-            assert_raises(
-                exc.IntegrityError,
-                conn.execute,
-                self.tables.manual_pk.insert(),
-                {"id": 1, "data": "d1"},
-            )
-            trans.rollback()
-
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error_raw_sql(self):
+        """
+        Additional test that is related that our developers added.
+        """
         insert = text("INSERT INTO MANUAL_PK VALUES (1, 'd1')")
         with config.db.begin() as conn:
             conn.execute(insert)

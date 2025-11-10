@@ -129,57 +129,35 @@ class MetadataTest(fixtures.TablesTest):
             table_names = dialect.get_table_names(connection=c, schema=self.schema)
             assert table_names == ["s", "t"]
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_has_table_table_exists(self, use_sql_fallback, engine_name):
+    def test_has_table_table_exists(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             has_table = dialect.has_table(
                 connection=c,
                 schema=self.schema,
                 table_name="t",
-                use_sql_fallback=use_sql_fallback,
             )
-            assert has_table, "Table %s.T was not found, but should exist" % self.schema
+            assert has_table, f"Table {self.schema}.T was not found, but should exist"
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_has_table_table_exists_not(self, use_sql_fallback, engine_name):
+    def test_has_table_table_exists_not(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             has_table = dialect.has_table(
                 connection=c,
                 schema=self.schema,
                 table_name="not_exist",
-                use_sql_fallback=use_sql_fallback,
             )
-            assert not has_table, (
-                "Table %s.not_exist was found, but should not exist" % self.schema
-            )
-
-    @pytest.mark.parametrize("schema", [TEST_GET_METADATA_FUNCTIONS_SCHEMA, None])
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
-    def test_compare_has_table_for_sql_and_odbc(self, schema, engine_name):
-        with self.engine_map[engine_name].begin() as c:
-            dialect = inspect(c).dialect
-            has_table_fallback = dialect.has_table(
-                connection=c, schema=schema, use_sql_fallback=True, table_name="t"
-            )
-            has_table_odbc = dialect.has_table(
-                connection=c, schema=schema, table_name="t"
-            )
-            assert has_table_fallback == has_table_odbc, (
-                "Expected table %s.t with odbc and fallback" % schema
-            )
+            assert (
+                not has_table
+            ), f"Table {self.schema}.not_exist was found, but should not exist"
 
     @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(

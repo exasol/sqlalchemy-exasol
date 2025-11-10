@@ -286,19 +286,17 @@ class MetadataTest(fixtures.TablesTest):
             key=lambda k: k["name"],
         )
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_columns(self, use_sql_fallback, engine_name):
+    def test_get_columns(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             columns = dialect.get_columns(
                 connection=c,
                 schema=self.schema,
                 table_name="t",
-                use_sql_fallback=use_sql_fallback,
             )
             expected = [
                 {
@@ -335,19 +333,17 @@ class MetadataTest(fixtures.TablesTest):
                 expected
             ) == self.make_columns_comparable(columns)
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_columns_table_name_none(self, use_sql_fallback, engine_name):
+    def test_get_columns_table_name_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             columns = dialect.get_columns(
                 connection=c,
                 schema=self.schema,
                 table_name=None,
-                use_sql_fallback=use_sql_fallback,
             )
             assert columns == []
 
@@ -403,38 +399,34 @@ class MetadataTest(fixtures.TablesTest):
             with pytest.raises(NoSuchTableError):
                 dialect.get_pk_constraint(connection=c, table_name=table, schema=schema)
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_pk_constraint(self, use_sql_fallback, engine_name):
+    def test_get_pk_constraint(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             pk_constraint = dialect.get_pk_constraint(
                 connection=c,
                 schema=self.schema,
                 table_name="t",
-                use_sql_fallback=use_sql_fallback,
             )
             assert pk_constraint["constrained_columns"] == [
                 "pid1",
                 "pid2",
             ] and pk_constraint["name"].startswith("sys_")
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_pk_constraint_table_name_none(self, use_sql_fallback, engine_name):
+    def test_get_pk_constraint_table_name_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             pk_constraint = dialect.get_pk_constraint(
                 connection=c,
                 schema=self.schema,
                 table_name=None,
-                use_sql_fallback=use_sql_fallback,
             )
             assert pk_constraint is None
 
@@ -498,19 +490,17 @@ class MetadataTest(fixtures.TablesTest):
             with pytest.raises(NoSuchTableError):
                 dialect.get_foreign_keys(connection=c, table_name=table, schema=schema)
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_foreign_keys(self, use_sql_fallback, engine_name):
+    def test_get_foreign_keys(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             foreign_keys = dialect.get_foreign_keys(
                 connection=c,
                 schema=self.schema,
                 table_name="s",
-                use_sql_fallback=use_sql_fallback,
             )
             expected = [
                 {
@@ -524,18 +514,16 @@ class MetadataTest(fixtures.TablesTest):
 
             assert foreign_keys == expected
 
-    @pytest.mark.parametrize("use_sql_fallback", [True, False])
     @pytest.mark.parametrize(
         "engine_name",
         [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
     )
-    def test_get_foreign_keys_table_name_none(self, use_sql_fallback, engine_name):
+    def test_get_foreign_keys_table_name_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             foreign_keys = dialect.get_foreign_keys(
                 connection=c,
                 schema=self.schema,
                 table_name=None,
-                use_sql_fallback=use_sql_fallback,
             )
             assert foreign_keys == []

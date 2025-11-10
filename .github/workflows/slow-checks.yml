@@ -31,9 +31,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install via apt
-        run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
-
       - name: Run Tests and Collect Coverage
         run: |
           export SQLALCHEMY_WARN_20=1

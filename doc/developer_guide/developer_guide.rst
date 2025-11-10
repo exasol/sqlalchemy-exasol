@@ -18,22 +18,6 @@ Tools
     * Prerequisites_
 
 
-Libraries
-+++++++++
-* unixodbc
-* unixodbc-dev
-* libboost-date-time-dev
-* libboost-locale-dev
-* libboost-system-dev
-
-
-Example: Install of required system libraries on Ubuntu
-
-.. code-block::
-
-    sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
-
-
 Locale
 +++++++
 Make sure the local is set up appropriately.

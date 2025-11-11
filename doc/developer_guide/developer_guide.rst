@@ -141,11 +141,6 @@ Tests
 
         nox -s "verify(connector='pyodbc')"
 
-#. Run all tests with `turbodbc` connector
-
-    .. code-block::
-
-        nox -s "verify(connector='turbodbc')"
 
 .. attention::
 

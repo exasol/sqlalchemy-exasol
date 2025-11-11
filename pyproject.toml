@@ -64,12 +64,10 @@ packaging = ">=21.3"
 pyexasol = ">=0.26.0,<2"
 sqlalchemy = "^2.0.0"
 
-turbodbc = { version = "==4.5.4", optional = true }
 pyodbc = { version = ">=4.0.34,<6", optional = true }
 
 [tool.poetry.extras]
 pyodbc = ["pyodbc"]
-turbodbc = ["turbodbc"]
 
 [tool.poetry.group.dev.dependencies]
 nox = ">=2022.1.7"
@@ -85,7 +83,6 @@ exasol-toolbox = "^1.12.0"
 
 [tool.poetry.plugins."sqlalchemy.dialects"]
 "exa.pyodbc" = "sqlalchemy_exasol.pyodbc:EXADialect_pyodbc"
-"exa.turbodbc" = "sqlalchemy_exasol.turbodbc:EXADialect_turbodbc"
 "exa.websocket" = "sqlalchemy_exasol.websocket:EXADialect_websocket"
 
 
@@ -94,9 +91,9 @@ addopts = "--tb native -v -r fxX"
 filterwarnings = [
 "error",
 "ignore::pytest.PytestUnraisableExceptionWarning",
-# this is used for turbodbc and pyodbc as historically we'd like to remove them.
+# this is used for pyodbc as historically we'd like to remove this.
 # thus far, it seems like this is not a strict requirement for the migration,
-# so we will ignore them.
+# so we will ignore this.
 "ignore::sqlalchemy_exasol.warnings.SqlaExasolDeprecationWarning"
 ]
 markers = [

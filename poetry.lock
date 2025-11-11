@@ -4527,22 +4527,6 @@ files = [
 ]
 
 [[package]]
-name = "turbodbc"
-version = "4.5.4"
-description = "turbodbc is a Python DB API 2.0 compatible ODBC driver"
-optional = true
-python-versions = ">=3.8"
-groups = ["main"]
-markers = "extra == \"turbodbc\""
-files = [
-    {file = "turbodbc-4.5.4.tar.gz", hash = "sha256:ceb717749cc85f845d2564bfdb993480428bbc32bf80464c1ddb34a1b419ae7f"},
-]
-
-[package.extras]
-arrow = ["pyarrow (>=1.0,<8.1.0)"]
-numpy = ["numpy (>=1.19.0)"]
-
-[[package]]
 name = "twine"
 version = "6.2.0"
 description = "Collection of utilities for publishing packages on PyPI"
@@ -4852,9 +4836,8 @@ type = ["pytest-mypy"]
 
 [extras]
 pyodbc = ["pyodbc"]
-turbodbc = ["turbodbc"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "b2dc254e5a30023d266d34978e5ece56ea855c22ee0fee0256193fbbbc137aa6"
+content-hash = "22b4471a4620c272665643dd5cad22f3c4c46295b27100a27370048f014f2795"

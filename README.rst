@@ -55,7 +55,7 @@ ODBC-based dialects demand a thorough understanding of (Unix)ODBC, and the setup
 
 .. warning::
 
-    The maintenance of Turbodbc & pyodbc support is currently paused, and it is planned to be phased out in future versions.
+    The maintenance of pyodbc support is currently paused, and it is planned to be phased out in future versions.
 
 
 System Requirements

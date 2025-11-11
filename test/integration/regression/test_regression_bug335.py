@@ -21,7 +21,7 @@ def connection_string(exasol_config):
     return (
         f"exa+websocket://{config.username}:{config.password}@{config.host}:{config.port}/"
         f"?DEFAULTPARAMSIZE=200&INTTYPESINRESULTSIFPOSSIBLE=y"
-        "&FINGERPRINT=NOCERTCHECK&CONNECTIONLCALL=en_US.UTF-8"
+        "&FINGERPRINT=NOCERTCHECK&CONNECTIONLCALL=en_US.UTF-8&AUTOCOMMIT=0"
     )
 
 

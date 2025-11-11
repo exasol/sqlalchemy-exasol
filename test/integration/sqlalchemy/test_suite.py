@@ -12,10 +12,12 @@ from sqlalchemy.schema import (
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
+from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
+from sqlalchemy.testing.suite import LongNameBlowoutTest as _LongNameBlowoutTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import ReturningGuardsTest as _ReturningGuardsTest
@@ -30,9 +32,6 @@ the test or that test condition.
 """
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite import testing
-from sqlalchemy.testing.suite.test_ddl import (
-    LongNameBlowoutTest as _LongNameBlowoutTest,
-)
 
 # Tests marked with xfail and this reason are failing after updating to SQLAlchemy 2.x.
 # We will investigate and fix as many as possible in next PRs.
@@ -450,3 +449,15 @@ class NumericTest(_NumericTest):
     @testing.requires.float_is_numeric
     def test_float_is_not_numeric(self, connection, cls_):
         super().test_float_is_not_numeric()
+
+
+class DifficultParametersTest(_DifficultParametersTest):
+    @_DifficultParametersTest.tough_parameters
+    @config.requirements.unusual_column_name_characters
+    def test_round_trip_same_named_column(self, paramname, connection, metadata):
+        if testing.db.dialect.server_version_info <= (7, 1, 30):
+            # This does not work for Exasol DB versions <= 7.1.30.
+            # See: https://github.com/exasol/sqlalchemy-exasol/issues/232
+            if paramname == "dot.s":
+                pytest.xfail(reason="dot.s does work for < 7.1.30")
+        super().test_round_trip_same_named_column(paramname, connection, metadata)

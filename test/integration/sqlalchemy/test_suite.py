@@ -1,10 +1,10 @@
 # import all SQLAlchemy tests for this dialect
+from enum import Enum
 from inspect import cleandoc
 
 import pytest
 import sqlalchemy as sa
 from pyexasol import ExaQueryError
-from sqlalchemy import create_engine
 from sqlalchemy.schema import (
     DDL,
     Index,
@@ -12,7 +12,6 @@ from sqlalchemy.schema import (
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
-from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
@@ -27,8 +26,8 @@ from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
 """
 Here, all tests are imported from the testing suite of sqlalchemy to ensure that the
 Exasol dialect passes these expected tests. If a tests fails, it is investigated and,
-if the underlying issue(s) cannot be resolved, overridden with a rationale & skip for
-the test or that test condition (as some only fail for a specific DB driver).
+if the underlying issue(s) cannot be resolved, overridden with a rationale & xfail for
+the test or that test condition.
 """
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite import testing
@@ -41,6 +40,10 @@ from sqlalchemy.testing.suite.test_ddl import (
 BREAKING_CHANGES_SQL_ALCHEMY_2x = (
     "Failing test after updating to SQLAlchemy 2.x. To be investigated."
 )
+
+
+class XfailRationale(str, Enum):
+    EXPLICIT_INDEX = "EXASOL does not support explicit indexes"
 
 
 class ReturningGuardsTest(_ReturningGuardsTest):
@@ -56,10 +59,7 @@ class ReturningGuardsTest(_ReturningGuardsTest):
 
     @staticmethod
     def _run_test(test_method, connection, run_stmt):
-        if "websocket" in testing.db.dialect.driver:
-            with pytest.raises(ExaQueryError):
-                test_method(connection, run_stmt)
-        else:
+        with pytest.raises(ExaQueryError):
             test_method(connection, run_stmt)
 
     def test_delete_single(self, connection, run_stmt):
@@ -83,7 +83,7 @@ class RowFetchTest(_RowFetchTest):
     )
 
     @testing.config.requirements.duplicate_names_in_cursor_description
-    @pytest.mark.skipif("websocket" in testing.db.dialect.driver, reason=RATIONAL)
+    @pytest.mark.xfail(reason=RATIONAL, strict=True)
     def test_row_with_dupe_names(self, connection):
         super().test_row_with_dupe_names(connection)
 
@@ -126,7 +126,6 @@ class HasTableTest(_HasTableTest):
 
 class InsertBehaviorTest(_InsertBehaviorTest):
     @pytest.mark.xfail(
-        "websocket" in testing.db.dialect.driver,
         reason="This currently isn't supported by the websocket protocol L3-1064.",
         strict=True,
     )
@@ -140,36 +139,6 @@ class RowCountTest(_RowCountTest):
     def test_non_rowcount_scenarios_no_raise(self):
         # says cursor already closed so very likely need to fix!
         super().test_non_rowcount_scenarios_no_raise()
-
-
-class DifficultParametersTest(_DifficultParametersTest):
-    tough_parameters = testing.combinations(
-        ("boring",),
-        ("per cent",),
-        ("per % cent",),
-        ("%percent",),
-        ("par(ens)",),
-        ("percent%(ens)yah",),
-        ("col:ons",),
-        ("_starts_with_underscore",),
-        ("more :: %colons%",),
-        ("_name",),
-        ("___name",),
-        ("[BracketsAndCase]",),
-        ("42numbers",),
-        ("percent%signs",),
-        ("has spaces",),
-        ("/slashes/",),
-        ("more/slashes",),
-        ("1param",),
-        ("1col:on",),
-        argnames="paramname",
-    )
-
-    @tough_parameters
-    def test_round_trip_same_named_column(self, paramname, connection, metadata):
-        # dot_s and qmarks are currently disabled see https://github.com/exasol/sqlalchemy-exasol/issues/232
-        super().test_round_trip_same_named_column(paramname, connection, metadata)
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):
@@ -352,7 +321,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
         if not schema and testing.requires.temp_table_reflection.enabled:
             cls.define_temp_tables(metadata)
 
-    @pytest.mark.skip(reason="EXASOL has no explicit indexes")
+    @pytest.mark.xfail(reason=XfailRationale.EXPLICIT_INDEX.value)
     def test_get_indexes(self, connection, use_schema):
         super().test_get_indexes()
 
@@ -374,13 +343,11 @@ class ComponentReflectionTest(_ComponentReflectionTest):
 
 
 class HasIndexTest(_HasIndexTest):
-    RATIONAL = """EXASOL does not support no explicit indexes"""
-
-    @pytest.mark.skip(reason=RATIONAL)
+    @pytest.mark.xfail(reason=XfailRationale.EXPLICIT_INDEX.value, strict=True)
     def test_has_index(self):
         super().test_has_index()
 
-    @pytest.mark.skip(reason=RATIONAL)
+    @pytest.mark.xfail(reason=XfailRationale.EXPLICIT_INDEX.value, strict=True)
     @testing.requires.schemas
     def test_has_index_schema(self):
         super().test_has_index_schema()

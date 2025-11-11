@@ -352,10 +352,6 @@ class ComponentReflectionTest(_ComponentReflectionTest):
         # See https://docs.sqlalchemy.org/en/20/core/reflection.html#sqlalchemy.engine.reflection.Inspector.get_multi_foreign_keys
         super().test_get_multi_foreign_keys()
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_get_view_definition_does_not_exist(self):
-        super().test_get_view_definition_does_not_exist()
-
 
 class HasIndexTest(_HasIndexTest):
     @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value, strict=True)

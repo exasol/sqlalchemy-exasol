@@ -13,7 +13,6 @@ from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
-from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
@@ -43,7 +42,15 @@ BREAKING_CHANGES_SQL_ALCHEMY_2x = (
 
 
 class XfailRationale(str, Enum):
-    EXPLICIT_INDEX = "EXASOL does not support explicit indexes"
+    MANUAL_INDEX = cleandoc(
+        """sqlalchemy-exasol does not support manual indexes.
+        (see https://docs.exasol.com/db/latest/performance/indexes.htm#Manualindexoperations)
+        Manual indexes are not recommended within the Exasol DB.
+        """
+    )
+    SELECT_LIST = cleandoc(
+        """Exasol does not allow EXISTS or IN predicates as part of the select list."""
+    )
 
 
 class ReturningGuardsTest(_ReturningGuardsTest):
@@ -321,7 +328,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
         if not schema and testing.requires.temp_table_reflection.enabled:
             cls.define_temp_tables(metadata)
 
-    @pytest.mark.xfail(reason=XfailRationale.EXPLICIT_INDEX.value)
+    @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value)
     def test_get_indexes(self, connection, use_schema):
         super().test_get_indexes()
 
@@ -343,31 +350,38 @@ class ComponentReflectionTest(_ComponentReflectionTest):
 
 
 class HasIndexTest(_HasIndexTest):
-    @pytest.mark.xfail(reason=XfailRationale.EXPLICIT_INDEX.value, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value, strict=True)
     def test_has_index(self):
         super().test_has_index()
 
-    @pytest.mark.xfail(reason=XfailRationale.EXPLICIT_INDEX.value, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value, strict=True)
     @testing.requires.schemas
     def test_has_index_schema(self):
         super().test_has_index_schema()
 
 
 class LongNameBlowoutTest(_LongNameBlowoutTest):
-    @testing.combinations(
+    testing_parameters = testing.combinations(
         ("fk",),
         ("pk",),
-        # Manual indexes are not recommended within the Exasol DB,
-        # (see https://docs.exasol.com/db/latest/performance/best_practices.htm)
-        # therefore they are currently not supported by the sqlalchemy-exasol extension.
-        # ("ix",)
+        ("ix",),
         ("ck", testing.requires.check_constraint_reflection.as_skips()),
         ("uq", testing.requires.unique_constraint_reflection.as_skips()),
         argnames="type_",
     )
-    @testing.provide_metadata
-    def test_long_convention_name(self, type_, connection):
-        metadata = self.metadata
+
+    @testing_parameters
+    def test_long_convention_name(self, type_, metadata, connection):
+        """
+        The default implementation of test_long_convention_name in
+        class sqlalchemy.testing.suite.LongNameBlowoutTest needs to be
+        overridden here as Exasol does not support manually created indices.
+        Beyond the first check, if `type_ == "ix"`, the rest of the code
+        has been copied without modification.
+        """
+
+        if type_ == "ix":
+            pytest.xfail(reason=XfailRationale.MANUAL_INDEX.value)
 
         actual_name, reflected_name = getattr(self, type_)(metadata, connection)
 
@@ -382,15 +396,9 @@ class LongNameBlowoutTest(_LongNameBlowoutTest):
 
 
 class CompoundSelectTest(_CompoundSelectTest):
-    @pytest.mark.skip(
-        reason=cleandoc(
-            """Skip this test as EXASOL does not allow EXISTS or IN predicates
-        as part of the select list. Skipping is implemented by redefining
-        the method as proposed by SQLAlchemy docs for new dialects."""
-        )
-    )
-    def test_null_in_empty_set_is_false(self):
-        return
+    @pytest.mark.xfail(reason=XfailRationale.SELECT_LIST.value, strict=True)
+    def test_null_in_empty_set_is_false(self, connection):
+        self.test_null_in_empty_set_is_false(connection)
 
 
 class ExceptionTest(_ExceptionTest):
@@ -402,12 +410,12 @@ class ExceptionTest(_ExceptionTest):
       - https://github.com/exasol/sqlalchemy-exasol/issues/120
     """
 
-    @pytest.mark.xfail(reason=RATIONALE)
+    @pytest.mark.xfail(reason=RATIONALE, strict=True)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error(self):
         super().test_integrity_error()
 
-    @pytest.mark.xfail(reason=RATIONALE)
+    @pytest.mark.xfail(reason=RATIONALE, strict=True)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error_raw_sql(self):
         """
@@ -417,18 +425,6 @@ class ExceptionTest(_ExceptionTest):
         with config.db.begin() as conn:
             conn.execute(insert)
             assert_raises(exc.IntegrityError, conn.execute, insert)
-
-
-class ExpandingBoundInTest(_ExpandingBoundInTest):
-    @pytest.mark.skip(
-        reason=cleandoc(
-            """Skip this test as EXASOL does not allow EXISTS or IN predicates
-        as part of the select list. Skipping is implemented by redefining
-        the method as proposed by SQLAlchemy docs for new dialects."""
-        )
-    )
-    def test_null_in_empty_set_is_false(self):
-        return
 
 
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):

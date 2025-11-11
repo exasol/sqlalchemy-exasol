@@ -47,6 +47,10 @@ class XfailRationale(str, Enum):
         Manual indexes are not recommended within the Exasol DB.
         """
     )
+    NEW_FEATURE_2x = cleandoc(
+        """In migrating to 2.x, new features were introduced by SQLAlchemy that
+        have not yet been implemented in sqlalchemy-exasol."""
+    )
     QUOTING = cleandoc(
         """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
         issues in other dialects related to object names that contain quotes
@@ -338,16 +342,19 @@ class ComponentReflectionTest(_ComponentReflectionTest):
     def test_get_indexes(self, connection, use_schema):
         super().test_get_indexes()
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.NEW_FEATURE_2x.value, strict=True)
     def test_get_multi_columns(self):
+        # See https://docs.sqlalchemy.org/en/20/core/reflection.html#sqlalchemy.engine.reflection.Inspector.get_multi_columns
         super().test_get_multi_columns()
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.NEW_FEATURE_2x.value, strict=True)
     def test_get_multi_foreign_keys(self):
+        # See https://docs.sqlalchemy.org/en/20/core/reflection.html#sqlalchemy.engine.reflection.Inspector.get_multi_foreign_keys
         super().test_get_multi_foreign_keys()
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.NEW_FEATURE_2x.value, strict=True)
     def test_get_multi_pk_constraint(self):
+        # See https://docs.sqlalchemy.org/en/20/core/reflection.html#sqlalchemy.engine.reflection.Inspector.get_multi_pk_constraint
         super().test_get_multi_pk_constraint()
 
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)

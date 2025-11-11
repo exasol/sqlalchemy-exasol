@@ -427,6 +427,20 @@ class CompoundSelectTest(_CompoundSelectTest):
 
 
 class ExceptionTest(_ExceptionTest):
+    RATIONALE = """
+    The websocket-based dialect does not yet support raising an
+    error on a duplicate key. This was noted before as an issue
+    for the deprecated ODBC-based dialects in:
+      - https://github.com/exasol/sqlalchemy-exasol/issues/539
+      - https://github.com/exasol/sqlalchemy-exasol/issues/120
+    """
+
+    @pytest.mark.xfail(reason=RATIONALE)
+    @requirements.duplicate_key_raises_integrity_error
+    def test_integrity_error(self):
+        super().test_integrity_error()
+
+    @pytest.mark.xfail(reason=RATIONALE)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error_raw_sql(self):
         """

@@ -27,7 +27,7 @@ from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
 """
 Here, all tests are imported from the testing suite of sqlalchemy to ensure that the
 Exasol dialect passes these expected tests. If a tests fails, it is investigated and,
-if the underlying issue(s) cannot be resolved, overridden with a rationale & xfail for
+if the underlying issue(s) cannot be resolved, override them with a rationale & xfail for
 the test or that test condition.
 """
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
@@ -459,5 +459,5 @@ class DifficultParametersTest(_DifficultParametersTest):
             # This does not work for Exasol DB versions <= 7.1.30.
             # See: https://github.com/exasol/sqlalchemy-exasol/issues/232
             if paramname == "dot.s":
-                pytest.xfail(reason="dot.s does work for < 7.1.30")
+                pytest.xfail(reason="dot.s does not work for <= 7.1.30")
         super().test_round_trip_same_named_column(paramname, connection, metadata)

@@ -1,7 +1,7 @@
 # Unreleased
 
 In this release, the ODBC-based dialects pyodbc and Turbodbc were dropped. Please
-switch over to using the remaining dialect provided by websocket. Connection
+switch over to using the websocket dialect. Connection
 strings should be altered to start with `exa+websocket://`.
 
 ## Refactoring

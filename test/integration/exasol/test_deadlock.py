@@ -19,9 +19,8 @@ from sqlalchemy.testing import (
 
 
 # TODO: get_schema_names, get_view_names and get_view_definition didn't cause deadlocks in this scenario
-@pytest.mark.skipif(
-    "pyodbc" not in str(testing.db.url),
-    reason="We currently only support snapshot metadata requests in the pyodbc based dialect",
+@pytest.mark.xfail(
+    reason="We do not currently support snapshot metadata",
 )
 class MetadataTest(fixtures.TablesTest):
     __backend__ = True
@@ -38,111 +37,41 @@ class MetadataTest(fixtures.TablesTest):
         session = engine.connect().execution_options(autocommit=False)
         return engine, session
 
-    def test_no_deadlock_for_get_table_names_without_fallback(self):
-        def without_fallback(session2, schema, table):
+    def test_no_deadlock_for_get_table_names(self):
+        def get_table_names(session2, schema, table):
             dialect = inspect(session2).dialect
-            dialect.get_table_names(session2, schema=schema, use_sql_fallback=False)
+            dialect.get_table_names(session2, schema=schema)
 
-        self.run_deadlock_for_table(without_fallback)
+        self.run_deadlock_for_table(get_table_names)
 
-    # NOTE: If a DB >= 7.1.0 still deadlocks here, it may due to the usage of an old ODBC driver version
-    @pytest.mark.skipif(
-        testing.db.dialect.server_version_info >= (7, 1, 0),
-        reason="DB version(s) after 7.1.0 should not deadlock here",
-    )
-    def test_deadlock_for_get_table_names_with_fallback(self):
-        def with_fallback(session2, schema, table):
+    def test_no_deadlock_for_get_columns(self):
+        def get_columns(session2, schema, table):
             dialect = inspect(session2).dialect
-            dialect.get_table_names(session2, schema=schema, use_sql_fallback=True)
+            dialect.get_columns(session2, schema=schema, table_name=table)
 
-        with pytest.raises(Exception):
-            self.run_deadlock_for_table(with_fallback)
+        self.run_deadlock_for_table(get_columns)
 
-    @pytest.mark.skipif(
-        testing.db.dialect.server_version_info <= (7, 1, 0),
-        reason="DB version(s) before 7.1.0 are expected to deadlock here",
-    )
-    def test_no_deadlock_for_get_table_names_with_fallback(self):
-        def with_fallback(session2, schema, table):
+    def test_no_deadlock_for_get_pk_constraint(self):
+        def get_pk_constraint(session2, schema, table):
             dialect = inspect(session2).dialect
-            dialect.get_table_names(session2, schema=schema, use_sql_fallback=True)
+            dialect.get_pk_constraint(session2, table_name=table, schema=schema)
 
-        self.run_deadlock_for_table(with_fallback)
+        self.run_deadlock_for_table(get_pk_constraint)
 
-    def test_no_deadlock_for_get_columns_without_fallback(self):
-        def without_fallback(session2, schema, table):
+    def test_no_deadlock_for_get_foreign_keys(self):
+        def get_foreign_keys(session2, schema, table):
             dialect = inspect(session2).dialect
-            dialect.get_columns(
-                session2, schema=schema, table_name=table, use_sql_fallback=False
-            )
+            dialect.get_foreign_keys(session2, table_name=table, schema=schema)
 
-        self.run_deadlock_for_table(without_fallback)
+        self.run_deadlock_for_table(get_foreign_keys)
 
-    def test_no_deadlock_for_get_columns_with_fallback(self):
-        # TODO: Doesnt produce a deadlock anymore since last commit?
-        def with_fallback(session2, schema, table):
-            dialect = inspect(session2).dialect
-            dialect.get_columns(
-                session2, schema=schema, table_name=table, use_sql_fallback=True
-            )
-
-        self.run_deadlock_for_table(with_fallback)
-
-    def test_no_deadlock_for_get_pk_constraint_without_fallback(self):
-        def without_fallback(session2, schema, table):
-            dialect = inspect(session2).dialect
-            dialect.get_pk_constraint(
-                session2, table_name=table, schema=schema, use_sql_fallback=False
-            )
-
-        self.run_deadlock_for_table(without_fallback)
-
-    def test_no_deadlock_for_get_pk_constraint_with_fallback(self):
-        def with_fallback(session2, schema, table):
-            dialect = inspect(session2).dialect
-            dialect.get_pk_constraint(
-                session2, table_name=table, schema=schema, use_sql_fallback=True
-            )
-
-        self.run_deadlock_for_table(with_fallback)
-
-    def test_no_deadlock_for_get_foreign_keys_without_fallback(self):
-        def without_fallback(session2, schema, table):
-            dialect = inspect(session2).dialect
-            dialect.get_foreign_keys(
-                session2, table_name=table, schema=schema, use_sql_fallback=False
-            )
-
-        self.run_deadlock_for_table(without_fallback)
-
-    def test_no_deadlock_for_get_foreign_keys_with_fallback(self):
-        def with_fallback(session2, schema, table):
-            dialect = inspect(session2).dialect
-            dialect.get_foreign_keys(
-                session2, table_name=table, schema=schema, use_sql_fallback=True
-            )
-
-        self.run_deadlock_for_table(with_fallback)
-
-    def test_no_deadlock_for_get_view_names_without_fallback(self):
+    def test_no_deadlock_for_get_view_names(self):
         # TODO: think of other scenarios where metadata deadlocks with view could happen
-        def without_fallback(session2, schema, table):
+        def get_view_names(session2, schema, table):
             dialect = inspect(session2).dialect
-            dialect.get_view_names(
-                session2, table_name=table, schema=schema, use_sql_fallback=False
-            )
+            dialect.get_view_names(session2, table_name=table, schema=schema)
 
-        self.run_deadlock_for_table(without_fallback)
-
-    def test_no_deadlock_for_get_view_names_with_fallback(self):
-        # TODO: think of other scenarios where metadata deadlocks with view could happen
-        def with_fallback(session2, schema, table):
-            dialect = inspect(session2).dialect
-            dialect.get_view_names(
-                session2, table_name=table, schema=schema, use_sql_fallback=True
-            )
-
-        self.run_deadlock_for_table(with_fallback)
+        self.run_deadlock_for_table(get_view_names)
 
     def watchdog(self, session0, schema):
         while self.watchdog_run:

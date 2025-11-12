@@ -1,7 +1,0 @@
-[ODBC]
-#Trace=yes
-#TraceFile=~/odbc.trace
-
-[EXAODBC]
-#Driver location needs to be added in build environment:
-DRIVER=<PATH_TO_DRIVER>

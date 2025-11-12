@@ -1,11 +1,10 @@
 # import all SQLAlchemy tests for this dialect
+from enum import Enum
 from inspect import cleandoc
 
 import pytest
 import sqlalchemy as sa
 from pyexasol import ExaQueryError
-from sqlalchemy import create_engine
-from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import (
     DDL,
     Index,
@@ -15,10 +14,10 @@ from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflec
 from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
-from sqlalchemy.testing.suite import ExpandingBoundInTest as _ExpandingBoundInTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
+from sqlalchemy.testing.suite import LongNameBlowoutTest as _LongNameBlowoutTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import ReturningGuardsTest as _ReturningGuardsTest
@@ -28,28 +27,36 @@ from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
 """
 Here, all tests are imported from the testing suite of sqlalchemy to ensure that the
 Exasol dialect passes these expected tests. If a tests fails, it is investigated and,
-if the underlying issue(s) cannot be resolved, overridden with a rationale & skip for
-the test or that test condition (as some only fail for a specific DB driver).
+if the underlying issue(s) cannot be resolved, override them with a rationale & xfail for
+the test or that test condition.
 """
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite import testing
-from sqlalchemy.testing.suite.test_ddl import (
-    LongNameBlowoutTest as _LongNameBlowoutTest,
-)
 
 # Tests marked with xfail and this reason are failing after updating to SQLAlchemy 2.x.
 # We will investigate and fix as many as possible in next PRs.
 BREAKING_CHANGES_SQL_ALCHEMY_2x = (
     "Failing test after updating to SQLAlchemy 2.x. To be investigated."
 )
-RATIONALE_PYODBC_HAS_TABLE = cleandoc(
-    """
-The Exasol PyODBC dialect does not check against views for `has_table`, see also `Inspector.has_table()`.
 
-This is due to historic differences between PyODBC and the other Exasol dialects.
-As PyODBC is marked as deprecated, it is not a priority to fix this.
-"""
-)
+
+class XfailRationale(str, Enum):
+    MANUAL_INDEX = cleandoc(
+        """sqlalchemy-exasol does not support manual indexes.
+        (see https://docs.exasol.com/db/latest/performance/indexes.htm#Manualindexoperations)
+        Manual indexes are not recommended within the Exasol DB.
+        """
+    )
+    QUOTING = cleandoc(
+        """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
+        issues in other dialects related to object names that contain quotes
+        and double quotes. Since this feature is not relevant to the
+        Exasol dialect, the entire suite is set to xfail. For further info, see:
+        https://github.com/sqlalchemy/sqlalchemy/issues/5456"""
+    )
+    SELECT_LIST = cleandoc(
+        """Exasol does not allow EXISTS or IN predicates as part of the select list."""
+    )
 
 
 class ReturningGuardsTest(_ReturningGuardsTest):
@@ -65,10 +72,7 @@ class ReturningGuardsTest(_ReturningGuardsTest):
 
     @staticmethod
     def _run_test(test_method, connection, run_stmt):
-        if "websocket" in testing.db.dialect.driver:
-            with pytest.raises(ExaQueryError):
-                test_method(connection, run_stmt)
-        else:
+        with pytest.raises(ExaQueryError):
             test_method(connection, run_stmt)
 
     def test_delete_single(self, connection, run_stmt):
@@ -92,7 +96,7 @@ class RowFetchTest(_RowFetchTest):
     )
 
     @testing.config.requirements.duplicate_names_in_cursor_description
-    @pytest.mark.skipif("websocket" in testing.db.dialect.driver, reason=RATIONAL)
+    @pytest.mark.xfail(reason=RATIONAL, strict=True)
     def test_row_with_dupe_names(self, connection):
         super().test_row_with_dupe_names(connection)
 
@@ -128,25 +132,6 @@ class HasTableTest(_HasTableTest):
                 DDL("DROP VIEW %s.vv" % (config.test_schema)),
             )
 
-    @pytest.mark.xfail(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_PYODBC_HAS_TABLE,
-        strict=True,
-    )
-    @testing.requires.views
-    def test_has_table_view(self, connection):
-        super().test_has_table_view(connection)
-
-    @pytest.mark.xfail(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_PYODBC_HAS_TABLE,
-        strict=True,
-    )
-    @testing.requires.views
-    @testing.requires.schemas
-    def test_has_table_view_schema(self, connection):
-        super().test_has_table_view_schema(connection)
-
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_has_table_cache(self, connection):
         super().test_has_table_cache(connection)
@@ -154,7 +139,6 @@ class HasTableTest(_HasTableTest):
 
 class InsertBehaviorTest(_InsertBehaviorTest):
     @pytest.mark.xfail(
-        "websocket" in testing.db.dialect.driver,
         reason="This currently isn't supported by the websocket protocol L3-1064.",
         strict=True,
     )
@@ -164,63 +148,10 @@ class InsertBehaviorTest(_InsertBehaviorTest):
 
 
 class RowCountTest(_RowCountTest):
-    PYODBC_RATIONALE = cleandoc(
-        """
-        pyodbc does not support returning the actual affected rows when executemany is used,
-        the cursor result always will be set to the rowcount = -1 in this case.
-        This also is a valid behaviour according to the python DBAPI specification.
-        For more details see also:
-        * https://peps.python.org/pep-0249/
-        * https://peps.python.org/pep-0249/#rowcount
-        * https://peps.python.org/pep-0249/#id21
-        * https://peps.python.org/pep-0249/#executemany
-        """
-    )
-
-    @pytest.mark.skipif("pyodbc" in testing.db.dialect.driver, reason=PYODBC_RATIONALE)
-    @testing.requires.sane_multi_rowcount
-    def test_multi_update_rowcount(self, connection):
-        super().test_multi_update_rowcount(connection)
-
-    @pytest.mark.skipif("pyodbc" in testing.db.dialect.driver, reason=PYODBC_RATIONALE)
-    @testing.requires.sane_multi_rowcount
-    def test_multi_delete_rowcount(self, connection):
-        super().test_multi_delete_rowcount(connection)
-
     @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
     def test_non_rowcount_scenarios_no_raise(self):
         # says cursor already closed so very likely need to fix!
         super().test_non_rowcount_scenarios_no_raise()
-
-
-class DifficultParametersTest(_DifficultParametersTest):
-    tough_parameters = testing.combinations(
-        ("boring",),
-        ("per cent",),
-        ("per % cent",),
-        ("%percent",),
-        ("par(ens)",),
-        ("percent%(ens)yah",),
-        ("col:ons",),
-        ("_starts_with_underscore",),
-        ("more :: %colons%",),
-        ("_name",),
-        ("___name",),
-        ("[BracketsAndCase]",),
-        ("42numbers",),
-        ("percent%signs",),
-        ("has spaces",),
-        ("/slashes/",),
-        ("more/slashes",),
-        ("1param",),
-        ("1col:on",),
-        argnames="paramname",
-    )
-
-    @tough_parameters
-    def test_round_trip_same_named_column(self, paramname, connection, metadata):
-        # dot_s and qmarks are currently disabled see https://github.com/exasol/sqlalchemy-exasol/issues/232
-        super().test_round_trip_same_named_column(paramname, connection, metadata)
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):
@@ -403,7 +334,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
         if not schema and testing.requires.temp_table_reflection.enabled:
             cls.define_temp_tables(metadata)
 
-    @pytest.mark.skip(reason="EXASOL has no explicit indexes")
+    @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value)
     def test_get_indexes(self, connection, use_schema):
         super().test_get_indexes()
 
@@ -423,88 +354,40 @@ class ComponentReflectionTest(_ComponentReflectionTest):
     def test_get_view_definition_does_not_exist(self):
         super().test_get_view_definition_does_not_exist()
 
-    @pytest.mark.xfail(
-        "pyodbc" in testing.db.dialect.driver,
-        reason=RATIONALE_PYODBC_HAS_TABLE,
-        strict=True,
-    )
-    @testing.combinations(
-        ("get_table_options", testing.requires.reflect_table_options),
-        "get_columns",
-        (
-            "get_pk_constraint",
-            testing.requires.primary_key_constraint_reflection,
-        ),
-        (
-            "get_foreign_keys",
-            testing.requires.foreign_key_constraint_reflection,
-        ),
-        ("get_indexes", testing.requires.index_reflection),
-        (
-            "get_unique_constraints",
-            testing.requires.unique_constraint_reflection,
-        ),
-        (
-            "get_check_constraints",
-            testing.requires.check_constraint_reflection,
-        ),
-        ("get_table_comment", testing.requires.comment_reflection),
-        argnames="method",
-    )
-    def test_not_existing_table(self, method, connection):
-        """
-        This test is copied over instead of using super().test_not_existing_table
-        due to some issues related to propagating the custom pytest plugin from
-        sqlalchemy. It has been difficult to ascertain how to fix it. Yes, as PyODBC
-        support would be removed, this override would not be necessary in the future,
-        and the pytest plugin issue would not be present.
-
-        Essentially, by using super().test_not_existing_table, these tests fail with:
-            TypeError: test_not_existing_table() missing 3 required positional
-            arguments: 'method', 'connection', and '_exclusions_0`
-        The _exclusions_0 comes from an additional parameterization that is associated
-        with the sqlalchemy.testing.combinations usage which is overridden via
-        sqlalchemy.testing.plugin.pytestplugin::PytestFixtureFunctions.combinations
-        (see the variable `current_exclusion_name`) by using
-        sqlalchemy.testing.plugin.pytestplugin::pytest_configure. The usage
-        of super().test_not_existing_table() does not have an explicit argument
-        for passing in _exclusions_0, etc., so it is unclear at this time how to
-        resolve this mismatch in expectations.
-        """
-        insp = inspect(connection)
-        meth = getattr(insp, method)
-        with expect_raises(NoSuchTableError):
-            meth("table_does_not_exists")
-
 
 class HasIndexTest(_HasIndexTest):
-    RATIONAL = """EXASOL does not support no explicit indexes"""
-
-    @pytest.mark.skip(reason=RATIONAL)
+    @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value, strict=True)
     def test_has_index(self):
         super().test_has_index()
 
-    @pytest.mark.skip(reason=RATIONAL)
+    @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value, strict=True)
     @testing.requires.schemas
     def test_has_index_schema(self):
         super().test_has_index_schema()
 
 
 class LongNameBlowoutTest(_LongNameBlowoutTest):
-    @testing.combinations(
+    testing_parameters = testing.combinations(
         ("fk",),
         ("pk",),
-        # Manual indexes are not recommended within the Exasol DB,
-        # (see https://docs.exasol.com/db/latest/performance/best_practices.htm)
-        # therefore they are currently not supported by the sqlalchemy-exasol extension.
-        # ("ix",)
+        ("ix",),
         ("ck", testing.requires.check_constraint_reflection.as_skips()),
         ("uq", testing.requires.unique_constraint_reflection.as_skips()),
         argnames="type_",
     )
-    @testing.provide_metadata
-    def test_long_convention_name(self, type_, connection):
-        metadata = self.metadata
+
+    @testing_parameters
+    def test_long_convention_name(self, type_, metadata, connection):
+        """
+        The default implementation of test_long_convention_name in
+        class sqlalchemy.testing.suite.LongNameBlowoutTest needs to be
+        overridden here as Exasol does not support manually created indices.
+        Beyond the first check, if `type_ == "ix"`, the rest of the code
+        has been copied without modification.
+        """
+
+        if type_ == "ix":
+            pytest.xfail(reason=XfailRationale.MANUAL_INDEX.value)
 
         actual_name, reflected_name = getattr(self, type_)(metadata, connection)
 
@@ -519,109 +402,40 @@ class LongNameBlowoutTest(_LongNameBlowoutTest):
 
 
 class CompoundSelectTest(_CompoundSelectTest):
-    @pytest.mark.skip(
-        reason=cleandoc(
-            """Skip this test as EXASOL does not allow EXISTS or IN predicates
-        as part of the select list. Skipping is implemented by redefining
-        the method as proposed by SQLAlchemy docs for new dialects."""
-        )
-    )
-    def test_null_in_empty_set_is_false(self):
-        return
+    @pytest.mark.xfail(reason=XfailRationale.SELECT_LIST.value, strict=True)
+    def test_null_in_empty_set_is_false(self, connection):
+        self.test_null_in_empty_set_is_false(connection)
 
 
 class ExceptionTest(_ExceptionTest):
-    RATIONALE = (
-        "This is likely a driver issue. We will investigate it in "
-        "https://github.com/exasol/sqlalchemy-exasol/issues/539."
-    )
+    RATIONALE = """
+    The websocket-based dialect does not yet support raising an
+    error on a duplicate key. This was noted before as an issue
+    for the deprecated ODBC-based dialects in:
+      - https://github.com/exasol/sqlalchemy-exasol/issues/539
+      - https://github.com/exasol/sqlalchemy-exasol/issues/120
+    """
 
-    @pytest.mark.xfail("odbc" in testing.db.dialect.driver, reason=RATIONALE)
+    @pytest.mark.xfail(reason=RATIONALE, strict=True)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error(self):
-        # Note: autocommit currently is needed to force error evaluation,
-        #       otherwise errors will be swallowed.
-        #       see also https://github.com/exasol/sqlalchemy-exasol/issues/120
-        engine = create_engine(
-            config.db.url,
-            connect_args={"autocommit": True},
-        )
-        with engine.connect() as conn:
-            trans = conn.begin()
-            conn.execute(self.tables.manual_pk.insert(), {"id": 1, "data": "d1"})
+        super().test_integrity_error()
 
-            assert_raises(
-                exc.IntegrityError,
-                conn.execute,
-                self.tables.manual_pk.insert(),
-                {"id": 1, "data": "d1"},
-            )
-            trans.rollback()
-
+    @pytest.mark.xfail(reason=RATIONALE, strict=True)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error_raw_sql(self):
+        """
+        Additional test that is related that our developers added.
+        """
         insert = text("INSERT INTO MANUAL_PK VALUES (1, 'd1')")
         with config.db.begin() as conn:
             conn.execute(insert)
             assert_raises(exc.IntegrityError, conn.execute, insert)
 
 
-class ExpandingBoundInTest(_ExpandingBoundInTest):
-    @pytest.mark.skip(
-        reason=cleandoc(
-            """Skip this test as EXASOL does not allow EXISTS or IN predicates
-        as part of the select list. Skipping is implemented by redefining
-        the method as proposed by SQLAlchemy docs for new dialects."""
-        )
-    )
-    def test_null_in_empty_set_is_false(self):
-        return
-
-
+@pytest.mark.xfail(reason=XfailRationale.QUOTING.value, strict=True)
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):
-    RATIONAL = cleandoc(
-        """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
-        issues in other dialects related to object names that contain quotes
-        and double quotes. Since this feature is not relevant to the
-        Exasol dialect, the entire suite will be skipped. More info on fix:
-        https://github.com/sqlalchemy/sqlalchemy/issues/5456"""
-    )
-
-    @pytest.mark.skip(reason=RATIONAL)
-    def test_get_table_options(self, name):
-        return
-
-    @pytest.mark.skip(reason=RATIONAL)
-    def test_get_view_definition(self, name):
-        return
-
-    @pytest.mark.skip(reason=RATIONAL)
-    def test_get_columns(self, name):
-        return
-
-    @pytest.mark.skip(reason=RATIONAL)
-    def test_get_pk_constraint(self, name):
-        return
-
-    @pytest.mark.skip(reason=RATIONAL)
-    def test_get_foreign_keys(self, name):
-        return
-
-    @pytest.mark.skip(reason=RATIONAL)
-    def test_get_indexes(self, name):
-        return
-
-    @pytest.mark.skip(reason=RATIONAL)
-    def test_get_unique_constraints(self, name):
-        return
-
-    @pytest.mark.skip(reason=RATIONAL)
-    def test_get_table_comment(self, name):
-        return
-
-    @pytest.mark.skip(reason=RATIONAL)
-    def test_get_check_constraints(self, name):
-        return
+    pass
 
 
 class NumericTest(_NumericTest):
@@ -635,3 +449,15 @@ class NumericTest(_NumericTest):
     @testing.requires.float_is_numeric
     def test_float_is_not_numeric(self, connection, cls_):
         super().test_float_is_not_numeric()
+
+
+class DifficultParametersTest(_DifficultParametersTest):
+    @_DifficultParametersTest.tough_parameters
+    @config.requirements.unusual_column_name_characters
+    def test_round_trip_same_named_column(self, paramname, connection, metadata):
+        if testing.db.dialect.server_version_info <= (7, 1, 30):
+            # This does not work for Exasol DB versions <= 7.1.30.
+            # See: https://github.com/exasol/sqlalchemy-exasol/issues/232
+            if paramname == "dot.s":
+                pytest.xfail(reason="dot.s does not work for <= 7.1.30")
+        super().test_round_trip_same_named_column(paramname, connection, metadata)

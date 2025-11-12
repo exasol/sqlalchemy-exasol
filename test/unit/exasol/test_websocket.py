@@ -40,7 +40,7 @@ def set_kwargs(
         pytest.param(
             make_url(
                 "exa+websocket://sys:exasol@localhost:8888/TEST?"
-                "CONNECTIONCALL=en_US.UTF-8&DRIVER=EXAODBC"
+                "CONNECTIONCALL=en_US.UTF-8"
                 "&SSLCertificate=SSL_VERIFY_NONE"
             ),
             set_kwargs(
@@ -54,7 +54,7 @@ def set_kwargs(
         pytest.param(
             make_url(
                 "exa+websocket://sys:exasol@localhost:8888/TEST?"
-                "CONNECTIONCALL=en_US.UTF-8&DRIVER=EXAODBC"
+                "CONNECTIONCALL=en_US.UTF-8"
                 "&SSLCertificate=SSL_VERIFY_NONE"
                 "&ENCRYPTION=N"
             ),
@@ -94,7 +94,7 @@ def test_create_connection_args(url, expected_kwargs):
 def test_raises_an_exception_for_invalid_arguments():
     url = make_url(
         "exa+websocket://sys:exasol@localhost:8888/TEST?"
-        "CONNECTIONCALL=en_US.UTF-8&DRIVER=EXAODBC"
+        "CONNECTIONCALL=en_US.UTF-8"
         "&ENCRYPTION=N"
     )
 

@@ -2,7 +2,6 @@ import time
 from threading import Thread
 
 import pytest
-import sqlalchemy.testing as testing
 from sqlalchemy import (
     create_engine,
     inspect,

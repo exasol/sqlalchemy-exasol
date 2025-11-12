@@ -5,6 +5,7 @@ from inspect import cleandoc
 import pytest
 import sqlalchemy as sa
 from pyexasol import ExaQueryError
+from sqlalchemy import Inspector
 from sqlalchemy.schema import (
     DDL,
     Index,
@@ -23,6 +24,7 @@ from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgume
 from sqlalchemy.testing.suite import ReturningGuardsTest as _ReturningGuardsTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
+from sqlalchemy.testing.suite.test_reflection import _multi_combination
 
 """
 Here, all tests are imported from the testing suite of sqlalchemy to ensure that the
@@ -338,14 +340,53 @@ class ComponentReflectionTest(_ComponentReflectionTest):
         if not schema and testing.requires.temp_table_reflection.enabled:
             cls.define_temp_tables(metadata)
 
+    @staticmethod
+    def _convert_view_nullable(expected_multi_output):
+        """
+        Convert expected nullable to None
+
+        For view, nullable is always NULL, so the expected result needs
+        to be modified. For more reference, see:
+        https://docs.exasol.com/saas/sql_references/system_tables/metadata/exa_all_columns.htm
+        """
+        for key, value_list in expected_multi_output.items():
+            schema, table_or_view = key
+            if not table_or_view.endswith("_v"):
+                continue
+            for column_def in value_list:
+                # Replace nullable: <ANY> with nullable: None
+                column_def["nullable"] = None
+
     @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value)
     def test_get_indexes(self, connection, use_schema):
         super().test_get_indexes()
 
-    @pytest.mark.xfail(reason=XfailRationale.NEW_FEATURE_2x.value, strict=True)
-    def test_get_multi_columns(self):
-        # See https://docs.sqlalchemy.org/en/20/core/reflection.html#sqlalchemy.engine.reflection.Inspector.get_multi_columns
-        super().test_get_multi_columns()
+    @_multi_combination
+    def test_get_multi_columns(self, get_multi_exp, schema, scope, kind, use_filter):
+        """
+        The default implementation of test_get_multi_columns in
+        class sqlalchemy.testing.suite.ComponentReflectionTest
+        needs to be overridden here as Exasol always requires that nullable be NULL
+        for the columns of views. The code given in this overriding class
+        method was directly copied. See notes, marked with 'Added', highlighting
+        the changed place.
+        """
+        insp, kws, exp = get_multi_exp(
+            schema,
+            scope,
+            kind,
+            use_filter,
+            Inspector.get_columns,
+            self.exp_columns,
+        )
+
+        # Added to convert nullable for columns in views
+        self._convert_view_nullable(exp)
+
+        for kw in kws:
+            insp.clear_cache()
+            result = insp.get_multi_columns(**kw)
+            self._check_table_dict(result, exp, self._required_column_keys)
 
     @pytest.mark.xfail(reason=XfailRationale.NEW_FEATURE_2x.value, strict=True)
     def test_get_multi_foreign_keys(self):

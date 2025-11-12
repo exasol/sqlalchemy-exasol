@@ -20,7 +20,7 @@ Tools
 
 Locale
 +++++++
-Make sure the local is set up appropriately.
+Make sure the locale is set up appropriately.
 
 Example: Setting up an english locale
 

@@ -200,12 +200,12 @@ class MetadataTest(fixtures.TablesTest):
     def test_get_view_definition_view_name_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
-            view_definition = dialect.get_view_definition(
-                connection=c,
-                schema=self.schema,
-                view_name=None,
-            )
-            assert view_definition is None
+            with pytest.raises(NoSuchTableError):
+                dialect.get_view_definition(
+                    connection=c,
+                    schema=self.schema,
+                    view_name=None,
+                )
 
     @pytest.mark.parametrize(
         "engine_name",

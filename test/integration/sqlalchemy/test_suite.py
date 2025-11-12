@@ -49,10 +49,6 @@ class XfailRationale(str, Enum):
         Manual indexes are not recommended within the Exasol DB.
         """
     )
-    NEW_FEATURE_2x = cleandoc(
-        """In migrating to 2.x, new features were introduced by SQLAlchemy that
-        have not yet been implemented in sqlalchemy-exasol."""
-    )
     QUOTING = cleandoc(
         """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
         issues in other dialects related to object names that contain quotes
@@ -388,10 +384,52 @@ class ComponentReflectionTest(_ComponentReflectionTest):
             result = insp.get_multi_columns(**kw)
             self._check_table_dict(result, exp, self._required_column_keys)
 
-    @pytest.mark.xfail(reason=XfailRationale.NEW_FEATURE_2x.value, strict=True)
-    def test_get_multi_foreign_keys(self):
-        # See https://docs.sqlalchemy.org/en/20/core/reflection.html#sqlalchemy.engine.reflection.Inspector.get_multi_foreign_keys
-        super().test_get_multi_foreign_keys()
+    @_multi_combination
+    def test_get_multi_foreign_keys(
+        self, get_multi_exp, schema, scope, kind, use_filter
+    ):
+        """
+        The default implementation of test_get_multi_foreign_keys in
+        class sqlalchemy.testing.suite.ComponentReflectionTest
+        needs to be overridden here as Exasol does not support custom constraints.
+        The code given in this overriding class method was directly copied. See notes,
+        marked with 'Replaced', highlighting the changed place.
+        """
+
+        def sort_entries_in_place(result_set):
+            for key, value_list in result_set.items():
+                result_set[key] = sorted(value_list, key=lambda x: x["referred_table"])
+
+        insp, kws, exp = get_multi_exp(
+            schema,
+            scope,
+            kind,
+            use_filter,
+            Inspector.get_foreign_keys,
+            self.exp_fks,
+        )
+
+        for kw in kws:
+            insp.clear_cache()
+            result = insp.get_multi_foreign_keys(**kw)
+
+            # Replaced as self._adjust_sort did not work, as some constraints
+            # cannot be added into an Exasol DB as described in define_reflected_tables
+            # self._adjust_sort(
+            #     result, exp, lambda d: tuple(d["referred_table"])
+            # )
+            sort_entries_in_place(exp)
+            sort_entries_in_place(result)
+
+            self._check_table_dict(
+                result,
+                exp,
+                {
+                    "name",
+                    "constrained_columns",
+                    "referred_schema",
+                },
+            )
 
 
 class HasIndexTest(_HasIndexTest):

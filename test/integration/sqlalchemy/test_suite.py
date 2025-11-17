@@ -353,7 +353,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
                 # Replace nullable: <ANY> with nullable: None
                 column_def["nullable"] = None
 
-    @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value)
+    @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value, strict=True)
     def test_get_indexes(self, connection, use_schema):
         super().test_get_indexes()
 

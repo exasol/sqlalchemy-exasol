@@ -934,7 +934,10 @@ class EXADialect(default.DefaultDialect):
         tables = [self.normalize_name(row[0]) for row in result]
         return tables
 
-    def has_table(self, connection, table_name, schema=None, **kw):
+    @reflection.cache
+    def has_table(self, connection, table_name, schema=None, **kw) -> bool:
+        self._ensure_has_table_connection(connection)
+
         schema = self._get_schema_for_input(connection, schema)
         sql_statement = (
             "SELECT OBJECT_NAME FROM SYS.EXA_ALL_OBJECTS "
@@ -956,34 +959,38 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
-        schema = self._get_schema_for_input(connection, schema)
+        schema_name = self._get_schema_for_input(connection, schema)
         sql_statement = "SELECT view_name FROM  SYS.EXA_ALL_VIEWS WHERE view_schema = "
-        if schema is None:
+        if schema_name is None:
             sql_statement += "CURRENT_SCHEMA ORDER BY view_name"
             result = connection.execute(sql.text(sql_statement))
         else:
             sql_statement += ":schema ORDER BY view_name"
             result = connection.execute(
-                sql.text(sql_statement), {"schema": self.denormalize_name(schema)}
+                sql.text(sql_statement), {"schema": self.denormalize_name(schema_name)}
             )
         return [self.normalize_name(row[0]) for row in result]
 
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):
-        schema = self._get_schema_for_input(connection, schema)
-        sql_stmnt = "SELECT view_text FROM sys.exa_all_views WHERE view_name = :view_name AND view_schema = "
-        if schema is None:
-            sql_stmnt += "CURRENT_SCHEMA"
+        schema_name = self._get_schema_for_input(connection, schema)
+        sql_statement = "SELECT view_text FROM sys.exa_all_views WHERE view_name = :view_name AND view_schema = "
+        if schema_name is None:
+            sql_statement += "CURRENT_SCHEMA"
         else:
-            sql_stmnt += ":schema"
+            sql_statement += ":schema"
         result = connection.execute(
-            sql.text(sql_stmnt),
+            sql.text(sql_statement),
             {
                 "view_name": self.denormalize_name(view_name),
-                "schema": self.denormalize_name(schema),
+                "schema": self.denormalize_name(schema_name),
             },
         ).scalar()
-        return result if result else None
+        if result:
+            return result
+        raise sqlalchemy.exc.NoSuchTableError(
+            f"{schema_name}.{view_name}" if schema_name else view_name
+        )
 
     @staticmethod
     def quote_string_value(string_value):

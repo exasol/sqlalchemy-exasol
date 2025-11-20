@@ -341,8 +341,8 @@ class ComponentReflectionTest(_ComponentReflectionTest):
         """
         Convert expected nullable to None
 
-        For view, nullable is always NULL, so the expected result needs
-        to be modified. For more reference, see:
+        For columns of a view in Exasol, nullable is always NULL,
+        so the expected result needs to be modified. For more reference, see:
         https://docs.exasol.com/saas/sql_references/system_tables/metadata/exa_all_columns.htm
         """
         for key, value_list in expected_multi_output.items():
@@ -362,7 +362,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
         """
         The default implementation of test_get_multi_columns in
         class sqlalchemy.testing.suite.ComponentReflectionTest
-        needs to be overridden here as Exasol always requires that nullable be NULL
+        needs to be overridden here, as Exasol always requires nullable to be NULL
         for the columns of views. The code given in this overriding class
         method was directly copied. See notes, marked with 'Added', highlighting
         the changed place.

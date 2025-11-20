@@ -1,6 +1,7 @@
 # import all SQLAlchemy tests for this dialect
 from enum import Enum
 from inspect import cleandoc
+from typing import NamedTuple
 
 import pytest
 import sqlalchemy as sa
@@ -34,12 +35,6 @@ the test or that test condition.
 """
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite import testing
-
-# Tests marked with xfail and this reason are failing after updating to SQLAlchemy 2.x.
-# We will investigate and fix as many as possible in next PRs.
-BREAKING_CHANGES_SQL_ALCHEMY_2x = (
-    "Failing test after updating to SQLAlchemy 2.x. To be investigated."
-)
 
 
 class XfailRationale(str, Enum):
@@ -145,11 +140,29 @@ class InsertBehaviorTest(_InsertBehaviorTest):
         super().test_empty_insert_multiple(connection)
 
 
+class ReplacementVariation(NamedTuple):
+    update: bool = False
+    delete: bool = False
+    insert: bool = False
+    select: bool = False
+
+
 class RowCountTest(_RowCountTest):
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_non_rowcount_scenarios_no_raise(self):
-        # says cursor already closed so very likely need to fix!
-        super().test_non_rowcount_scenarios_no_raise()
+    # @testing.variation has a complicated structure. It's unclear, but at this time,
+    # "insert" and "select" are not being properly set to include .update values
+    # Thus, a substitute with NamedTuple is used here to generate the equivalent.
+    @pytest.mark.parametrize(
+        "statement",
+        [
+            ReplacementVariation(update=True),
+            ReplacementVariation(delete=True),
+            ReplacementVariation(insert=True),
+            ReplacementVariation(select=True),
+        ],
+    )
+    @testing.variation("close_first", [True, False])
+    def test_non_rowcount_scenarios_no_raise(self, connection, statement, close_first):
+        super().test_non_rowcount_scenarios_no_raise(connection, statement, close_first)
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):

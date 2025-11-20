@@ -51,7 +51,6 @@ from collections.abc import MutableMapping
 from contextlib import closing
 from typing import (
     Any,
-    Type,
 )
 
 import sqlalchemy.exc
@@ -711,6 +710,9 @@ class EXAIdentifierPreparer(compiler.IdentifierPreparer):
 
 
 class EXAExecutionContext(default.DefaultExecutionContext):
+    def post_exec(self):
+        self._rowcount = self.cursor.rowcount
+
     def fire_sequence(self, default, type_):
         raise NotImplemented
 

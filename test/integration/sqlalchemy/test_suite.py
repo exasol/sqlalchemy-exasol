@@ -134,10 +134,6 @@ class HasTableTest(_HasTableTest):
                 DDL("DROP VIEW %s.vv" % (config.test_schema)),
             )
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_has_table_cache(self, connection):
-        super().test_has_table_cache(connection)
-
 
 class InsertBehaviorTest(_InsertBehaviorTest):
     @pytest.mark.xfail(

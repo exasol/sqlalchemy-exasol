@@ -125,7 +125,7 @@ class MetadataTest(fixtures.TablesTest):
             table_names = dialect.get_table_names(connection=c, schema=self.schema)
             assert table_names == ["s", "t"]
 
-    def test_has_table_table_exists(self, engine_name):
+    def test_has_table_where_table_exists(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             has_table = dialect.has_table(
@@ -135,7 +135,7 @@ class MetadataTest(fixtures.TablesTest):
             )
             assert has_table, f"Table {self.schema}.T was not found, but should exist"
 
-    def test_has_table_table_exists_not(self, engine_name):
+    def test_has_table_where_table_does_not_exist(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             has_table = dialect.has_table(
@@ -169,7 +169,7 @@ class MetadataTest(fixtures.TablesTest):
             )
             assert view_definition == self.view_defintion
 
-    def test_get_view_definition_view_name_none(self, engine_name):
+    def test_get_view_definition_where_view_name_is_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             with pytest.raises(NoSuchTableError):
@@ -188,7 +188,7 @@ class MetadataTest(fixtures.TablesTest):
             pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
         ],
     )
-    def test_get_columns_raises_exception_for_no_table(
+    def test_get_columns_raises_exception_for_non_existing_entities(
         self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
@@ -196,8 +196,9 @@ class MetadataTest(fixtures.TablesTest):
             with pytest.raises(NoSuchTableError):
                 dialect.get_columns(connection=c, table_name=table, schema=schema)
 
-    def make_columns_comparable(
-        self, column_list
+    @staticmethod
+    def _make_columns_comparable(
+        column_list,
     ):  # object equality doesn't work for sqltypes
         return sorted(
             ({k: str(v) for k, v in column.items()} for column in column_list),
@@ -243,11 +244,11 @@ class MetadataTest(fixtures.TablesTest):
                 },
             ]
 
-            assert self.make_columns_comparable(
+            assert self._make_columns_comparable(
                 expected
-            ) == self.make_columns_comparable(columns)
+            ) == self._make_columns_comparable(columns)
 
-    def test_get_columns_table_name_none(self, engine_name):
+    def test_get_columns_where_table_name_is_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             columns = dialect.get_columns(
@@ -266,7 +267,7 @@ class MetadataTest(fixtures.TablesTest):
             pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
         ],
     )
-    def test_get_pk_constraint_raises_exception_for_no_table(
+    def test_get_pk_constraint_raises_exception_for_non_existing_entities(
         self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
@@ -287,7 +288,7 @@ class MetadataTest(fixtures.TablesTest):
                 "pid2",
             ] and pk_constraint["name"].startswith("sys_")
 
-    def test_get_pk_constraint_table_name_none(self, engine_name):
+    def test_get_pk_constraint_where_table_name_is_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             pk_constraint = dialect.get_pk_constraint(
@@ -306,7 +307,7 @@ class MetadataTest(fixtures.TablesTest):
             pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
         ],
     )
-    def test_get_foreign_keys_raises_exception_for_no_table(
+    def test_get_foreign_keys_raises_exception_for_non_existing_entities(
         self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
@@ -334,7 +335,7 @@ class MetadataTest(fixtures.TablesTest):
 
             assert foreign_keys == expected
 
-    def test_get_foreign_keys_table_name_none(self, engine_name):
+    def test_get_foreign_keys_where_table_name_is_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             foreign_keys = dialect.get_foreign_keys(

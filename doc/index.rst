@@ -22,14 +22,13 @@ Documentation of SQLAlchemy-Exasol
         :link: faq
         :link-type: ref
 
-        Frequently asked questsions.
+        Frequently asked questions.
 
 .. toctree::
    :maxdepth: 1
    :hidden:
 
-   user_guide
+   user_guide/index
    developer_guide/index
    faq
    changes/changelog
-

@@ -9,14 +9,8 @@ from sqlalchemy import (
     sql,
     testing,
 )
-from sqlalchemy.testing.fixtures import (
-    TestBase,
-    config,
-)
-
-FINGERPRINT_SECURITY_RATIONALE = (
-    "Only websocket supports giving a fingerprint in the connection"
-)
+from sqlalchemy.testing import config
+from sqlalchemy.testing.fixtures import TestBase
 
 
 def get_fingerprint(dsn):
@@ -62,9 +56,10 @@ class CertificateTest(TestBase):
             pass
         return url.set(query=query)
 
-    @pytest.mark.skipif(
+    @pytest.mark.xfail(
         testing.db.dialect.server_version_info < (7, 1, 0),
         reason="DB version(s) before 7.1.0 don't enforce ssl/tls",
+        strict=True,
     )
     def test_db_connection_fails_with_default_settings_for_self_signed_certificates(
         self,
@@ -81,10 +76,6 @@ class CertificateTest(TestBase):
         expected_substrings = ["self-signed certificate", "self signed certificate"]
         assert any([e in actual_message for e in expected_substrings])
 
-    @pytest.mark.skipif(
-        "websocket" not in testing.db.dialect.driver,
-        reason="Only websocket supports passing on connect_args like this.",
-    )
     def test_db_skip_certification_validation_passes(self):
         url = self.remove_ssl_settings(config.db.url)
 
@@ -101,10 +92,6 @@ class CertificateTest(TestBase):
         result = self.perform_test_query(engine)
         assert result == [(42,)]
 
-    @pytest.mark.skipif(
-        "websocket" not in testing.db.dialect.driver,
-        reason=FINGERPRINT_SECURITY_RATIONALE,
-    )
     def test_db_with_fingerprint_passes(self):
         url = self.remove_ssl_settings(config.db.url)
         connect_args = url.translate_connect_args(database="schema")
@@ -118,10 +105,6 @@ class CertificateTest(TestBase):
         result = self.perform_test_query(engine)
         assert result == [(42,)]
 
-    @pytest.mark.skipif(
-        "websocket" not in testing.db.dialect.driver,
-        reason=FINGERPRINT_SECURITY_RATIONALE,
-    )
     def test_db_with_wrong_fingerprint_fails(self):
         url = self.remove_ssl_settings(config.db.url)
         connect_args = url.translate_connect_args(database="schema")

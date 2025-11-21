@@ -156,13 +156,6 @@ class Requirements(SuiteRequirements):
         return exclusions.closed()
 
     @property
-    def duplicate_key_raises_integrity_error(self):
-        return exclusions.only_on(
-            [lambda config: config.db.dialect.driver == "pyodbc"],
-            reason="Currently this is only supported by pyodbc based dialects",
-        )
-
-    @property
     def independent_connections(self):
         return exclusions.open()
 

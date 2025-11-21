@@ -1,7 +1,7 @@
 import datetime
 
 from sqlalchemy_exasol import base
-from sqlalchemy_exasol.pyodbc import EXADialect_pyodbc
+from sqlalchemy_exasol.websocket import EXADialect_websocket
 
 
 def raw_sql(query):
@@ -14,7 +14,7 @@ def raw_sql(query):
     :returns: A string of raw SQL
     :rtype: string
     """
-    dialect = EXADialect_pyodbc()
+    dialect = EXADialect_websocket()
 
     class LiteralCompiler(base.EXACompiler):
         def visit_bindparam(
@@ -30,20 +30,19 @@ def raw_sql(query):
         def render_literal_value(self, value, type_):
             if value is None:
                 return "NULL"
-            elif isinstance(value, bytes):
+            if isinstance(value, bytes):
                 return "'{value}'".format(value=value.decode("utf-8"))
-            elif isinstance(value, str):
+            if isinstance(value, str):
                 return f"'{value}'"
-            elif type(value) is datetime.date:
+            if type(value) is datetime.date:
                 return "to_date('{value}', 'YYYY-MM-DD')".format(
                     value=value.strftime("%Y-%m-%d")
                 )
-            elif type(value) is datetime.datetime:
+            if type(value) is datetime.datetime:
                 return "to_timestamp('{value}', 'YYYY-MM-DD HH24:MI:SS.FF6')".format(
                     value=value.strftime("%Y-%m-%d %H:%M:%S.%f")
                 )
-            else:
-                return f"{value}"
+            return f"{value}"
 
     compiler = LiteralCompiler(dialect, query)
     return compiler.string

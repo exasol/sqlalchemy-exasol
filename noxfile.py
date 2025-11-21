@@ -18,16 +18,11 @@ sys.path.append(f"{SCRIPTS}")
 
 
 import nox
-from nox import Session
-from nox.sessions import SessionRunner
-
-from exasol.odbc import (
-    ODBC_DRIVER,
-    odbcconfig,
-)
 
 # imports all nox task provided by the toolbox
 from exasol.toolbox.nox.tasks import *  # type: ignore
+from nox import Session
+from nox.sessions import SessionRunner
 
 # default actions to be run if nothing is explicitly specified with the -s option
 nox.options.sessions = ["project:fix"]
@@ -127,19 +122,17 @@ def sqlalchemy_tests(session: Session) -> None:
         )
         return p
 
-    with odbcconfig(ODBC_DRIVER) as (config, env):
-        args = parser().parse_args(session.posargs)
-        connector = args.connector
-        session.run(
-            *_coverage_command(),
-            "pytest",
-            "--dropfirst",
-            "--db",
-            f"exasol-{connector}",
-            f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
-            external=True,
-            env=env,
-        )
+    args = parser().parse_args(session.posargs)
+    connector = args.connector
+    session.run(
+        *_coverage_command(),
+        "pytest",
+        "--dropfirst",
+        "--db",
+        f"exasol-{connector}",
+        f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
+        external=True,
+    )
 
 
 @nox.session(name="test:exasol", python=False)
@@ -158,19 +151,17 @@ def exasol_tests(session: Session) -> None:
         )
         return p
 
-    with odbcconfig(ODBC_DRIVER) as (config, env):
-        args = parser().parse_args(session.posargs)
-        connector = args.connector
-        session.run(
-            *_coverage_command(),
-            "pytest",
-            "--dropfirst",
-            "--db",
-            f"exasol-{connector}",
-            f"{PROJECT_ROOT / 'test' / 'integration' / 'exasol'}",
-            external=True,
-            env=env,
-        )
+    args = parser().parse_args(session.posargs)
+    connector = args.connector
+    session.run(
+        *_coverage_command(),
+        "pytest",
+        "--dropfirst",
+        "--db",
+        f"exasol-{connector}",
+        f"{PROJECT_ROOT / 'test' / 'integration' / 'exasol'}",
+        external=True,
+    )
 
 
 @nox.session(name="test:regression", python=False)
@@ -241,28 +232,26 @@ def report_skipped(session: Session) -> None:
     with TemporaryDirectory() as tmp_dir:
         for connector in PROJECT_CONFIG.connectors:
             report = Path(tmp_dir) / f"test-report{connector}.json"
-            with odbcconfig(ODBC_DRIVER) as (config, env):
-                session.run(
-                    "pytest",
-                    "--dropfirst",
-                    "--db",
-                    f"exasol-{connector}",
-                    f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
-                    "--json-report",
-                    f"--json-report-file={report}",
-                    external=True,
-                    env=env,
-                )
-                session.run(
-                    "python",
-                    f"{SCRIPTS / 'report.py'}",
-                    "-f",
-                    "csv",
-                    "--output",
-                    f"skipped-tests-{connector}.csv",
-                    f"{connector}",
-                    f"{report}",
-                )
+            session.run(
+                "pytest",
+                "--dropfirst",
+                "--db",
+                f"exasol-{connector}",
+                f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
+                "--json-report",
+                f"--json-report-file={report}",
+                external=True,
+            )
+            session.run(
+                "python",
+                f"{SCRIPTS / 'report.py'}",
+                "-f",
+                "csv",
+                "--output",
+                f"skipped-tests-{connector}.csv",
+                f"{connector}",
+                f"{report}",
+            )
 
 
 def _connector_matrix(config: Config):
@@ -291,4 +280,5 @@ def full_matrix(session: Session) -> None:
     matrix = _python_matrix(PROJECT_CONFIG)
     matrix.update(_exasol_matrix(PROJECT_CONFIG))
     matrix.update(_connector_matrix(PROJECT_CONFIG))
+    matrix["integration-group"] = ["exasol", "regression", "sqla"]
     print(json.dumps(matrix))

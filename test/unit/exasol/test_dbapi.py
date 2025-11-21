@@ -6,7 +6,6 @@ import datetime
 import importlib
 
 import pytest
-
 from exasol.driver.websocket._connection import _requires_connection
 from exasol.driver.websocket._cursor import (
     MetaData,

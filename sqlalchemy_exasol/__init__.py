@@ -1,13 +1,13 @@
 from sqlalchemy_exasol import (
     base,
-    pyodbc,
+    websocket,
 )
 from sqlalchemy_exasol.version import VERSION
 
 __version__ = VERSION
 
 # default dialect
-base.dialect = pyodbc.dialect  # type: ignore
+base.dialect = websocket.dialect  # type: ignore
 
 __all__ = (
     "BLOB",

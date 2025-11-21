@@ -1,6 +1,8 @@
 Development
 ============
 This chapter contains information helpful when you want to engage in development of this project.
+``sqlalchemy-exasol`` provides an Exasol dialect for ``sqlalchemy``. For further information
+on the creation of a dialect, see `SQLAlchemy's README.dialects.rst <https://github.com/sqlalchemy/sqlalchemy/blob/main/README.dialects.rst>`__.
 
 Prerequisites
 -------------
@@ -16,25 +18,9 @@ Tools
     * Prerequisites_
 
 
-Libraries
-+++++++++
-* unixodbc
-* unixodbc-dev
-* libboost-date-time-dev
-* libboost-locale-dev
-* libboost-system-dev
-
-
-Example: Install of required system libraries on Ubuntu
-
-.. code-block::
-
-    sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
-
-
 Locale
 +++++++
-Make sure the local is setup appropriately.
+Make sure the locale is set up appropriately.
 
 Example: Setting up an english locale
 
@@ -123,27 +109,9 @@ Tests
 
     .. code-block::
 
-        # make sure you are using the virtual environment poetry has setup for this project
+        # make sure you are using the virtual environment poetry has set up for this project
         poetry shell
 
-
-#. Run all tests with `pyodbc` connector
-
-    .. code-block::
-
-        nox
-
-    or
-
-    .. code-block::
-
-        nox -s "verify(connector='pyodbc')"
-
-#. Run all tests with `turbodbc` connector
-
-    .. code-block::
-
-        nox -s "verify(connector='turbodbc')"
 
 .. attention::
 

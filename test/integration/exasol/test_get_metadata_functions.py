@@ -25,6 +25,10 @@ ENGINE_SCHEMA_DATABASE = "ENGINE_SCHEMA_DATABASE"
 ENGINE_SCHEMA_2_DATABASE = "ENGINE_SCHEMA_2_DATABASE"
 
 
+@pytest.mark.parametrize(
+    "engine_name",
+    [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
+)
 class MetadataTest(fixtures.TablesTest):
     __backend__ = True
 
@@ -109,30 +113,18 @@ class MetadataTest(fixtures.TablesTest):
         engine = create_engine(url)
         return engine
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_schema_names(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             schema_names = dialect.get_schema_names(connection=c)
             assert self.schema in schema_names and self.schema_2 in schema_names
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_table_names(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             table_names = dialect.get_table_names(connection=c, schema=self.schema)
             assert table_names == ["s", "t"]
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_has_table_table_exists(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
@@ -143,10 +135,6 @@ class MetadataTest(fixtures.TablesTest):
             )
             assert has_table, f"Table {self.schema}.T was not found, but should exist"
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_has_table_table_exists_not(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
@@ -159,30 +147,18 @@ class MetadataTest(fixtures.TablesTest):
                 not has_table
             ), f"Table {self.schema}.not_exist was found, but should not exist"
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_view_names(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             view_names = dialect.get_view_names(connection=c, schema=self.schema)
             assert view_names == ["v"]
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_view_names_for_sys(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             view_names = dialect.get_view_names(connection=c, schema="sys")
             assert view_names == []
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_view_definition(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
@@ -193,10 +169,6 @@ class MetadataTest(fixtures.TablesTest):
             )
             assert view_definition == self.view_defintion
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_view_definition_view_name_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
@@ -207,10 +179,6 @@ class MetadataTest(fixtures.TablesTest):
                     view_name=None,
                 )
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     @pytest.mark.parametrize(
         "schema,table",
         [
@@ -236,10 +204,6 @@ class MetadataTest(fixtures.TablesTest):
             key=lambda k: k["name"],
         )
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_columns(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
@@ -283,10 +247,6 @@ class MetadataTest(fixtures.TablesTest):
                 expected
             ) == self.make_columns_comparable(columns)
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_columns_table_name_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
@@ -297,10 +257,6 @@ class MetadataTest(fixtures.TablesTest):
             )
             assert columns == []
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     @pytest.mark.parametrize(
         "schema,table",
         [
@@ -318,10 +274,6 @@ class MetadataTest(fixtures.TablesTest):
             with pytest.raises(NoSuchTableError):
                 dialect.get_pk_constraint(connection=c, table_name=table, schema=schema)
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_pk_constraint(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
@@ -335,10 +287,6 @@ class MetadataTest(fixtures.TablesTest):
                 "pid2",
             ] and pk_constraint["name"].startswith("sys_")
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_pk_constraint_table_name_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
@@ -349,10 +297,6 @@ class MetadataTest(fixtures.TablesTest):
             )
             assert pk_constraint is None
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     @pytest.mark.parametrize(
         "schema,table",
         [
@@ -370,10 +314,6 @@ class MetadataTest(fixtures.TablesTest):
             with pytest.raises(NoSuchTableError):
                 dialect.get_foreign_keys(connection=c, table_name=table, schema=schema)
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_foreign_keys(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
@@ -394,10 +334,6 @@ class MetadataTest(fixtures.TablesTest):
 
             assert foreign_keys == expected
 
-    @pytest.mark.parametrize(
-        "engine_name",
-        [ENGINE_NONE_DATABASE, ENGINE_SCHEMA_DATABASE, ENGINE_SCHEMA_2_DATABASE],
-    )
     def test_get_foreign_keys_table_name_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect

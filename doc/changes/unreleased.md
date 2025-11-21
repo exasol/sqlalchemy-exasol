@@ -28,3 +28,4 @@ strings should be altered to start with `exa+websocket://`.
 - #652: Reinstated `sqlalchemy` tests after minor modifications to work for Exasol:
   - `HasTableTest.test_has_table_cache`
   - `RowCountTest.test_non_rowcount_scenarios_no_raise`
+- #658: Updated to `exasol-toolbox` 3.0.0

@@ -1,5 +1,3 @@
-from typing import Union
-
 import pytest
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
@@ -13,7 +11,7 @@ def set_kwargs(
     tls: bool = True,
     certificate_validation: bool = True,
     **kwargs,
-) -> dict[str, Union[str, bool]]:
+) -> dict[str, str | bool]:
     return {
         "dsn": dsn,
         "tls": tls,

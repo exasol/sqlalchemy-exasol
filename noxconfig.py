@@ -55,7 +55,4 @@ class Config(BaseConfig):
     plugins: list = [StartDB, StopDB]
 
 
-PROJECT_CONFIG = Config(
-    # PTB 1.12.0 still supports Python 3.9, so we override the python_versions
-    python_versions=("3.10", "3.11", "3.12", "3.13"),
-)
+PROJECT_CONFIG = Config()

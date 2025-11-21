@@ -7,10 +7,7 @@ import pytest
 import sqlalchemy as sa
 from pyexasol import ExaQueryError
 from sqlalchemy import Inspector
-from sqlalchemy.exc import (
-    CompileError,
-    DBAPIError,
-)
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.schema import (
     DDL,
     Index,

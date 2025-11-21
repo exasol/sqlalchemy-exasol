@@ -188,9 +188,12 @@ class MetadataTest(fixtures.TablesTest):
             pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
         ],
     )
-    def test_get_columns_raises_exception_for_non_existing_entities(
+    def test_get_columns_raises_exception_for_non_existing_db_objects(
         self, schema, table, engine_name
     ):
+        """
+        Either schema or table might be missing.
+        """
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             with pytest.raises(NoSuchTableError):
@@ -267,7 +270,7 @@ class MetadataTest(fixtures.TablesTest):
             pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
         ],
     )
-    def test_get_pk_constraint_raises_exception_for_non_existing_entities(
+    def test_get_pk_constraint_raises_exception_for_non_existing_db_objects(
         self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:
@@ -307,7 +310,7 @@ class MetadataTest(fixtures.TablesTest):
             pytest.param("NOT_A_SCHEMA", "s", id="not existing schema"),
         ],
     )
-    def test_get_foreign_keys_raises_exception_for_non_existing_entities(
+    def test_get_foreign_keys_raises_exception_for_non_existing_db_objects(
         self, schema, table, engine_name
     ):
         with self.engine_map[engine_name].begin() as c:

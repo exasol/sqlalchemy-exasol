@@ -7,6 +7,10 @@ import pytest
 import sqlalchemy as sa
 from pyexasol import ExaQueryError
 from sqlalchemy import Inspector
+from sqlalchemy.exc import (
+    CompileError,
+    DBAPIError,
+)
 from sqlalchemy.schema import (
     DDL,
     Index,
@@ -93,7 +97,7 @@ class RowFetchTest(_RowFetchTest):
     )
 
     @testing.config.requirements.duplicate_names_in_cursor_description
-    @pytest.mark.xfail(reason=RATIONAL, strict=True)
+    @pytest.mark.xfail(reason=RATIONAL, raises=DBAPIError, strict=True)
     def test_row_with_dupe_names(self, connection):
         super().test_row_with_dupe_names(connection)
 
@@ -133,6 +137,7 @@ class HasTableTest(_HasTableTest):
 class InsertBehaviorTest(_InsertBehaviorTest):
     @pytest.mark.xfail(
         reason="This currently isn't supported by the websocket protocol L3-1064.",
+        raises=TypeError,
         strict=True,
     )
     @testing.requires.empty_inserts_executemany
@@ -502,12 +507,12 @@ class ExceptionTest(_ExceptionTest):
       - https://github.com/exasol/sqlalchemy-exasol/issues/120
     """
 
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=RATIONALE, raises=DBAPIError, strict=True)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error(self):
         super().test_integrity_error()
 
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=RATIONALE, raises=DBAPIError, strict=True)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error_raw_sql(self):
         """
@@ -519,7 +524,7 @@ class ExceptionTest(_ExceptionTest):
             assert_raises(exc.IntegrityError, conn.execute, insert)
 
 
-@pytest.mark.xfail(reason=XfailRationale.QUOTING.value, strict=True)
+@pytest.mark.xfail(reason=XfailRationale.QUOTING.value, raises=DBAPIError, strict=True)
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):
     pass
 
@@ -530,11 +535,11 @@ class NumericTest(_NumericTest):
     Float & Double. Thus, we expect this test to fail.
     """
 
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=RATIONALE, raises=AssertionError, strict=True)
     @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
     @testing.requires.float_is_numeric
     def test_float_is_not_numeric(self, connection, cls_):
-        super().test_float_is_not_numeric()
+        super().test_float_is_not_numeric(connection, cls_)
 
 
 class DifficultParametersTest(_DifficultParametersTest):

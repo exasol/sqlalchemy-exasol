@@ -25,3 +25,6 @@ strings should be altered to start with `exa+websocket://`.
   - `ComponentReflectionTest.test_get_multi_foreign_keys`
   - `ComponentReflectionTest.test_get_multi_pk_constraint`
   - `ComponentReflectionTest.test_get_view_definition_does_not_exist`
+- #652: Reinstated `sqlalchemy` tests after minor modifications to work for Exasol:
+  - `HasTableTest.test_has_table_cache`
+  - `RowCountTest.test_non_rowcount_scenarios_no_raise`

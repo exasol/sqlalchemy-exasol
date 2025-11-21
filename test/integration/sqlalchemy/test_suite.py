@@ -1,18 +1,22 @@
 # import all SQLAlchemy tests for this dialect
 from enum import Enum
 from inspect import cleandoc
+from typing import NamedTuple
 
 import pytest
 import sqlalchemy as sa
 from pyexasol import ExaQueryError
 from sqlalchemy import Inspector
+from sqlalchemy.exc import (
+    CompileError,
+    DBAPIError,
+)
 from sqlalchemy.schema import (
     DDL,
     Index,
 )
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
-from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
@@ -35,12 +39,6 @@ the test or that test condition.
 from sqlalchemy.testing.suite import *  # noqa: F403, F401
 from sqlalchemy.testing.suite import testing
 
-# Tests marked with xfail and this reason are failing after updating to SQLAlchemy 2.x.
-# We will investigate and fix as many as possible in next PRs.
-BREAKING_CHANGES_SQL_ALCHEMY_2x = (
-    "Failing test after updating to SQLAlchemy 2.x. To be investigated."
-)
-
 
 class XfailRationale(str, Enum):
     MANUAL_INDEX = cleandoc(
@@ -55,9 +53,6 @@ class XfailRationale(str, Enum):
         and double quotes. Since this feature is not relevant to the
         Exasol dialect, the entire suite is set to xfail. For further info, see:
         https://github.com/sqlalchemy/sqlalchemy/issues/5456"""
-    )
-    SELECT_LIST = cleandoc(
-        """Exasol does not allow EXISTS or IN predicates as part of the select list."""
     )
 
 
@@ -98,7 +93,7 @@ class RowFetchTest(_RowFetchTest):
     )
 
     @testing.config.requirements.duplicate_names_in_cursor_description
-    @pytest.mark.xfail(reason=RATIONAL, strict=True)
+    @pytest.mark.xfail(reason=RATIONAL, raises=DBAPIError, strict=True)
     def test_row_with_dupe_names(self, connection):
         super().test_row_with_dupe_names(connection)
 
@@ -134,14 +129,11 @@ class HasTableTest(_HasTableTest):
                 DDL("DROP VIEW %s.vv" % (config.test_schema)),
             )
 
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_has_table_cache(self, connection):
-        super().test_has_table_cache(connection)
-
 
 class InsertBehaviorTest(_InsertBehaviorTest):
     @pytest.mark.xfail(
         reason="This currently isn't supported by the websocket protocol L3-1064.",
+        raises=TypeError,
         strict=True,
     )
     @testing.requires.empty_inserts_executemany
@@ -149,11 +141,29 @@ class InsertBehaviorTest(_InsertBehaviorTest):
         super().test_empty_insert_multiple(connection)
 
 
+class ReplacementVariation(NamedTuple):
+    update: bool = False
+    delete: bool = False
+    insert: bool = False
+    select: bool = False
+
+
 class RowCountTest(_RowCountTest):
-    @pytest.mark.xfail(reason=BREAKING_CHANGES_SQL_ALCHEMY_2x, strict=True)
-    def test_non_rowcount_scenarios_no_raise(self):
-        # says cursor already closed so very likely need to fix!
-        super().test_non_rowcount_scenarios_no_raise()
+    # @testing.variation has a complicated structure. It's unclear, but at this time,
+    # "insert" and "select" are not being properly set to include .update values
+    # Thus, a substitute with NamedTuple is used here to generate the equivalent.
+    @pytest.mark.parametrize(
+        "statement",
+        [
+            ReplacementVariation(update=True),
+            ReplacementVariation(delete=True),
+            ReplacementVariation(insert=True),
+            ReplacementVariation(select=True),
+        ],
+    )
+    @testing.variation("close_first", [True, False])
+    def test_non_rowcount_scenarios_no_raise(self, connection, statement, close_first):
+        super().test_non_rowcount_scenarios_no_raise(connection, statement, close_first)
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):
@@ -478,12 +488,6 @@ class LongNameBlowoutTest(_LongNameBlowoutTest):
                 eq_(overlap, reflected_name)
 
 
-class CompoundSelectTest(_CompoundSelectTest):
-    @pytest.mark.xfail(reason=XfailRationale.SELECT_LIST.value, strict=True)
-    def test_null_in_empty_set_is_false(self, connection):
-        self.test_null_in_empty_set_is_false(connection)
-
-
 class ExceptionTest(_ExceptionTest):
     RATIONALE = """
     The websocket-based dialect does not yet support raising an
@@ -493,12 +497,12 @@ class ExceptionTest(_ExceptionTest):
       - https://github.com/exasol/sqlalchemy-exasol/issues/120
     """
 
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=RATIONALE, raises=DBAPIError, strict=True)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error(self):
         super().test_integrity_error()
 
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=RATIONALE, raises=DBAPIError, strict=True)
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error_raw_sql(self):
         """
@@ -510,7 +514,7 @@ class ExceptionTest(_ExceptionTest):
             assert_raises(exc.IntegrityError, conn.execute, insert)
 
 
-@pytest.mark.xfail(reason=XfailRationale.QUOTING.value, strict=True)
+@pytest.mark.xfail(reason=XfailRationale.QUOTING.value, raises=DBAPIError, strict=True)
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):
     pass
 
@@ -521,11 +525,11 @@ class NumericTest(_NumericTest):
     Float & Double. Thus, we expect this test to fail.
     """
 
-    @pytest.mark.xfail(reason=RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=RATIONALE, raises=AssertionError, strict=True)
     @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
     @testing.requires.float_is_numeric
     def test_float_is_not_numeric(self, connection, cls_):
-        super().test_float_is_not_numeric()
+        super().test_float_is_not_numeric(connection, cls_)
 
 
 class DifficultParametersTest(_DifficultParametersTest):

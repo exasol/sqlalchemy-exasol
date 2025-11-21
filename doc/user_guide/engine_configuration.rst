@@ -13,6 +13,7 @@ parsed, and thus, special characters must be properly escaped.
     and which characters need to be escaped for the :ref:`url_string`, see
     the `SQLAlchemy documentation <https://docs.sqlalchemy.org/en/20/core/engines.html>`__.
 
+    Check out which parameters are suggested to include for certain scenarios in :ref:`suggested_parameters`.
     Specific parameters for the SQLAlchemy-Exasol dialect are given in :ref:`dialect_specific_params`.
 
 
@@ -58,6 +59,31 @@ URL string
         url_string = f"exa+websocket://{user}:{password}@{host}:{port}/{schema}{query}"
 
         create_engine(url_string)
+
+.. _suggested_parameters:
+
+Suggested Parameters
+--------------------
+
+In the table below are selected parameters that are suggested for specific scenarios.
+The examples are given for :ref:`instance_url` where ``query`` is a keyword
+argument supplied to the ``URL.create()`` constructor.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Name
+     - Example
+     - Description
+   * - CONNECTIONLCALL
+     - .. code-block:: python
+
+         query={
+          "CONNECTIONLCALL": "en_US.UTF-8"
+         }
+     - To avoid errors due to different code pages used by the client process (Python)
+       and the Exasol driver, this is recommended to use, particular for Unix-based
+       systems.
 
 .. _dialect_specific_params:
 

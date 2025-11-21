@@ -3,23 +3,8 @@
 :octicon:`person` User Guide
 ============================
 
-SQLAlchemy-Exasol is a dialect extension for SQLAlchemy, implementing support for Exasol databases.
-
-.. note::
-    For more details on SQLAlchemy, please consult its `documentation <https://docs.sqlalchemy.org/en/14/>`_.
-
 Getting Started
 ~~~~~~~~~~~~~~~
-
-#. Install the `SQLAlchemy-Exasol extension <https://pypi.org/project/sqlalchemy_exasol/>`_
-
-    .. code-block:: shell
-
-        $ pip install sqlalchemy-exasol
-
-    .. note::
-
-        SQLAlchemy will be installed as well, as it is a required dependency for SQLAlchemy-Exasol.
 
 #. Execute queries
 

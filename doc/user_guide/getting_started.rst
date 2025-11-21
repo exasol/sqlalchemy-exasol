@@ -41,6 +41,28 @@ For a user's first steps, it is recommended to try out running basic queries on 
     beforehand in another DB-manipulation tool to ensure that the output you will
     receive is as desired (and not, i.e. millions of rows).
 
+    The example use the :ref:`instance_url` available since SQLAlchemy 1.4. It is still
+    possible to use a :ref:`url_string` instead.
+
+
+.. code-block:: python
+
+    from sqlalchemy import create_engine, text, URL
+
+    url_object = URL.create(
+        drivername="exa+websocket",
+        username="sys",
+        password="exasol",
+        host="127.0.0.1",
+        port="8563",
+    )
+
+    engine = create_engine(url_object)
+    # All literal text should be passed through `text()` before execution
+    sql_text = text("SELECT 42 FROM DUAL")
+    with engine.connect() as con:
+        result = con.execute(sql_text).fetchall()
+
 Diving Deeper
 -------------
 

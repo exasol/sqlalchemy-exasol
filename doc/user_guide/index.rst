@@ -3,6 +3,12 @@
 :octicon:`person` User Guide
 ============================
 
+.. toctree::
+    :maxdepth: 2
+
+    getting_started
+    engine_configuration
+
 Getting Started
 ~~~~~~~~~~~~~~~
 

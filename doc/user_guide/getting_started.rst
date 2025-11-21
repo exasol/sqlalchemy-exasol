@@ -66,4 +66,4 @@ For a user's first steps, it is recommended to try out running basic queries on 
 Diving Deeper
 -------------
 
-* For configuring usage, see :ref:`configuration`.
+* For information on setup options, see :ref:`configuration`.

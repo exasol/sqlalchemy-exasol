@@ -7,3 +7,4 @@ Configuration
     :maxdepth: 2
 
     engine_configuration
+    security

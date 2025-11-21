@@ -7,14 +7,14 @@
     :maxdepth: 2
 
     getting_started
-    engine_configuration
+    configuration/index
 
 Getting Started
 ~~~~~~~~~~~~~~~
 
 #. Execute queries
 
-    .. code-block:: python
+.. code-block:: python
 
         from sqlalchemy import create_engine, sql
 

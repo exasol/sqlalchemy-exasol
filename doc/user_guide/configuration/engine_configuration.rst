@@ -22,43 +22,43 @@ parsed, and thus, special characters must be properly escaped.
 Instance of ``URL``
 ^^^^^^^^^^^^^^^^^^^
 
-    .. code-block:: python
+.. code-block:: python
 
-        from sqlalchemy import create_engine, URL
+    from sqlalchemy import create_engine, URL
 
-        url_object = URL.create(
-            drivername="exa+websocket",
-            username="sys",
-            password="exasol",
-            host="127.0.0.1",
-            port="8563",
-            query={"AUTOCOMMIT": "y"},
-        )
+    url_object = URL.create(
+        drivername="exa+websocket",
+        username="sys",
+        password="exasol",
+        host="127.0.0.1",
+        port="8563",
+        query={"AUTOCOMMIT": "y"},
+    )
 
-        create_engine(url_object)
+    create_engine(url_object)
 
 .. _url_string:
 
 URL string
 ^^^^^^^^^^
 
-    .. code-block:: python
+.. code-block:: python
 
-        from sqlalchemy import create_engine
+    from sqlalchemy import create_engine
 
-        user = "sys"
-        password = "exasol"
-        host = "127.0.0.1"
-        port = "8563"
-        schema = "my_schema"
-        # All parameters specified in the query are of form NAME=value
-        # The first parameter in the query is preceded by a `?`.
-        # Additional parameters are preceded by a `&`.
-        query = "?AUTOCOMMIT=y"
+    user = "sys"
+    password = "exasol"
+    host = "127.0.0.1"
+    port = "8563"
+    schema = "my_schema"
+    # All parameters specified in the query are of form NAME=value
+    # The first parameter in the query is preceded by a `?`.
+    # Additional parameters are preceded by a `&`.
+    query = "?AUTOCOMMIT=y"
 
-        url_string = f"exa+websocket://{user}:{password}@{host}:{port}/{schema}{query}"
+    url_string = f"exa+websocket://{user}:{password}@{host}:{port}/{schema}{query}"
 
-        create_engine(url_string)
+    create_engine(url_string)
 
 .. _suggested_parameters:
 

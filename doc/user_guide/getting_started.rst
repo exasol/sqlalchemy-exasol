@@ -40,3 +40,8 @@ For a user's first steps, it is recommended to try out running basic queries on 
     Exasol database. If that is not the case, it is recommended to check your query
     beforehand in another DB-manipulation tool to ensure that the output you will
     receive is as desired (and not, i.e. millions of rows).
+
+Diving Deeper
+-------------
+
+* For configuring usage, see :ref:`configuration`.

@@ -84,6 +84,7 @@ filterwarnings = [
 markers = [
     "backend: backend tests.",
 ]
+xfail_strict = true
 
 [tool.black]
 line-length = 88

@@ -17,7 +17,6 @@ from sqlalchemy.schema import (
 )
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
-from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
@@ -54,9 +53,6 @@ class XfailRationale(str, Enum):
         and double quotes. Since this feature is not relevant to the
         Exasol dialect, the entire suite is set to xfail. For further info, see:
         https://github.com/sqlalchemy/sqlalchemy/issues/5456"""
-    )
-    SELECT_LIST = cleandoc(
-        """Exasol does not allow EXISTS or IN predicates as part of the select list."""
     )
 
 
@@ -490,12 +486,6 @@ class LongNameBlowoutTest(_LongNameBlowoutTest):
                 eq_(overlap[0:-5], reflected_name[0 : len(overlap) - 5])
             else:
                 eq_(overlap, reflected_name)
-
-
-class CompoundSelectTest(_CompoundSelectTest):
-    @pytest.mark.xfail(reason=XfailRationale.SELECT_LIST.value, strict=True)
-    def test_null_in_empty_set_is_false(self, connection):
-        self.test_null_in_empty_set_is_false(connection)
 
 
 class ExceptionTest(_ExceptionTest):

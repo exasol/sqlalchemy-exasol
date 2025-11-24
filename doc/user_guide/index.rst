@@ -64,39 +64,6 @@ Further Examples
         result = con.execute(sql.text(query)).fetchall()
 
 
-.. code-block:: python
-
-    from sqlalchemy import create_engine
-
-    """
-    ATTENTION:
-    In terms of security it is NEVER a good idea to disable certificate validation!
-    In rare cases, it may be handy for non-security related reasons.
-    That said, if you are not 100% sure about your scenario, stick with the secure defaults.
-    In most cases, having a valid fingerprint, certificate and/or configuring the truststore(s)
-    appropriately is the best/correct solution.
-    """
-    user = "sys"
-    password = "exasol"
-    host = "127.0.0.1"
-    port = "8563
-        query={"SSLCertificate":"SSL_VERIFY_NONE"}
-
-
-    # To disable certificate validation -> NOT recommended
-    ssl_certificate = "SSL_VERIFY_NONE"
-    engine = create_engine(f"exa+websocket://{user}:{password}@{host}:{port}?CONNECTIONLCALL=en_US.UTF-8&SSLCertificate={ssl_certificate}")
-    with engine.connect() as con:
-        ...
-
-    # To validate via fingerprint
-    fingerprint = "C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028"
-    url = f"exa+websocket://{user}:{password}@{host}:{port}?CONNECTIONLCALL=en_US.UTF-8&FINGERPRINT={fingerprint}"
-    engine = create_engine(url)
-    with engine.connect() as con:
-        ...
-
-
 General Notes
 ~~~~~~~~~~~~~
 

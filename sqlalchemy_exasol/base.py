@@ -32,7 +32,7 @@ Identifier Casing
 
 Exasol mimics the behavior of Oracle. Thus, for this dialect implementation
 the Oracle dialect was taken as a reference.
-In Exasol, the data dictionary represents all case insensitive identifier names
+In Exasol, the data dictionary represents all case-insensitive identifier names
 using UPPERCASE text.SQLAlchemy on the other hand considers an all-lower case
 identifiers to be case-insensitive. The Oracle dialect converts identifier to
 and from those two formats during schema level communication, such as reflection

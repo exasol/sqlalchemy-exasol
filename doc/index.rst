@@ -29,6 +29,6 @@ Documentation of SQLAlchemy-Exasol
    :hidden:
 
    user_guide/index
-   developer_guide/index
+   developer_guide
    faq
    changes/changelog

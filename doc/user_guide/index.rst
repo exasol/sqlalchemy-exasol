@@ -44,26 +44,6 @@ Getting Started
         ...
 
 
-Further Examples
-~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine, sql
-
-    user = "sys"
-    password = "exasol"
-    host = "127.0.0.1"
-    port = "8563
-    schema = "my_schema"
-
-    url = f"exa+websocket://{user}:{password}@{host}:{port}/{schema}?CONNECTIONLCALL=en_US.UTF-8"
-    engine = create_engine(url)
-    query = "select 42 from dual"
-    with engine.connect() as con:
-        result = con.execute(sql.text(query)).fetchall()
-
-
 General Notes
 ~~~~~~~~~~~~~
 

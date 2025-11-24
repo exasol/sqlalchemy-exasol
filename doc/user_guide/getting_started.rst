@@ -68,6 +68,6 @@ Diving Deeper
 
 * For information on setup options, see :ref:`configuration`.
 * With SQLAlchemy 2.x, there are more options regarding sessions and how commits
-behave within those, it is recommended to check out the
-`Session Transaction <https://docs.sqlalchemy.org/en/20/orm/session_transaction.html>`__ page
-and adapt your code according to the best practices.
+  behave within those, it is recommended to check out the
+  `Session Transaction <https://docs.sqlalchemy.org/en/20/orm/session_transaction.html>`__ page
+  and adapt your code according to the best practices.

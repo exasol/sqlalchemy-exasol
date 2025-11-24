@@ -116,7 +116,7 @@ Handling in SQLAlchemy-Exasol
 .. _fingerprint_verification:
 
 Fingerprint Verification
-"""""""""""""""""""""""""""
+""""""""""""""""""""""""
 
 Similar to JDBC / ODBC drivers, SQLAlchemy-Exasol supports fingerprint verification.
 For more information, see the ODBC entry on `fingerprint <https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/using_odbc.htm?Highlight=prepared%20statement#fingerprint>`__.
@@ -159,12 +159,12 @@ Additionally, you can **disable the certificate check completely** by setting "n
     However, this should **NEVER** be used for production.
 
 
-Passing a Certificate Location into the Connection
-""""""""""""""""""""""""""""""""""""""""""""""""""
+Custom Certificate Location
+"""""""""""""""""""""""""""
 
-At this time, it is not possible to specify a unique certificate location into the
-connection URL. This is supported directly by PyExasol and is a feature that could
-be supported in SQLAlchemy-Exasol.
+At this time, it is not possible to specify a custom certificate location into the
+connection URL. This is supported by the backend code (PyExasol) and is a feature that
+could be added to SQLAlchemy-Exasol.
 
 .. _disable_certificate_verification:
 

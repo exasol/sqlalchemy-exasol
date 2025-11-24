@@ -71,17 +71,39 @@ To run a specific task, execute the following command:
 
 You can modify or add a new task by editing the ``noxfile.py`` file.
 
-Tests
------
+Running tests
+-------------
 
-.. attention::
+.. note::
+    If you manually run some integration tests or want to try a database-related operation
+    out:
 
-    If something is not working or unclear, you may want to look into the CI/CD action_ files.
+    .. code-block:: shell
+
+        # to start a test database
+        poetry run -- nox -s db:start -- --db-version <db_version>
+        # to stop a test database
+        poetry run -- nox -s db:stop
+
+Unit Tests
+++++++++++
+
+The integration tests are located within ``test/unit``.
+
+.. code-block:: shell
+
+    poetry run -- nox -s test:unit
+
 
 Integration Tests
 +++++++++++++++++
 
 The integration tests are located within ``test/integration``.
+
+.. attention::
+
+   A Docker container with a test database needs to be started for the integration tests.
+   If a test group is not working or unclear, you may want to look into the CI/CD action_ files.
 
 They are split into three groups to reduce the likelihood of test side effects:
 

@@ -105,10 +105,52 @@ argument supplied to the ``URL.create()`` constructor.
          query={
           "AUTOCOMMIT": "y"
          }
-     - This indicates if the connection should automatically perform commits or not.
-       The parsed value is case insensitive:
+     - This indicates if the connection should automatically commits or not.
+       The parsed value is case insensitive.
 
         * To enable autocommit, specify ``"y"`` or ``"yes"``.
         * To disable autocommit, specify ``"n"`` or ``"no"``.
 
        The default is for autocommit to be enabled (``"y"``).
+   * - ENCRYPTION
+     - .. code-block:: python
+
+         query={
+          "ENCRYPTION": "y"
+         }
+     - This indicates if the connection should be encrypted or not.
+       The parsed value is case insensitive.
+
+        * To enable TLS encryption, specify ``"y"`` or ``"yes"``.
+        * To disable TLS encryption (not recommended), specify ``"n"`` or ``"no"``.
+
+       The default is for TLS encryption to be enabled (``"y"``). For more information
+       about TLS encryption, please see the :ref:`security` page.
+   * - FINGERPRINT
+     - .. code-block:: python
+
+         query={
+          "FINGERPRINT": "<fingerprint>"
+         }
+     - An alternate to SSL certificate validation is to validate the connection
+       via a fingerprint.
+
+        * By default, fingerprint validation is not active.
+        * To use fingerprint validation, provide your fingerprint value
+          (i.e. "0ACD07D4E9CEEB122773A71B9C3BD01CE49FC99901DE7C0E0030C942805BA64C").
+
+       For more information about fingerprint validation, please see the :ref:`security`
+       page.
+   * - SSLCertificate
+     - .. code-block:: python
+
+         query={
+          "SSLCertificate": "SSL_VERIFY_NONE"
+         }
+     - This indicates if the connection should validate the SSL certificate or not.
+
+        * The default behavior is to require SSL certificate validation.
+        * To disable SSL certificate validation (not recommended), specify ``"SSL_VERIFY_NONE"``.
+
+       For more information about validating the SSL certificate, please see
+       the :ref:`security` page.

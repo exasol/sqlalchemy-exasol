@@ -4,6 +4,11 @@ This chapter contains information helpful when you want to engage in development
 ``sqlalchemy-exasol`` provides an Exasol dialect for ``sqlalchemy``. For further information
 on the creation of a dialect, see `SQLAlchemy's README.dialects.rst <https://github.com/sqlalchemy/sqlalchemy/blob/main/README.dialects.rst>`__.
 
+.. note::
+    This project uses the `features of the Exasol-Toolbox <https://exasol.github.io/python-toolbox/main/user_guide/features/index.html>`__.
+    These features include: common Git hooks, CI/CD templates, common
+    task sessions via ``nox``, a standardized release preparation & triggering, etc.
+
 Prerequisites
 -------------
 If you want to engage in development of this project, you should have the following libraries and tools available.
@@ -27,7 +32,7 @@ Example: Set up an English locale
     export LANG=en_US.UTF-8
 
 Set up Your Workspace
----------------------
++++++++++++++++++++++
 
 #. Get the Source Code
     .. code-block::
@@ -49,21 +54,20 @@ Set up Your Workspace
 
 Task Runner (Nox)
 -----------------
-Most repeating and complex tasks within this project are automated using the task runner `nox`.
-To get an overview about the available `tasks` just run:
+Most repeating and complex tasks within this project are automated using the session runner `nox`.
+To get an overview about the available ``sessions`` just run:
 
 .. code-block::
 
-    nox -l
+    poetry run -- nox -l
 
-All task(s) which will be run by default will have a leading `*`.
-In order to run a specific task execute the following command:
+To run a specific task, execute the following command:
 
 .. code-block::
 
-    nox -s <task-name>
+    poetry run -- nox -s <task-name>
 
-You can modify or add new task by editing the file `noxfile.py`.
+You can modify or add a new task by editing the ``noxfile.py`` file.
 
 Tests
 -----

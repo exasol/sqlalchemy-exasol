@@ -125,22 +125,22 @@ argument supplied to the ``URL.create()`` constructor.
         * To disable TLS encryption (not recommended), specify ``"n"`` or ``"no"``.
 
        The default is for TLS encryption to be enabled (``"y"``). For more information
-       about TLS encryption, please see the :ref:`security` page.
+       about TLS encryption, please see :ref:`tls`.
    * - FINGERPRINT
      - .. code-block:: python
 
          query={
           "FINGERPRINT": "<fingerprint>"
          }
-     - An alternate to SSL certificate validation is to validate the connection
+     - An alternate to SSL certificate verification is to validate the connection
        via a fingerprint.
 
-        * By default, fingerprint validation is not active.
-        * To use fingerprint validation, provide your fingerprint value
+        * By default, fingerprint verification is not active.
+        * To use fingerprint verification, provide your fingerprint value
           (i.e. "0ACD07D4E9CEEB122773A71B9C3BD01CE49FC99901DE7C0E0030C942805BA64C").
 
-       For more information about fingerprint validation, please see the :ref:`security`
-       page.
+       For more information about fingerprint verification, please see
+       :ref:`fingerprint_verification`.
    * - SSLCertificate
      - .. code-block:: python
 
@@ -149,8 +149,9 @@ argument supplied to the ``URL.create()`` constructor.
          }
      - This indicates if the connection should validate the SSL certificate or not.
 
-        * The default behavior is to require SSL certificate validation.
-        * To disable SSL certificate validation (not recommended), specify ``"SSL_VERIFY_NONE"``.
+        * The default behavior is to require SSL certificate verification.
+        * To disable SSL certificate verification (not recommended and not secure),
+          specify ``"SSL_VERIFY_NONE"``.
 
        For more information about validating the SSL certificate, please see
-       the :ref:`security` page.
+       :ref:`disable_certificate_verification`.

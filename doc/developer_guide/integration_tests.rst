@@ -40,7 +40,7 @@ two groups.
 
 
 Setup
-=====
++++++
 
 Integration testing automatically is done by GitHub Actions contained in this repository, which provide a CI/CD pipeline to test, build, and deploy sqlalchemy_exasol to PyPI.
 All important tasks within the actions are using **nox**, which also can be used locally.

@@ -29,36 +29,22 @@ Example: Set up an English locale
 Set up Your Workspace
 ---------------------
 
-Get the Source Code
-+++++++++++++++++++
+#. Get the Source Code
+    .. code-block::
 
-.. code-block::
+        git clone https://github.com/exasol/sqlalchemy-exasol.git
 
-    git clone https://github.com/exasol/sqlalchemy-exasol.git
+#. Set up the Tooling & Virtual Environment
+    .. code-block::
 
-Set up the Tooling & Virtual Environment
-++++++++++++++++++++++++++++++++++++++++
+        poetry env use python3.10
+        poetry install
 
-.. code-block::
 
-    poetry shell
-    poetry install
-
-.. warning::
-
-    make sure you have the poetry shell active whenever you want to work in the workspace
-
-Install the Git Commit Hooks
-++++++++++++++++++++++++++++
-
-.. code-block::
-
-    pre-commit install
-
-.. note::
-
-    This may need to be rerun if you want or do add non standard hook types, for further details
-    see `pre-commit install -h`.
+#. Install the Git Hooks
+    A `.pre-commit-config.yaml` is included in the source code. Follow the instructions
+    provided on the Exasol-Toolbox's page for
+    `Git hooks <https://exasol.github.io/python-toolbox/main/user_guide/features/git_hooks/index.html>`__.
 
 
 Task Runner (Nox)

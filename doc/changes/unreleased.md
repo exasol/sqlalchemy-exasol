@@ -29,3 +29,7 @@ strings should be altered to start with `exa+websocket://`.
   - `HasTableTest.test_has_table_cache`
   - `RowCountTest.test_non_rowcount_scenarios_no_raise`
 - #658: Updated to `exasol-toolbox` 3.0.0
+
+## Documentation
+
+- #663: Updated developer documentation

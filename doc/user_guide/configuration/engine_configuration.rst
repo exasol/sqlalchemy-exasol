@@ -1,6 +1,8 @@
 Engine Configuration
 =====================
 
+.. _specifying_url:
+
 Options for Specifying the URL
 ------------------------------
 
@@ -26,13 +28,22 @@ Instance of ``URL``
 
     from sqlalchemy import create_engine, URL
 
+    # All parameters, which are not keyword arguments for `URL.create`,
+    # should be specified in the `query` dictionary.
+    # For two specified parameters, this would follow this pattern:
+    #   query = {"<Keyword>": "<value>", "<Keyword2>": "<value2>"}
+    query={
+        "AUTOCOMMIT": "y",
+        "CONNECTIONLCALL": "en_US.UTF-8"
+    }
+
     url_object = URL.create(
         drivername="exa+websocket",
         username="sys",
         password="exasol",
         host="127.0.0.1",
         port="8563",
-        query={"AUTOCOMMIT": "y"},
+        query=query,
     )
 
     create_engine(url_object)
@@ -51,10 +62,13 @@ URL string
     host = "127.0.0.1"
     port = "8563"
     schema = "my_schema"
-    # All parameters specified in the query are of form NAME=value
+    # All parameters, which are not keyword arguments for `URL.create`,
+    # should be specified in `query` and are of the form NAME=value
     # The first parameter in the query is preceded by a `?`.
     # Additional parameters are preceded by a `&`.
-    query = "?AUTOCOMMIT=y"
+    # For example, two parameters would follow this pattern:
+    #    query = "?<Keyword>=<value>&<Keyword2>=<value2>"
+    query = "?AUTOCOMMIT=y&CONNECTIONLCALL=en_US.UTF-8"
 
     url_string = f"exa+websocket://{username}:{password}@{host}:{port}/{schema}{query}"
 
@@ -65,91 +79,63 @@ URL string
 Suggested Parameters
 --------------------
 
-The table below suggests selected parameters for specific scenarios and
-gives an example for :ref:`instance_url`, passing ``query`` as a keyword
-argument to the ``URL.create()`` constructor.
+The table below suggests selected parameters for specific scenarios and gives the values
+as needed for the :ref:`instance_url`. One or more specified parameters may be passed to
+the connection URL as described in :ref:`specifying_url`.
 
 .. list-table::
    :header-rows: 1
 
-   * - Name
-     - Example
+   * - Keyword
      - Description
    * - CONNECTIONLCALL
-     - .. code-block:: python
-
-         query={
-          "CONNECTIONLCALL": "en_US.UTF-8"
-         }
      - To avoid errors due to different code pages used by the client process (Python)
-       and the Exasol driver, this is recommended to use, particular for Unix-based
-       systems.
+       and the Exasol driver, it is recommend to use ``"en_US.UTF-8"``, particularly for
+       Unix-based systems.
 
 .. _dialect_specific_params:
 
 Dialect-Specific Parameters
 ---------------------------
 The table below lists additional parameters that are specific to the SQLAlchemy-Exasol
-dialect and gives an example for :ref:`instance_url`, passing ``query`` as a keyword
-argument to the ``URL.create()`` constructor.
+dialect and gives the values as needed for the :ref:`instance_url`. One or more
+specified parameters may be passed to the connection URL as described in :ref:`specifying_url`.
 
 .. list-table::
    :header-rows: 1
 
-   * - Name
-     - Example
+   * - Keyword
      - Description
    * - AUTOCOMMIT
-     - .. code-block:: python
-
-         query={
-          "AUTOCOMMIT": "y"
-         }
      - This indicates if the connection automatically commits or not.
        The parsed value is case-insensitive.
 
-        * To enable autocommit, specify ``"y"`` or ``"yes"``.
+        * (default) To enable autocommit, specify ``"y"`` or ``"yes"``.
         * To disable autocommit, specify ``"n"`` or ``"no"``.
 
-       The default is for autocommit to be enabled (``"y"``).
    * - ENCRYPTION
-     - .. code-block:: python
-
-         query={
-          "ENCRYPTION": "y"
-         }
      - This indicates if the connection should be encrypted or not.
        The parsed value is case-insensitive.
 
-        * To enable TLS encryption, specify ``"y"`` or ``"yes"``.
+        * (default) To enable TLS encryption, specify ``"y"`` or ``"yes"``.
         * To disable TLS encryption (not recommended), specify ``"n"`` or ``"no"``.
 
-       The default is for TLS encryption to be enabled (``"y"``). For more information
-       about TLS encryption, please see :ref:`tls`.
+       For more information about TLS encryption, please see :ref:`tls`.
    * - FINGERPRINT
-     - .. code-block:: python
-
-         query={
-          "FINGERPRINT": "<fingerprint>"
-         }
      - An alternate to SSL certificate verification is to verify the connection
        via a fingerprint.
 
-        * By default, fingerprint verification is not active.
+        * (default) Fingerprint verification is not active.
         * To use fingerprint verification, provide your fingerprint value
-          (i.e. "0ACD07D4E9CEEB122773A71B9C3BD01CE49FC99901DE7C0E0030C942805BA64C").
+          (i.e. ``"0ACD07D4E9CEEB122773A71B9C3BD01CE49FC99901DE7C0E0030C942805BA64C"``).
 
        For more information about fingerprint verification, please see
        :ref:`fingerprint_verification`.
    * - SSLCertificate
-     - .. code-block:: python
-
-         query={
-          "SSLCertificate": "SSL_VERIFY_NONE"
-         }
      - This indicates if the connection should verify the SSL certificate or not.
 
-        * The default behavior is to require SSL certificate verification.
+        * The default behavior is to require SSL certificate verification. There
+          is currently not an option to specify this further as enabled.
         * To disable SSL certificate verification (not recommended and not secure),
           specify ``"SSL_VERIFY_NONE"``. This value is case-insensitive.
 

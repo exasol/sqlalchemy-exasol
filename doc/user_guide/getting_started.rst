@@ -71,3 +71,16 @@ Diving Deeper
   behave within those, it is recommended to check out the
   `Session Transaction <https://docs.sqlalchemy.org/en/20/orm/session_transaction.html>`__ page
   and adapt your code according to the best practices.
+
+General Tips
+------------
+
+* Always use lowercase identifiers for schema, table, and column names. SQLAlchemy
+  treats lowercase identifiers as case-insensitive. The dialect takes care of
+  transforming the identifier into a case-insensitive representation for the specific
+  database. In the case of Exasol, this is uppercase.
+
+Known Issues
+------------
+* Insert
+    - Insert multiple empty rows via prepared statements does not work in all cases

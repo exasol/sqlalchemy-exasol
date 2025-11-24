@@ -56,7 +56,7 @@ Set up Your Workspace
 
 Task Runner (Nox)
 -----------------
-Most repeating and complex tasks within this project are automated using the session runner `nox`.
+Most repeating and complex tasks within this project are automated using the session runner ``nox``.
 To get an overview about the available ``sessions`` just run:
 
 .. code-block::
@@ -78,29 +78,52 @@ Tests
 
     If something is not working or unclear, you may want to look into the CI/CD action_ files.
 
-Integration Test
-++++++++++++++++
+Integration Tests
++++++++++++++++++
 
-The integration tests are located within `test/integration`. They are split in
-two groups.
+The integration tests are located within ``test/integration``.
+
+They are split into three groups to reduce the likelihood of test side effects:
 
 #. The SQLAlchemy conformance test suite
 
-    The sqlalchemy conformance test suite is provided and maintained by the sqlalchemy project and intended to support third party dialect developers.
-    For further details see also `README.dialects.rst <https://docs.exasol.com/db/latest/sql_reference.htm>`_.
+    The SQLAlchemy conformance test suite is provided and maintained by the sqlalchemy project and intended to support third party dialect developers.
+    For further details, see also `README.dialects.rst <https://docs.exasol.com/db/latest/sql_reference.htm>`_.
+    In general, if Exasol does not support a feature for a test, it is preferred to use a
+    ``pytest.mark.xfail`` marker (rather than to skip the test or modify the
+    ``sqlalchemy_exasol.requirements.py``). An ``xfail`` provides continuous feedback
+    that an expected error is being raised, and it is preferred as both SQLAlchemy and our
+    Exasol Databases are being updated, and it is possible that a future version
+    may include this feature or require minor modifications for this to work.
+
+    .. code-block:: shell
+
+        poetry run -- nox -s test:sqla -- --connector websocket
 
 #. Our custom Exasol test suite
 
-    The Exasol test suite consists of test written and maintained by exasol.
+    The Exasol test suite consists of test written and maintained by Exasol. These
+    have a slight reliance upon the generic classes provided by the SQLAlchemy
+    conformance test suite.
 
-.. note::
+    .. code-block:: shell
 
-    In order to reduce the likelihood of test side effects, the `sqlalchemy` and the `exasol` test suites
-    are executed in separate pytest test runs.
+        poetry run -- nox -s test:exasol -- --connector websocket
+
+#. Regression test suite
+
+    This is an extension to our custom Exasol test suite that ensures that previously
+    reported bugs are not experienced by customers as there are upgrades to the
+    SQLAlchemy API and Exasol databases.
+
+    .. code-block:: shell
+
+        poetry run -- nox -s test:regression -- --connector websocket
+
 
 .. attention::
 
-    The exasol database does do implicit schema/context changes (open & close schema)
+    The Exasol database does do implicit schema/context changes (open & close schema)
     in certain scenarios. Keep this in mind when setting up (writing) tests.
 
     #. CREATE SCHEMA implicitly changes the CURRENT_SCHEMA context
@@ -109,9 +132,9 @@ two groups.
 
     #. DROP SCHEMA sometimes switches the context to <null>
 
-        If the CURRENT_SCHEMA is dropped an implicit context switch to <null> is done
+        If the CURRENT_SCHEMA is dropped, an implicit context switch to <null> is done
 
-    For further details have a look at the `Exasol-Documentation <https://docs.exasol.com/db/latest/sql_reference.htm>`_.
+    For further details, have a look at the `Exasol-Documentation <https://docs.exasol.com/db/latest/sql_reference.htm>`_.
 
     .. note::
 

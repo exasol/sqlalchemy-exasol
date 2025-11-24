@@ -11,6 +11,11 @@ authentication methods and require a TLS/SSL certificate setup. Throughout this
 guide on security, an overview of the security features of SQLAlchemy-Exasol is
 provided.
 
+.. note::
+    While PyExasol supports connecting with SAAS database instances, the
+    SQLAlchemy-Exasol dialect has not yet been extended to work with them. This would be
+    a future feature.
+
 .. _authentication:
 
 Authentication

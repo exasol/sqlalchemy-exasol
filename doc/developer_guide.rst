@@ -164,6 +164,23 @@ They are split into three groups to reduce the likelihood of test side effects:
         this side effect.
 
 
+Preparing & Triggering a Release
+--------------------------------
+
+The ``Exasol-Toolbox`` provides nox sessions to semi-automate the release process:
+
+.. code-block:: python
+
+    # prepare a release
+    nox -s release:prepare -- --type {major,minor,patch}
+
+    # trigger a release
+    nox -s release:trigger
+
+For further information, please refer to the ``Exasol-Toolbox``'s page `Creating a Release
+<https://exasol.github.io/python-toolbox/main/user_guide/features/creating_a_release.html>`_.
+
+
 .. _action: https://github.com/exasol/sqlalchemy-exasol/actions
 .. _python: https://www.python.org/
 .. _poetry: https://python-poetry.org/

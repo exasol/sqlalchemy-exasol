@@ -38,7 +38,7 @@ For a user's first steps, it is recommended to try out running basic queries on 
 .. note::
     These examples are written assuming a newly installed or otherwise safe-to-test
     Exasol database. If that is not the case, it is recommended to check your query
-    beforehand in another DB-manipulation tool to ensure that the output you will
+    beforehand in another database-manipulation tool to ensure that the output you will
     receive is as desired (and not, i.e. millions of rows).
 
     The example use the :ref:`instance_url` available since SQLAlchemy 1.4. It is still

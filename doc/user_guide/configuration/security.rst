@@ -55,18 +55,18 @@ provided to the engine.
 Transport Layer Security (TLS)
 ******************************
 
-Similar to other Exasol connectors, SQLAlchemy-Exasol is compatible with using TLS cryptographic
-protocol. As a part of the TLS handshake, the drivers require the SSL/TLS certificate
-used by Exasol to be validated. This is the standard practice that increases the security of
+Similar to other Exasol connectors, SQLAlchemy-Exasol supports using the cryptographic
+protocol TLS. As a part of the TLS handshake, the drivers require the SSL/TLS certificate
+used by Exasol to be verified. This is a standard practice to increase the security of
 connections by preventing man-in-the-middle attacks.
 
-Please check out the following documentation for user-friendly tutorials on TLS from Exasol:
+Please check out Exasol's user-friendly tutorials on TLS:
 
 * `An introduction to TLS <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_introduction.md>`__
-* `TLS at Exasol <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_with_exasol.md>`__
-* `TLS in UDFs tutorial <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_in_udfs.md>`__
+* `TLS with Exasol <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_with_exasol.md>`__
+* `TLS in UDFs <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_in_udfs.md>`__
 
-For technical articles made by Exasol relating to TLS, please see:
+Additionally, Exasol provides the following technical articles relating to TLS:
 
 - `Database connection encryption at Exasol <https://exasol.my.site.com/s/article/Database-connection-encryption-at-Exasol/>`__
 - `CHANGELOG: TLS for all Exasol drivers <https://exasol.my.site.com/s/article/Changelog-content-6507>`__
@@ -78,6 +78,7 @@ For technical articles made by Exasol relating to TLS, please see:
 
 Certificate Verification
 ------------------------
+Certificates verification provides proof of the authenticity of the database you are connecting to.
 
 As further discussed in
 `Certificate and Certificate Agencies <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_introduction.md#certificates-and-certification-agencies>`__,
@@ -88,7 +89,7 @@ there are three kinds of certificates:
 * ones that are self-signed
 
 Before using a certificate for certificate verification, your IT Admin should ensure that
-whatever certificate your Exasol instance uses is the most secure:
+whatever certificate your Exasol instance uses, is the most secure:
 
 - Exasol running on-premise uses a default self-signed SSL certificate. Your IT Admin
   should replace the certificate with one provided by your organization. For further
@@ -173,7 +174,7 @@ Disabling Certificate Verification
 
 As discussed in the :ref:`dialect_specific_params`, SQLAlchemy-Exasol by default has certificate
 verification turned on. This is to improve security and prevent man-in-the-middle
-attacks. In the case of testing with a local DB, a user might want to temporarily
+attacks. In the case of testing with a local database, a user might want to temporarily
 disable certificate verification.
 
 .. warning::
@@ -197,4 +198,4 @@ disable certificate verification.
 
     create_engine(url_object)
 
-Alternatively, you can disable the certificate check by setting "nocertcheck" as fingerprint value, see :ref:`fingerprint_verification`.
+Alternatively, you can disable the certificate check by setting "nocertcheck" as th fingerprint value, see :ref:`fingerprint_verification` above.

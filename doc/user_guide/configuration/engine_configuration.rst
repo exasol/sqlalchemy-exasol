@@ -46,7 +46,7 @@ URL string
 
     from sqlalchemy import create_engine
 
-    user = "sys"
+    username = "sys"
     password = "exasol"
     host = "127.0.0.1"
     port = "8563"
@@ -56,7 +56,7 @@ URL string
     # Additional parameters are preceded by a `&`.
     query = "?AUTOCOMMIT=y"
 
-    url_string = f"exa+websocket://{user}:{password}@{host}:{port}/{schema}{query}"
+    url_string = f"exa+websocket://{username}:{password}@{host}:{port}/{schema}{query}"
 
     create_engine(url_string)
 

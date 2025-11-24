@@ -5,12 +5,12 @@ Options for Specifying the URL
 ------------------------------
 
 The value passed to ``create_engine()`` may be either an :ref:`instance_url`
-or a :ref:`url_string`. For the :ref:`url_string`, the connection parameters will be
+or a :ref:`url_string`. For the ``url_string``, the connection parameters will be
 parsed, and thus, special characters must be properly escaped.
 
 .. note::
-    For more information, like which parameters are allowed into an :ref:`instance_url`
-    and which characters need to be escaped for the :ref:`url_string`, see
+    For more information, like which parameters are allowed into an ``instance_url``
+    and which characters need to be escaped for the ``url_string``, see
     the `SQLAlchemy documentation <https://docs.sqlalchemy.org/en/20/core/engines.html>`__.
 
     Check out which parameters are suggested to include for certain scenarios in :ref:`suggested_parameters`.
@@ -65,9 +65,9 @@ URL string
 Suggested Parameters
 --------------------
 
-In the table below are selected parameters that are suggested for specific scenarios.
-The examples are given for :ref:`instance_url` where ``query`` is a keyword
-argument supplied to the ``URL.create()`` constructor.
+The table below suggests selected parameters for specific scenarios and
+gives an example for :ref:`instance_url`, passing ``query`` as a keyword
+argument to the ``URL.create()`` constructor.
 
 .. list-table::
    :header-rows: 1
@@ -89,9 +89,9 @@ argument supplied to the ``URL.create()`` constructor.
 
 Dialect-Specific Parameters
 ---------------------------
-In the table below are additional parameters that are specific to the SQLAlchemy-Exasol
-dialect. The examples are given for :ref:`instance_url` where ``query`` is a keyword
-argument supplied to the ``URL.create()`` constructor.
+The table below lists additional parameters that are specific to the SQLAlchemy-Exasol
+dialect and gives an example for :ref:`instance_url`, passing ``query`` as a keyword
+argument to the ``URL.create()`` constructor.
 
 .. list-table::
    :header-rows: 1
@@ -105,7 +105,7 @@ argument supplied to the ``URL.create()`` constructor.
          query={
           "AUTOCOMMIT": "y"
          }
-     - This indicates if the connection should automatically commits or not.
+     - This indicates if the connection automatically commits or not.
        The parsed value is case-insensitive.
 
         * To enable autocommit, specify ``"y"`` or ``"yes"``.

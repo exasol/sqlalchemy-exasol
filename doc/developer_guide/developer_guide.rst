@@ -6,7 +6,7 @@ on the creation of a dialect, see `SQLAlchemy's README.dialects.rst <https://git
 
 Prerequisites
 -------------
-If you want to engage in development of this project you should have the following libraries and tools available.
+If you want to engage in development of this project, you should have the following libraries and tools available.
 
 Tools
 +++++
@@ -14,53 +14,30 @@ Tools
 * poetry_
 * git_
 * Docker_
-* integration-test-docker-environment_
-    * Prerequisites_
-
 
 Locale
 +++++++
 Make sure the locale is set up appropriately.
 
-Example: Setting up an english locale
+Example: Set up an English locale
 
 .. code-block::
 
     sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
     export LANG=en_US.UTF-8
 
+Set up Your Workspace
+---------------------
 
-Project Layout
-++++++++++++++
-
-.. attention::
-
-    Currently it is required that the integration-test-docker-environment_  project is checked out in parallel to this
-    project. For more details on this have a look at the `Settings` in `noxfile.py`
-
-    Expected Layout:
-
-    .. code-block::
-
-        |-sqlalchemy-exasol/
-        ├─ ...
-        |-integration-test-docker-environment
-        ├─ ...
-        |
-        ...
-
-Setup Your Workspace
---------------------
-
-Get The Source
-++++++++++++++
+Get the Source Code
++++++++++++++++++++
 
 .. code-block::
 
     git clone https://github.com/exasol/sqlalchemy-exasol.git
 
-Setup the Tooling & Virtual Environment
-+++++++++++++++++++++++++++++++++++++++
+Set up the Tooling & Virtual Environment
+++++++++++++++++++++++++++++++++++++++++
 
 .. code-block::
 
@@ -105,7 +82,7 @@ You can modify or add new task by editing the file `noxfile.py`.
 Tests
 -----
 
-#. Install all python dependencies needed for development
+#. Install all Python dependencies needed for development
 
     .. code-block::
 

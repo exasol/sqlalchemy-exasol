@@ -106,7 +106,7 @@ argument supplied to the ``URL.create()`` constructor.
           "AUTOCOMMIT": "y"
          }
      - This indicates if the connection should automatically commits or not.
-       The parsed value is case insensitive.
+       The parsed value is case-insensitive.
 
         * To enable autocommit, specify ``"y"`` or ``"yes"``.
         * To disable autocommit, specify ``"n"`` or ``"no"``.
@@ -119,7 +119,7 @@ argument supplied to the ``URL.create()`` constructor.
           "ENCRYPTION": "y"
          }
      - This indicates if the connection should be encrypted or not.
-       The parsed value is case insensitive.
+       The parsed value is case-insensitive.
 
         * To enable TLS encryption, specify ``"y"`` or ``"yes"``.
         * To disable TLS encryption (not recommended), specify ``"n"`` or ``"no"``.
@@ -132,7 +132,7 @@ argument supplied to the ``URL.create()`` constructor.
          query={
           "FINGERPRINT": "<fingerprint>"
          }
-     - An alternate to SSL certificate verification is to validate the connection
+     - An alternate to SSL certificate verification is to verify the connection
        via a fingerprint.
 
         * By default, fingerprint verification is not active.
@@ -147,11 +147,11 @@ argument supplied to the ``URL.create()`` constructor.
          query={
           "SSLCertificate": "SSL_VERIFY_NONE"
          }
-     - This indicates if the connection should validate the SSL certificate or not.
+     - This indicates if the connection should verify the SSL certificate or not.
 
         * The default behavior is to require SSL certificate verification.
         * To disable SSL certificate verification (not recommended and not secure),
-          specify ``"SSL_VERIFY_NONE"``.
+          specify ``"SSL_VERIFY_NONE"``. This value is case-insensitive.
 
-       For more information about validating the SSL certificate, please see
+       For more information about verifying the SSL certificate, please see
        :ref:`disable_certificate_verification`.

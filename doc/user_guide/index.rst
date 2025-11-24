@@ -80,6 +80,8 @@ Further Examples
     password = "exasol"
     host = "127.0.0.1"
     port = "8563
+        query={"SSLCertificate":"SSL_VERIFY_NONE"}
+
 
     # To disable certificate validation -> NOT recommended
     ssl_certificate = "SSL_VERIFY_NONE"

@@ -1,5 +1,5 @@
-SQLAlchemy Dialect for EXASOL DB
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SQLAlchemy Dialect for Exasol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 .. image:: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/pr-merge.yml/badge.svg?branch=master&event=push
@@ -42,9 +42,7 @@ SQLAlchemy Dialect for EXASOL DB
     :target: https://pypi.org/project/sqlalchemy_exasol
     :alt: PyPI - Downloads
 
-Getting Started with SQLAlchemy-Exasol
---------------------------------------
-SQLAlchemy-Exasol supports a Websocket-based dialect.
+SQLAlchemy-Exasol supports a Websocket-based dialect for interacting with an Exasol database.
 
 System Requirements
 -------------------

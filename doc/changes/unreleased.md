@@ -1,8 +1,14 @@
 # Unreleased
 
-In this release, the ODBC-based dialects pyodbc and Turbodbc were dropped. Please
-switch over to using the websocket dialect. Connection
-strings should be altered to start with `exa+websocket://`.
+In this beta release, SQLAlchemy-Exasol has been updated to work with
+SQLAlchemy 2.x. For details on what SQLAlchemy 2.x brings and changes
+needed in your projects, please check out the following links:
+* [What's New in 2.0](https://docs.sqlalchemy.org/en/20/changelog/whatsnew_20.html)
+* [Major Migration Guide for 2.0](https://docs.sqlalchemy.org/en/20/changelog/migration_20.html)
+
+Additionally, the ODBC-based dialects pyodbc and Turbodbc, which had been marked as
+deprecated, were dropped. Please switch over to using the websocket dialect.
+Connection strings should be altered to start with `exa+websocket://`.
 
 ## Refactoring
 
@@ -31,5 +37,7 @@ strings should be altered to start with `exa+websocket://`.
 - #658: Updated to `exasol-toolbox` 3.0.0
 
 ## Documentation
-
+- #660: Updated User Guide
+  - Added Getting Started, Security, & Engine Configuration pages
+  - Cleaned up index and README.rst
 - #663: Updated developer documentation

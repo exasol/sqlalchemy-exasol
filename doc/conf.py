@@ -86,5 +86,6 @@ linkcheck_ignore: list[str] = []
 linkcheck_allowed_redirects = {
     # All HTTP redirections from the source URI to
     # the canonical URI will be treated as "working".
-    r"https://github\.com/.*": r"https://github\.com/login*"
+    r"https://github\.com/.*": r"https://github\.com/login*",
+    r"https://exasol\.my\.site\.com/s/article/.*": r"https://exasol\.my\.site\.com/s/article/.*?language=en_US",
 }

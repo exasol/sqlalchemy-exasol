@@ -18,11 +18,6 @@ Documentation of SQLAlchemy-Exasol
 
         Instructions and best practices to help developers contribute to the project and set up their development environment.
 
-    .. grid-item-card:: :octicon:`question` FAQ
-        :link: faq
-        :link-type: ref
-
-        Frequently asked questions.
 
 .. toctree::
    :maxdepth: 1
@@ -30,5 +25,4 @@ Documentation of SQLAlchemy-Exasol
 
    user_guide/index
    developer_guide
-   faq
    changes/changelog

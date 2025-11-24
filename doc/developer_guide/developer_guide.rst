@@ -1,6 +1,6 @@
 Development
 ============
-This chapter contains information helpful when you want to engage in development of this project.
+This guide contains information helpful when you want to engage in development of this project.
 ``sqlalchemy-exasol`` provides an Exasol dialect for ``sqlalchemy``. For further information
 on the creation of a dialect, see `SQLAlchemy's README.dialects.rst <https://github.com/sqlalchemy/sqlalchemy/blob/main/README.dialects.rst>`__.
 
@@ -72,17 +72,9 @@ You can modify or add a new task by editing the ``noxfile.py`` file.
 Tests
 -----
 
-#. Install all Python dependencies needed for development
-
-    .. code-block::
-
-        # make sure you are using the virtual environment poetry has set up for this project
-        poetry shell
-
-
 .. attention::
 
-    If something still is not working or unclear, you may want to look into the CI/CD action_ files.
+    If something is not working or unclear, you may want to look into the CI/CD action_ files.
 
 .. _action: https://github.com/exasol/sqlalchemy-exasol/actions
 .. _python: https://www.python.org/

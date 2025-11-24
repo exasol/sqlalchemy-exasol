@@ -88,17 +88,18 @@ class EXADialect_websocket(EXADialect):
         def tls(value):
             value = value.lower()
             mapping = defaultdict(
-                lambda: True, {"y": True, "yes": "True", "n": False, "no": False}
+                lambda: True, {"y": True, "yes": True, "n": False, "no": False}
             )
             return mapping[value]
 
         def certificate_validation(value):
+            value = value.upper()
             return True if value != "SSL_VERIFY_NONE" else False
 
         def autocommit(value):
             value = value.lower()
             mapping = defaultdict(
-                bool, {"y": True, "yes": "True", "n": False, "no": False}
+                bool, {"y": True, "yes": True, "n": False, "no": False}
             )
             return mapping[value]
 

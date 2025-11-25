@@ -48,7 +48,7 @@ Set up Your Workspace
 
 #. Install the Git Hooks
     A `.pre-commit-config.yaml` is included in the source code. Follow the instructions
-    provided on the Exasol-Toolbox's page for
+    provided on the Exasol-Python-Toolbox's page for
     `Git hooks <https://exasol.github.io/python-toolbox/main/user_guide/features/git_hooks/index.html>`__.
 
 
@@ -169,7 +169,7 @@ The integration tests are split into three groups to reduce the likelihood of te
 Preparing & Triggering a Release
 --------------------------------
 
-The ``Exasol-Toolbox`` provides nox sessions to semi-automate the release process:
+The ``Exasol-Python-Toolbox`` provides nox sessions to semi-automate the release process:
 
 .. code-block:: python
 

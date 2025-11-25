@@ -41,3 +41,4 @@ Connection strings should be altered to start with `exa+websocket://`.
   - Added Getting Started, Security, & Engine Configuration pages
   - Cleaned up index and README.rst
 - #663: Updated developer documentation
+- #653: Updated User Guide for SaaS

@@ -174,10 +174,10 @@ The ``Exasol-Python-Toolbox`` provides nox sessions to semi-automate the release
 .. code-block:: python
 
     # prepare a release
-    nox -s release:prepare -- --type {major,minor,patch}
+    poetry run -- nox -s release:prepare -- --type {major,minor,patch}
 
     # trigger a release
-    nox -s release:trigger
+    poetry run -- nox -s release:trigger
 
 For further information, please refer to the ``Exasol-Python-Toolbox``'s page `Creating a Release
 <https://exasol.github.io/python-toolbox/main/user_guide/features/creating_a_release.html>`_.

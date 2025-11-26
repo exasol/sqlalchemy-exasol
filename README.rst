@@ -1,5 +1,5 @@
-SQLAlchemy Dialect for EXASOL DB
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SQLAlchemy Dialect for Exasol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 .. image:: https://github.com/exasol/sqlalchemy-exasol/actions/workflows/pr-merge.yml/badge.svg?branch=master&event=push
@@ -42,31 +42,12 @@ SQLAlchemy Dialect for EXASOL DB
     :target: https://pypi.org/project/sqlalchemy_exasol
     :alt: PyPI - Downloads
 
-
-Getting Started with SQLAlchemy-Exasol
---------------------------------------
-SQLAlchemy-Exasol supports multiple dialects, primarily differentiated by whether they are ODBC or Websocket-based.
-
-Choosing a Dialect
-++++++++++++++++++
-
-We recommend using the Websocket-based dialect due to its simplicity.
-ODBC-based dialects demand a thorough understanding of (Unix)ODBC, and the setup is considerably more complex.
-
-.. warning::
-
-    The maintenance of Turbodbc & pyodbc support is currently paused, and it is planned to be phased out in future versions.
-
+SQLAlchemy-Exasol supports a Websocket-based dialect for interacting with an Exasol database.
 
 System Requirements
 -------------------
-- Exasol >= 7.1 (e.g. `docker-db <test_docker_image_>`_ or a `cloud instance <test_drive_>`_)
+- Exasol >= 7.1 (e.g. `docker-db <test_docker_image_>`_ or a `Exasol SaaS instance <test_drive_>`_)
 - Python >= 3.10
-
-.. note::
-
-   For ODBC-Based Dialects, additional libraries required for ODBC are necessary
-   (for further details, checkout the `developer guide`_).
 
 Features
 --------
@@ -80,5 +61,4 @@ Check out sqlalchemy-exasols's [User Guide(https://exasol.github.io/sqlalchemy-e
 
 .. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
 .. _test_docker_image: https://github.com/exasol/docker-db
-.. _odbc_driver: https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/odbc_linux.htm
 .. _test_drive: https://cloud.exasol.com/signup

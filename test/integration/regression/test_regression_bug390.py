@@ -10,9 +10,9 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
     pytester.makepyfile(
         # fmt: off
         cleandoc(
-            f"""                                
+            f"""
         from sqlalchemy import create_engine, sql
-        
+
         def test():
             url = "exa+websocket://{{user}}:{{pw}}@{{host}}:{{port}}?SSLCertificate=SSL_VERIFY_NONE"
             url = url.format(
@@ -33,8 +33,8 @@ def test_connection_with_block_cleans_up_properly(pytester, exasol_config):
     actual = str(r.stderr)
 
     # We can't assert here actual != "", because runpytest_subprocess prints warnings
-    # that can't be caught for Python 3.13 independent of the backend (pyodbc, turboodbc, websockets)
-    # since we moved from pytest-itde plugin to the pytest-backend plugin.
+    # that can't be caught for Python 3.13 since we moved from pytest-itde plugin to
+    # the pytest-backend plugin.
     # The warnings look like the following:
     #   <frozen importlib._bootstrap_external>:784: ResourceWarning: unclosed database in
     #   <sqlite3.Connection object at 0x7faa81955b70>

@@ -11,11 +11,6 @@ authentication methods and require a TLS/SSL certificate setup. Throughout this
 guide on security, an overview of the security features of SQLAlchemy-Exasol is
 provided.
 
-.. note::
-    While PyExasol supports connecting with SAAS database instances, the
-    SQLAlchemy-Exasol dialect has not yet been extended to work with them. This would be
-    a future feature.
-
 .. _authentication:
 
 Authentication
@@ -26,16 +21,25 @@ credentials for a connection made with the :ref:`instance_url` or :ref:`url_stri
 provided to the engine.
 
 +------------------+------------------------------+----------------------------------------+
-| Exasol DB        | Setting Credentials          | SQLAlchemy-Exasol parameters           |
+| Exasol DB        | Setting Credentials          | PyExasol parameters                    |
 +==================+==============================+========================================+
 | on-premise       | `on-premise authentication`_ | * ``username``                         |
+|                  |                              | * ``password``                         |
++------------------+------------------------------+----------------------------------------+
+| SaaS             | `SAAS authentication`_       | * ``username``                         |
 |                  |                              | * ``password``                         |
 +------------------+------------------------------+----------------------------------------+
 | Docker (testing) | `Docker authentication`_     | * ``username``                         |
 |                  |                              | * ``password``                         |
 +------------------+------------------------------+----------------------------------------+
 
+.. note::
+    While PyExasol supports connecting with SaaS database instances using
+    ``access_token`` or ``refresh_token``, the SQLAlchemy-Exasol dialect does not yet
+    support these.
+
 .. _on-premise authentication: https://docs.exasol.com/db/latest/sql/create_user.htm
+.. _SAAS authentication: https://docs.exasol.com/saas/administration/access_mngt/access_management.htm#Databaseaccessmanagement
 .. _Docker authentication: https://github.com/exasol/docker-db?tab=readme-ov-file#connecting-to-the-database
 
 

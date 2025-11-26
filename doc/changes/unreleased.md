@@ -1,6 +1,6 @@
 # Unreleased
 
-In this beta release, SQLAlchemy-Exasol has been updated to work with
+In this release, SQLAlchemy-Exasol has been updated to work with
 SQLAlchemy 2.x. For details on what SQLAlchemy 2.x brings and changes
 needed in your projects, please check out the following links:
 * [What's New in 2.0](https://docs.sqlalchemy.org/en/20/changelog/whatsnew_20.html)
@@ -41,3 +41,4 @@ Connection strings should be altered to start with `exa+websocket://`.
   - Added Getting Started, Security, & Engine Configuration pages
   - Cleaned up index and README.rst
 - #663: Updated developer documentation
+- #653: Updated User Guide for accessing Exasol SaaS instances.

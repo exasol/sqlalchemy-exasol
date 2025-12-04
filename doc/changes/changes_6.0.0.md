@@ -1,8 +1,17 @@
-# 6.0.0 - 2025-12-04
+# 6.0.0 - 2025-12-05
 
-In this release, SQLAlchemy-Exasol has been updated to work with
-SQLAlchemy 2.x. For details on what SQLAlchemy 2.x brings and changes
-needed in your projects, please check out the following links:
+In this major release, `sqlachemy-exasol` has been migrated to the SQLAlchemy 2.0 API
+and conventions. The focus of the migration was preserving existing feature parity.
+Thus, new features added in the SQLAlchemy 2.0 API may not work as expected.
+If such features are important to your team or if you experience other issues, please open
+an [issue](https://github.com/exasol/sqlalchemy-exasol/issues). Note that this migration
+is a **breaking change** and action will need to be taken by your team to make
+your code compatible with `sqlalchemy-exasol==6.0.0`.
+
+The migration to SQLAlchemy 2.0 allows users to continued security support, performance
+improvements, modern typing support, and addition features. For details
+on what SQLAlchemy 2.0 brings and changes needed in your projects, please check out the
+following links:
 * [What's New in 2.0](https://docs.sqlalchemy.org/en/20/changelog/whatsnew_20.html)
 * [Major Migration Guide for 2.0](https://docs.sqlalchemy.org/en/20/changelog/migration_20.html)
 

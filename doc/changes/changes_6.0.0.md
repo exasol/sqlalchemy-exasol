@@ -8,10 +8,10 @@ an [issue](https://github.com/exasol/sqlalchemy-exasol/issues). Note that this m
 is a **breaking change** and action will need to be taken by your team to make
 your code compatible with `sqlalchemy-exasol==6.0.0`.
 
-The migration to SQLAlchemy 2.0 allows users to continued security support, performance
-improvements, modern typing support, and addition features. For details
-on what SQLAlchemy 2.0 brings and changes needed in your projects, please check out the
-following links:
+The migration to SQLAlchemy 2.0 allows users to benefit from continued security support, performance
+improvements, modern typing support, and additional features. For details
+on what SQLAlchemy 2.0 brings and which changes are needed in your projects, please
+check out the following links:
 * [What's New in 2.0](https://docs.sqlalchemy.org/en/20/changelog/whatsnew_20.html)
 * [Major Migration Guide for 2.0](https://docs.sqlalchemy.org/en/20/changelog/migration_20.html)
 

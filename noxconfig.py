@@ -55,4 +55,7 @@ class Config(BaseConfig):
     plugins: list = [StartDB, StopDB]
 
 
-PROJECT_CONFIG = Config()
+PROJECT_CONFIG = Config(
+    # Override as docker-db pulled several images & will be resolved in PTB
+    exasol_versions=("7.1.30", "8.29.13", "2025.1.8")
+)

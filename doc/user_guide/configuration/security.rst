@@ -21,7 +21,7 @@ credentials for a connection made with the :ref:`instance_url` or :ref:`url_stri
 provided to the engine.
 
 +------------------+------------------------------+----------------------------------------+
-| Exasol DB        | Setting Credentials          | PyExasol parameters                    |
+| Exasol DB        | Setting Credentials          | Parameters                             |
 +==================+==============================+========================================+
 | on-premise       | `on-premise authentication`_ | * ``username``                         |
 |                  |                              | * ``password``                         |

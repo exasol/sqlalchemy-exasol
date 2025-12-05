@@ -1,6 +1,6 @@
 [project]
 name = "sqlalchemy_exasol"
-version = "5.2.0"
+version = "6.0.0"
 requires-python = ">=3.10,<4"
 description = "EXASOL dialect for SQLAlchemy"
 authors = [

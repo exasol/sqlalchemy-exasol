@@ -42,7 +42,7 @@ Instance of ``URL``
         username="sys",
         password="exasol",
         host="127.0.0.1",
-        port="8563",
+        port=8563,
         query=query,
     )
 

@@ -1,4 +1,4 @@
-# 6.0.0 - 2025-12-05
+# 6.0.0 - 2025-12-08
 
 In this major release, `sqlachemy-exasol` has been migrated to the SQLAlchemy 2.0 API
 and conventions. The focus of the migration was preserving existing feature parity.

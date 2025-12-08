@@ -2,7 +2,8 @@
 name = "sqlalchemy_exasol"
 version = "6.0.0"
 # pytest-exasol-backend requires <3.14. When this has been updated,
-# then this can be updated.
+# then this can be updated per:
+#     https://github.com/exasol/sqlalchemy-exasol/issues/674
 requires-python = ">=3.10,<3.14"
 description = "EXASOL dialect for SQLAlchemy"
 authors = [

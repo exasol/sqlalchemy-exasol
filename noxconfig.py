@@ -56,6 +56,10 @@ class Config(BaseConfig):
 
 
 PROJECT_CONFIG = Config(
+    # pytest-exasol-backend requires <3.14. When this has been updated,
+    # then this can be updated per:
+    #     https://github.com/exasol/sqlalchemy-exasol/issues/674
+    python_versions=("3.10", "3.11", "3.12", "3.13"),
     # Override as docker-db pulled several images & will be resolved in PTB
-    exasol_versions=("7.1.30", "8.29.13", "2025.1.8")
+    exasol_versions=("7.1.30", "8.29.13", "2025.1.8"),
 )

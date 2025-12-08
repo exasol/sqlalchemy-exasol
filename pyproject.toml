@@ -1,7 +1,12 @@
 [project]
 name = "sqlalchemy_exasol"
-version = "5.2.0"
-requires-python = ">=3.10,<4"
+version = "6.0.0"
+# pytest-exasol-backend requires Python <3.14. When pytest-exasol-backend has been
+# updated to allow Python 3.14, then we can remove the override for python_versions.
+# Keeping track of pytest-exasol-backend and removing the override is tracked in
+# this issue:
+#     https://github.com/exasol/sqlalchemy-exasol/issues/674
+requires-python = ">=3.10,<3.14"
 description = "EXASOL dialect for SQLAlchemy"
 authors = [
     { name = "Exasol AG", email = "opensource@exasol.com" },
@@ -71,7 +76,7 @@ nox = ">=2022.1.7"
 pytest-json-report = ">=1.5.0"
 pytest = ">=6,<9"
 rich = "^13.3.1"
-exasol-integration-test-docker-environment = "^4.0.0"
+exasol-integration-test-docker-environment = "^5.0.0"
 pytest-exasol-backend = "^1.0.0"
 exasol-toolbox = "^3.0.0"
 

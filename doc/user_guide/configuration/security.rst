@@ -21,7 +21,7 @@ credentials for a connection made with the :ref:`instance_url` or :ref:`url_stri
 provided to the engine.
 
 +------------------+------------------------------+----------------------------------------+
-| Exasol DB        | Setting Credentials          | PyExasol parameters                    |
+| Exasol DB        | Setting Credentials          | Parameters                             |
 +==================+==============================+========================================+
 | on-premise       | `on-premise authentication`_ | * ``username``                         |
 |                  |                              | * ``password``                         |
@@ -54,7 +54,7 @@ provided to the engine.
             username="sys",
             password="exasol",
             host="127.0.0.1",
-            port="8563",
+            port=8563,
         )
 
         create_engine(url_object)
@@ -142,7 +142,7 @@ For more information, see the ODBC entry on `fingerprint <https://docs.exasol.co
         username="sys",
         password="exasol",
         host="127.0.0.1",
-        port="8563",
+        port=8563,
         query={"FINGERPRINT": fingerprint},
     )
 
@@ -159,7 +159,7 @@ Additionally, you can **disable the certificate check completely** by setting "n
         username="sys",
         password="exasol",
         host="127.0.0.1",
-        port="8563",
+        port=8563,
         query={"FINGERPRINT": "nocertcheck"},
     )
 
@@ -201,7 +201,7 @@ disable certificate verification.
         username="sys",
         password="exasol",
         host="127.0.0.1",
-        port="8563",
+        port=8563,
         query={"SSLCertificate": "SSL_VERIFY_NONE"},
     )
 

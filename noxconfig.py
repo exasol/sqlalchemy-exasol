@@ -56,8 +56,10 @@ class Config(BaseConfig):
 
 
 PROJECT_CONFIG = Config(
-    # pytest-exasol-backend requires <3.14. When this has been updated,
-    # then this can be updated per:
+    # pytest-exasol-backend requires Python <3.14. When pytest-exasol-backend has been
+    # updated to allow Python 3.14, then we can remove the override for python_versions.
+    # Keeping track of pytest-exasol-backend and removing the override is tracked in
+    # this issue:
     #     https://github.com/exasol/sqlalchemy-exasol/issues/674
     python_versions=("3.10", "3.11", "3.12", "3.13"),
     # Override as docker-db pulled several images & will be resolved in PTB

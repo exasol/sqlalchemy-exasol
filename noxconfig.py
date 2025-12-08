@@ -62,6 +62,8 @@ PROJECT_CONFIG = Config(
     # this issue:
     #     https://github.com/exasol/sqlalchemy-exasol/issues/674
     python_versions=("3.10", "3.11", "3.12", "3.13"),
-    # Override as docker-db pulled several images & will be resolved in PTB
+    # Override to restrict to existing version on dockerhub. To be resolved in
+    # PTB issue:
+    #    https://github.com/exasol/python-toolbox/issues/604
     exasol_versions=("7.1.30", "8.29.13", "2025.1.8"),
 )

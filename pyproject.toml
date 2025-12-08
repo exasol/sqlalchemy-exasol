@@ -1,7 +1,9 @@
 [project]
 name = "sqlalchemy_exasol"
 version = "6.0.0"
-requires-python = ">=3.10,<4"
+# pytest-exasol-backend requires <3.14. When this has been updated,
+# then this can be updated.
+requires-python = ">=3.10,<3.14"
 description = "EXASOL dialect for SQLAlchemy"
 authors = [
     { name = "Exasol AG", email = "opensource@exasol.com" },
@@ -71,7 +73,7 @@ nox = ">=2022.1.7"
 pytest-json-report = ">=1.5.0"
 pytest = ">=6,<9"
 rich = "^13.3.1"
-exasol-integration-test-docker-environment = "^4.0.0"
+exasol-integration-test-docker-environment = "^5.0.0"
 pytest-exasol-backend = "^1.0.0"
 exasol-toolbox = "^3.0.0"
 

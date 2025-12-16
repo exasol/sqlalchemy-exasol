@@ -25,7 +25,7 @@ from nox import Session
 from nox.sessions import SessionRunner
 
 # default actions to be run if nothing is explicitly specified with the -s option
-nox.options.sessions = ["project:fix"]
+nox.options.sessions = ["format:fix"]
 
 from noxconfig import (
     PROJECT_CONFIG,

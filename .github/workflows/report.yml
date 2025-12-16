@@ -22,7 +22,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@v4
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: ./artifacts
 

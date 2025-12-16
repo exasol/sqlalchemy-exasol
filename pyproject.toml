@@ -78,7 +78,7 @@ pytest = ">=6,<9"
 rich = "^13.3.1"
 exasol-integration-test-docker-environment = "^5.0.0"
 pytest-exasol-backend = "^1.0.0"
-exasol-toolbox = "^3.0.0"
+exasol-toolbox = "^4.0.0"
 
 [tool.poetry.plugins."sqlalchemy.dialects"]
 "exa.websocket" = "sqlalchemy_exasol.websocket:EXADialect_websocket"

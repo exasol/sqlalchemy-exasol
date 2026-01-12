@@ -43,8 +43,8 @@ classifiers = [
 ]
 dependencies = [
     "packaging>=21.3",
-    "pyexasol>=0.26.0,<2",
-    "sqlalchemy>=2.0.0,<3",
+    "pyexasol>=0.26.0,<3.0",
+    "sqlalchemy>=2.0.0,<3.0",
 ]
 
 [project.urls]
@@ -111,10 +111,10 @@ max-module-lines = 800
 
 [tool.ruff.lint]
 extend-ignore = [
-    "E",      # Syntax errors
-    "F",      # Pyflakes rules (excluding F401)
-    "UP",     # pyupgrade rules
-    "D",      # Docstring rules
+    "E", # Syntax errors
+    "F", # Pyflakes rules (excluding F401)
+    "UP", # pyupgrade rules
+    "D",  # Docstring rules
 ]
 extend-select = ["F401"]
 unfixable = []

@@ -284,9 +284,11 @@ def run_examples(session: Session) -> None:
     """Execute examples, assuming a DB already is ready."""
     path = PROJECT_CONFIG.root_path / "examples"
 
-    errors = OrderedDict()
+    errors: OrderedDict[str, str] = OrderedDict()
     for file in sorted(path.rglob("*.py")):
+        print(f"\033[32m{file.name}\033[0m")
         result = subprocess.run(["python", str(file)], capture_output=True, text=True)
+        print(result.stdout)
         if stderr := result.stderr:
             # This records the last line in the traceback, which typically contains
             # the raised exception.
@@ -295,6 +297,6 @@ def run_examples(session: Session) -> None:
     if len(errors) > 0:
         escape_red = "\033[31m"
         print(escape_red + "Errors running examples:")
-        for file, error in errors.items():
-            print(f"- {file}: {error}")
+        for file_name, error in errors.items():
+            print(f"- {file_name}: {error}")
         session.error(1)

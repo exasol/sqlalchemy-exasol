@@ -35,34 +35,37 @@ First Steps
 -----------
 
 For a user's first steps, it is recommended to try out running basic queries on a safe-to-test table.
+For this purpose and to demonstrate what a user can do with `sqlalchemy-exasol`,
+examples are provided.
 
 .. note::
     These examples are written assuming a newly installed or otherwise safe-to-test
-    Exasol database. If that is not the case, it is recommended to check your query
-    beforehand in another database-manipulation tool to ensure that the output you will
-    receive is as desired (and not, i.e. millions of rows).
+    Exasol database (i.e. Exasol Docker DB). The examples use the :ref:`instance_url`
+    available since SQLAlchemy 1.4. It is still possible to use a :ref:`url_string` instead.
 
-    The example use the :ref:`instance_url` available since SQLAlchemy 1.4. It is still
-    possible to use a :ref:`url_string` instead.
+Connection Configuration
+++++++++++++++++++++++++
+For running the examples, a default connection configuration for an Exasol Docker DB has
+been provided in the   ``examples/config.py``. If your setup differs, you can override
+the default values by setting exported environment variables, as specified in the
+docstring.
 
+.. collapse:: config.py
+    :open:
 
-.. code-block:: python
+    .. literalinclude:: ../../examples/config.py
+           :language: python3
 
-    from sqlalchemy import create_engine, text, URL
+Testing your Connection
++++++++++++++++++++++++
+To test that your connection works & perform your first query, please
+execute ``examples/getting_started/1_create_and_test_connection.py``.
 
-    url_object = URL.create(
-        drivername="exa+websocket",
-        username="sys",
-        password="exasol",
-        host="127.0.0.1",
-        port="8563",
-    )
+.. collapse:: 1_create_and_test_connection.py
+    :open:
 
-    engine = create_engine(url_object)
-    # All literal text should be passed through `text()` before execution
-    sql_text = text("SELECT 42 FROM DUAL")
-    with engine.connect() as con:
-        result = con.execute(sql_text).fetchall()
+    .. literalinclude:: ../../examples/getting_started/1_create_and_test_connection.py
+           :language: python3
 
 Diving Deeper
 -------------

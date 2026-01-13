@@ -1,7 +1,8 @@
 # Unreleased
 
 ## Feature
-* #693: Added `py.typed` file so type hints can propagate
+
+* #693: Added `py.typed` file so type hints can propagate and added CI setup to execute examples
 
 ## Refactoring
 

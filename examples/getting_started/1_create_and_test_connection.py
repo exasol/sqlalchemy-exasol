@@ -1,1 +1,40 @@
-x = 1
+from sqlalchemy import (
+    URL,
+    create_engine,
+    text,
+)
+
+from examples.config import CONNECTION_CONFIG
+
+"""
+If the `engine.connect()` step fails, please double-check the credentials
+you put into `CONNECTION_CONFIG` or provided by setting environment variables (i.e
+EXA_HOST, ...).
+
+If you get an error message matching:
+    Could not connect to Exasol: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify
+    failed: self-signed certificate in certificate chain (_ssl.c:1004)
+Then, you need to provide the fingerprint or certificate to properly connect to your DB,
+as described on:
+- https://exasol.github.io/sqlalchemy-exasol/master/user_guide/configuration/security.html
+This would be provided via the environment variable `EXA_QUERY`, which sets the
+`CONNECTION_CONFIG.query` value.
+"""
+
+url_object = URL.create(
+    drivername="exa+websocket",
+    username=CONNECTION_CONFIG.username,
+    password=CONNECTION_CONFIG.password.get_secret_value(),
+    host=CONNECTION_CONFIG.host,
+    port=CONNECTION_CONFIG.port,
+    database=CONNECTION_CONFIG.database,
+    query=CONNECTION_CONFIG.query,
+)
+
+engine = create_engine(url_object)
+# All literal text should be passed through `text()` before execution
+sql_text = text("SELECT 42 FROM DUAL")
+
+with engine.connect() as con:
+    result = con.execute(sql_text).fetchall()
+print(f"QUERY RESULT: {result}")

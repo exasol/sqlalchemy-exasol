@@ -7,16 +7,6 @@ from argparse import ArgumentParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-# fmt: off
-PROJECT_ROOT = Path(__file__).parent
-# scripts path also contains administrative code/modules which are used by some nox targets
-SCRIPTS = PROJECT_ROOT / "scripts"
-DOC = PROJECT_ROOT / "doc"
-DOC_BUILD = DOC / "build"
-sys.path.append(f"{SCRIPTS}")
-# fmt: on
-
-
 import nox
 
 # imports all nox task provided by the toolbox
@@ -31,6 +21,11 @@ from noxconfig import (
     PROJECT_CONFIG,
     Config,
 )
+
+SCRIPTS = PROJECT_CONFIG.root_path / "scripts"
+DOC = PROJECT_CONFIG.root_path / "doc"
+DOC_BUILD = DOC / "build"
+sys.path.append(f"{SCRIPTS}")
 
 _log = logging.getLogger(__name__)
 
@@ -91,7 +86,7 @@ def _coverage_command():
         "coverage",
         "run",
         "-a",
-        f"--rcfile={PROJECT_ROOT / 'pyproject.toml'}",
+        f"--rcfile={PROJECT_CONFIG.root_path / 'pyproject.toml'}",
         "-m",
     ]
     return coverage_command
@@ -130,7 +125,7 @@ def sqlalchemy_tests(session: Session) -> None:
         "--dropfirst",
         "--db",
         f"exasol-{connector}",
-        f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
+        f"{PROJECT_CONFIG.root_path / 'test' / 'integration' / 'sqlalchemy'}",
         external=True,
     )
 
@@ -159,7 +154,7 @@ def exasol_tests(session: Session) -> None:
         "--dropfirst",
         "--db",
         f"exasol-{connector}",
-        f"{PROJECT_ROOT / 'test' / 'integration' / 'exasol'}",
+        f"{PROJECT_CONFIG.root_path / 'test' / 'integration' / 'exasol'}",
         external=True,
     )
 
@@ -170,7 +165,7 @@ def regression_tests(session: Session) -> None:
     session.run(
         *_coverage_command(),
         "pytest",
-        f"{PROJECT_ROOT / 'test' / 'integration' / 'regression'}",
+        f"{PROJECT_CONFIG.root_path / 'test' / 'integration' / 'regression'}",
     )
 
 
@@ -200,7 +195,7 @@ def integration_tests_for_sqlalchemy_exasol(session: Session) -> None:
         )
         return p
 
-    coverage_file = PROJECT_ROOT / ".coverage"
+    coverage_file = PROJECT_CONFIG.root_path / ".coverage"
     coverage_file.unlink(missing_ok=True)
 
     args = parser().parse_args(session.posargs)
@@ -237,7 +232,7 @@ def report_skipped(session: Session) -> None:
                 "--dropfirst",
                 "--db",
                 f"exasol-{connector}",
-                f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
+                f"{PROJECT_CONFIG.root_path / 'test' / 'integration' / 'sqlalchemy'}",
                 "--json-report",
                 f"--json-report-file={report}",
                 external=True,

@@ -23,8 +23,6 @@ from noxconfig import (
 )
 
 SCRIPTS = PROJECT_CONFIG.root_path / "scripts"
-DOC = PROJECT_CONFIG.root_path / "doc"
-DOC_BUILD = DOC / "build"
 sys.path.append(f"{SCRIPTS}")
 
 _log = logging.getLogger(__name__)

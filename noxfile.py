@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import logging
+import subprocess
 import sys
 from argparse import ArgumentParser
+from collections import OrderedDict
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -275,3 +277,24 @@ def full_matrix(session: Session) -> None:
     matrix.update(_connector_matrix(PROJECT_CONFIG))
     matrix["integration-group"] = ["exasol", "regression", "sqla"]
     print(json.dumps(matrix))
+
+
+@nox.session(name="run:examples", python=False)
+def run_examples(session: Session) -> None:
+    """Execute examples, assuming a DB already is ready."""
+    path = PROJECT_CONFIG.root_path / "examples"
+
+    errors = OrderedDict()
+    for file in sorted(path.rglob("*.py")):
+        result = subprocess.run(["python", str(file)], capture_output=True, text=True)
+        if stderr := result.stderr:
+            # This records the last line in the traceback, which typically contains
+            # the raised exception.
+            errors[file.name] = stderr.strip().split("\n")[-1]
+
+    if len(errors) > 0:
+        escape_red = "\033[31m"
+        print(escape_red + "Errors running examples:")
+        for file, error in errors.items():
+            print(f"- {file}: {error}")
+        session.error(1)

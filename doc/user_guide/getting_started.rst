@@ -9,7 +9,8 @@ The provided dialect is based on `PyExasol <https://github.com/exasol/pyexasol/>
 on the `Websocket-client API <https://github.com/exasol/websocket-api>`__.
 
 .. note::
-    For more details on SQLAlchemy, please consult its `documentation <https://docs.sqlalchemy.org/en/14/>`_.
+    For more details on SQLAlchemy, please consult its `general documentation <https://docs.sqlalchemy.org/en/20/>`_
+    and `dialect-specific documentation <https://docs.sqlalchemy.org/en/20/dialects/>`.
 
 Prerequisites
 -------------

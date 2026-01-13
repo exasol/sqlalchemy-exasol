@@ -89,6 +89,9 @@ filterwarnings = [
 ]
 markers = [
     "backend: backend tests.",
+    # needed for pytest >= 8.0, as the markers must be registered. This comes from
+    # sqlalchemy's test suite.
+    "mypy: mypy integration / plugin tests",
 ]
 xfail_strict = true
 

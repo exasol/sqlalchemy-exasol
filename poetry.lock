@@ -1152,14 +1152,14 @@ types-requests = ">=2.31.0.6,<3.0.0.0"
 
 [[package]]
 name = "exasol-toolbox"
-version = "4.0.0"
+version = "4.0.1"
 description = "Your one-stop solution for managing all standard tasks and core workflows of your Python project."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "exasol_toolbox-4.0.0-py3-none-any.whl", hash = "sha256:5411bff719327dde894e64dc545c2d27131f8592d5f6cbc2642a0474cceec856"},
-    {file = "exasol_toolbox-4.0.0.tar.gz", hash = "sha256:742743bf4a88e1be7240b2eec98bc7c65a7630b2c4cb59d39d68d42a85bae675"},
+    {file = "exasol_toolbox-4.0.1-py3-none-any.whl", hash = "sha256:5b4179ba6936bf8d4e63570846ecede381f9db79539752438ea120a7b0fa3df0"},
+    {file = "exasol_toolbox-4.0.1.tar.gz", hash = "sha256:0e180289f23e0f562aefa890ffb6cd35099f99aedda2d2735faf762263dd50f6"},
 ]
 
 [package.dependencies]
@@ -3257,14 +3257,14 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "pytest-exasol-backend"
-version = "1.2.3"
+version = "1.2.4"
 description = ""
 optional = false
 python-versions = "<3.14,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest_exasol_backend-1.2.3-py3-none-any.whl", hash = "sha256:852be5796310772d7d710717002e81bbd0458b5658669da6bb3ddf14e6a5b2ad"},
-    {file = "pytest_exasol_backend-1.2.3.tar.gz", hash = "sha256:6eebe25752499efafa1a0de7c4320713f93aeb13f8401a7d30baf779eb778946"},
+    {file = "pytest_exasol_backend-1.2.4-py3-none-any.whl", hash = "sha256:f7fde35be9cea11369a2c249a431f697ecae64276e3ad4764f4140fe5bb2e6e4"},
+    {file = "pytest_exasol_backend-1.2.4.tar.gz", hash = "sha256:ea8680a0fe7cc45626159a451da386ef7c6b90b19ad8c707e86cb7102b08de23"},
 ]
 
 [package.dependencies]
@@ -3587,20 +3587,19 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "rich"
-version = "13.9.4"
+version = "14.2.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 optional = false
 python-versions = ">=3.8.0"
 groups = ["dev"]
 files = [
-    {file = "rich-13.9.4-py3-none-any.whl", hash = "sha256:6049d5e6ec054bf2779ab3358186963bac2ea89175919d699e378b99738c2a90"},
-    {file = "rich-13.9.4.tar.gz", hash = "sha256:439594978a49a09530cff7ebc4b5c7103ef57baf48d5ea3184f21d9a2befa098"},
+    {file = "rich-14.2.0-py3-none-any.whl", hash = "sha256:76bc51fe2e57d2b1be1f96c524b890b816e334ab4c1e45888799bfaab0021edd"},
+    {file = "rich-14.2.0.tar.gz", hash = "sha256:73ff50c7c0c1c77c8243079283f4edb376f0f6442433aecb8ce7e6d0b92d1fe4"},
 ]
 
 [package.dependencies]
 markdown-it-py = ">=2.2.0"
 pygments = ">=2.13.0,<3.0.0"
-typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
@@ -4877,4 +4876,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "4b6261ab7c20d69c6e9af456e18ec8f884be847eff5515ed24360d9536b3d742"
+content-hash = "fe77133f45a177c9e9c2b126e3e4321d20b0ba1df50d3cf904cde9dddb8a7cd4"

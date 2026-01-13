@@ -13,7 +13,7 @@ authors = [
 #     https://github.com/exasol/sqlalchemy-exasol/issues/674
 requires-python = ">=3.10,<3.14"
 readme = "README.rst"
-license = "BSD"
+license = "BSD-2-Clause"
 license-files = ["LICENSE"]
 keywords = [
     "exasol",

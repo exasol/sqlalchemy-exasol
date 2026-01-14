@@ -34,14 +34,10 @@ Installing
 First Steps
 -----------
 
-For a user's first steps, it is recommended to try out running basic queries on a safe-to-test table.
-For this purpose and to demonstrate what a user can do with `sqlalchemy-exasol`,
-examples are provided.
-
-.. note::
-    These examples are written assuming a newly installed or otherwise safe-to-test
-    Exasol database (i.e. Exasol Docker DB). The examples use the :ref:`instance_url`
-    available since SQLAlchemy 1.4. It is still possible to use a :ref:`url_string` instead.
+For a user's first step, we recommend, running some basic queries on a safe-to-test table.
+`sqlalchemy-exasol` provides examples for this purpose, demonstrating the most important features.
+The examples use the :ref:`instance_url` available since SQLAlchemy 1.4.
+It is still possible to use a :ref:`url_string` instead.
 
 Connection Configuration
 ++++++++++++++++++++++++

@@ -13,7 +13,6 @@ jobs:
     needs: [ build-matrix ]
     runs-on:  ubuntu-24.04
     strategy:
-      fail-fast: false
       matrix:
         python-version: ["3.12"]
         exasol-version: ${{ fromJson(needs.build-matrix.outputs.matrix).exasol-version }}

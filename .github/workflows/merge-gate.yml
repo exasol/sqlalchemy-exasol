@@ -35,7 +35,7 @@ jobs:
 
   verify-examples:
     needs: [ run-slow-tests ]
-    uses: verify-examples.yml
+    uses: ./.github/workflows/verify-examples.yml
     permissions:
       contents: read
 

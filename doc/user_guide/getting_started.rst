@@ -53,8 +53,8 @@ exported environment variables, as specified in the docstring.
 
 Testing your Connection
 +++++++++++++++++++++++
-To test that your connection works & perform your first query, please
-execute ``examples/getting_started/1_create_and_test_connection.py``.
+To test that your connection works and to execute your first query, please
+run ``examples/getting_started/1_create_and_test_connection.py``.
 
 .. collapse:: 1_create_and_test_connection.py
     :open:

@@ -1,4 +1,4 @@
-name: Examples
+name: Verify examples
 
 on:
   workflow_call:
@@ -8,13 +8,10 @@ jobs:
     name: Generate Build Matrix
     uses: ./.github/workflows/matrix-exasol.yml
 
-  examples:
-    name: Run Examples (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
+  verify-examples:
+    name: Verify Examples (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
     needs: [ build-matrix ]
-    # For all containers with versions 7.1.x and older versions 8.y.z of docker-db,
-    # there will be a crash if UDFs (User Defined Functions) are utilized.
     runs-on:  ubuntu-24.04
-    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:

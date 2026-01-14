@@ -10,11 +10,13 @@ Examples
     connection_configuration
     testing_connection
 
-Here we group and present the code for our examples. While there are docstrings and
-comments in the code to provide context, please look to our :ref:`getting_started`
-guide, sub-pages in :ref:`features`, and the
-`general documentation of SQLAlchemy <https://docs.sqlalchemy.org/en/20/>`_
-for a more detailed walkthrough.
+SQLAlchemy-Exasol contains the following examples which are regularly verified in the CI to be correct.
+For a broader introduction and an overview, please see:
+* :ref:`getting_started`
+* :ref:`features`
+* `General documentation of SQLAlchemy <https://docs.sqlalchemy.org/en/20/>`_
+
+For details, please look at the docstrings and comments in the source code of the examples.
 
 Pre-requisites
 --------------

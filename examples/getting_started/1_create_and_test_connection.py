@@ -1,3 +1,6 @@
+# This is nearly identical to 0_create_and_test_connection.py, but here we use the
+# `CONNECTION_CONFIG`. This is an important step before continuing with other examples.
+
 from sqlalchemy import (
     URL,
     create_engine,

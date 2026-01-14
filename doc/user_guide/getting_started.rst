@@ -3,6 +3,8 @@
 Getting Started
 ===============
 
+This guide is designed to get a new user started with ``sqlalchemy-exasol``.
+
 Prerequisites
 -------------
 
@@ -27,35 +29,11 @@ First Steps
 -----------
 
 For a user's first step, we recommend, running some basic queries on a safe-to-test table.
-``sqlalchemy-exasol`` provides examples for this purpose, demonstrating the most important features.
-The examples use the :ref:`instance_url` available since SQLAlchemy 1.4.
-It is still possible to use a :ref:`url_string` instead.
+As a first step, we recommend executing:
 
-Connection Configuration
-++++++++++++++++++++++++
-For running the examples, file ``examples/config.py`` provides a default connection configuration
-for an Exasol Docker DB. If your setup differs, you can either modify the values in the
-``CONNECTION_CONFIG`` initialization or override the default values by setting
-exported environment variables, as specified in the docstring.
-
-.. collapse:: config.py
-    :open:
-
-    .. literalinclude:: ../../examples/config.py
-           :language: python3
-
-Testing your Connection
-+++++++++++++++++++++++
-To test that your connection works and to execute your first query, please
-run ``examples/getting_started/1_create_and_test_connection.py``.
-
-.. collapse:: 1_create_and_test_connection.py
-    :open:
-
-    .. literalinclude:: ../../examples/getting_started/1_create_and_test_connection.py
-           :language: python3
-
-
+.. literalinclude:: ../../examples/getting_started/0_create_and_test_connection.py
+       :language: python3
+       :caption: examples/getting_started/0_create_and_test_connection.py
 
 Next Steps
 ----------
@@ -64,3 +42,5 @@ The SQLAlchemy-Exasol documentation covers many topics at different levels of ex
 
 * For best securing your connection, see :ref:`security`.
 * For other connection parameters, see :ref:`engine_configuration`.
+* Check out the available :ref:`features` & related :ref:`examples` for this purpose, demonstrating the most
+  important features.

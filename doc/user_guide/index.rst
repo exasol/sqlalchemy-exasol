@@ -8,6 +8,8 @@
 
     getting_started
     configuration/index
+    examples/index
+    features/index
 
 Welcome to SQLAlchemy-Exasol
 -----------------------------
@@ -29,7 +31,9 @@ please see our :ref:`getting_started` guide.
 Diving Deeper
 -------------
 
-* For information on setup options, see :ref:`configuration`.
+* For information on parameters for your connection, see :ref:`configuration`.
+* For details on what features are available, see :ref:`features`.
+* Coded examples are provided in :ref:`examples`.
 * With SQLAlchemy 2.x, there are more options regarding sessions and how commits
   behave within those, it is recommended to check out the
   `Session Transaction <https://docs.sqlalchemy.org/en/20/orm/session_transaction.html>`__ page

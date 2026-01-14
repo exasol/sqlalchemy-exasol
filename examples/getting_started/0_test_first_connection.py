@@ -18,10 +18,10 @@ url_object = URL.create(
     query={"FINGERPRINT": "nocertcheck"},
 )
 
-engine = create_engine(url_object)
-# All literal text should be passed through `text()` before execution
+# All literal text should be passed through `text()` before execution.
 sql_text = text("SELECT 42 FROM DUAL")
 
+engine = create_engine(url_object)
 with engine.connect() as con:
     result = con.execute(sql_text).fetchall()
 print(f"QUERY RESULT: {result}")

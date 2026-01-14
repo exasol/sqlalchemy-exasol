@@ -25,13 +25,8 @@ Some basic preparation steps are required to see the examples in action:
     - `exasol/docker-db <https://hub.docker.com/r/exasol/docker-db/tags>`__, which can be easily accessed by using ``poetry run -- nox -s db:start``
     - the free `Exasol Community Edition <https://www.exasol.com/free-signup-community-edition/>`__
 
-#. Open the ``/examples/`` directory and edit the file ``config.py`` (described in :ref:`example_configuration`).
-#. To verify that your connection configuration is correct, run ``examples/getting_started/1_create_and_test_connection.py`` (described in :ref:`example_connection`):
-
-    .. code-block::
-
-        poetry run -- python examples/getting_started/1_create_and_test_connection.py
-
+#. Open the ``/examples/`` directory and edit the file configuration file, as described in :ref:`example_configuration`.
+#. To verify that your connection configuration is correct, run the code, as described in :ref:`example_connection`:
 #. Now, you may run whatever examples you would like:
 
     .. code-block:: bash
@@ -57,10 +52,14 @@ exported environment variables, as specified in the docstring.
 Testing your Connection
 -----------------------
 
-To test that your connection works from the ``exasmples/config.py`` and to execute
-your first query, please run :ref:`example_connection`.
+To test that your connection works from the ``examples/config.py`` and to execute
+your first query, please run :ref:`example_connection`:
+
+.. code-block::
+
+    poetry run -- python examples/getting_started/1_test_config_connection.py
 
 
-.. literalinclude:: ../../../examples/getting_started/1_create_and_test_connection.py
+.. literalinclude:: ../../../examples/getting_started/1_test_config_connection.py
        :language: python3
-       :caption: examples/getting_started/1_create_and_test_connection.py
+       :caption: examples/getting_started/1_test_config_connection.py

@@ -1,4 +1,4 @@
-# This is nearly identical to 0_create_and_test_connection.py, but here we use the
+# This is nearly identical to 0_test_first_connection.py, but here we use the
 # `CONNECTION_CONFIG`. This is an important step before continuing with other examples.
 
 from sqlalchemy import (
@@ -36,10 +36,10 @@ url_object = URL.create(
     query=CONNECTION_CONFIG.query,
 )
 
-engine = create_engine(url_object)
-# All literal text should be passed through `text()` before execution
+# All literal text should be passed through `text()` before execution.
 sql_text = text("SELECT 42 FROM DUAL")
 
+engine = create_engine(url_object)
 with engine.connect() as con:
     result = con.execute(sql_text).fetchall()
 print(f"QUERY RESULT: {result}")

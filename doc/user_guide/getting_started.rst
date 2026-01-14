@@ -34,7 +34,8 @@ It is still possible to use a :ref:`url_string` instead.
 Connection Configuration
 ++++++++++++++++++++++++
 For running the examples, file ``examples/config.py`` provides a default connection configuration
-for an Exasol Docker DB. If your setup differs, you can override the default values by setting
+for an Exasol Docker DB. If your setup differs, you can either modify the values in the
+`CONNECTION_CONFIG` initialization or override the default values by setting
 exported environment variables, as specified in the docstring.
 
 .. collapse:: config.py

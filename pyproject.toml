@@ -44,7 +44,10 @@ classifiers = [
 dependencies = [
     "packaging>=21.3",
     "pyexasol>=0.26.0,<3.0",
-    "sqlalchemy>=2.0.0,<3.0",
+    # sqlalchemy has been downpinned to exclude 2.0.45 released 2025-December
+    # as we had failing test suites. This will be resolved in :
+    #     https://github.com/exasol/sqlalchemy-exasol/issues/697
+    "sqlalchemy>=2.0.0,<2.0.45",
 ]
 
 [project.urls]

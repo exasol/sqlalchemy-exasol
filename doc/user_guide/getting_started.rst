@@ -1,16 +1,7 @@
+.. _getting_started:
+
 Getting Started
 ===============
-
-Welcome to SQLAlchemy-Exasol
------------------------------
-
-SQLAlchemy-Exasol is a dialect extension for SQLAlchemy, implementing support for Exasol databases.
-The provided dialect is based on `PyExasol <https://github.com/exasol/pyexasol/>`__, which relies
-on the `Websocket-client API <https://github.com/exasol/websocket-api>`__.
-
-.. note::
-    For more details on SQLAlchemy, please consult its `general documentation <https://docs.sqlalchemy.org/en/20/>`_
-    and `dialect-specific documentation <https://docs.sqlalchemy.org/en/20/dialects/>`.
 
 Prerequisites
 -------------
@@ -61,25 +52,3 @@ run ``examples/getting_started/1_create_and_test_connection.py``.
 
     .. literalinclude:: ../../examples/getting_started/1_create_and_test_connection.py
            :language: python3
-
-Diving Deeper
--------------
-
-* For information on setup options, see :ref:`configuration`.
-* With SQLAlchemy 2.x, there are more options regarding sessions and how commits
-  behave within those, it is recommended to check out the
-  `Session Transaction <https://docs.sqlalchemy.org/en/20/orm/session_transaction.html>`__ page
-  and adapt your code according to the best practices.
-
-General Tips
-------------
-
-* Always use lowercase identifiers for schema, table, and column names. SQLAlchemy
-  treats lowercase identifiers as case-insensitive. The dialect takes care of
-  transforming the identifier into a case-insensitive representation for the specific
-  database. In the case of Exasol, this is uppercase.
-
-Known Issues
-------------
-* Insert
-    - Insert multiple empty rows via prepared statements does not work in all cases

@@ -1,3 +1,5 @@
+.. _engine_configuration:
+
 Engine Configuration
 =====================
 

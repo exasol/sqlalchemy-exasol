@@ -63,4 +63,4 @@ Next Steps
 The SQLAlchemy-Exasol documentation covers many topics at different levels of experience:
 
 * For best securing your connection, see :ref:`security`.
-* For other connection parameters, see :ref:`specifying_url`.
+* For other connection parameters, see :ref:`engine_configuration`.

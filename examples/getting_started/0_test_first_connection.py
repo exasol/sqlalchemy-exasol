@@ -12,7 +12,7 @@ url_object = URL.create(
     password="exasol",
     host="127.0.0.1",
     port=8563,
-    # This value should only be used for non-productive use cases.
+    # The value `"nocertcheck"` should only be used for non-productive use cases.
     # See https://exasol.github.io/sqlalchemy-exasol/master/user_guide/configuration/security.html
     # for more options for productive use cases.
     query={"FINGERPRINT": "nocertcheck"},

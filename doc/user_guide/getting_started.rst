@@ -12,7 +12,8 @@ Prerequisites
 Installing
 ----------
 
-`sqlalchemy-exasol is distributed through PyPI <https://pypi.org/project/sqlalchemy_exasol/>`__. It can be installed via pip, poetry, or any other compatible dependency management tool:
+`sqlalchemy-exasol is distributed through PyPI <https://pypi.org/project/sqlalchemy_exasol/>`__.
+It can be installed via pip, poetry, or any other compatible dependency management tool:
 
 .. code-block:: bash
 

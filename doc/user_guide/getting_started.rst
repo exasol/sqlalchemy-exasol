@@ -25,10 +25,10 @@ It can be installed via pip, poetry, or any other compatible dependency manageme
 
     SQLAlchemy will be installed as well, as it is a required dependency for SQLAlchemy-Exasol.
 
-First Steps
------------
+First Step
+----------
 
-For a user's first step, we recommend, running this on a safe-to-test database:
+For your first step, we recommend, running this on a safe-to-test database:
 
 .. literalinclude:: ../../examples/getting_started/0_test_first_connection.py
        :language: python3

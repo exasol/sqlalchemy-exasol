@@ -5,7 +5,7 @@ Examples
 
 Here we group and present the code for our examples. While there are docstrings and
 comments in the code to provide context, please look to our :ref:`getting_started`
-guide, pages in :ref:`features`, and the
+guide, sub-pages in :ref:`features`, and the
 `general documentation of SQLAlchemy <https://docs.sqlalchemy.org/en/20/>`_
 for a more detailed walkthrough.
 
@@ -44,7 +44,8 @@ for an Exasol Docker DB. If your setup differs, you can either modify the values
 exported environment variables, as specified in the docstring.
 
 Environment variables may be set like:
-.. code-block:: bash
+
+.. code-block:: shell
 
     export EXA_USERNAME='abcd'
     export EXA_QUERY='{"FINGERPRINT": "abcde1234"}'
@@ -62,7 +63,7 @@ Testing your Connection
 To test that your connection works from the ``examples/config.py`` and to execute
 your first query, please run :ref:`example_connection`:
 
-.. code-block::
+.. code-block:: shell
 
     poetry run -- python examples/getting_started/1_test_config_connection.py
 

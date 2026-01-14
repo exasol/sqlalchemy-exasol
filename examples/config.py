@@ -20,8 +20,8 @@ class ConnectionConfig(BaseSettings):
     be overridden individually by environment variables.
 
     The environment variable to use to override the default value is
-    given in `validation_alias`. Note that you may need to set an exported
-    environment variable for it to properly work.
+    given in `validation_alias` for each attribute. Note that you may
+    need to set an exported environment variable for it to properly work.
     """
 
     username: str = Field(default="sys", validation_alias="EXA_USERNAME")
@@ -40,7 +40,7 @@ class ConnectionConfig(BaseSettings):
     @model_validator(mode="after")
     def set_query_default(self) -> "ConnectionConfig":
         """
-        For security purposes, `query` should NEVER be set to the "fallback" value for a
+        For security purposes, `self.query` should NEVER be empty for a
         PRODUCTION system. Please refer to our Security page:
         - https://exasol.github.io/sqlalchemy-exasol/master/user_guide/configuration/security.html
         to find an option appropriate for your use case.

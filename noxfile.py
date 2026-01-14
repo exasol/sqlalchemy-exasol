@@ -2,20 +2,12 @@ from __future__ import annotations
 
 import argparse
 import logging
+import subprocess
 import sys
 from argparse import ArgumentParser
+from collections import OrderedDict
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
-# fmt: off
-PROJECT_ROOT = Path(__file__).parent
-# scripts path also contains administrative code/modules which are used by some nox targets
-SCRIPTS = PROJECT_ROOT / "scripts"
-DOC = PROJECT_ROOT / "doc"
-DOC_BUILD = DOC / "build"
-sys.path.append(f"{SCRIPTS}")
-# fmt: on
-
 
 import nox
 
@@ -31,6 +23,9 @@ from noxconfig import (
     PROJECT_CONFIG,
     Config,
 )
+
+SCRIPTS = PROJECT_CONFIG.root_path / "scripts"
+sys.path.append(f"{SCRIPTS}")
 
 _log = logging.getLogger(__name__)
 
@@ -91,7 +86,7 @@ def _coverage_command():
         "coverage",
         "run",
         "-a",
-        f"--rcfile={PROJECT_ROOT / 'pyproject.toml'}",
+        f"--rcfile={PROJECT_CONFIG.root_path / 'pyproject.toml'}",
         "-m",
     ]
     return coverage_command
@@ -130,7 +125,7 @@ def sqlalchemy_tests(session: Session) -> None:
         "--dropfirst",
         "--db",
         f"exasol-{connector}",
-        f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
+        f"{PROJECT_CONFIG.root_path / 'test' / 'integration' / 'sqlalchemy'}",
         external=True,
     )
 
@@ -159,7 +154,7 @@ def exasol_tests(session: Session) -> None:
         "--dropfirst",
         "--db",
         f"exasol-{connector}",
-        f"{PROJECT_ROOT / 'test' / 'integration' / 'exasol'}",
+        f"{PROJECT_CONFIG.root_path / 'test' / 'integration' / 'exasol'}",
         external=True,
     )
 
@@ -170,7 +165,7 @@ def regression_tests(session: Session) -> None:
     session.run(
         *_coverage_command(),
         "pytest",
-        f"{PROJECT_ROOT / 'test' / 'integration' / 'regression'}",
+        f"{PROJECT_CONFIG.root_path / 'test' / 'integration' / 'regression'}",
     )
 
 
@@ -200,7 +195,7 @@ def integration_tests_for_sqlalchemy_exasol(session: Session) -> None:
         )
         return p
 
-    coverage_file = PROJECT_ROOT / ".coverage"
+    coverage_file = PROJECT_CONFIG.root_path / ".coverage"
     coverage_file.unlink(missing_ok=True)
 
     args = parser().parse_args(session.posargs)
@@ -237,7 +232,7 @@ def report_skipped(session: Session) -> None:
                 "--dropfirst",
                 "--db",
                 f"exasol-{connector}",
-                f"{PROJECT_ROOT / 'test' / 'integration' / 'sqlalchemy'}",
+                f"{PROJECT_CONFIG.root_path / 'test' / 'integration' / 'sqlalchemy'}",
                 "--json-report",
                 f"--json-report-file={report}",
                 external=True,
@@ -282,3 +277,26 @@ def full_matrix(session: Session) -> None:
     matrix.update(_connector_matrix(PROJECT_CONFIG))
     matrix["integration-group"] = ["exasol", "regression", "sqla"]
     print(json.dumps(matrix))
+
+
+@nox.session(name="run:examples", python=False)
+def run_examples(session: Session) -> None:
+    """Execute examples, assuming a DB already is ready."""
+    path = PROJECT_CONFIG.root_path / "examples"
+
+    errors: OrderedDict[str, str] = OrderedDict()
+    for file in sorted(path.rglob("*.py")):
+        print(f"\033[32m{file.name}\033[0m")
+        result = subprocess.run(["python", str(file)], capture_output=True, text=True)
+        print(result.stdout)
+        if stderr := result.stderr:
+            # This records the last line in the traceback, which typically contains
+            # the raised exception.
+            errors[file.name] = stderr.strip().split("\n")[-1]
+
+    if len(errors) > 0:
+        escape_red = "\033[31m"
+        print(escape_red + "Errors running examples:")
+        for file_name, error in errors.items():
+            print(f"- {file_name}: {error}")
+        session.error(1)

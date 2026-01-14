@@ -33,9 +33,9 @@ jobs:
     permissions:
       contents: read
 
-  examples:
+  verify-examples:
     needs: [ run-slow-tests ]
-    uses: ./.github/workflows/examples.yml
+    uses: verify-examples.yml
     permissions:
       contents: read
 
@@ -46,7 +46,7 @@ jobs:
     permissions:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
-    needs: [ fast-checks, slow-checks, examples ]
+    needs: [ fast-checks, slow-checks, verify-examples ]
 
     # Each job requires a step, so we added this dummy step.
     steps:

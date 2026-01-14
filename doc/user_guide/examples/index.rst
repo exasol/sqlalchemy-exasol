@@ -3,11 +3,23 @@
 Examples
 ========
 
+.. toctree::
+    :maxdepth: 1
+    :hidden:
+
+    connection_configuration
+    testing_connection
+
 Here we group and present the code for our examples. While there are docstrings and
 comments in the code to provide context, please look to our :ref:`getting_started`
 guide, sub-pages in :ref:`features`, and the
 `general documentation of SQLAlchemy <https://docs.sqlalchemy.org/en/20/>`_
 for a more detailed walkthrough.
+
+Pre-requisites
+--------------
+
+- `Poetry <https://python-poetry.org/docs/#installing-with-the-official-installer>`__ >= 2.1.0
 
 Preparation
 -----------
@@ -32,42 +44,3 @@ Some basic preparation steps are required to see the examples in action:
     .. code-block:: bash
 
         poetry run -- python examples/<path_to_desired_module>.py
-
-.. _example_configuration:
-
-Connection Configuration
-------------------------
-
-For running the examples, file ``examples/config.py`` provides a default connection configuration
-for an Exasol Docker DB. If your setup differs, you can either modify the values in the
-``CONNECTION_CONFIG`` initialization or override the default values by setting
-exported environment variables, as specified in the docstring.
-
-Environment variables may be set like:
-
-.. code-block:: shell
-
-    export EXA_USERNAME='abcd'
-    export EXA_QUERY='{"FINGERPRINT": "abcde1234"}'
-
-
-.. literalinclude:: ../../../examples/config.py
-       :language: python3
-       :caption: examples/config.py
-
-.. _example_connection:
-
-Testing your Connection
------------------------
-
-To test that your connection works from the ``examples/config.py`` and to execute
-your first query, please run :ref:`example_connection`:
-
-.. code-block:: shell
-
-    poetry run -- python examples/getting_started/1_test_config_connection.py
-
-
-.. literalinclude:: ../../../examples/getting_started/1_test_config_connection.py
-       :language: python3
-       :caption: examples/getting_started/1_test_config_connection.py

@@ -27,7 +27,7 @@ First Steps
 -----------
 
 For a user's first step, we recommend, running some basic queries on a safe-to-test table.
-`sqlalchemy-exasol` provides examples for this purpose, demonstrating the most important features.
+``sqlalchemy-exasol`` provides examples for this purpose, demonstrating the most important features.
 The examples use the :ref:`instance_url` available since SQLAlchemy 1.4.
 It is still possible to use a :ref:`url_string` instead.
 
@@ -35,7 +35,7 @@ Connection Configuration
 ++++++++++++++++++++++++
 For running the examples, file ``examples/config.py`` provides a default connection configuration
 for an Exasol Docker DB. If your setup differs, you can either modify the values in the
-`CONNECTION_CONFIG` initialization or override the default values by setting
+``CONNECTION_CONFIG`` initialization or override the default values by setting
 exported environment variables, as specified in the docstring.
 
 .. collapse:: config.py

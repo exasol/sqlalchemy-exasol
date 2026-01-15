@@ -42,23 +42,6 @@ provided to the engine.
 .. _SAAS authentication: https://docs.exasol.com/saas/administration/access_mngt/access_management.htm#Databaseaccessmanagement
 .. _Docker authentication: https://github.com/exasol/docker-db?tab=readme-ov-file#connecting-to-the-database
 
-
-#. Connect to Exasol on-premise or Docker
-
-   .. code-block:: python
-
-      from sqlalchemy import create_engine, URL
-
-        url_object = URL.create(
-            drivername="exa+websocket",
-            username="sys",
-            password="exasol",
-            host="127.0.0.1",
-            port=8563,
-        )
-
-        create_engine(url_object)
-
 .. _tls:
 
 Transport Layer Security (TLS)

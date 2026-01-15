@@ -8,6 +8,27 @@ Connection Parameters
 SQLAlchemy Parameters
 ---------------------
 
+The table below lists parameters used in the :ref:`instance_url`.
+
+.. list-table::
+   :header-rows: 1
+   * - Parameter
+     - Description
+   * - drivername
+     - The name of the database backend.
+       For SQLAlchemy-Exasol, this is ``"exa+websocket"``.
+   * - username
+     - The name of the user for authentication, i.e. ``"sys"``.
+   * password
+     - The password associated with the given username. This should not be encoded,
+       and special characters do not need to be escaped, i.e. ``"exasol"``.
+   * host
+     - The host DSN to access the database, i.e. ``"127.0.0.1"``.
+   * port
+     - The port number to access the database, i.e. ``8563``.
+   * query
+     - A dictionary of string keys to string values to be passed
+       to the dialect and/or the DBAPI upon connect.
 
 
 .. _dialect_specific_params:

@@ -1,7 +1,7 @@
-.. _engine_configuration:
+.. _connection_specification:
 
-Engine Configuration
-=====================
+Connection Specification
+========================
 
 .. _specifying_url:
 

@@ -207,4 +207,4 @@ disable certificate verification.
 
     create_engine(url_object)
 
-Alternatively, you can disable the certificate check by setting "nocertcheck" as th fingerprint value, see :ref:`fingerprint_verification` above.
+Alternatively, you can disable the certificate check by setting "nocertcheck" as the fingerprint value, see :ref:`fingerprint_verification` above.

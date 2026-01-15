@@ -144,7 +144,10 @@ For more information, see the ODBC entry on `fingerprint <https://docs.exasol.co
 
     create_engine(url_object)
 
-Additionally, you can **disable the certificate check completely** by setting "nocertcheck" (case-insensitive) as a fingerprint value:
+Additionally, you can **disable the certificate check completely** by setting "nocertcheck" (case-insensitive) as a fingerprint value.
+
+.. warning::
+    However, this should **NEVER** be used for production.
 
 .. code-block:: python
 
@@ -161,8 +164,7 @@ Additionally, you can **disable the certificate check completely** by setting "n
 
     create_engine(url_object)
 
-.. warning::
-    However, this should **NEVER** be used for production.
+
 
 
 Custom Certificate Location
@@ -185,7 +187,7 @@ disable certificate verification.
 .. warning::
     Due to the increased security risks, this change should :octicon:`alert` **NEVER** be used for production.
 
-    For more context regarding the security risks of disabling certificate verification,
+    For more context regarding the security risks,
     see `An introduction to TLS <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_introduction.md>`__.
 
 .. code-block:: python

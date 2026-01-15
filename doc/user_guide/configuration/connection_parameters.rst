@@ -52,9 +52,9 @@ specified parameters may be passed to the connection URL as described in :ref:`s
      - This indicates if the connection should verify the SSL certificate or not.
 
         * The default behavior is to require SSL certificate verification. There
-          is currently not an option to specify this further as enabled.
-        * To disable SSL certificate verification (not recommended and not secure),
+          is currently not an option for users to directly specify this as enabled.
+        * To disable SSL certificate verification (**NOT** recommended and **NOT** secure),
           specify ``"SSL_VERIFY_NONE"``. This value is case-insensitive.
 
        For more information about verifying the SSL certificate, please see
-       :ref:`disable_certificate_verification`.
+       :ref:`tls`.

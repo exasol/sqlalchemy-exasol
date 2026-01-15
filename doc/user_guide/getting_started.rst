@@ -34,12 +34,18 @@ For your first step, we recommend, running this on a safe-to-test database:
        :language: python3
        :caption: examples/getting_started/0_test_first_connection.py
 
+..  note::
+
+    The connection may be either an :ref:`instance_url` or a :ref:`url_string`. As it is
+    less complicated, throughout the User Guide, the code examples primarily use an
+    instance of URL to specify the connection parameters.
+
 Next Steps
 ----------
 
 The SQLAlchemy-Exasol documentation covers many topics at different levels of experience:
 
 * For best securing your connection, see :ref:`security`.
-* For other connection parameters, see :ref:`engine_configuration`.
+* For other connection parameters, see :ref:`connection_parameters`.
 * Check out the available :ref:`features` & related :ref:`examples`, demonstrating the most
   important features.

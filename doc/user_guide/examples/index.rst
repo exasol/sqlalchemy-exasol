@@ -4,14 +4,15 @@ Examples
 ========
 
 .. toctree::
-    :maxdepth: 1
-    :hidden:
+   :maxdepth: 2
+   :hidden:
 
-    connection_configuration
-    testing_connection
+   connection_configuration
+   testing_connection
 
 SQLAlchemy-Exasol contains the following examples which are regularly verified in the CI to be correct.
 For a broader introduction and an overview, please see:
+
 * :ref:`getting_started`
 * :ref:`features`
 * `General documentation of SQLAlchemy <https://docs.sqlalchemy.org/en/20/>`_

@@ -42,23 +42,6 @@ provided to the engine.
 .. _SAAS authentication: https://docs.exasol.com/saas/administration/access_mngt/access_management.htm#Databaseaccessmanagement
 .. _Docker authentication: https://github.com/exasol/docker-db?tab=readme-ov-file#connecting-to-the-database
 
-
-#. Connect to Exasol on-premise or Docker
-
-   .. code-block:: python
-
-      from sqlalchemy import create_engine, URL
-
-        url_object = URL.create(
-            drivername="exa+websocket",
-            username="sys",
-            password="exasol",
-            host="127.0.0.1",
-            port=8563,
-        )
-
-        create_engine(url_object)
-
 .. _tls:
 
 Transport Layer Security (TLS)
@@ -85,8 +68,8 @@ Additionally, Exasol provides the following technical articles relating to TLS:
 
 .. _certificate_verification:
 
-Certificate Verification
-------------------------
+About Certificate Verification
+------------------------------
 Certificates verification provides proof of the authenticity of the database you are connecting to.
 
 As further discussed in
@@ -119,58 +102,33 @@ whatever certificate your Exasol instance uses, is the most secure:
     For setting up a certificate, see the information provided in
     `PyExasol's security documentation <https://exasol.github.io/pyexasol/master/user_guide/configuration/security.html#setup>`__.
 
+If your certificate is properly set up, then the default security configuration
+should work (with the correct authentication credentials for your database setup).
 
-Handling in SQLAlchemy-Exasol
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. literalinclude:: ../../../examples/configuration/security/0_default_with_certificate.py
+       :language: python3
+       :caption: examples/configuration/security/0_default_with_certificate.py
+
 
 .. _fingerprint_verification:
 
 Fingerprint Verification
-""""""""""""""""""""""""
+------------------------
 
 Similar to JDBC / ODBC drivers, SQLAlchemy-Exasol supports fingerprint verification.
 For more information, see the ODBC entry on `fingerprint <https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/using_odbc.htm?Highlight=prepared%20statement#fingerprint>`__.
 
-.. code-block:: python
+.. literalinclude:: ../../../examples/configuration/security/1_with_fingerprint.py
+   :language: python3
+   :caption: examples/configuration/security/1_with_fingerprint.py
 
-    from sqlalchemy import create_engine, URL
 
-    fingerprint = "0ACD07D4E9CEEB122773A71B9C3BD01CE49FC99901DE7C0E0030C942805BA64C"
-
-    url_object = URL.create(
-        drivername="exa+websocket",
-        username="sys",
-        password="exasol",
-        host="127.0.0.1",
-        port=8563,
-        query={"FINGERPRINT": fingerprint},
-    )
-
-    create_engine(url_object)
-
-Additionally, you can **disable the certificate check completely** by setting "nocertcheck" (case-insensitive) as a fingerprint value:
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine, URL
-
-    url_object = URL.create(
-        drivername="exa+websocket",
-        username="sys",
-        password="exasol",
-        host="127.0.0.1",
-        port=8563,
-        query={"FINGERPRINT": "nocertcheck"},
-    )
-
-    create_engine(url_object)
-
-.. warning::
-    However, this should **NEVER** be used for production.
-
+Additionally, you can **disable the certificate check completely** by setting
+`"nocertcheck"` (case-insensitive) as the fingerprint value.  However, this should
+**NEVER** be used for production.
 
 Custom Certificate Location
-"""""""""""""""""""""""""""
+---------------------------
 
 At this time, it is not possible to specify a custom certificate location into the
 connection URL. This is supported by the backend code (PyExasol) and is a feature that
@@ -178,8 +136,8 @@ could be added to SQLAlchemy-Exasol.
 
 .. _disable_certificate_verification:
 
-Disabling Certificate Verification
-""""""""""""""""""""""""""""""""""
+Disable Certificate Verification
+----------------------------------
 
 As discussed in the :ref:`dialect_specific_params`, SQLAlchemy-Exasol by default has certificate
 verification turned on. This is to improve security and prevent man-in-the-middle
@@ -189,22 +147,12 @@ disable certificate verification.
 .. warning::
     Due to the increased security risks, this change should :octicon:`alert` **NEVER** be used for production.
 
-    For more context regarding the security risks of disabling certificate verification,
+    For more context regarding the security risks,
     see `An introduction to TLS <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_introduction.md>`__.
 
-.. code-block:: python
+.. literalinclude:: ../../../examples/configuration/security/2_disable_certificate_verification.py
+       :language: python3
+       :caption: examples/configuration/2_disable_certificate_verification.py
+       :end-before: # used in CI for verification
 
-  from sqlalchemy import create_engine, URL
-
-    url_object = URL.create(
-        drivername="exa+websocket",
-        username="sys",
-        password="exasol",
-        host="127.0.0.1",
-        port=8563,
-        query={"SSLCertificate": "SSL_VERIFY_NONE"},
-    )
-
-    create_engine(url_object)
-
-Alternatively, you can disable the certificate check by setting "nocertcheck" as th fingerprint value, see :ref:`fingerprint_verification` above.
+Alternatively, you can disable the certificate check by setting "nocertcheck" as the fingerprint value, see :ref:`fingerprint_verification` above.

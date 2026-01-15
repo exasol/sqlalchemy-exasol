@@ -15,8 +15,7 @@ SQLAlchemy Parameters
 Dialect-Specific Parameters
 ---------------------------
 The table below lists additional parameters that are specific to the SQLAlchemy-Exasol
-dialect and gives the values as needed for the :ref:`instance_url`. One or more
-specified parameters may be passed to the connection URL as described in :ref:`specifying_url`.
+dialect and gives the values as needed for the :ref:`instance_url`.
 
 .. list-table::
    :header-rows: 1

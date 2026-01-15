@@ -3,19 +3,12 @@
 Connection Specification
 ========================
 
-.. _specifying_url:
-
-Options for Specifying the URL
-------------------------------
-
-The value passed to ``create_engine()`` may be either an :ref:`instance_url`
-or a :ref:`url_string`. For the ``url_string``, the connection parameters will be
+The connection may be specified as either an :ref:`instance_url` or a :ref:`url_string`.
+When the connection is defined as a URL string, the connection parameters will be
 parsed, and thus, special characters must be properly escaped.
 
 .. note::
-    For more information, like which parameters are allowed into an ``instance_url``
-    and which characters need to be escaped for the ``url_string``, see
-    the `SQLAlchemy documentation <https://docs.sqlalchemy.org/en/20/core/engines.html>`__.
+    For more information, see the `SQLAlchemy documentation <https://docs.sqlalchemy.org/en/20/core/engines.html>`__.
 
     Check out which parameters are suggested to include for certain scenarios in :ref:`suggested_parameters`.
     Specific parameters for the SQLAlchemy-Exasol dialect are given in :ref:`dialect_specific_params`.
@@ -79,11 +72,10 @@ URL string
 .. _suggested_parameters:
 
 Suggested Parameters
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
 The table below suggests selected parameters for specific scenarios and gives the values
-as needed for the :ref:`instance_url`. One or more specified parameters may be passed to
-the connection URL as described in :ref:`specifying_url`.
+as needed for the :ref:`instance_url`.
 
 .. list-table::
    :header-rows: 1

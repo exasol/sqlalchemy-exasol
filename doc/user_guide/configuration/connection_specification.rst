@@ -19,18 +19,18 @@ parsed, and thus, special characters must be properly escaped.
 Instance of ``URL``
 ^^^^^^^^^^^^^^^^^^^
 
-.. literalinclude:: ../../../examples/configuration/0_instance_of_url.py
+.. literalinclude:: ../../../examples/configuration/connection_specification/0_instance_of_url.py
        :language: python3
-       :caption: examples/configuration/0_instance_of_url.py
+       :caption: examples/configuration/connection_specification/0_instance_of_url.py
 
 .. _url_string:
 
 URL string
 ^^^^^^^^^^
 
-.. literalinclude:: ../../../examples/configuration/1_url_string.py
+.. literalinclude:: ../../../examples/configuration/connection_specification/1_url_string.py
        :language: python3
-       :caption: examples/configuration/1_url_string.py
+       :caption: examples/configuration/connection_specification/1_url_string.py
 
 .. _suggested_parameters:
 

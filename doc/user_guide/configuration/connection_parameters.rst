@@ -50,10 +50,10 @@ dialect and gives the values as needed for the :ref:`instance_url`.
    * - SSLCertificate
      - This indicates if the connection should verify the SSL certificate or not.
 
-        * The default behavior is to require SSL certificate verification. There
-          is currently not an option for users to directly specify this as enabled.
+        * (default) SSL certificate verification is active. There is currently not an
+          option for users to directly specify this as enabled.
         * To disable SSL certificate verification (**NOT** recommended and **NOT** secure),
           specify ``"SSL_VERIFY_NONE"``. This value is case-insensitive.
 
        For more information about verifying the SSL certificate, please see
-       :ref:`tls`.
+       :ref:`certificate_verification`.

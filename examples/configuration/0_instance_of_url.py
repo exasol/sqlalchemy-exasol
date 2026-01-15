@@ -1,0 +1,20 @@
+from sqlalchemy import (
+    URL,
+    create_engine,
+)
+
+url_object = URL.create(
+    drivername="exa+websocket",
+    username="sys",
+    password="exasol",
+    host="127.0.0.1",
+    port=8563,
+    query={
+        "AUTOCOMMIT": "y",
+        "CONNECTIONLCALL": "en_US.UTF-8",
+        # This should NEVER be used for production systems.
+        "FINGERPRINT": "nocertcheck",
+    },
+)
+
+create_engine(url_object)

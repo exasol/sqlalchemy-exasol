@@ -23,22 +23,16 @@ Instance of ``URL``
 
     from sqlalchemy import create_engine, URL
 
-    # All parameters, which are not keyword arguments for `URL.create`,
-    # should be specified in the `query` dictionary.
-    # For two specified parameters, this would follow this pattern:
-    #   query = {"<Keyword>": "<value>", "<Keyword2>": "<value2>"}
-    query={
-        "AUTOCOMMIT": "y",
-        "CONNECTIONLCALL": "en_US.UTF-8"
-    }
-
     url_object = URL.create(
         drivername="exa+websocket",
         username="sys",
         password="exasol",
         host="127.0.0.1",
         port=8563,
-        query=query,
+        query={
+        "AUTOCOMMIT": "y",
+        "CONNECTIONLCALL": "en_US.UTF-8"
+    },
     )
 
     create_engine(url_object)

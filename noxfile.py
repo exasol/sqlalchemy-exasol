@@ -5,7 +5,6 @@ import logging
 import subprocess
 import sys
 from argparse import ArgumentParser
-from collections import OrderedDict
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -284,19 +283,19 @@ def run_examples(session: Session) -> None:
     """Execute examples, assuming a DB already is ready."""
     path = PROJECT_CONFIG.root_path / "examples"
 
-    errors: OrderedDict[str, str] = OrderedDict()
+    files_with_errors = []
     for file in sorted(path.rglob("*.py")):
         print(f"\033[32m{file.name}\033[0m")
         result = subprocess.run(["python", str(file)], capture_output=True, text=True)
-        print(result.stdout)
-        if stderr := result.stderr:
-            # This records the last line in the traceback, which typically contains
-            # the raised exception.
-            errors[file.name] = stderr.strip().split("\n")[-1]
+        if result.stdout:
+            print(result.stdout)
+        if result.stderr:
+            print(result.stderr)
+            files_with_errors.append(file.name)
 
-    if len(errors) > 0:
+    if len(files_with_errors) > 0:
         escape_red = "\033[31m"
         print(escape_red + "Errors running examples:")
-        for file_name, error in errors.items():
-            print(f"- {file_name}: {error}")
+        for file_name in files_with_errors:
+            print(f"- {file_name}")
         session.error(1)

@@ -9,9 +9,7 @@ parsed, and thus, special characters must be properly escaped.
 
 .. note::
     For more information, see the `SQLAlchemy documentation <https://docs.sqlalchemy.org/en/20/core/engines.html>`__.
-
-    Check out which parameters are suggested to include for certain scenarios in :ref:`suggested_parameters`.
-    Specific parameters for the SQLAlchemy-Exasol dialect are given in :ref:`dialect_specific_params`.
+    General parameters & specific parameters for the SQLAlchemy-Exasol dialect are given in :ref:`connection_parameters`.
 
 
 .. _instance_url:
@@ -31,21 +29,3 @@ URL string
 .. literalinclude:: ../../../examples/configuration/connection_specification/1_url_string.py
        :language: python3
        :caption: examples/configuration/connection_specification/1_url_string.py
-
-.. _suggested_parameters:
-
-Suggested Parameters
-^^^^^^^^^^^^^^^^^^^^
-
-The table below suggests selected parameters for specific scenarios and gives the values
-as needed for the :ref:`instance_url`.
-
-.. list-table::
-   :header-rows: 1
-
-   * - Keyword
-     - Description
-   * - CONNECTIONLCALL
-     - To avoid errors due to different code pages used by the client process (Python)
-       and the Exasol driver, it is recommend to use ``"en_US.UTF-8"``, particularly for
-       Unix-based systems.

@@ -102,6 +102,23 @@ whatever certificate your Exasol instance uses, is the most secure:
     For setting up a certificate, see the information provided in
     `PyExasol's security documentation <https://exasol.github.io/pyexasol/master/user_guide/configuration/security.html#setup>`__.
 
+If your certificate is properly set up, then the default security configuration
+should work.
+
+.. code-block:: python
+
+      from sqlalchemy import create_engine, URL
+
+        url_object = URL.create(
+            drivername="exa+websocket",
+            username="sys",
+            password="exasol",
+            host="127.0.0.1",
+            port=8563,
+        )
+
+        create_engine(url_object)
+
 .. _fingerprint_verification:
 
 Fingerprint Verification

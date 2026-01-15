@@ -281,11 +281,11 @@ def full_matrix(session: Session) -> None:
 @nox.session(name="run:examples", python=False)
 def run_examples(session: Session) -> None:
     """Execute examples, assuming a DB already is ready."""
-    path = PROJECT_CONFIG.root_path / "examples"
+    examples_path = PROJECT_CONFIG.root_path / "examples"
 
     files_with_errors = []
-    for file in sorted(path.rglob("*.py")):
-        print(f"\033[32m{file.name}\033[0m")
+    for file in sorted(examples_path.rglob("*.py")):
+        print(f"\033[32m{file.relative_to(examples_path)}\033[0m")
         result = subprocess.run(["python", str(file)], capture_output=True, text=True)
         if result.stdout:
             print(result.stdout)

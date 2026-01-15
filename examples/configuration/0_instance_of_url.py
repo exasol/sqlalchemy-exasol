@@ -9,6 +9,8 @@ url_object = URL.create(
     password="exasol",
     host="127.0.0.1",
     port=8563,
+    # All parameters that are not keyword arguments for `URL.create` are in added
+    # into the `query` dictionary.
     query={
         "AUTOCOMMIT": "y",
         "CONNECTIONLCALL": "en_US.UTF-8",

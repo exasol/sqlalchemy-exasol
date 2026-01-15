@@ -19,49 +19,18 @@ parsed, and thus, special characters must be properly escaped.
 Instance of ``URL``
 ^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: python
-
-    from sqlalchemy import create_engine, URL
-
-    url_object = URL.create(
-        drivername="exa+websocket",
-        username="sys",
-        password="exasol",
-        host="127.0.0.1",
-        port=8563,
-        query={
-        "AUTOCOMMIT": "y",
-        "CONNECTIONLCALL": "en_US.UTF-8"
-    },
-    )
-
-    create_engine(url_object)
+.. literalinclude:: ../../../examples/configuration/0_instance_of_url.py
+       :language: python3
+       :caption: examples/configuration/0_instance_of_url.py
 
 .. _url_string:
 
 URL string
 ^^^^^^^^^^
 
-.. code-block:: python
-
-    from sqlalchemy import create_engine
-
-    username = "sys"
-    password = "exasol"
-    host = "127.0.0.1"
-    port = "8563"
-    schema = "my_schema"
-    # All parameters, which are not keyword arguments for `URL.create`,
-    # should be specified in `query` and are of the form NAME=value
-    # The first parameter in the query is preceded by a `?`.
-    # Additional parameters are preceded by a `&`.
-    # For example, two parameters would follow this pattern:
-    #    query = "?<Keyword>=<value>&<Keyword2>=<value2>"
-    query = "?AUTOCOMMIT=y&CONNECTIONLCALL=en_US.UTF-8"
-
-    url_string = f"exa+websocket://{username}:{password}@{host}:{port}/{schema}{query}"
-
-    create_engine(url_string)
+.. literalinclude:: ../../../examples/configuration/1_url_string.py
+       :language: python3
+       :caption: examples/configuration/1_url_string.py
 
 .. _suggested_parameters:
 

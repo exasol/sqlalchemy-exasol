@@ -85,8 +85,8 @@ Additionally, Exasol provides the following technical articles relating to TLS:
 
 .. _certificate_verification:
 
-Certificate Verification
-------------------------
+About Certificate Verification
+------------------------------
 Certificates verification provides proof of the authenticity of the database you are connecting to.
 
 As further discussed in
@@ -119,14 +119,10 @@ whatever certificate your Exasol instance uses, is the most secure:
     For setting up a certificate, see the information provided in
     `PyExasol's security documentation <https://exasol.github.io/pyexasol/master/user_guide/configuration/security.html#setup>`__.
 
-
-Handling in SQLAlchemy-Exasol
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 .. _fingerprint_verification:
 
 Fingerprint Verification
-""""""""""""""""""""""""
+------------------------
 
 Similar to JDBC / ODBC drivers, SQLAlchemy-Exasol supports fingerprint verification.
 For more information, see the ODBC entry on `fingerprint <https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/using_odbc.htm?Highlight=prepared%20statement#fingerprint>`__.
@@ -170,7 +166,7 @@ Additionally, you can **disable the certificate check completely** by setting "n
 
 
 Custom Certificate Location
-"""""""""""""""""""""""""""
+---------------------------
 
 At this time, it is not possible to specify a custom certificate location into the
 connection URL. This is supported by the backend code (PyExasol) and is a feature that
@@ -178,8 +174,8 @@ could be added to SQLAlchemy-Exasol.
 
 .. _disable_certificate_verification:
 
-Disabling Certificate Verification
-""""""""""""""""""""""""""""""""""
+Disable Certificate Verification
+----------------------------------
 
 As discussed in the :ref:`dialect_specific_params`, SQLAlchemy-Exasol by default has certificate
 verification turned on. This is to improve security and prevent man-in-the-middle

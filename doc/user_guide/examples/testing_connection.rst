@@ -1,7 +1,7 @@
 .. _example_connection:
 
 Testing your Connection
------------------------
+=======================
 
 To test that your connection works from the ``examples/config.py`` and to execute
 your first query, please run :ref:`example_connection`:

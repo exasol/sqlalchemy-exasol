@@ -127,28 +127,10 @@ For more information, see the ODBC entry on `fingerprint <https://docs.exasol.co
 
     create_engine(url_object)
 
-Additionally, you can **disable the certificate check completely** by setting "nocertcheck" (case-insensitive) as a fingerprint value.
+Additionally, you can **disable the certificate check completely** by setting `"nocertcheck"` (case-insensitive) as the fingerprint value.
 
 .. warning::
     However, this should **NEVER** be used for production.
-
-.. code-block:: python
-
-    from sqlalchemy import create_engine, URL
-
-    url_object = URL.create(
-        drivername="exa+websocket",
-        username="sys",
-        password="exasol",
-        host="127.0.0.1",
-        port=8563,
-        query={"FINGERPRINT": "nocertcheck"},
-    )
-
-    create_engine(url_object)
-
-
-
 
 Custom Certificate Location
 ---------------------------

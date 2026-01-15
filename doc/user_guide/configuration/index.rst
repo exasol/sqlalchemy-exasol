@@ -7,4 +7,5 @@ Configuration
     :maxdepth: 2
 
     engine_configuration
+    connection_parameters
     security

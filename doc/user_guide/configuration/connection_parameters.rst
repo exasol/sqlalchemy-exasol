@@ -12,6 +12,7 @@ The table below lists parameters used in the :ref:`instance_url`.
 
 .. list-table::
    :header-rows: 1
+
    * - Parameter
      - Description
    * - drivername
@@ -19,16 +20,18 @@ The table below lists parameters used in the :ref:`instance_url`.
        For SQLAlchemy-Exasol, this is ``"exa+websocket"``.
    * - username
      - The name of the user for authentication, i.e. ``"sys"``.
-   * password
+   * - password
      - The password associated with the given username. This should not be encoded,
        and special characters do not need to be escaped, i.e. ``"exasol"``.
-   * host
+   * - host
      - The host DSN to access the database, i.e. ``"127.0.0.1"``.
-   * port
+   * - port
      - The port number to access the database, i.e. ``8563``.
-   * query
+   * - query
      - A dictionary of string keys to string values to be passed
-       to the dialect and/or the DBAPI upon connect.
+       to the dialect upon connecting, i.e. ``{"AUTOCOMMIT": "y"}``.
+       For other relevant keywords, see :ref:`dialect_specific_params`.
+
 
 
 .. _dialect_specific_params:

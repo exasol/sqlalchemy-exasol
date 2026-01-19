@@ -7,9 +7,9 @@ For connecting to a database, SQLAlchemy requires to call ``create_engine()`` wi
 argument specifying the detailed parameters of the connection. The parameters include:
 the host and port of the database service, the username and password, and other options.
 
-The argument's data type can be a `str`, see :ref:`str <url_string>` or
-:ref:`URL <instance_url>`. For data type `str`, the connection parameters will be
-parsed, and thus, special characters must be properly escaped.
+The argument's data type can be a :ref:`url_string` or :ref:`instance_url`. For data
+type ``str``, the connection parameters will be parsed, and thus, special characters
+must be properly escaped.
 
 .. note::
     For more information, see the `SQLAlchemy documentation <https://docs.sqlalchemy.org/en/20/core/engines.html>`__.
@@ -18,8 +18,8 @@ parsed, and thus, special characters must be properly escaped.
 
 .. _instance_url:
 
-Instance of ``URL``
-^^^^^^^^^^^^^^^^^^^
+``URL``
+^^^^^^^
 
 .. literalinclude:: ../../../examples/configuration/connection_specification/0_instance_of_url.py
        :language: python3
@@ -27,8 +27,8 @@ Instance of ``URL``
 
 .. _url_string:
 
-URL string
-^^^^^^^^^^
+``str``
+^^^^^^^
 
 .. literalinclude:: ../../../examples/configuration/connection_specification/1_url_string.py
        :language: python3

@@ -8,7 +8,7 @@ Connection Parameters
 General SQLAlchemy Parameters
 -----------------------------
 
-The table below lists parameters used in the :ref:`instance_url`.
+The table below lists parameters used in the :ref:`connection_specification`.
 
 .. list-table::
    :header-rows: 1
@@ -39,7 +39,7 @@ The table below lists parameters used in the :ref:`instance_url`.
 Specific Parameters for Dialect SQLAlchemy-Exasol
 -------------------------------------------------
 The table below lists additional parameters that are specific to the SQLAlchemy-Exasol
-dialect and gives the values as needed for the :ref:`instance_url`.
+dialect and gives the values as needed for the :ref:`connection_specification`.
 
 .. list-table::
    :header-rows: 1

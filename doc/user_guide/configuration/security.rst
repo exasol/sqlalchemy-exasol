@@ -86,9 +86,11 @@ whatever certificate your Exasol instance uses, is the most secure:
 - Exasol running on-premise uses a default self-signed SSL certificate. Your IT Admin
   should replace the certificate with one provided by your organization. For further
   context and instructions, see:
-  - `Conceptual: Incoming TLS Connections <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_with_exasol.md#incoming-tls-connections>`__
-  - `TLS Certificate Instructions <https://docs.exasol.com/db/latest/administration/on-premise/access_management/tls_certificate.htm>`__.
-  - `confd_client cert_update <https://docs.exasol.com/db/latest/confd/jobs/cert_update.htm>`_
+
+    - `Conceptual: Incoming TLS Connections <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_with_exasol.md#incoming-tls-connections>`__
+    - `TLS Certificate Instructions <https://docs.exasol.com/db/latest/administration/on-premise/access_management/tls_certificate.htm>`__.
+    - `confd_client cert_update <https://docs.exasol.com/db/latest/confd/jobs/cert_update.htm>`_
+
 - Exasol Docker uses a self-signed SSL certificate by default. You, as a user, may
   generate a proper SSL certificate and submit it for use via the ConfD API. More
   details are available on:

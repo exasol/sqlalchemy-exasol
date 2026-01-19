@@ -1,7 +1,7 @@
 .. _example_configuration:
 
 Connection Configuration
-------------------------
+========================
 
 For running the examples, file ``examples/config.py`` provides a default connection configuration
 for an Exasol Docker DB. If your setup differs, you can either modify the values in the

@@ -17,6 +17,7 @@ from sqlalchemy import (
     Engine,
     create_engine,
 )
+from sqlalchemy.sql.ddl import CreateSchema
 
 DEFAULT_SCHEMA_NAME = "EXAMPLE_SCHEMA"
 
@@ -87,6 +88,14 @@ class SqlAlchemyFactory(BaseSettings):
 
         url = self.create_url()
         return create_engine(url)
+
+    @staticmethod
+    def create_schema(engine: Engine, schema: str = DEFAULT_SCHEMA_NAME) -> None:
+        """
+        Create schema
+        """
+        with engine.connect() as connection:
+            connection.execute(CreateSchema(schema, if_not_exists=True))
 
 
 CONNECTION_CONFIG = ConnectionConfig()

@@ -3,8 +3,12 @@
 Connection Specification
 ========================
 
-The connection may be specified as either an :ref:`instance_url` or a :ref:`url_string`.
-When the connection is defined as a URL string, the connection parameters will be
+For connecting to a database, SQLAlchemy requires to call ``create_engine()`` with an
+argument specifying the detailed parameters of the connection. The parameters include:
+the host and port of the database service, the username and password, and other options.
+
+The argument's data type can be a `str`, see :ref:`str <url_string>` or
+:ref:`URL <instance_url>`. For data type `str`, the connection parameters will be
 parsed, and thus, special characters must be properly escaped.
 
 .. note::

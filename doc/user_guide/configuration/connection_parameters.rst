@@ -5,8 +5,8 @@ Connection Parameters
 
 .. _sqlalchemy_parameters:
 
-SQLAlchemy Parameters
----------------------
+General SQLAlchemy Parameters
+-----------------------------
 
 The table below lists parameters used in the :ref:`instance_url`.
 
@@ -19,25 +19,25 @@ The table below lists parameters used in the :ref:`instance_url`.
      - The name of the database backend.
        For SQLAlchemy-Exasol, this is ``"exa+websocket"``.
    * - username
-     - The name of the user for authentication, i.e. ``"sys"``.
+     - The name of the user for authentication, e.g. ``"sys"``.
    * - password
      - The password associated with the given username. This should not be encoded,
-       and special characters do not need to be escaped, i.e. ``"exasol"``.
+       and special characters do not need to be escaped, e.g. ``"exasol"``.
    * - host
-     - The host DSN to access the database, i.e. ``"127.0.0.1"``.
+     - The host data source name (DSN) to access the database, e.g. ``"127.0.0.1"``.
    * - port
-     - The port number to access the database, i.e. ``8563``.
+     - The port number to access the database, e.g. ``8563``.
    * - query
      - A dictionary of string keys to string values to be passed
-       to the dialect upon connecting, i.e. ``{"AUTOCOMMIT": "y"}``.
+       to the dialect upon connecting, e.g. ``{"AUTOCOMMIT": "y"}``.
        For other relevant keywords, see :ref:`dialect_specific_params`.
 
 
 
 .. _dialect_specific_params:
 
-Dialect-Specific Parameters
----------------------------
+Specific Parameters for Dialect SQLAlchemy-Exasol
+-------------------------------------------------
 The table below lists additional parameters that are specific to the SQLAlchemy-Exasol
 dialect and gives the values as needed for the :ref:`instance_url`.
 
@@ -67,7 +67,7 @@ dialect and gives the values as needed for the :ref:`instance_url`.
 
         * (default) Fingerprint verification is not active.
         * To use fingerprint verification, provide your fingerprint value
-          (i.e. ``"0ACD07D4E9CEEB122773A71B9C3BD01CE49FC99901DE7C0E0030C942805BA64C"``).
+          (e.g. ``"0ACD07D4E9CEEB122773A71B9C3BD01CE49FC99901DE7C0E0030C942805BA64C"``).
 
        For more information about fingerprint verification, please see
        :ref:`fingerprint_verification`.

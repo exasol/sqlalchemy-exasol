@@ -70,7 +70,7 @@ Additionally, Exasol provides the following technical articles relating to TLS:
 
 About Certificate Verification
 ------------------------------
-Certificates verification provides proof of the authenticity of the database you are connecting to.
+A certificate proves the authenticity of the database you are connecting to.
 
 As further discussed in
 `Certificate and Certificate Agencies <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_introduction.md#certificates-and-certification-agencies>`__,
@@ -103,7 +103,7 @@ whatever certificate your Exasol instance uses, is the most secure:
     `PyExasol's security documentation <https://exasol.github.io/pyexasol/master/user_guide/configuration/security.html#setup>`__.
 
 If your certificate is properly set up, then the default security configuration
-should work (with the correct authentication credentials for your database setup).
+should work --- assuming correct credentials.
 
 .. literalinclude:: ../../../examples/configuration/security/0_default_with_certificate.py
        :language: python3
@@ -115,8 +115,8 @@ should work (with the correct authentication credentials for your database setup
 Fingerprint Verification
 ------------------------
 
-Similar to JDBC / ODBC drivers, SQLAlchemy-Exasol supports fingerprint verification.
-For more information, see the ODBC entry on `fingerprint <https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/using_odbc.htm?Highlight=prepared%20statement#fingerprint>`__.
+Similar to the JDBC / ODBC drivers, SQLAlchemy-Exasol supports *fingerprint verification*.
+For more information, see `fingerprint <https://docs.exasol.com/db/latest/connect_exasol/drivers/odbc/using_odbc.htm?Highlight=prepared%20statement#fingerprint>`__ in Exasol's documentation for ODBC drivers.
 
 .. literalinclude:: ../../../examples/configuration/security/1_with_fingerprint.py
    :language: python3

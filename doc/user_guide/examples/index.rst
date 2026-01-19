@@ -41,7 +41,7 @@ Some basic preparation steps are required to see the examples in action:
     - the free `Exasol Community Edition <https://www.exasol.com/free-signup-community-edition/>`__
 
 #. Open the ``/examples/`` directory and edit the file configuration file, as described in :ref:`example_configuration`.
-#. To verify that your connection configuration is correct, run the code, as described in :ref:`example_connection`:
+#. To verify that your connection configuration is correct, run the code, as described in :ref:`example_connection`.
 #. Now, you may run whatever examples you would like:
 
     .. code-block:: bash

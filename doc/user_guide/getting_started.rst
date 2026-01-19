@@ -36,9 +36,9 @@ For your first step, we recommend, running this on a safe-to-test database:
 
 ..  note::
 
-    The connection may be either an :ref:`instance_url` or a :ref:`url_string`. As it is
-    less complicated, throughout the User Guide, the code examples primarily use an
-    instance of URL to specify the connection parameters.
+    The connection may be of data type :ref:`str <instance_url>` or a
+    :ref:`URL <url_string>`. The code examples throughout the User Guide use data
+    type ``URL``, as it is less complicated.
 
 Next Steps
 ----------

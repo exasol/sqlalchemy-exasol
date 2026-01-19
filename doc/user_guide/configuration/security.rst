@@ -76,9 +76,9 @@ As further discussed in
 `Certificate and Certificate Agencies <https://github.com/exasol/tutorials/blob/1.0.0/tls/doc/tls_introduction.md#certificates-and-certification-agencies>`__,
 there are three kinds of certificates:
 
-* ones from a public Certificate Authority (CA)
-* ones from a private CA
-* ones that are self-signed
+* certificates from a public Certificate Authority (CA)
+* certificates from a private CA
+* certificates, that are self-signed
 
 Before using a certificate for certificate verification, your IT Admin should ensure that
 whatever certificate your Exasol instance uses, is the most secure:

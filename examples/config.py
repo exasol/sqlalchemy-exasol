@@ -12,6 +12,13 @@ from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
 )
+from sqlalchemy import (
+    URL,
+    Engine,
+    create_engine,
+)
+
+DEFAULT_SCHEMA_NAME = "EXAMPLE_SCHEMA"
 
 
 class ConnectionConfig(BaseSettings):
@@ -51,7 +58,40 @@ class ConnectionConfig(BaseSettings):
         return self
 
 
-CONNECTION_CONFIG: ConnectionConfig = ConnectionConfig()
+class SqlAlchemyFactory(BaseSettings):
+    config: ConnectionConfig
+
+    def create_url(self) -> URL:
+        """
+        Create a new `URL` instance, which is used in `create_engine`. The parameters
+        to URL are described further on:
+            https://exasol.github.io/sqlalchemy-exasol/master/user_guide/configuration/connection_parameters.html
+        """
+        return URL.create(
+            drivername="exa+websocket",
+            username=self.config.username,
+            password=self.config.password.get_secret_value(),
+            host=self.config.host,
+            port=self.config.port,
+            database=self.config.database,
+            query=self.config.query,
+        )
+
+    def create_engine(self) -> Engine:
+        """
+        Create a new `Engine` instance. This is used to create a connection via
+        `connect()`. Throughout the examples, the default values for `create_engine()`
+        are used, but other options are described on:
+            https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine
+        """
+
+        url = self.create_url()
+        return create_engine(url)
+
+
+CONNECTION_CONFIG = ConnectionConfig()
+SQL_ALCHEMY = SqlAlchemyFactory(config=CONNECTION_CONFIG)
+ENGINE = SQL_ALCHEMY.create_engine()
 
 if __name__ == "__main__":
     print(f"CONNECTION_DICT: {CONNECTION_CONFIG.model_dump_json(indent=4)}")

@@ -14,7 +14,8 @@ url_object = URL.create(
     query={
         "AUTOCOMMIT": "y",
         "CONNECTIONLCALL": "en_US.UTF-8",
-        # This should NEVER be used for production systems.
+        # This should NEVER be used for production systems,
+        # see "Disable Certificate Verification" in the User Guide.
         "FINGERPRINT": "nocertcheck",
     },
 )

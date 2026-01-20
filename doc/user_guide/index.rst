@@ -51,4 +51,5 @@ General Tips
 Known Issues
 ------------
 * Insert
-    - Insert multiple empty rows via prepared statements does not work in all cases
+    - Insert multiple empty rows via prepared statements does not work in all cases.
+    - The Exasol dialect does not support returning for multiple inserts.

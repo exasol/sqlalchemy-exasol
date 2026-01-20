@@ -69,7 +69,7 @@ with Session(ENGINE) as session:
 
 # 2. Check to see what data was added
 with Session(ENGINE) as session:
-    stmt = select(User).options(joinedload(User.email_addresses))
+    stmt = select(User).options(joinedload(User.email_addresses))  # type: ignore
     # .unique() is required for the 1-to-Many `joinedload` to deduplicate parent objects
     results = session.scalars(stmt).unique().all()
 

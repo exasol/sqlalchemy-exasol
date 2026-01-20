@@ -12,7 +12,7 @@ from sqlalchemy.orm import (
 from examples.config import (
     ENGINE,
 )
-from examples.features.ORM._0_create_tables import (
+from examples.features.orm._0_create_tables import (
     EmailAddress,
     User,
 )

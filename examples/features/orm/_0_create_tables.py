@@ -41,7 +41,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     first_name: Mapped[str] = mapped_column(String(30))
     last_name: Mapped[str] = mapped_column(String(30))
-    # For relationship, this must match the class name.
+    # For relationship, the column type must use the class name, but the
+    # `back_populates` uses the name of the table in the database.
     email_addresses: Mapped[list[EmailAddress]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )

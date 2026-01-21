@@ -8,7 +8,7 @@ from sqlalchemy import (
 from examples.config import ENGINE
 
 """
-If `Engine.connect()` fails, please double-check the credentials
+If `ENGINE.connect()` fails, please double-check the credentials
 you either put into `CONNECTION_CONFIG` or provided by setting environment variables (i.e
 EXA_HOST, ...).
 

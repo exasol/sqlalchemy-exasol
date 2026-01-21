@@ -48,8 +48,8 @@ General Tips
   transforming the identifier into a case-insensitive representation for the specific
   database. In the case of Exasol, this is uppercase.
 
-Known Issues
-------------
+Known Limitations
+-----------------
 * Insert
     - Insert multiple empty rows via prepared statements does not work in all cases.
     - The Exasol dialect does not support returning for multiple inserts.

@@ -10,8 +10,8 @@ jobs:
     permissions:
       contents: read
 
-  Tests:
-    name: Integration-Tests (${{matrix.connector}}, Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
+  tests:
+    name: Integration-Tests (Python-${{ matrix.python-version }}, test:${{ matrix.integration-group }}, Exasol-${{ matrix.exasol-version}}, ${{matrix.connector}})
     needs: [ build-matrix ]
     runs-on: ubuntu-24.04
     permissions:
@@ -24,24 +24,25 @@ jobs:
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v1
+        uses: exasol/python-toolbox/.github/actions/python-environment@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install via apt
-        run: sudo apt-get install unixodbc unixodbc-dev libboost-date-time-dev libboost-locale-dev libboost-system-dev
+      - name: Start test db
+        run: poetry run -- nox -s db:start -- --db-version ${{ matrix.exasol-version }}
 
       - name: Run Tests and Collect Coverage
-        run: |
-          export SQLALCHEMY_WARN_20=1
-          poetry run -- nox -s test:integration -- --coverage --db-version ${{ matrix.exasol-version }}
+        run: poetry run -- nox -s test:${{ matrix.integration-group }}
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v5
         with:
-          name: coverage-python${{ matrix.python-version }}-${{matrix.connector}}-exasol${{ matrix.exasol-version }}slow
+          name: coverage-python${{ matrix.python-version }}-${{ matrix.integration-group }}-exasol${{ matrix.exasol-version }}-${{matrix.connector}}-slow
           path: .coverage
           include-hidden-files: true
+
+      - name: Stop test db
+        run: poetry run -- nox -s db:stop

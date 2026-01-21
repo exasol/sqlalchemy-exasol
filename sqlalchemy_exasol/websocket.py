@@ -1,5 +1,4 @@
 import datetime
-import decimal
 import time
 from collections import (
     ChainMap,
@@ -11,6 +10,7 @@ from sqlalchemy.exc import ArgumentError
 from sqlalchemy.sql import sqltypes
 
 from sqlalchemy_exasol.base import EXADialect
+from sqlalchemy_exasol.types import ExaDecimal
 from sqlalchemy_exasol.version import VERSION
 
 
@@ -22,29 +22,6 @@ class Integer(sqltypes.INTEGER):
             return value
 
         return to_integer
-
-
-class Decimal(sqltypes.DECIMAL):
-    def bind_processor(self, dialect):
-        return super().bind_processor(dialect)
-
-    def result_processor(self, dialect, coltype):
-        if not self.asdecimal:
-            return lambda value: None if value is None else float(value)
-
-        fstring = "%%.%df" % self._effective_decimal_return_scale
-
-        def to_decimal(value):
-            if value is None:
-                return None
-            elif isinstance(value, decimal.Decimal):
-                return value
-            elif isinstance(value, float):
-                return decimal.Decimal(fstring % value)
-            else:
-                return decimal.Decimal(value)
-
-        return to_decimal
 
 
 class Date(sqltypes.DATE):
@@ -90,13 +67,13 @@ class EXADialect_websocket(EXADialect):
     supports_statement_cache = False
     colspecs = {
         sqltypes.Integer: Integer,
-        sqltypes.Numeric: Decimal,
+        sqltypes.Numeric: ExaDecimal,
         sqltypes.Date: Date,
         sqltypes.DateTime: DateTime,
     }
 
     @classmethod
-    def dbapi(cls):
+    def import_dbapi(cls):
         return __import__(
             "exasol.driver.websocket.dbapi2", fromlist="exasol.driver.websocket"
         )
@@ -111,17 +88,18 @@ class EXADialect_websocket(EXADialect):
         def tls(value):
             value = value.lower()
             mapping = defaultdict(
-                lambda: True, {"y": True, "yes": "True", "n": False, "no": False}
+                lambda: True, {"y": True, "yes": True, "n": False, "no": False}
             )
             return mapping[value]
 
         def certificate_validation(value):
-            return True if not value == "SSL_VERIFY_NONE" else False
+            value = value.upper()
+            return True if value != "SSL_VERIFY_NONE" else False
 
         def autocommit(value):
             value = value.lower()
             mapping = defaultdict(
-                bool, {"y": True, "yes": "True", "n": False, "no": False}
+                bool, {"y": True, "yes": True, "n": False, "no": False}
             )
             return mapping[value]
 
@@ -145,7 +123,14 @@ class EXADialect_websocket(EXADialect):
             converters[name].name: converters[name].map(value)
             for name, value in known_options.items()
         }
-        kwargs["dsn"] = f'{kwargs.pop("host")}:{kwargs.pop("port")}'
+
+        fingerprint = url.query.get("FINGERPRINT", None)
+        if fingerprint:
+            kwargs["dsn"] = f'{kwargs.pop("host")}/{fingerprint}:{kwargs.pop("port")}'
+            user_settings["certificate_validation"] = False
+        else:
+            kwargs["dsn"] = f'{kwargs.pop("host")}:{kwargs.pop("port")}'
+
         kwargs = dict(**ChainMap(user_settings, kwargs, defaults))
 
         if not kwargs["tls"] and kwargs["certificate_validation"]:

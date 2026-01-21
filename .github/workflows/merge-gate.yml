@@ -33,6 +33,13 @@ jobs:
     permissions:
       contents: read
 
+  verify-examples:
+    name: Verify examples
+    needs: [ run-slow-tests ]
+    uses: ./.github/workflows/verify-examples.yml
+    permissions:
+      contents: read
+
   # This job ensures inputs have been executed successfully.
   approve-merge:
     name: Allow Merge
@@ -40,7 +47,7 @@ jobs:
     permissions:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
-    needs: [ fast-checks, slow-checks ]
+    needs: [ fast-checks, slow-checks, verify-examples ]
 
     # Each job requires a step, so we added this dummy step.
     steps:

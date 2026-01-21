@@ -22,8 +22,10 @@ from sqlalchemy.schema import (
     CreateSchema,
     DropSchema,
 )
-from sqlalchemy.testing import fixtures
-from sqlalchemy.testing.fixtures import config
+from sqlalchemy.testing import (
+    config,
+    fixtures,
+)
 
 
 class TranslateMap(fixtures.TestBase):

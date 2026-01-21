@@ -6,95 +6,93 @@ from sqlalchemy_exasol.version import VERSION
 from sqlalchemy_exasol.websocket import EXADialect_websocket
 
 
+def set_kwargs(
+    dsn: str = "localhost:8888",
+    tls: bool = True,
+    certificate_validation: bool = True,
+    **kwargs,
+) -> dict[str, str | bool]:
+    return {
+        "dsn": dsn,
+        "tls": tls,
+        "certificate_validation": certificate_validation,
+        "client_name": "EXASOL:SQLA:WS",
+        "client_version": VERSION,
+        **kwargs,
+    }
+
+
 @pytest.mark.parametrize(
-    "url,expected",
+    "url,expected_kwargs",
     [
-        (
+        pytest.param(
             make_url("exa+websocket://localhost:8888"),
-            (
-                [],
-                {
-                    "dsn": "localhost:8888",
-                    "tls": True,
-                    "certificate_validation": True,
-                    "client_name": "EXASOL:SQLA:WS",
-                    "client_version": VERSION,
-                },
-            ),
+            set_kwargs(),
+            id="default_settings",
         ),
-        (
+        pytest.param(
             make_url("exa+websocket://sys:exasol@localhost:8888"),
-            (
-                [],
-                {
-                    "dsn": "localhost:8888",
-                    "password": "exasol",
-                    "username": "sys",
-                    "tls": True,
-                    "certificate_validation": True,
-                    "client_name": "EXASOL:SQLA:WS",
-                    "client_version": VERSION,
-                },
-            ),
+            set_kwargs(username="sys", password="exasol"),
+            id="with_username_and_password",
         ),
-        (
+        pytest.param(
             make_url(
                 "exa+websocket://sys:exasol@localhost:8888/TEST?"
-                "CONNECTIONCALL=en_US.UTF-8&DRIVER=EXAODBC"
+                "CONNECTIONCALL=en_US.UTF-8"
                 "&SSLCertificate=SSL_VERIFY_NONE"
             ),
-            (
-                [],
-                {
-                    "dsn": "localhost:8888",
-                    "password": "exasol",
-                    "username": "sys",
-                    "tls": True,
-                    "certificate_validation": False,
-                    "schema": "TEST",
-                    "client_name": "EXASOL:SQLA:WS",
-                    "client_version": VERSION,
-                },
+            set_kwargs(
+                certificate_validation=False,
+                schema="TEST",
+                username="sys",
+                password="exasol",
             ),
+            id="with_ssl_verify_none",
         ),
-        (
+        pytest.param(
             make_url(
                 "exa+websocket://sys:exasol@localhost:8888/TEST?"
-                "CONNECTIONCALL=en_US.UTF-8&DRIVER=EXAODBC"
+                "CONNECTIONCALL=en_US.UTF-8"
                 "&SSLCertificate=SSL_VERIFY_NONE"
                 "&ENCRYPTION=N"
             ),
-            (
-                [],
-                {
-                    "dsn": "localhost:8888",
-                    "password": "exasol",
-                    "username": "sys",
-                    "tls": False,
-                    "certificate_validation": False,
-                    "schema": "TEST",
-                    "client_name": "EXASOL:SQLA:WS",
-                    "client_version": VERSION,
-                },
+            set_kwargs(
+                certificate_validation=False,
+                tls=False,
+                schema="TEST",
+                username="sys",
+                password="exasol",
             ),
+            id="with_ssl_verify_none_and_no_encryption",
+        ),
+        pytest.param(
+            make_url(
+                "exa+websocket://sys:exasol@localhost:8888?FINGERPRINT=C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028"
+            ),
+            set_kwargs(
+                dsn="localhost/C70EB4DC0F62A3BF8FD7FF22D2EB2C489834958212AC12C867459AB86BE3A028:8888",
+                certificate_validation=False,
+                username="sys",
+                password="exasol",
+            ),
+            id="with_fingerprint",
         ),
     ],
 )
-def test_create_connection_args(url, expected):
+def test_create_connection_args(url, expected_kwargs):
     dialect = EXADialect_websocket()
     actual = dialect.create_connect_args(url)
 
     actual_args, actual_kwargs = actual
-    expected_args, expected_kwargs = expected
 
-    assert actual_args == expected_args
+    assert actual_args == []
     assert actual_kwargs == expected_kwargs
 
 
 def test_raises_an_exception_for_invalid_arguments():
     url = make_url(
         "exa+websocket://sys:exasol@localhost:8888/TEST?"
-        "CONNECTIONCALL=en_US.UTF-8&DRIVER=EXAODBC"
+        "CONNECTIONCALL=en_US.UTF-8"
         "&ENCRYPTION=N"
     )
 

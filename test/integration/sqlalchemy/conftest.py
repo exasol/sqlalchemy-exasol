@@ -1,11 +1,10 @@
+import ssl
 from contextlib import contextmanager
 
 import pyexasol
 import pytest
 from sqlalchemy.dialects import registry
 
-registry.register("exa.pyodbc", "sqlalchemy_exasol.pyodbc", "EXADialect_pyodbc")
-registry.register("exa.turbodbc", "sqlalchemy_exasol.turbodbc", "EXADialect_turbodbc")
 registry.register(
     "exa.websocket", "sqlalchemy_exasol.websocket", "EXADialect_websocket"
 )
@@ -30,6 +29,7 @@ def _pyexasol_connection(dsn="localhost:8563", user="SYS", password="exasol"):
         dsn=dsn,
         user=user,
         password=password,
+        websocket_sslopt={"cert_reqs": ssl.CERT_NONE},
     )
     yield connection
     connection.close()

@@ -1,0 +1,83 @@
+.. _connection_parameters:
+
+Connection Parameters
+=====================
+
+.. _sqlalchemy_parameters:
+
+General SQLAlchemy Parameters
+-----------------------------
+
+The table below lists parameters used in the :ref:`connection_specification`.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - Description
+   * - drivername
+     - The name of the database backend.
+       For SQLAlchemy-Exasol, this is ``"exa+websocket"``.
+   * - username
+     - The name of the user for authentication, e.g. ``"sys"``.
+   * - password
+     - The password associated with the given username. This should not be encoded,
+       and special characters do not need to be escaped, e.g. ``"exasol"``.
+   * - host
+     - The host data source name (DSN) to access the database, e.g. ``"127.0.0.1"``.
+   * - port
+     - The port number to access the database, e.g. ``8563``.
+   * - query
+     - A dictionary of string keys to string values to be passed
+       to the dialect upon connecting, e.g. ``{"AUTOCOMMIT": "y"}``.
+       For other relevant keywords, see :ref:`dialect_specific_params`.
+
+
+
+.. _dialect_specific_params:
+
+Specific Parameters for Dialect SQLAlchemy-Exasol
+-------------------------------------------------
+The table below lists additional parameters that are specific to the SQLAlchemy-Exasol
+dialect and gives the values as needed for the :ref:`connection_specification`.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Keyword
+     - Description
+   * - AUTOCOMMIT
+     - This indicates if the connection automatically commits or not.
+       The parsed value is case-insensitive.
+
+        * (default) To enable autocommit, specify ``"y"`` or ``"yes"``.
+        * To disable autocommit, specify ``"n"`` or ``"no"``.
+
+   * - ENCRYPTION
+     - This indicates if the connection should be encrypted or not.
+       The parsed value is case-insensitive.
+
+        * (default) To enable TLS encryption, specify ``"y"`` or ``"yes"``.
+        * To disable TLS encryption (not recommended), specify ``"n"`` or ``"no"``.
+
+       For more information about TLS encryption, please see :ref:`tls`.
+   * - FINGERPRINT
+     - An alternate to SSL certificate verification is to verify the connection
+       via a fingerprint.
+
+        * (default) Fingerprint verification is not active.
+        * To use fingerprint verification, provide your fingerprint value
+          (e.g. ``"0ACD07D4E9CEEB122773A71B9C3BD01CE49FC99901DE7C0E0030C942805BA64C"``).
+
+       For more information about fingerprint verification, please see
+       :ref:`fingerprint_verification`.
+   * - SSLCertificate
+     - This indicates if the connection should verify the SSL certificate or not.
+
+        * (default) SSL certificate verification is active. There is currently not an
+          option for users to directly specify this as enabled.
+        * To disable SSL certificate verification (**NOT** recommended and **NOT** secure),
+          specify ``"SSL_VERIFY_NONE"``. This value is case-insensitive.
+
+       For more information about verifying the SSL certificate, please see
+       :ref:`certificate_verification`.

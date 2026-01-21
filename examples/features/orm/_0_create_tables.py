@@ -34,7 +34,7 @@ class Base(DeclarativeBase):
     metadata = metadata_obj
 
 
-# 3. Inherit the `Base` class when defining your tables
+# 3. Inherit from the `Base` class when defining your tables
 class User(Base):
     __tablename__ = "user"
 
@@ -46,7 +46,7 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
 
-    def first_email(self):
+    def first_email(self) -> Column[str] | None:
         if self.email_addresses:
             return self.email_addresses[0].email_address
         return None
@@ -71,7 +71,7 @@ class EmailAddress(Base):
 # 4. Create all tables
 Base.metadata.create_all(ENGINE)
 
-# 5. Verify that tables have been created
+# 5. Verify that the tables have been created
 query = f"""
 SELECT TABLE_NAME
 FROM SYS.EXA_ALL_TABLES

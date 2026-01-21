@@ -31,8 +31,8 @@ Preparation
 .. note::
 
     The example scripts provided here use a centralized configuration & custom classes
-    and functions to reduce their setup. For a simpler and direct SQLAlchemy approach
-    see the examples code in :ref:`first_step` and :ref:`connection_specification`.
+    and functions to reduce their setup. For a simpler and direct SQLAlchemy approach,
+    see the example code in :ref:`first_step` and :ref:`connection_specification`.
 
 
 Some basic preparation steps are required to see the examples in action:

@@ -1,26 +1,3 @@
-"""
-This script inserts multiple entries into our two tables in one session.
-As mentioned in the Known Limitations section of the User Guide:
-    https://exasol.github.io/sqlalchemy-exasol/master/user_guide/index.html#known-issues
-SQLAlchemy is slower than other drivers at performing multiple entry inserts.
-It is recommended to use PyExasol or the native Exasol IMPORT statement instead.
-
-This example is provided to show how a multiple insert would work for two tables. In
-particular, note that in 1.a and 1.b the difference between SQLAlchemy-Exasol
-and other SQLAlchemy dialects. For some other SQLAlchemy dialects, they could use
-something like:
-
-    users = session.scalars(
-        insert(User).returning(User),
-        bulk_data
-    ).all()
-
-This, however, does not work for Exasol and will result in:
-    sqlalchemy.exc.InvalidRequestError: Can't use explicit RETURNING for bulk INSERT
-    operation with exasol+exasol.driver.websocket.dbapi2 backend; executemany with
-    RETURNING is not enabled for this dialect.
-"""
-
 from sqlalchemy import (
     delete,
     insert,
@@ -66,7 +43,8 @@ bulk_data = [
 ]
 with Session(ENGINE) as session:
     # a. We do NOT use options that implicitly rely on RETURNING, as the Exasol dialect
-    # doesn't support RETURNING. See the module's docstring for more details.
+    # doesn't support RETURNING. For more details, see the `Inserting Multiple Entries`
+    # page.
     session.execute(insert(User), bulk_data)
     # Flush to make the rows available for querying in this transaction
     session.flush()

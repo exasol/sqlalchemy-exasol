@@ -48,8 +48,17 @@ General Tips
   transforming the identifier into a case-insensitive representation for the specific
   database. In the case of Exasol, this is uppercase.
 
+.. _known_limitations:
+
 Known Limitations
 -----------------
 * Insert
-    - Insert multiple empty rows via prepared statements does not work in all cases.
-    - The Exasol dialect does not support returning for multiple inserts.
+
+  - SQLAlchemy is slower than other drivers at performing multiple entry inserts.
+    It is recommended to use `PyExasol <https://exasol.github.io/pyexasol/master/user_guide/exploring_features/import_and_export/index.html>`__
+    or the `native Exasol IMPORT statement <https://docs.exasol.com/db/latest/sql/import.htm>`__
+    instead.
+  - Inserting multiple empty rows via prepared statements does not work in all cases.
+  - As shown in :ref:`example_orm_insert_multiple_entries`, some SQLAlchemy functions
+    which implicitly rely on RETURNING will not work, as the Exasol dialect does
+    not support RETURNING. This example shows how to successfully work around that.

@@ -7,4 +7,4 @@ ORM Examples
    :maxdepth: 2
 
    create_tables
-   insert_data
+   insert_multiple_entries

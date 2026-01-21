@@ -25,6 +25,8 @@ It can be installed via pip, poetry, or any other compatible dependency manageme
 
     SQLAlchemy will be installed as well, as it is a required dependency for SQLAlchemy-Exasol.
 
+.. _first_step:
+
 First Step
 ----------
 

@@ -9,6 +9,7 @@ Examples
 
    connection_configuration
    testing_connection
+   orm/index.rst
 
 SQLAlchemy-Exasol contains the following examples which are regularly verified in the CI to be correct.
 For a broader introduction and an overview, please see:
@@ -27,6 +28,13 @@ Pre-requisites
 Preparation
 -----------
 
+.. note::
+
+    The example scripts provided here use a centralized configuration & custom classes
+    and functions to reduce their setup. For a simpler and direct SQLAlchemy approach
+    see the examples code in :ref:`first_step` and :ref:`connection_specification`.
+
+
 Some basic preparation steps are required to see the examples in action:
 
 #. Download the `SQLAlchemy-Exasol source code <https://github.com/exasol/sqlalchemy-exasol/>`__.\
@@ -41,7 +49,7 @@ Some basic preparation steps are required to see the examples in action:
     - the free `Exasol Community Edition <https://www.exasol.com/free-signup-community-edition/>`__
 
 #. Open the ``/examples/`` directory and edit the file configuration file, as described in :ref:`example_configuration`.
-#. To verify that your connection configuration is correct, run the code, as described in :ref:`example_connection`:
+#. To verify that your connection configuration is correct, run the code, as described in :ref:`example_connection`.
 #. Now, you may run whatever examples you would like:
 
     .. code-block:: bash

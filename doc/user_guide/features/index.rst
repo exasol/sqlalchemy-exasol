@@ -3,6 +3,8 @@
 Features
 ========
 
+.. _orm:
+
 Object-Relational Mapping
 -------------------------
 

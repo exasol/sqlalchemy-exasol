@@ -28,6 +28,13 @@ Pre-requisites
 Preparation
 -----------
 
+.. note::
+
+    The example scripts provided here use a centralized configuration & custom classes
+    and functions to reduce their setup. For a simpler and direct SQLAlchemy approach
+    see the examples code in :ref:`first_step` and :ref:`connection_specification`.
+
+
 Some basic preparation steps are required to see the examples in action:
 
 #. Download the `SQLAlchemy-Exasol source code <https://github.com/exasol/sqlalchemy-exasol/>`__.\

@@ -87,12 +87,17 @@ with Session(ENGINE) as session:
     # h. Commit everything at once
     session.commit()
 
-# 2. Check to see what data was added
-with Session(ENGINE) as session:
-    stmt = select(User).options(joinedload(User.email_addresses))  # type: ignore
-    # .unique() is required for the 1-to-Many `joinedload` to deduplicate parent objects
-    results = session.scalars(stmt).unique().all()
 
-for result in results:
-    emails = [e.email_address for e in result.email_addresses]
-    print(f"{result.id} {result.first_name} {result.last_name} {emails}")
+# 2. Select to see the results
+def select_all_entries():
+    with Session(ENGINE) as session:
+        stmt = select(User).options(joinedload(User.email_addresses))  # type: ignore
+        # .unique() is required for the 1-to-Many `joinedload` to deduplicate parent objects
+        results = session.scalars(stmt).unique().all()
+
+    for result in results:
+        emails = [e.email_address for e in result.email_addresses]
+        print(f"{result.id} {result.first_name} {result.last_name} {emails}")
+
+
+select_all_entries()

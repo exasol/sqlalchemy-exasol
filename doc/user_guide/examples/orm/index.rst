@@ -14,4 +14,4 @@ numerical order, as also given in the list below:
 
    create_tables
    single_entry
-   insert_multiple_entries
+   multiple_entries

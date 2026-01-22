@@ -78,7 +78,7 @@ with Session(ENGINE) as session:
             user_to_update.email_addresses[0].email_address = "paris.doe@example.com"
 
         session.commit()
-        print("\n--User 'Jax Doe' has been updated to 'Paris Doe'.--")
+        print(f"\n--User {user_to_update.id} has been updated.--")
 
 select_all_entries()
 
@@ -95,6 +95,6 @@ with Session(ENGINE) as session:
 
         # c. Commit the changes to persist the deletion
         session.commit()
-        print("\n--User 'Paris Doe' has been deleted from the database.--")
+        print(f"\n--User {user_to_delete.id} has been deleted.--")
 
 select_all_entries()

@@ -101,3 +101,45 @@ def select_all_entries():
 
 
 select_all_entries()
+
+# 3. Update multiple entries
+with Session(ENGINE) as session:
+    # Fetch the users by their old last names
+    raine = session.query(User).filter_by(last_name="Whispers").first()
+    eda = session.query(User).filter_by(last_name="Clawthorne").first()
+
+    raine.last_name = "Clawthorne-Whispers"
+    eda.last_name = "Clawthorne-Whispers"
+
+    eda_email = session.query(EmailAddress).filter_by(user_id=eda.id).first()
+    eda_email.email_address = "eda.clawthorne-whispers@owlhouse.com"
+
+    session.commit()
+    print(f"\n--Users {eda.id} & {raine.id} have been updated.--")
+
+select_all_entries()
+
+# 4. Delete multiple entries
+with Session(ENGINE) as session:
+    amity = (
+        session.query(User).filter_by(first_name="Amity", last_name="Blight").first()
+    )
+    willow = (
+        session.query(User).filter_by(first_name="Willow", last_name="Park").first()
+    )
+    lux = session.query(User).filter_by(first_name="Lux", last_name="Noceda").first()
+
+    user_ids = [user.id for user in [amity, willow, lux] if user]
+
+    # Delete email addresses associated with these users, as they graduated
+    for user_id in user_ids:
+        session.query(EmailAddress).filter(EmailAddress.user_id == user_id).delete(
+            synchronize_session=False
+        )
+
+    session.commit()
+    print(
+        f"\n--EmailAddress for User {amity.id}, {willow.id}, {lux.id} have been deleted.--"
+    )
+
+select_all_entries()

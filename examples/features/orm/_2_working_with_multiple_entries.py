@@ -108,14 +108,16 @@ with Session(ENGINE) as session:
     raine = session.query(User).filter_by(last_name="Whispers").first()
     eda = session.query(User).filter_by(last_name="Clawthorne").first()
 
-    raine.last_name = "Clawthorne-Whispers"
-    eda.last_name = "Clawthorne-Whispers"
+    if raine and eda:
+        raine.last_name = "Clawthorne-Whispers"
+        eda.last_name = "Clawthorne-Whispers"
 
-    eda_email = session.query(EmailAddress).filter_by(user_id=eda.id).first()
-    eda_email.email_address = "eda.clawthorne-whispers@owlhouse.com"
+        eda_email = session.query(EmailAddress).filter_by(user_id=eda.id).first()
+        if eda_email:
+            eda_email.email_address = "eda.clawthorne-whispers@owlhouse.com"  # type: ignore
 
-    session.commit()
-    print(f"\n--Users {eda.id} & {raine.id} have been updated.--")
+        session.commit()
+        print(f"\n--Users {eda.id} & {raine.id} have been updated.--")
 
 select_all_entries()
 
@@ -129,17 +131,18 @@ with Session(ENGINE) as session:
     )
     lux = session.query(User).filter_by(first_name="Lux", last_name="Noceda").first()
 
-    user_ids = [user.id for user in [amity, willow, lux] if user]
+    if amity and willow and lux:
+        user_ids = [user.id for user in [amity, willow, lux] if user]
 
-    # Delete email addresses associated with these users, as they graduated
-    for user_id in user_ids:
-        session.query(EmailAddress).filter(EmailAddress.user_id == user_id).delete(
-            synchronize_session=False
+        # Delete email addresses associated with these users, as they graduated
+        for user_id in user_ids:
+            session.query(EmailAddress).filter(EmailAddress.user_id == user_id).delete(
+                synchronize_session=False
+            )
+
+        session.commit()
+        print(
+            f"\n--EmailAddress for User {amity.id}, {willow.id}, {lux.id} have been deleted.--"
         )
-
-    session.commit()
-    print(
-        f"\n--EmailAddress for User {amity.id}, {willow.id}, {lux.id} have been deleted.--"
-    )
 
 select_all_entries()

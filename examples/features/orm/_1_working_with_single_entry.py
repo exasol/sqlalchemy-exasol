@@ -75,7 +75,9 @@ with Session(ENGINE) as session:
         user_to_update.first_name = "Paris"
 
         if user_to_update.email_addresses:
-            user_to_update.email_addresses[0].email_address = "paris.doe@example.com"
+            user_to_update.email_addresses[0].email_address = (
+                "paris.doe@example.com"  # type:ignore
+            )
 
         session.commit()
         print(f"\n--User {user_to_update.id} has been updated.--")

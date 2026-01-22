@@ -23,8 +23,8 @@ with Session(ENGINE) as session:
     session.execute(delete(User))
     session.commit()
 
-# 1. Perform a bulk insert
-bulk_data = [
+# 1. Insert multiple entries
+data = [
     {
         "first_name": "Lux",
         "last_name": "Noceda",
@@ -41,31 +41,50 @@ bulk_data = [
         "email_addresses": ["bard.coven@community.com"],
     },
 ]
+
 with Session(ENGINE) as session:
-    # a. We do NOT use options that implicitly rely on RETURNING, as the Exasol dialect
-    # doesn't support RETURNING. For more details, see the `Inserting Multiple Entries`
-    # page.
-    session.execute(insert(User), bulk_data)
-    # Flush to make the rows available for querying in this transaction
+    # a. Create new instances
+    # Note: We do NOT use options that implicitly rely on RETURNING, as the Exasol dialect
+    # doesn't support RETURNING. For more details, see:
+    #    https://exasol.github.io/sqlalchemy-exasol/master/user_guide/examples/orm/insert_multiple_entries.html
+    user_1 = User(first_name="Amity", last_name="Blight")
+    user_2 = User(first_name="Willow", last_name="Park")
+
+    # b. Adds multiple entries to be inserted
+    session.add_all([user_1, user_2])
+
+    # c. Add more entries using a dictionary
+    session.execute(insert(User), data)
+
+    # d. Sends the pending changes to the session WITHOUT committing it yet;
+    # this updates Users with id values.
     session.flush()
 
-    # b. Select back the IDs by matching first/last name to get the newly created IDs
-    names = [(d["first_name"], d["last_name"]) for d in bulk_data]
+    # e. Retrieve user ids
+    names = [(d["first_name"], d["last_name"]) for d in data]
     stmt = select(User.id, User.first_name, User.last_name).where(
         tuple_(User.first_name, User.last_name).in_(names)
     )
     user_map = {(u.first_name, u.last_name): u.id for u in session.execute(stmt)}
 
-    # c. Build and insert to EmailAddress
+    # f. Insert emails for dictionary-based data
     email_payload = []
-    for entry in bulk_data:
+    for entry in data:
         user_id = user_map.get((entry["first_name"], entry["last_name"]))
         for email in entry["email_addresses"]:
             email_payload.append({"user_id": user_id, "email_address": email})
-
     session.execute(insert(EmailAddress), email_payload)
 
-    # d. Commit everything at once
+    # g. Insert emails for individual entries
+    email_address_1 = EmailAddress(
+        email_address="amity.blight@hexside.com", user_id=user_1.id
+    )
+    email_address_2 = EmailAddress(
+        email_address="willow.park@hexside.com", user_id=user_2.id
+    )
+    session.add_all([email_address_1, email_address_2])
+
+    # h. Commit everything at once
     session.commit()
 
 # 2. Check to see what data was added

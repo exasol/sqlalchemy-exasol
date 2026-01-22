@@ -13,4 +13,5 @@ numerical order, as also given in the list below:
    :maxdepth: 2
 
    create_tables
+   single_entry
    insert_multiple_entries

@@ -73,7 +73,7 @@ with Session(ENGINE) as session:
             email_payload.append({"user_id": user_id, "email_address": email})
     session.execute(insert(EmailAddress), email_payload)
 
-    # g. Insert emails for individual entries
+    # g. Insert an email address for each entry
     email_address_1 = EmailAddress(
         email_address="amity.blight@hexside.com", user_id=user_1.id
     )
@@ -82,11 +82,11 @@ with Session(ENGINE) as session:
     )
     session.add_all([email_address_1, email_address_2])
 
-    # h. Commit everything at once
+    # h. Commit all changes
     session.commit()
 
 
-# 2. Select to see the results
+# 2. Display the results
 def select_all_entries():
     with Session(ENGINE) as session:
         stmt = select(User).options(joinedload(User.email_addresses))  # type: ignore
@@ -140,7 +140,7 @@ with Session(ENGINE) as session:
 
         session.commit()
         print(
-            f"\n--EmailAddress for User {amity.id}, {willow.id}, {lux.id} have been deleted.--"
+            f"\n--EmailAddress for Users {amity.id}, {willow.id}, and {lux.id} have been deleted.--"
         )
 
 select_all_entries()

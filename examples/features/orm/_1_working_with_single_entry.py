@@ -63,7 +63,7 @@ select_all_entries()
 
 # 3. Update the entry
 with Session(ENGINE) as session:
-    # a. Query the user by their identifying information
+    # a. Query a user by first and last name
     user_to_update = (
         session.query(User).filter_by(first_name="Jax", last_name="Doe").first()
     )

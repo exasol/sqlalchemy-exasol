@@ -9,9 +9,7 @@ from sqlalchemy.orm import (
     joinedload,
 )
 
-from examples.config import (
-    ENGINE,
-)
+from examples.config import ENGINE
 from examples.features.orm._0_create_tables import (
     EmailAddress,
     User,

@@ -15,3 +15,4 @@
 
 * #698: Updated Configuration pages
 * #703: Added ORM examples
+* #706: Added more single and multiple entry ORM examples

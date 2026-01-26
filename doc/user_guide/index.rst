@@ -59,6 +59,6 @@ Known Limitations
     or the `native Exasol IMPORT statement <https://docs.exasol.com/db/latest/sql/import.htm>`__
     instead.
   - Inserting multiple empty rows via prepared statements does not work in all cases.
-  - As shown in :ref:`example_orm_insert_multiple_entries`, some SQLAlchemy functions
+  - As shown in :ref:`example_orm_multiple_entries`, some SQLAlchemy functions
     which implicitly rely on RETURNING will not work, as the Exasol dialect does
     not support RETURNING. This example shows how to successfully work around that.

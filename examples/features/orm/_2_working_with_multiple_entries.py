@@ -2,7 +2,6 @@ from sqlalchemy import (
     delete,
     insert,
     select,
-    tuple_,
 )
 from sqlalchemy.orm import (
     Session,
@@ -38,34 +37,31 @@ data = [
         "last_name": "Whispers",
         "email_addresses": ["bard.coven@community.com"],
     },
+    {
+        "first_name": "Amity",
+        "last_name": "Blight",
+        "email_addresses": ["amity.blight@hexside.com"],
+    },
+    {
+        "first_name": "Willow",
+        "last_name": "Park",
+        "email_addresses": ["willow.park@hexside.com"],
+    },
 ]
 
 with Session(ENGINE) as session:
-    # a. Create new instances
-    # Note: We do NOT use options that implicitly rely on RETURNING, as the Exasol dialect
-    # doesn't support RETURNING. For more details, see:
-    #    https://exasol.github.io/sqlalchemy-exasol/master/user_guide/examples/orm/insert_multiple_entries.html
-    user_1 = User(first_name="Amity", last_name="Blight")
-    user_2 = User(first_name="Willow", last_name="Park")
-
-    # b. Adds multiple entries to be inserted
-    session.add_all([user_1, user_2])
-
-    # c. Add more entries using a dictionary
+    # a. Add more entries using a dictionary
     session.execute(insert(User), data)
 
-    # d. Sends the pending changes to the session WITHOUT committing it yet;
+    # b. Sends the pending changes to the session WITHOUT committing it yet;
     # this updates Users with id values.
     session.flush()
 
-    # e. Retrieve user ids
-    names = [(d["first_name"], d["last_name"]) for d in data]
-    stmt = select(User.id, User.first_name, User.last_name).where(
-        tuple_(User.first_name, User.last_name).in_(names)
-    )
+    # c. Retrieve user ids
+    stmt = select(User.id, User.first_name, User.last_name)
     user_map = {(u.first_name, u.last_name): u.id for u in session.execute(stmt)}
 
-    # f. Insert emails for dictionary-based data
+    # d. Insert emails for dictionary-based data
     email_payload = []
     for entry in data:
         user_id = user_map.get((entry["first_name"], entry["last_name"]))
@@ -73,16 +69,7 @@ with Session(ENGINE) as session:
             email_payload.append({"user_id": user_id, "email_address": email})
     session.execute(insert(EmailAddress), email_payload)
 
-    # g. Insert an email address for each entry
-    email_address_1 = EmailAddress(
-        email_address="amity.blight@hexside.com", user_id=user_1.id
-    )
-    email_address_2 = EmailAddress(
-        email_address="willow.park@hexside.com", user_id=user_2.id
-    )
-    session.add_all([email_address_1, email_address_2])
-
-    # h. Commit all changes
+    # e. Commit all changes
     session.commit()
 
 

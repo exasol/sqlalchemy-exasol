@@ -35,8 +35,14 @@ with Session(ENGINE) as session:
     # this updates the User with a numerical id value.
     session.flush()
 
+    # d. Retrieve user ids
+    stmt = select(User.id).where(
+        User.first_name == new_user.first_name, User.last_name == new_user.last_name
+    )
+    user_id = session.execute(stmt).scalar()
+
     new_email = EmailAddress(
-        user_id=new_user.id,
+        user_id=user_id,
         email_address="jax.doe@example.com",
     )
 

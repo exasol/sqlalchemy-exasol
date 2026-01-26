@@ -11,7 +11,7 @@ jobs:
   verify-examples:
     name: Verify Examples (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
     needs: [ build-matrix ]
-    runs-on:  ubuntu-24.04
+    runs-on:  "ubuntu-24.04"
     strategy:
       matrix:
         python-version: ["3.12"]
@@ -20,10 +20,10 @@ jobs:
       contents: read
     steps:
       - name: Check out repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v4
+        uses: exasol/python-toolbox/.github/actions/python-environment@v5
         with:
           python-version: ${{ matrix.python-version }}
 

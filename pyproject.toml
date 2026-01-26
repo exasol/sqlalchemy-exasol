@@ -14,7 +14,6 @@ authors = [
 requires-python = ">=3.10,<3.14"
 readme = "README.rst"
 license = "BSD-2-Clause"
-license-files = ["LICENSE"]
 keywords = [
     "exasol",
     "sql",
@@ -49,6 +48,7 @@ dependencies = [
     #     https://github.com/exasol/sqlalchemy-exasol/issues/697
     "sqlalchemy>=2.0.0,<2.0.45",
 ]
+license-files = ["LICENSE"]
 
 [project.urls]
 Homepage = "https://www.exasol.com/"
@@ -57,12 +57,27 @@ Source = "https://github.com/exasol/sqlalchemy-exasol"
 Issues = "https://github.com/exasol/sqlalchemy-exasol/issues"
 Changelog = "https://exasol.github.io/sqlalchemy-exasol/changelog.html"
 
+[project.entry-points."sqlalchemy.dialects"]
+"exa.websocket" = "sqlalchemy_exasol.websocket:EXADialect_websocket"
+
 [build-system]
 requires = ["poetry_core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[dependency-groups]
+dev = [
+    "nox>=2022.1.7",
+    "pytest-json-report>=1.5.0",
+    "pytest>=6,<9",
+    "exasol-integration-test-docker-environment>=5.0.0,<6",
+    "pytest-exasol-backend>=1.0.0,<2",
+    "exasol-toolbox>=5.0.0,<6",
+    "pydantic>=2.12.5,<3",
+    "pydantic-settings>=2.12.0,<3",
+]
+
 [tool.poetry]
-requires-poetry = ">=2.1.0"
+requires-poetry = ">=2.3.0"
 packages = [
     { include = "sqlalchemy_exasol" },
 ]
@@ -72,19 +87,6 @@ include = [
     "LICENSE",
 ]
 exclude = []
-
-[tool.poetry.group.dev.dependencies]
-nox = ">=2022.1.7"
-pytest-json-report = ">=1.5.0"
-pytest = ">=6,<9"
-exasol-integration-test-docker-environment = "^5.0.0"
-pytest-exasol-backend = "^1.0.0"
-exasol-toolbox = "^4.0.1"
-pydantic = "^2.12.5"
-pydantic-settings = "^2.12.0"
-
-[tool.poetry.plugins."sqlalchemy.dialects"]
-"exa.websocket" = "sqlalchemy_exasol.websocket:EXADialect_websocket"
 
 [tool.pytest.ini_options]
 addopts = "--tb native -v -r fxX"

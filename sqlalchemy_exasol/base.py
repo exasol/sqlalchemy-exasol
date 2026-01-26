@@ -54,6 +54,15 @@ from typing import (
     Any,
 )
 
+from pyexasol.exceptions import (
+    ExaAuthError,
+    ExaCommunicationError,
+    ExaError,
+    ExaQueryError,
+    ExaRequestError,
+    ExaRuntimeError,
+)
+
 import sqlalchemy.exc
 from sqlalchemy import (
     event,
@@ -837,18 +846,6 @@ class EXATimestamp(sqltypes.TypeDecorator):
     
     
 from sqlalchemy import exc as sa_exc
-
-_PYEXA_TO_SA = {
-    "ExaQueryError": sa_exc.ProgrammingError,
-    "ExaAuthError": sa_exc.OperationalError,
-    "ExaRequestError": sa_exc.OperationalError,
-    "ExaCommunicationError": sa_exc.OperationalError,
-    "ExaRuntimeError": sa_exc.DatabaseError,
-    "ExaConstraintViolationError": sa_exc.IntegrityError,
-    "ExaIntegrityError": sa_exc.IntegrityError,
-    "ExaError": sa_exc.DatabaseError,
-}
-
 class EXADialect(default.DefaultDialect):
     name = "exasol"
     max_identifier_length = 128
@@ -1342,19 +1339,17 @@ class EXADialect(default.DefaultDialect):
     dbapi_exception_translation_map = {}
 
     def do_execute(self, cursor, statement, parameters, context=None):
-        # print("TRIGGERED DO EXECUTE")
         try:
             return super().do_execute(cursor, statement, parameters, context)
-        except Exception as e:
-            mapped = _PYEXA_TO_SA.get(e.__class__.__name__)
-            if mapped:
-                # simplest: construct the SA exception directly
-                try:
-                    raise mapped(statement, parameters, e) from e
-                except TypeError:
-                    # handle minor signature differences across SA versions
-                    try:
-                        raise mapped(statement, parameters, e, False) from e
-                    except TypeError:
-                        raise mapped(str(e)) from e
-            raise
+
+        # Query-specific server errors
+        except ExaQueryError as e:
+            raise sa_exc.ProgrammingError(statement, parameters, e) from e
+
+        # Connection/auth/request/transport problems
+        except (ExaAuthError, ExaRequestError, ExaCommunicationError) as e:
+            raise sa_exc.OperationalError(statement, parameters, e) from e
+
+        # Everything else from pyexasol
+        except (ExaRuntimeError, ExaError) as e:
+            raise sa_exc.DatabaseError(statement, parameters, e) from e

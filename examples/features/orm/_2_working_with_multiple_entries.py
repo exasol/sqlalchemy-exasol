@@ -53,7 +53,7 @@ with Session(ENGINE) as session:
     # a. Add more entries using a dictionary
     session.execute(insert(User), data)
 
-    # b. Sends the pending changes to the session WITHOUT committing it yet;
+    # b. Send the pending changes to the session WITHOUT committing it yet;
     # this updates Users with id values.
     session.flush()
 
@@ -61,7 +61,7 @@ with Session(ENGINE) as session:
     stmt = select(User.id, User.first_name, User.last_name)
     user_map = {(u.first_name, u.last_name): u.id for u in session.execute(stmt)}
 
-    # d. Insert emails for dictionary-based data
+    # d. Insert email for each user in the dictionary
     email_payload = []
     for entry in data:
         user_id = user_map.get((entry["first_name"], entry["last_name"]))

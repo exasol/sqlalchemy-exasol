@@ -52,6 +52,7 @@ from contextlib import closing
 from datetime import datetime
 from typing import (
     Any,
+    Optional
 )
 
 from pyexasol.exceptions import (
@@ -696,65 +697,115 @@ class EXADDLCompiler(compiler.DDLCompiler):
 
 
 class EXATypeCompiler(compiler.GenericTypeCompiler):
-    """force mapping of BIGINT to DECIMAL(19)
-    The mapping back is done by the driver using flag
-    INTTYPESINRESULTSIFPOSSIBLE=Y. This is enforced by default by this
-    dialect. However, BIGINT is mapped to DECIMAL(36) and the driver only
-    converts types decimal scale==0 and 9<precision<=19 back to BIGINT
-    https://www.exasol.com/support/browse/EXA-23267
+    """Type compiler for Exasol (WebSocket-only).
+
+    Policy:
+    - Do NOT override types Exasol already supports well via native names/aliases
+      (BIGINT/INTEGER/SMALLINT, NUMERIC/DECIMAL, FLOAT/REAL/DOUBLE, etc.).
+    - Only override types that Exasol doesn't have as first-class SQL types or
+      where SQLAlchemy may emit a name Exasol won't accept (e.g. TIME, DATETIME,
+      TEXT/LOB-ish types, UUID, binary types, ENUM).
+    - For long text, use explicit VARCHAR(n) for Alembic/reflection stability.
     """
 
-    def visit_big_integer(self, type_, **kw):
-        return "DECIMAL(19)"
+    # Exasol VARCHAR max length (per docs)
+    _MAX_VARCHAR_SIZE = 2_000_000
 
-    def visit_large_binary(self, type_):
-        return self.visit_BLOB(type_)
+    # ---- helpers ----
 
-    # --- Date/time ---
+    def _varchar(self, length: Optional[int]) -> str:
+        """Render Exasol VARCHAR(n). Clamp to max; default to max if None/0."""
+        n = int(length) if length else self._MAX_VARCHAR_SIZE
+        if n > self._MAX_VARCHAR_SIZE:
+            n = self._MAX_VARCHAR_SIZE
+        return f"VARCHAR({n})"
 
-    # Some SQLAlchemy versions dispatch DateTime() to 'DATETIME' (upper-case)
-    def visit_DATETIME(self, type_, **kw):
-        return "TIMESTAMP"
+    def _varchar_max(self) -> str:
+        """Exasol 'CLOB' is an alias; we emit explicit max VARCHAR for stability."""
+        return f"VARCHAR({self._MAX_VARCHAR_SIZE})"
 
-    # Others dispatch to 'datetime' (lower-case) — keep both for safety
-    def visit_datetime(self, type_, **kw):
-        return "TIMESTAMP"
-
-    # If anything ever uses an explicit TIMESTAMP type, make it consistent
-    def visit_TIMESTAMP(self, type_, **kw):
-        return "TIMESTAMP"
+    def _timestamp(self) -> str:
+            return "TIMESTAMP"
     
-    # --- Strings / Text ---
+    # ---- Date / Time ----
 
-     # SA String(length) -> VARCHAR(n); String() -> CLOB (Exasol requires length)
-    def visit_string(self, type_, **kw):
-        if type_.length:
-            return f"VARCHAR({int(type_.length)})"
-        return "CLOB"
+    def visit_DATETIME(self, type_: sqltypes.DateTime, **kw: Any) -> str:
+        # Some SQLAlchemy versions dispatch DateTime() as DATETIME; Exasol uses TIMESTAMP.
+        return self._timestamp()
 
-    # SA Text() -> Exasol CLOB (Exasol has no TEXT; VARCHAR requires a length)
-    def visit_text(self, type_, **kw):
-        return "CLOB"
+    def visit_datetime(self, type_: sqltypes.DateTime, **kw: Any) -> str:
+        return self.visit_DATETIME(type_, **kw)
 
-    # (optional) SA UnicodeText() -> CLOB as well
-    def visit_unicode_text(self, type_, **kw):
-        return "CLOB"
+    def visit_TIME(self, type_: sqltypes.Time, **kw: Any) -> str:
+        # Exasol has no standalone TIME type; choose a policy.
+        # Mapping to TIMESTAMP preserves "temporal" semantics in DDL.
+        # If you prefer to fail fast instead, raise NotImplementedError here.
+        return self._timestamp()
 
-    # --- Numeric / Decimal ---
+    def visit_time(self, type_: sqltypes.Time, **kw: Any) -> str:
+        return self.visit_TIME(type_, **kw)
 
-    # Ensure Numeric/DECIMAL always renders with an explicit scale
-    def visit_numeric(self, type_, **kw):
-        # SA may pass scale as None or -1 when only precision was given
-        p = type_.precision
-        s = 0 if (type_.scale in (None, -1)) else type_.scale
-        if p is not None:
-            return f"DECIMAL({p},{s})"
-        # sensible fallback if nothing provided
-        return "DECIMAL(18,0)"
+    # ---- UUID ----
 
-    # Some code paths use DECIMAL directly rather than numeric
-    def visit_DECIMAL(self, type_, **kw):
-        return self.visit_numeric(type_, **kw)
+    def visit_UUID(self, type_: sqltypes.Uuid[Any], **kw: Any) -> str:
+        # Exasol has no native UUID type. Compact storage choice:
+        # HASHTYPE(16 BYTE) fits UUID bytes.
+        return "HASHTYPE(16 BYTE)"
+
+    def visit_uuid(self, type_: sqltypes.Uuid[Any], **kw: Any) -> str:
+        return self.visit_UUID(type_, **kw)
+
+    # ---- Binary / blobs ----
+
+    def visit_large_binary(self, type_: sqltypes.LargeBinary, **kw: Any) -> str:
+        # Exasol doesn't have a conventional BLOB/VARBINARY family.
+        # Store encoded bytes (hex/base64) at the app layer; represent as max VARCHAR.
+        return self._varchar_max()
+
+    def visit_BLOB(self, type_: sqltypes.LargeBinary, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_BINARY(self, type_: sqltypes.BINARY, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_VARBINARY(self, type_: sqltypes.VARBINARY, **kw: Any) -> str:
+        return self._varchar_max()
+
+    # ---- Text / long strings ----
+
+    def visit_TEXT(self, type_: sqltypes.Text, **kw: Any) -> str:
+        # Exasol has no TEXT type; treat as large string (explicit max VARCHAR).
+        return self._varchar_max()
+
+    def visit_text(self, type_: sqltypes.Text, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_CLOB(self, type_: sqltypes.CLOB, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_NCLOB(self, type_: sqltypes.Text, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_unicode_text(self, type_: sqltypes.UnicodeText, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_string(self, type_: sqltypes.String, **kw: Any) -> str:
+        # SA String(length) -> VARCHAR(length); String() -> VARCHAR(max) (Exasol requires length)
+        return self._varchar(getattr(type_, "length", None))
+
+    def visit_unicode(self, type_: sqltypes.Unicode, **kw: Any) -> str:
+        # Same policy as String
+        return self._varchar(getattr(type_, "length", None))
+
+    # ---- ENUM ----
+
+    def visit_enum(self, type_: sqltypes.Enum, **kw: Any) -> str:
+        # Exasol has no ENUM; store as VARCHAR(length_of_longest_value) or max VARCHAR.
+        enums = list(getattr(type_, "enums", []) or [])
+        if enums:
+            max_len = max(len(str(v)) for v in enums)
+            return self._varchar(max_len)
+        return self._varchar(None)
     
 
 

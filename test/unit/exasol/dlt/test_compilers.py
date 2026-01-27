@@ -1,6 +1,5 @@
 from types import SimpleNamespace
 
-import pytest
 from sqlalchemy import types as sqltypes
 
 from sqlalchemy_exasol import base
@@ -27,7 +26,9 @@ def test_big_integer_is_not_overridden_anymore():
 # --- Binary / blobs ---------------------------------------------------------
 def test_visit_large_binary_maps_to_max_varchar():
     compiler = _type_compiler()
-    assert compiler.visit_large_binary(sqltypes.LargeBinary()) == f"VARCHAR({MAX_VARCHAR})"
+    assert (
+        compiler.visit_large_binary(sqltypes.LargeBinary()) == f"VARCHAR({MAX_VARCHAR})"
+    )
 
 
 def test_visit_blob_family_maps_to_max_varchar():
@@ -81,7 +82,9 @@ def test_visit_text_and_clob_variants_map_to_max_varchar():
     # SQLAlchemy Text/UnicodeText -> max varchar
     assert compiler.visit_text(sqltypes.Text()) == f"VARCHAR({MAX_VARCHAR})"
     assert compiler.visit_TEXT(sqltypes.Text()) == f"VARCHAR({MAX_VARCHAR})"
-    assert compiler.visit_unicode_text(sqltypes.UnicodeText()) == f"VARCHAR({MAX_VARCHAR})"
+    assert (
+        compiler.visit_unicode_text(sqltypes.UnicodeText()) == f"VARCHAR({MAX_VARCHAR})"
+    )
 
     # Our compiler also supports CLOB/NCLOB visit names; not all SQLA versions expose
     # sqltypes.CLOB/NCLOB classes consistently, so we just call visit_* with a dummy.

@@ -50,11 +50,9 @@ import re
 from collections.abc import MutableMapping
 from contextlib import closing
 from datetime import datetime
-from typing import (
-    Any,
-    Optional
-)
+from typing import Any
 
+import sqlalchemy.exc
 from pyexasol.exceptions import (
     ExaAuthError,
     ExaCommunicationError,
@@ -63,8 +61,6 @@ from pyexasol.exceptions import (
     ExaRequestError,
     ExaRuntimeError,
 )
-
-import sqlalchemy.exc
 from sqlalchemy import (
     event,
     schema,
@@ -713,7 +709,7 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
 
     # ---- helpers ----
 
-    def _varchar(self, length: Optional[int]) -> str:
+    def _varchar(self, length: int | None) -> str:
         """Render Exasol VARCHAR(n). Clamp to max; default to max if None/0."""
         n = int(length) if length else self._MAX_VARCHAR_SIZE
         if n > self._MAX_VARCHAR_SIZE:
@@ -725,8 +721,8 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
         return f"VARCHAR({self._MAX_VARCHAR_SIZE})"
 
     def _timestamp(self) -> str:
-            return "TIMESTAMP"
-    
+        return "TIMESTAMP"
+
     # ---- Date / Time ----
 
     def visit_DATETIME(self, type_: sqltypes.DateTime, **kw: Any) -> str:
@@ -806,7 +802,6 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
             max_len = max(len(str(v)) for v in enums)
             return self._varchar(max_len)
         return self._varchar(None)
-    
 
 
 class EXAIdentifierPreparer(compiler.IdentifierPreparer):
@@ -873,11 +868,13 @@ class EXAExecutionContext(default.DefaultExecutionContext):
     def should_autocommit_text(self, statement):
         return AUTOCOMMIT_REGEXP.match(statement)
 
+
 class EXATimestamp(sqltypes.TypeDecorator):
     """Coerce Python datetime to a JSON-serializable wire value for pyexasol.
 
     Exasol TIMESTAMP has no timezone; we format naive/UTC datetimes accordingly.
     """
+
     impl = sqltypes.TIMESTAMP
     cache_ok = True
 
@@ -893,10 +890,13 @@ class EXATimestamp(sqltypes.TypeDecorator):
             if isinstance(value, sqltypes.DateTime):
                 return None
             return value
+
         return process
-    
-    
+
+
 from sqlalchemy import exc as sa_exc
+
+
 class EXADialect(default.DefaultDialect):
     name = "exasol"
     max_identifier_length = 128
@@ -1385,7 +1385,7 @@ class EXADialect(default.DefaultDialect):
         if isinstance(typeobj, sqltypes.DateTime):
             return EXATimestamp()
         return super().type_descriptor(typeobj)
-    
+
     # leave this for true DB-API remapping (ODBC etc.)
     dbapi_exception_translation_map = {}
 

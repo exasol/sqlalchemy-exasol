@@ -1,8 +1,4 @@
 import pytest
-from sqlalchemy import exc as sa_exc
-
-from sqlalchemy_exasol.base import EXADialect
-
 from pyexasol.exceptions import (
     ExaAuthError,
     ExaCommunicationError,
@@ -11,6 +7,9 @@ from pyexasol.exceptions import (
     ExaRequestError,
     ExaRuntimeError,
 )
+from sqlalchemy import exc as sa_exc
+
+from sqlalchemy_exasol.base import EXADialect
 
 
 class DummyCursor:

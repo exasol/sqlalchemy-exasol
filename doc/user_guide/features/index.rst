@@ -3,6 +3,21 @@
 Features
 ========
 
+Autoincrement Identity Columns
+------------------------------
+
+In SQLAlchemy-Exasol, the autoincrement feature leverages Exasol's native
+`IDENTITY <https://docs.exasol.com/db/latest/sql_references/data_types/identitycolumns.htm>`__
+columns to automatically generate unique, sequential primary key values. To enable this
+behavior when you define a table, see these examples, where ``primary_key=True`` for two
+identity columns:
+
+* :ref:`Create Table <example_non_orm_create_table>`
+* :ref:`Create Table with ORM <example_orm_create_table>`
+
+Once configured, Exasol handles the ID generation on the server
+side whenever a new row is inserted without a specified identifier.
+
 Automatic Indexes
 -----------------
 

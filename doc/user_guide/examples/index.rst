@@ -9,6 +9,7 @@ Examples
 
    connection_configuration
    testing_connection
+   non_orm/index.rst
    orm/index.rst
 
 SQLAlchemy-Exasol contains the following examples which are regularly verified in the CI to be correct.

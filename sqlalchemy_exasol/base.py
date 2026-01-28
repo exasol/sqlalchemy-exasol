@@ -751,20 +751,20 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
         return self.visit_UUID(type_, **kw)
 
     # ---- Binary / blobs ----
-
-    def visit_large_binary(self, type_: sqltypes.LargeBinary, **kw: Any) -> str:
-        # Exasol doesn't have a conventional BLOB/VARBINARY family.
-        # Store encoded bytes (hex/base64) at the app layer; represent as max VARCHAR.
-        return self._varchar_max()
-
     def visit_BLOB(self, type_: sqltypes.LargeBinary, **kw: Any) -> str:
-        return self._varchar_max()
+        raise sa_exc.CompileError(
+            "BLOB is not supported by the Exasol dialect"
+        )
 
     def visit_BINARY(self, type_: sqltypes.BINARY, **kw: Any) -> str:
-        return self._varchar_max()
+        raise sa_exc.CompileError(
+            "BINARY is not supported by the Exasol dialect"
+        )
 
     def visit_VARBINARY(self, type_: sqltypes.VARBINARY, **kw: Any) -> str:
-        return self._varchar_max()
+        raise sa_exc.CompileError(
+            "VARBINARY is not supported by the Exasol dialect"
+        )
 
     # ---- Text / long strings ----
 

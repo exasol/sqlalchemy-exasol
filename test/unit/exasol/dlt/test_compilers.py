@@ -49,8 +49,8 @@ def test_visit_datetime_variants_return_timestamp():
 
 def test_visit_time_variants_return_timestamp():
     compiler = _type_compiler()
-    assert compiler.visit_time(sqltypes.Time()) == "TIMESTAMP"
-    assert compiler.visit_TIME(sqltypes.Time()) == "TIMESTAMP"
+    assert compiler.visit_time(sqltypes.Time()) == "VARCHAR(16)"
+    assert compiler.visit_TIME(sqltypes.Time()) == "VARCHAR(16)"
 
 
 # --- UUID -------------------------------------------------------------------

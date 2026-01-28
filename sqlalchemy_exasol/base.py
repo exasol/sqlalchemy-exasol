@@ -49,7 +49,7 @@ import logging
 import re
 from collections.abc import MutableMapping
 from contextlib import closing
-from datetime import datetime
+from datetime import datetime, time
 from typing import Any
 
 import sqlalchemy.exc
@@ -62,6 +62,7 @@ from pyexasol.exceptions import (
     ExaRuntimeError,
 )
 from sqlalchemy import (
+    String,
     event,
     schema,
     sql,
@@ -733,10 +734,8 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
         return self.visit_DATETIME(type_, **kw)
 
     def visit_TIME(self, type_: sqltypes.Time, **kw: Any) -> str:
-        # Exasol has no standalone TIME type; choose a policy.
-        # Mapping to TIMESTAMP preserves "temporal" semantics in DDL.
         # If you prefer to fail fast instead, raise NotImplementedError here.
-        return self._timestamp()
+        return self._varchar(16)
 
     def visit_time(self, type_: sqltypes.Time, **kw: Any) -> str:
         return self.visit_TIME(type_, **kw)
@@ -893,7 +892,22 @@ class EXATimestamp(sqltypes.TypeDecorator):
 
         return process
 
+class EXATimestring(sqltypes.TypeDecorator):
+    impl = String(16)
+    cache_ok = True
 
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        if isinstance(value, time):
+            # ISO 8601 time
+            return value.isoformat()
+        return str(value)
+
+    def process_result_value(self, value, dialect):
+        # optional: return raw string or parse back
+        return value
+    
 from sqlalchemy import exc as sa_exc
 
 
@@ -1384,6 +1398,8 @@ class EXADialect(default.DefaultDialect):
         """
         if isinstance(typeobj, sqltypes.DateTime):
             return EXATimestamp()
+        if isinstance(typeobj, sqltypes.Time):
+            return EXATimestring()
         return super().type_descriptor(typeobj)
 
     # leave this for true DB-API remapping (ODBC etc.)

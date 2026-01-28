@@ -49,7 +49,10 @@ import logging
 import re
 from collections.abc import MutableMapping
 from contextlib import closing
-from datetime import datetime, time
+from datetime import (
+    datetime,
+    time,
+)
 from typing import Any
 
 import sqlalchemy.exc
@@ -752,19 +755,13 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
 
     # ---- Binary / blobs ----
     def visit_BLOB(self, type_: sqltypes.LargeBinary, **kw: Any) -> str:
-        raise sa_exc.CompileError(
-            "BLOB is not supported by the Exasol dialect"
-        )
+        raise sa_exc.CompileError("BLOB is not supported by the Exasol dialect")
 
     def visit_BINARY(self, type_: sqltypes.BINARY, **kw: Any) -> str:
-        raise sa_exc.CompileError(
-            "BINARY is not supported by the Exasol dialect"
-        )
+        raise sa_exc.CompileError("BINARY is not supported by the Exasol dialect")
 
     def visit_VARBINARY(self, type_: sqltypes.VARBINARY, **kw: Any) -> str:
-        raise sa_exc.CompileError(
-            "VARBINARY is not supported by the Exasol dialect"
-        )
+        raise sa_exc.CompileError("VARBINARY is not supported by the Exasol dialect")
 
     # ---- Text / long strings ----
 
@@ -892,6 +889,7 @@ class EXATimestamp(sqltypes.TypeDecorator):
 
         return process
 
+
 class EXATimestring(sqltypes.TypeDecorator):
     impl = String(16)
     cache_ok = True
@@ -907,7 +905,8 @@ class EXATimestring(sqltypes.TypeDecorator):
     def process_result_value(self, value, dialect):
         # optional: return raw string or parse back
         return value
-    
+
+
 from sqlalchemy import exc as sa_exc
 
 

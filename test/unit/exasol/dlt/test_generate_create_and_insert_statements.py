@@ -1,5 +1,9 @@
 import re
-from datetime import date, datetime, time
+from datetime import (
+    date,
+    datetime,
+    time,
+)
 from decimal import Decimal
 
 from sqlalchemy import (
@@ -9,7 +13,6 @@ from sqlalchemy import (
     DateTime,
     Float,
     Integer,
-    LargeBinary,
     MetaData,
     Numeric,
     SmallInteger,

@@ -2,6 +2,7 @@ from sqlalchemy import (
     delete,
     insert,
     select,
+    tuple_,
 )
 from sqlalchemy.orm import (
     Session,
@@ -108,26 +109,17 @@ select_all_entries()
 
 # 4. Delete multiple entries
 with Session(ENGINE) as session:
-    amity = (
-        session.query(User).filter_by(first_name="Amity", last_name="Blight").first()
-    )
-    willow = (
-        session.query(User).filter_by(first_name="Willow", last_name="Park").first()
-    )
-    lux = session.query(User).filter_by(first_name="Lux", last_name="Noceda").first()
+    targets = [("Amity", "Blight"), ("Willow", "Park"), ("Lux", "Noceda")]
+    stmt = select(User.id).filter(tuple_(User.first_name, User.last_name).in_(targets))
+    user_ids = session.scalars(stmt).all()
 
-    if amity and willow and lux:
-        user_ids = [user.id for user in [amity, willow, lux] if user]
-
-        # Delete email addresses associated with these users, as they graduated
-        for user_id in user_ids:
-            session.query(EmailAddress).filter(EmailAddress.user_id == user_id).delete(
-                synchronize_session=False
-            )
-
-        session.commit()
-        print(
-            f"\n--EmailAddress for Users {amity.id}, {willow.id}, and {lux.id} have been deleted.--"
+    # Delete email addresses associated with these users, as they graduated
+    for user_id in user_ids:
+        session.query(EmailAddress).filter(EmailAddress.user_id == user_id).delete(
+            synchronize_session=False
         )
+
+    session.commit()
+    print(f"\n--EmailAddress for Users {user_ids} have been deleted.--")
 
 select_all_entries()

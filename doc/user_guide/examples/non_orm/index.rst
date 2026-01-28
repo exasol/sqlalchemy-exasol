@@ -8,3 +8,4 @@ Basic Operations
 
    create_tables
    single_entry
+   multiple_entries

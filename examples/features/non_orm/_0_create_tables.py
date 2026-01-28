@@ -36,7 +36,7 @@ email_address_table = Table(
     metadata,
     Column("id", Integer, primary_key=True),
     Column("email_address", String(100), nullable=False),
-    Column("user_id", Integer, ForeignKey("user.id", ondelete="CASCADE")),
+    Column("user_id", Integer, ForeignKey("user.id")),
 )
 
 # 4. Create all tables

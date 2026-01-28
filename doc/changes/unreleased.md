@@ -16,3 +16,4 @@
 * #698: Updated Configuration pages
 * #703: Added ORM examples
 * #706: Added more single and multiple entry ORM examples
+* #712: Added to features information on: autoincremented columns, foreign keys, & automatic indexes

@@ -30,6 +30,7 @@ def test_big_integer_is_not_overridden_anymore():
     out = compiler.visit_big_integer(sqltypes.BigInteger())
     assert out != "DECIMAL(19)"
 
+
 # --- Date/time --------------------------------------------------------------
 def test_visit_datetime_variants_return_timestamp():
     compiler = _type_compiler()

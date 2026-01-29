@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import (
     Column,
     ForeignKey,
@@ -5,6 +7,7 @@ from sqlalchemy import (
     MetaData,
     String,
     Table,
+    text,
 )
 
 from examples.config import (
@@ -13,12 +16,14 @@ from examples.config import (
     SQL_ALCHEMY,
 )
 
+# For more information on table definitions, check out:
+#    https://docs.sqlalchemy.org/en/21/tutorial/metadata.html
+
 # 1. Ensure that the schema exists
 SQL_ALCHEMY.create_schema(engine=ENGINE, schema=DEFAULT_SCHEMA_NAME)
 
 # 2. Use the schema to define the metadata_obj, which is used in the `Base` class
 metadata_obj = MetaData(schema=DEFAULT_SCHEMA_NAME)
-
 
 metadata = MetaData()
 
@@ -42,3 +47,17 @@ email_address_table = Table(
 # 4. Create all tables
 with ENGINE.begin() as conn:
     metadata.create_all(conn)
+
+# 5. Verify that the tables have been created
+query = f"""
+SELECT TABLE_NAME
+FROM SYS.EXA_ALL_TABLES
+WHERE TABLE_SCHEMA = '{DEFAULT_SCHEMA_NAME}'
+ORDER BY TABLE_NAME
+"""
+
+with ENGINE.connect() as con:
+    results = con.execute(text(query)).fetchall()
+
+if __name__ == "__main__":
+    print(f"Tables in schema={DEFAULT_SCHEMA_NAME}: {results}")

@@ -90,14 +90,16 @@ select_all_entries()
 
 # 3. Update multiple entries
 with Session(ENGINE) as session:
-    # Fetch the users by their old last names
+    # a. Fetch the users by their old last names
     raine = session.query(User).filter_by(last_name="Whispers").first()
     eda = session.query(User).filter_by(last_name="Clawthorne").first()
 
     if raine and eda:
+        # b. Update Users last_name
         raine.last_name = "Clawthorne-Whispers"
         eda.last_name = "Clawthorne-Whispers"
 
+        # c. Update EmailAddress
         eda_email = session.query(EmailAddress).filter_by(user_id=eda.id).first()
         if eda_email:
             eda_email.email_address = "eda.clawthorne-whispers@owlhouse.com"  # type: ignore
@@ -109,11 +111,12 @@ select_all_entries()
 
 # 4. Delete multiple entries
 with Session(ENGINE) as session:
+    # a. Get the User.id for affected Users
     targets = [("Amity", "Blight"), ("Willow", "Park"), ("Lux", "Noceda")]
     stmt = select(User.id).filter(tuple_(User.first_name, User.last_name).in_(targets))
     user_ids = session.scalars(stmt).all()
 
-    # Delete email addresses associated with these users, as they graduated
+    # b. Delete EmailAddresses associated with these Users, as they graduated
     for user_id in user_ids:
         session.query(EmailAddress).filter(EmailAddress.user_id == user_id).delete(
             synchronize_session=False

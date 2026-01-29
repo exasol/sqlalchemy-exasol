@@ -52,7 +52,7 @@ def select_all_entries():
 
 select_all_entries()
 
-# 3. Update (Atomic execution)
+# 3. Update the entry
 with ENGINE.begin() as conn:
     # a. Update User
     conn.execute(
@@ -60,14 +60,14 @@ with ENGINE.begin() as conn:
         .where(user_table.c.first_name == "Jax")
         .values(first_name="Paris")
     )
-    # b. Update Email (using a subquery or join-like syntax depending on logic)
+    # b. Update EmailAddress
     conn.execute(
         update(email_address_table)
         .where(email_address_table.c.email_address == "jax.doe@example.com")
         .values(email_address="paris.doe@example.com")
     )
 
-# 4. Delete
+# 4. Delete the entry
 with ENGINE.begin() as conn:
     # a. Get the IDs of the users you want to delete
     user_ids_stmt = select(user_table.c.id).where(user_table.c.first_name == "Paris")
@@ -81,5 +81,5 @@ with ENGINE.begin() as conn:
             )
         )
 
-        # c. Now delete the user
+        # c. Delete the user
         conn.execute(delete(user_table).where(user_table.c.id.in_(user_ids)))

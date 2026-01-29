@@ -50,7 +50,7 @@ data = [
 ]
 
 with ENGINE.begin() as conn:
-    # a. Insert users
+    # a. Insert Users
     user_payload = [
         {"first_name": d["first_name"], "last_name": d["last_name"]} for d in data
     ]
@@ -60,7 +60,7 @@ with ENGINE.begin() as conn:
     stmt = select(user_table.c.id, user_table.c.first_name, user_table.c.last_name)
     user_map = {(row.first_name, row.last_name): row.id for row in conn.execute(stmt)}
 
-    # c. Insert
+    # c. Insert EmailAddresses
     email_payload = []
     for entry in data:
         u_id = user_map.get((entry["first_name"], entry["last_name"]))
@@ -98,6 +98,7 @@ select_all_entries()
 
 # 3. Update multiple entries
 with ENGINE.begin() as conn:
+    # a. Update the last_name of Users
     new_last_name = "Clawthorne-Whispers"
     conn.execute(
         update(user_table)
@@ -105,8 +106,7 @@ with ENGINE.begin() as conn:
         .values(last_name=new_last_name)
     )
 
-    # a. Update specific email by referencing the user's new state or joining
-    # Here we use a subquery to find the ID of Eda specifically
+    # b. Update the EmailAddress
     eda_id_subq = (
         select(user_table.c.id)
         .where(user_table.c.first_name == "Eda")
@@ -129,9 +129,8 @@ with ENGINE.begin() as conn:
     stmt = select(user_table.c.id).where(target_criteria)
     users_ids = conn.execute(stmt).scalars().all()
 
+    # b. Delete EmailAddresses associated with these Users, as they graduated
     for uid in users_ids:
-        # Re-create the statement for each execution to ensure
-        # the dialect handles the parameter as a simple equality
         email_delete_stmt = delete(email_address_table).where(
             email_address_table.c.user_id == uid
         )

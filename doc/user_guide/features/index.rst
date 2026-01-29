@@ -9,22 +9,21 @@ Autoincremented Columns
 In SQLAlchemy-Exasol, the autoincrement feature leverages Exasol's native
 `IDENTITY <https://docs.exasol.com/db/latest/sql_references/data_types/identitycolumns.htm>`__
 columns to automatically generate unique, sequential primary key values. To enable this
-behavior when you define a table, see these examples, where ``primary_key=True`` for two
-identity columns:
+behavior when defining a table, set ``primary_key=True`` as shown in the following examples:
 
 * :ref:`Create Table <example_non_orm_create_table>`
 * :ref:`Create Table with ORM <example_orm_create_table>`
 
-Once configured, Exasol handles the ID generation on the server
-side whenever a new row is inserted without a specified identifier.
+Once configured, Exasol generates a new ID on the server side whenever a new row is
+inserted.
 
 Automatic Indexes
 -----------------
 
 Exasol is a self-tuning database designed to eliminate the manual effort of performance
 optimization. Instead of requiring users to design and maintain indexes, the database
-engine intelligently generates them on the fly during query execution to ensure optimal
-join and filter performance.
+engine intelligently generates and updates them on the fly during query execution to ensure
+optimal join and filter performance.
 
 For SQLALchemy-Exasol users, this means:
 
@@ -54,14 +53,14 @@ primarily used as metadata to help the query optimizer create faster execution p
 * **Performance Impact**: Exasol leaves them disabled by default because strict
    enforcement adds overhead during high-speed data loading (DML operations).
 
-To see the status of your foreign key columns, check the
-` EXA_ALL_CONSTRAINTS table <https://docs.exasol.com/db/latest/sql_references/system_tables/metadata/exa_all_constraints.htm>.`__.
+To see the status of your foreign key columns, check table
+`EXA_ALL_CONSTRAINTS <https://docs.exasol.com/db/latest/sql_references/system_tables/metadata/exa_all_constraints.htm>`__.
+
 To check what your system settings are, use this SQL statement:
 
 .. code-block:: sql
 
-    SELECT *
-    FROM EXA_PARAMETERS
+    SELECT * FROM EXA_PARAMETERS
     WHERE PARAMETER_NAME = 'CONSTRAINT_STATE_DEFAULT';
 
 

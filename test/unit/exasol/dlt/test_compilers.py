@@ -1,6 +1,14 @@
 from types import SimpleNamespace
 
+import pytest
+from sqlalchemy import (
+    Column,
+    MetaData,
+    Table,
+)
+from sqlalchemy import exc as sa_exc
 from sqlalchemy import types as sqltypes
+from sqlalchemy.schema import CreateTable
 
 from sqlalchemy_exasol import base
 
@@ -21,24 +29,6 @@ def test_big_integer_is_not_overridden_anymore():
     compiler = _type_compiler()
     out = compiler.visit_big_integer(sqltypes.BigInteger())
     assert out != "DECIMAL(19)"
-
-
-# --- Binary / blobs ---------------------------------------------------------
-def test_visit_large_binary_maps_to_max_varchar():
-    compiler = _type_compiler()
-    assert (
-        compiler.visit_large_binary(sqltypes.LargeBinary()) == f"VARCHAR({MAX_VARCHAR})"
-    )
-
-
-def test_visit_blob_family_maps_to_max_varchar():
-    compiler = _type_compiler()
-
-    # These are not always instantiated in user code, but our compiler supports them.
-    assert compiler.visit_BLOB(sqltypes.LargeBinary()) == f"VARCHAR({MAX_VARCHAR})"
-    assert compiler.visit_BINARY(sqltypes.BINARY()) == f"VARCHAR({MAX_VARCHAR})"
-    assert compiler.visit_VARBINARY(sqltypes.VARBINARY()) == f"VARCHAR({MAX_VARCHAR})"
-
 
 # --- Date/time --------------------------------------------------------------
 def test_visit_datetime_variants_return_timestamp():
@@ -126,3 +116,30 @@ def test_visit_numeric_variants_apply_scale_defaults():
 
     assert "10" in out1  # keep this loose to avoid version-specific formatting diffs
     assert "DECIMAL" in out2 or "NUMERIC" in out2
+
+
+def _compile_create_table(table: Table) -> str:
+    """Compile CREATE TABLE DDL using the Exasol dialect (no DB needed)."""
+    dialect = base.EXADialect()
+    return str(CreateTable(table).compile(dialect=dialect))
+
+
+@pytest.mark.parametrize(
+    ("type_", "expected_msg"),
+    [
+        (sqltypes.LargeBinary(), "BLOB is not supported by the Exasol dialect"),
+        # SQLAlchemy has a BLOB type in some versions; in others it's LargeBinary-based.
+        (
+            getattr(sqltypes, "BLOB", sqltypes.LargeBinary)(),
+            "BLOB is not supported by the Exasol dialect",
+        ),
+        (sqltypes.BINARY(16), "BINARY is not supported by the Exasol dialect"),
+        (sqltypes.VARBINARY(16), "VARBINARY is not supported by the Exasol dialect"),
+    ],
+)
+def test_binary_types_are_rejected_at_ddl_compile(type_, expected_msg):
+    md = MetaData()
+    t = Table("t_bin", md, Column("c", type_))
+
+    with pytest.raises(sa_exc.CompileError, match=expected_msg):
+        _compile_create_table(t)

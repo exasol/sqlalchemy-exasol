@@ -122,9 +122,9 @@ def test_create_table_and_insert_cover_many_types_as_compiled_strings():
         """
         INSERT INTO "T_ALL_TYPES"
         ("C_INT", "C_SMALLINT", "C_BOOL", "C_DATE", "C_TIME", "C_DATETIME",
-         "C_VARCHAR_10", "C_TEXT", "C_NUMERIC", "C_FLOAT", "C_BLOB")
+         "C_VARCHAR_10", "C_TEXT", "C_NUMERIC", "C_FLOAT")
         VALUES
-        (1, 2, TRUE, '2026-01-28', '12:34:56', '2026-01-28 12:34:56',
+        (1, 2, true, '2026-01-28', '12:34:56', '2026-01-28 12:34:56',
          'hello', 'world', 123, 1.25)
         """
     )

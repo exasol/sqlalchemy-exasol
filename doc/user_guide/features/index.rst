@@ -39,6 +39,38 @@ unnecessary but intentionally unsupported to prevent interference with the engin
 optimization algorithms. For more in-depth information, explore the Exasol documentation
 on `indexes <https://docs.exasol.com/db/latest/performance/indexes.htm>`__.
 
+Caching
+-------
+
+Since version 1.4, SQLAlchemy features a "SQL compilation caching" facility designed to
+significantly reduce Python interpreter overhead during query construction. This system
+works by generating a unique cache key that represents the structural state of a Core or
+an ORM SQL construct, including its columns, tables, and JOIN conditions. Once a
+specific query structure is compiled into a string for the first time, SQLAlchemy stores
+the result in an internal cache; subsequent executions with the same structure skip the
+expensive string compilation process and reuse the existing SQL. This is particularly
+beneficial for ORM-heavy applications, as it streamlines the logic for lazy loaders and
+relationship lookups.
+
+For more information, see these pages from SQLAlchemy:
+
+* `Performance <https://docs.sqlalchemy.org/en/21/faq/performance.html>`__
+* `SQL Compilation Caching <https://docs.sqlalchemy.org/en/21/core/connections.html#sql-compilation-caching>`__
+
+Since version 1.4, SQLAlchemy has also streamlined its "Reflection API" by implementing
+an internal metadata cache within the Inspector object. This system is designed to
+minimize the performance cost of querying database system catalogs—such as those in
+Exasol—by ensuring that schema details like columns, foreign keys, and constraints are
+only fetched once per inspector instance. When a method like ``get_foreign_keys()`` is
+called, the result is stored in an internal dictionary; subsequent requests for the same
+table metadata skip the network round-trip and return the cached data immediately.
+This is particularly advantageous for applications that perform heavy reflection
+operations.
+
+For more details, see:
+
+* `Reflecting Database Objects <https://docs.sqlalchemy.org/en/21/core/reflection.html>`__
+
 Foreign Keys
 ------------
 

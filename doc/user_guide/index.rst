@@ -52,6 +52,16 @@ General Tips
 
 Known Limitations
 -----------------
+.. note::
+    * Running into an error with a specific SQLAlchemy example? Our Exasol dialect may
+      already be handling that for you! Check out our :ref:`features` for a full breakdown
+      of what is automated.
+    * In some cases, we might be able to provide new features or solutions for these
+      limitations. Please feel free to reach out by creating a
+      `GitHub issue <https://github.com/exasol/sqlalchemy-exasol/issues>`__.
+    * For technical difficulties, please submit a request
+      via the `Exasol Support Portal <https://exasol.my.site.com/s/create-new-case>`__.
+
 * Insert
 
   - SQLAlchemy is slower than other drivers at performing multiple entry inserts.

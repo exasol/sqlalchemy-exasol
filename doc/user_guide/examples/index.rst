@@ -11,6 +11,7 @@ Examples
    testing_connection
    non_orm/index.rst
    orm/index.rst
+   specific_focuses/index.rst
 
 SQLAlchemy-Exasol contains the following examples which are regularly verified in the CI to be correct.
 For a broader introduction and an overview, please see:
@@ -49,7 +50,7 @@ Some basic preparation steps are required to see the examples in action:
     - `exasol/docker-db <https://hub.docker.com/r/exasol/docker-db/tags>`__, which can be easily accessed by using ``poetry run -- nox -s db:start``
     - the free `Exasol Community Edition <https://www.exasol.com/free-signup-community-edition/>`__
 
-#. Open the ``/examples/`` directory and edit the file configuration file, as described in :ref:`example_configuration`.
+#. Open the ``/examples/`` directory and edit the configuration file, as described in :ref:`example_configuration`.
 #. To verify that your connection configuration is correct, run the code, as described in :ref:`example_connection`.
 #. Now, you may run whatever examples you would like:
 

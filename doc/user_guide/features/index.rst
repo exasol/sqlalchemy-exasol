@@ -3,6 +3,17 @@
 Features
 ========
 
+Autocommit
+----------
+
+By default SQLAlchemy-Exasol has ``AUTOCOMMIT`` turned on, as mentioned in
+:ref:`dialect_specific_params`. This means that every statement is executed and
+finalized by the database immediately after leaving a with-block.
+
+* Our :ref:`autocommit` examples
+* SQLAlchemy's `Working with Engines and Connections <https://docs.sqlalchemy.org/en/20/core/connections.html>`__
+* SQLAlchemy's `Transaction & Connection Management <https://docs.sqlalchemy.org/en/20/orm/session_transaction.html>`__
+
 Autoincremented Columns
 -----------------------
 

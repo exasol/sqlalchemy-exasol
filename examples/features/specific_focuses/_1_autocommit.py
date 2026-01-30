@@ -44,6 +44,16 @@ insert_statement = (
 )
 with ENGINE.begin() as conn:
     conn.execute(text(insert_statement), hex_data)
-    # if ENGINE.connect() were used instead of ENGINE.begin()
-    # and "AUTOCOMMIT" were disabled, you MUST include a
-    # con.commit() for the change to be persisted
+    # if `ENGINE.connect()` were used instead of `ENGINE.begin()` and "AUTOCOMMIT" were
+    # disabled, you MUST include a `con.commit()` for the change to be persisted;
+    # otherwise, no results will be found in #4
+
+# 4. DQL
+select_statement = f"SELECT * FROM {DEFAULT_SCHEMA_NAME}.{TABLE_NAME}"
+
+with ENGINE.connect() as con:
+    result = con.execute(text(select_statement)).fetchall()
+
+    print(f"Number of entries: {len(result)}")
+    for row in result:
+        print(row)

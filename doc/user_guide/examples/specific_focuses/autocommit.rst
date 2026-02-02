@@ -3,11 +3,29 @@
 Autocommit
 ==========
 
-These examples are meant to highlight best practices and the difference between having
-``AUTOCOMMIT`` enabled versus disabled. As ``AUTOCOMMIT`` is enabled by default,
-to run the examples with it disabled, you will need to modify your
-configuration file, as described on :ref:`example_configuration`, to set
-``"AUTOCOMMIT":"n"``.
+These examples are meant to highlight best practices and allow users to explore the
+difference between having ``AUTOCOMMIT`` enabled versus disabled.
+
+Throughout our examples, we use ``engine.begin()``. Code inside of a with-block using
+``engine.begin()`` will behave the same whether ``AUTOCOMMIT``
+is enabled (``y``) or disabled (``n``). This is because ``engine.begin()`` automatically
+issues a ``COMMIT`` when the block successfully finished or a ``ROLLBACK`` if it fails.
+For any basic database modifications, the recommended best practice is to use
+``engine.begin()``. This is to ensure that the objects are in the desired state before
+performing further manipulation steps. While it is possible to use ``engine.connect()``
+instead, when ``AUTOCOMMIT`` is disabled, you must manually, inside of the with-block,
+call ``commit()``. For a more nuanced discussion, see :ref:`begin_or_connect`.
+
+To explore what changes when ``AUTOCOMMIT`` is set to ``n``, you can:
+
+1. Modify your configuration file, as described on :ref:`example_configuration`, to set
+   ``"AUTOCOMMIT":"n"``.
+2. Modify the code in the examples to use ``engine.connect()`` instead of
+   ``engine.begin()``.
+3. Try to execute the examples and see what happens. You should get failures, as
+   ``engine.connect()`` without ``AUTOCOMMIT`` requires you to manually call
+   ``conn.commit()`` as needed.
+4. Add ``conn.commit()`` to the examples and try to execute them. They should now pass.
 
 .. note::
 
@@ -27,22 +45,16 @@ Data Definition Language (DDL)
        :caption: examples/features/specific_focuses/autocommit.py
        :end-before: # 2. Data Query Language (DQL)
 
-Code inside of a with-block using ``begin()`` will behave the same whether ``AUTOCOMMIT``
-is enabled or disabled. This is because ``begin()`` automatically issues a
-``COMMIT`` when the block successfully finished or a ``ROLLBACK`` if it fails.
+
+It is recommended to use ``engine.begin()`` for DDL statements.
 
 .. note::
 
-    It is recommended to use ``begin()`` for DDL statements. This is to
-    ensure that the objects are in the desired state before performing further
-    manipulation steps. While it is possible to use ``connect()`` instead,
-    when ``AUTOCOMMIT`` is disabled, you must manually, inside of the with-block,
-    call ``commit()``. For a slightly more nuanced discussion, see
-    :ref:`begin_or_connect`.
-
-    Additionally, note that ``IDENTITY`` **must** be included for the ID to
-    autoincrement. This is not true for the examples given in :ref:`examples_non_orm`
-    or :ref:`examples_orm`, where SQLAlchemy generates the required SQL statement.
+    Note that ``IDENTITY``
+    (`an Exasol Database keyword <https://docs.exasol.com/db/latest/sql_references/data_types/identitycolumns.htm?Highlight=identity>`__)
+    **must** be included for the ID to autoincrement. This is not required for the
+    examples given in :ref:`examples_non_orm` or :ref:`examples_orm`, where SQLAlchemy
+    generates the required SQL statement for the Exasol database instance.
 
 Data Query Language (DQL)
 -------------------------
@@ -67,10 +79,11 @@ Data Manipulation Language (DML)
        :start-at: # 3. Data Manipulation Language (DML)
 
 Like the :ref:`ddl` example, it is preferred here to use ``begin()`` in the with-block.
-This behaves the same whether ``AUTOCOMMIT`` is enabled or disabled. For a slightly
+This behaves the same whether ``AUTOCOMMIT`` is enabled or disabled. For a
 more nuanced discussion, see :ref:`begin_or_connect`.
 
 .. _begin_or_connect:
+
 
 Connection Management in SQLAlchemy
 -----------------------------------

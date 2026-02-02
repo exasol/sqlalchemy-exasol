@@ -30,9 +30,9 @@ WHERE TABLE_SCHEMA = '{DEFAULT_SCHEMA_NAME}'
 AND TABLE_NAME = '{TABLE_NAME}'
 """
 
-with ENGINE.connect() as con:
-    results = con.execute(text(query)).fetchall()
-    # con.commit() is never needed for DQL
+with ENGINE.connect() as conn:
+    results = conn.execute(text(query)).fetchall()
+    # conn.commit() is never needed for DQL
 
 print(f"Table search result: {results}")
 
@@ -40,19 +40,20 @@ print(f"Table search result: {results}")
 hex_data = [{"hex_code": "FF5733"}, {"hex_code": "33FF57"}, {"hex_code": "3357FF"}]
 
 insert_statement = (
-    f"INSERT INTO {DEFAULT_SCHEMA_NAME}.{TABLE_NAME} (hex_code) VALUES (:hex_code)"
+    f"INSERT INTO {DEFAULT_SCHEMA_NAME}.{TABLE_NAME} " f"(hex_code) VALUES (:hex_code)"
 )
 with ENGINE.begin() as conn:
     conn.execute(text(insert_statement), hex_data)
-    # if `ENGINE.connect()` were used instead of `ENGINE.begin()` and "AUTOCOMMIT" were
-    # disabled, you MUST include a `con.commit()` for the change to be persisted;
-    # otherwise, no results will be found in #4
+    # if `ENGINE.connect()` were used instead of `ENGINE.begin()` and
+    # "AUTOCOMMIT" were disabled, you MUST include a `conn.commit()`
+    # for the change to be persisted; otherwise, no results will be
+    # found in #4,
 
 # 4. DQL
 select_statement = f"SELECT * FROM {DEFAULT_SCHEMA_NAME}.{TABLE_NAME}"
 
-with ENGINE.connect() as con:
-    result = con.execute(text(select_statement)).fetchall()
+with ENGINE.connect() as conn:
+    result = conn.execute(text(select_statement)).fetchall()
 
     print(f"Number of entries: {len(result)}")
     for row in result:

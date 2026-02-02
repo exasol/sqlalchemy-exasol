@@ -3,6 +3,24 @@
 Features
 ========
 
+Autocommit
+----------
+
+By default, SQLAlchemy-Exasol has ``AUTOCOMMIT`` turned on, as mentioned in
+:ref:`dialect_specific_params`. This parameter is only relevant when using
+``engine.connect()``. When using ``engine.begin()``, the transaction, if the inner steps
+are successful, is always automatically committed at the end of the with-block.
+
+Committing or using autocommit ensures that any changes made during a transaction — such
+as inserts or updates — are permanently saved to the database. For more information on these
+patterns, please see :ref:`begin_or_connect` and these other resources:
+
+
+
+* Our :ref:`Autocommit Examples <autocommit>`
+* SQLAlchemy's `Working with Engines and Connections <https://docs.sqlalchemy.org/en/20/core/connections.html>`__
+* SQLAlchemy's `Transaction & Connection Management <https://docs.sqlalchemy.org/en/20/orm/session_transaction.html>`__
+
 Autoincremented Columns
 -----------------------
 

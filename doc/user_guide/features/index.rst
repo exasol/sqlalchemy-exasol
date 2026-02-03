@@ -130,11 +130,11 @@ To switch a constraint to ``ENABLE``, choose which SQL statement suits your purp
 Object Name Handling
 --------------------
 
-In an Exasol database instance, all case-insensitive (unquoted) object names are stored
-in **uppercase** text. In contrast, SQLAlchemy considers all **lowercase** object
-names to be case-insensitive.
+Exasol interprets all case-insensitive (unquoted) object names as **uppercase**
+text. In contrast, SQLAlchemy considers all **lowercase** object names to
+be case-insensitive.
 
-* The ``sqlalchemy-exasol`` dialect converts the object name during schema-level
+* The ``sqlalchemy-exasol`` dialect converts all object names during schema-level
   communication (e.g., during table and index reflection) to what is required for
   SQLAlchemy. Note that this conversion does **not** occur when you provide
   a fully prepared SQL statement (e.g., via a raw string or ``text()`` construct)

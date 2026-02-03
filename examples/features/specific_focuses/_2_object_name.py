@@ -18,11 +18,11 @@ SQL_ALCHEMY.create_schema(engine=ENGINE, schema=DEFAULT_SCHEMA_NAME)
 metadata = MetaData(schema=DEFAULT_SCHEMA_NAME)
 
 # 1. Create the table
-table_name_lower = "hex_lookup"
+table_name = "hex_lookup"
 
 hex_table = Table(
     # table_name_lower.upper() also would work
-    table_name_lower.lower(),
+    table_name.lower(),
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("hex_code", CHAR(6), nullable=False),
@@ -39,7 +39,7 @@ query = f"""
 SELECT *
 FROM SYS.EXA_ALL_TABLES
 WHERE TABLE_SCHEMA = '{DEFAULT_SCHEMA_NAME.upper()}'
-AND TABLE_NAME = '{table_name_lower.upper()}'
+AND TABLE_NAME = '{table_name.upper()}'
 """
 
 with ENGINE.connect() as con:

@@ -164,3 +164,17 @@ that ensures data consistency.
     * For more examples & details, see SQLAlchemy's
       `ORM Quick Start <https://docs.sqlalchemy.org/en/20/orm/quickstart.html>`__
       and `ORM Index <https://docs.sqlalchemy.org/en/20/orm/index.html>`__.
+
+Query Method Chaining
+---------------------
+
+Query method chaining in SQLAlchemy utilizes a generative interface where successive
+method calls like ``.filter()``, ``.join()``, and ``.order_by()`` return a new Query
+object containing the additional criteria. This allows you to build complex,
+multi-clause SQL statements through a fluent Pythonic syntax that remains readable and
+maintainable. The chain is ultimately executed when a final "execution" method such as
+``.all()``, ``.first()``, ``.scalar()``, etc. is called to fetch the results from the
+database. For more details, check out:
+
+* Our :ref:`Query Method Chaining Example <query_method_chaining>`
+* SQLAlchemy's `ORM Querying Guide <https://docs.sqlalchemy.org/en/20/orm/queryguide/select.html>`__

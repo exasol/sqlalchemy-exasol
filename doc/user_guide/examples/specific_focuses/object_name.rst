@@ -9,8 +9,8 @@ uppercase or lowercase.
 
 .. literalinclude:: ../../../../examples/features/specific_focuses/_2_object_name.py
        :language: python3
-       :caption: examples/features/specific_focuses/_2_object_name
-       :end-before: # 2. Select with Fully Prepared Raw SQL Statement
+       :caption: examples/features/specific_focuses/_2_object_name.py
+       :end-before: # 2. Select with fully prepared raw SQL statement
 
 When using a fully prepared raw SQL statement or using a where clause, you must
 ensure to send the text as it was saved in the Exasol database instance. In the
@@ -18,5 +18,5 @@ case of table & schema names, these are always saved in **uppercase**.
 
 .. literalinclude:: ../../../../examples/features/specific_focuses/_2_object_name.py
        :language: python3
-       :caption: examples/features/specific_focuses/_2_object_name
-       :start-at: # 2. Select with Fully Prepared Raw SQL Statement
+       :caption: examples/features/specific_focuses/_2_object_name.py
+       :start-at: # 2. Select with fully prepared raw SQL statement

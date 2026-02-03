@@ -31,7 +31,7 @@ hex_table = Table(
 with ENGINE.begin() as conn:
     metadata.create_all(conn)
 
-# 2. Select with Fully Prepared Raw SQL Statement
+# 2. Select with fully prepared raw SQL statement
 
 # Here only table_name_lower.upper(), etc. would work,
 # as the internal values are saved in uppercase.

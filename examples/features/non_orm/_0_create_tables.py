@@ -23,9 +23,7 @@ from examples.config import (
 SQL_ALCHEMY.create_schema(engine=ENGINE, schema=DEFAULT_SCHEMA_NAME)
 
 # 2. Use the schema to define the metadata_obj
-metadata_obj = MetaData(schema=DEFAULT_SCHEMA_NAME)
-
-metadata = MetaData()
+metadata = MetaData(schema=DEFAULT_SCHEMA_NAME)
 
 # 3. Define tables
 user_table = Table(

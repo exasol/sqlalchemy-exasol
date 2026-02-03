@@ -42,7 +42,7 @@ Data Definition Language (DDL)
 
 .. literalinclude:: ../../../../examples/features/specific_focuses/_1_autocommit.py
        :language: python3
-       :caption:examples/features/specific_focuses/_1_autocommit.py
+       :caption: examples/features/specific_focuses/_1_autocommit.py
        :end-before: # 2. Data Query Language (DQL)
 
 

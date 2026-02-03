@@ -127,6 +127,24 @@ To switch a constraint to ``ENABLE``, choose which SQL statement suits your purp
     -- For global enforcement, which will degrade performance
     ALTER SYSTEM SET DEFAULT_CONSTRAINT_STATE = 'ENABLE';
 
+Object Name Handling
+--------------------
+
+In an Exasol database instance, all case-insensitive (unquoted) object names are stored
+in **uppercase** text. In contrast, SQLAlchemy considers all **lowercase** object
+names to be case-insensitive.
+
+* The ``sqlalchemy-exasol`` dialect converts the object name during schema-level
+  communication (e.g., during table and index reflection) to what is required for
+  SQLAlchemy. Note that this conversion does **not** occur when you provide
+  a fully prepared SQL statement (e.g., via a raw string or ``text()`` construct)
+  or are selecting rows based on values, e.g. in a where clause.
+* Therefore, you should use **all lowercase names** when working with SQLAlchemy
+  metadata objects, but ensure you use **all uppercase names** when writing
+  strings to match Exasol's internal storage.
+
+For an example, see :ref:`object_name`.
+
 
 .. _orm:
 

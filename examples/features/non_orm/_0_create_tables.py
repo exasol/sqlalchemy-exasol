@@ -22,7 +22,7 @@ from examples.config import (
 # 1. Ensure that the schema exists
 SQL_ALCHEMY.create_schema(engine=ENGINE, schema=DEFAULT_SCHEMA_NAME)
 
-# 2. Use the schema to define the metadata_obj, which is used in the `Base` class
+# 2. Use the schema to define the metadata_obj
 metadata_obj = MetaData(schema=DEFAULT_SCHEMA_NAME)
 
 metadata = MetaData()

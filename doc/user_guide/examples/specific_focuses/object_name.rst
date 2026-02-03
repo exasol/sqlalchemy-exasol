@@ -5,7 +5,7 @@ Object Name Handling
 
 When passing an object name, e.g. the name of a database table, into a SQLAlchemy construct,
 the name usage is case-insensitive.  You could pass ``table_name.lower()``
-or  ``table_name.upper()`` as the first argument to ` `Table()`` in the following example,
+or  ``table_name.upper()`` as the first argument to ``Table()`` in the following example,
 and both options will work.
 
 .. literalinclude:: ../../../../examples/features/specific_focuses/_2_object_name.py

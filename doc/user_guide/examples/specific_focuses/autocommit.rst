@@ -42,7 +42,7 @@ Data Definition Language (DDL)
 
 .. literalinclude:: ../../../../examples/features/specific_focuses/_1_autocommit.py
        :language: python3
-       :caption: examples/features/specific_focuses/autocommit.py
+       :caption: examples/features/specific_focuses/_1_autocommit.py
        :end-before: # 2. Data Query Language (DQL)
 
 
@@ -61,7 +61,7 @@ Data Query Language (DQL)
 
 .. literalinclude:: ../../../../examples/features/specific_focuses/_1_autocommit.py
        :language: python3
-       :caption: examples/features/specific_focuses/autocommit.py
+       :caption: examples/features/specific_focuses/_1_autocommit.py
        :start-at: # 2. Data Query Language (DQL)
        :end-before: # 3. Data Manipulation Language (DML)
 
@@ -75,7 +75,7 @@ Data Manipulation Language (DML)
 
 .. literalinclude:: ../../../../examples/features/specific_focuses/_1_autocommit.py
        :language: python3
-       :caption: examples/features/specific_focuses/autocommit.py
+       :caption: examples/features/specific_focuses/_1_autocommit.py
        :start-at: # 3. Data Manipulation Language (DML)
 
 Like the :ref:`ddl` example, it is preferred here to use ``begin()`` in the with-block.

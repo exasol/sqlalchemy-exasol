@@ -19,3 +19,4 @@
 * #712: Added to features information on: autoincremented columns, foreign keys, & automatic indexes
 * #714: Added to features information on: caching + more non-ORM examples
 * #716: Added to features information on: autocommit
+* #718: Added to features information on: object name handling and query method chaining

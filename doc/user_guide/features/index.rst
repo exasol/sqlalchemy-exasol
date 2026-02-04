@@ -127,6 +127,25 @@ To switch a constraint to ``ENABLE``, choose which SQL statement suits your purp
     -- For global enforcement, which will degrade performance
     ALTER SYSTEM SET DEFAULT_CONSTRAINT_STATE = 'ENABLE';
 
+Object Name Handling
+--------------------
+
+Exasol interprets all case-insensitive (unquoted) object names as **uppercase**
+text. In contrast, SQLAlchemy considers all **lowercase** object names to
+be case-insensitive.
+
+* The ``sqlalchemy-exasol`` dialect converts all unquoted object names during
+  schema-level communication (e.g., during table and index reflection) to what is
+  required for SQLAlchemy. Note that this conversion does **not** occur when you provide
+  a fully prepared SQL statement (e.g., via a raw string or ``text()`` construct)
+  or are selecting rows based on values, e.g. in a where clause.
+* Therefore, whenever you have unquoted table names, you should use
+  **all lowercase names** when working with SQLAlchemy metadata objects, but ensure you
+  use **all uppercase names** when writing strings to match Exasol's internal storage.
+* Quoted object names should not have their cases altered.
+
+For an example, see :ref:`object_name`.
+
 
 .. _orm:
 
@@ -146,3 +165,17 @@ that ensures data consistency.
     * For more examples & details, see SQLAlchemy's
       `ORM Quick Start <https://docs.sqlalchemy.org/en/20/orm/quickstart.html>`__
       and `ORM Index <https://docs.sqlalchemy.org/en/20/orm/index.html>`__.
+
+Query Method Chaining
+---------------------
+
+Query method chaining in SQLAlchemy utilizes a generative interface where successive
+method calls like ``.filter()``, ``.join()``, and ``.order_by()`` return a new Query
+object containing the additional criteria. This allows you to build complex,
+multi-clause SQL statements through a fluent Pythonic syntax that remains readable and
+maintainable. The chain is ultimately executed when a final "execution" method such as
+``.all()``, ``.first()``, ``.scalar()``, etc. is called to fetch the results from the
+database. For more details, check out:
+
+* Our :ref:`Query Method Chaining Example <query_method_chaining>`
+* SQLAlchemy's `ORM Querying Guide <https://docs.sqlalchemy.org/en/20/orm/queryguide/select.html>`__

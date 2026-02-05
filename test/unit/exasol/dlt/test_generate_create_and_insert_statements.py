@@ -41,7 +41,7 @@ def test_datetime_is_wrapped_to_exatimestamp_via_type_descriptor():
     dialect = _dialect()
     impl = DateTime().dialect_impl(dialect)
 
-    # DateTime must be wrapped so values serialize correctly for pyexasol
+    # DateTime must be wrapped so values serialize correctly for PyExasol
     assert isinstance(impl, EXATimestamp)
 
 

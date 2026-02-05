@@ -11,13 +11,11 @@ from sqlalchemy import types as sqltypes
 from sqlalchemy.schema import CreateTable
 
 from sqlalchemy_exasol import base
+from sqlalchemy_exasol.base import EXATypeCompiler
 
 
 def _type_compiler():
     return base.EXATypeCompiler(base.EXADialect())
-
-
-MAX_VARCHAR = 2_000_000
 
 
 # --- BIGINT / BigInteger ----------------------------------------------------
@@ -63,25 +61,40 @@ def test_visit_string_and_unicode_length_handling():
     assert compiler.visit_unicode(sqltypes.Unicode(7)) == "VARCHAR(7)"
 
     # No length -> default to max varchar
-    assert compiler.visit_string(sqltypes.String()) == f"VARCHAR({MAX_VARCHAR})"
-    assert compiler.visit_unicode(sqltypes.Unicode()) == f"VARCHAR({MAX_VARCHAR})"
+    assert (
+        compiler.visit_string(sqltypes.String())
+        == f"VARCHAR({EXATypeCompiler._MAX_VARCHAR_SIZE})"
+    )
+    assert (
+        compiler.visit_unicode(sqltypes.Unicode())
+        == f"VARCHAR({EXATypeCompiler._MAX_VARCHAR_SIZE})"
+    )
 
 
 def test_visit_text_and_clob_variants_map_to_max_varchar():
     compiler = _type_compiler()
 
     # SQLAlchemy Text/UnicodeText -> max varchar
-    assert compiler.visit_text(sqltypes.Text()) == f"VARCHAR({MAX_VARCHAR})"
-    assert compiler.visit_TEXT(sqltypes.Text()) == f"VARCHAR({MAX_VARCHAR})"
     assert (
-        compiler.visit_unicode_text(sqltypes.UnicodeText()) == f"VARCHAR({MAX_VARCHAR})"
+        compiler.visit_text(sqltypes.Text())
+        == f"VARCHAR({EXATypeCompiler._MAX_VARCHAR_SIZE})"
+    )
+    assert (
+        compiler.visit_TEXT(sqltypes.Text())
+        == f"VARCHAR({EXATypeCompiler._MAX_VARCHAR_SIZE})"
+    )
+    assert (
+        compiler.visit_unicode_text(sqltypes.UnicodeText())
+        == f"VARCHAR({EXATypeCompiler._MAX_VARCHAR_SIZE})"
     )
 
     # Our compiler also supports CLOB/NCLOB visit names; not all SQLA versions expose
     # sqltypes.CLOB/NCLOB classes consistently, so we just call visit_* with a dummy.
     dummy = SimpleNamespace()
-    assert compiler.visit_CLOB(dummy) == f"VARCHAR({MAX_VARCHAR})"
-    assert compiler.visit_NCLOB(dummy) == f"VARCHAR({MAX_VARCHAR})"
+    assert compiler.visit_CLOB(dummy) == f"VARCHAR({EXATypeCompiler._MAX_VARCHAR_SIZE})"
+    assert (
+        compiler.visit_NCLOB(dummy) == f"VARCHAR({EXATypeCompiler._MAX_VARCHAR_SIZE})"
+    )
 
 
 # --- ENUM -------------------------------------------------------------------
@@ -98,7 +111,7 @@ def test_visit_enum_without_values_falls_back_to_max_varchar():
     # Hard to produce "no enums" via public Enum constructor in all versions,
     # so call visit_enum with a tiny dummy that looks like Enum.
     dummy = SimpleNamespace(enums=[])
-    assert compiler.visit_enum(dummy) == f"VARCHAR({MAX_VARCHAR})"
+    assert compiler.visit_enum(dummy) == f"VARCHAR({EXATypeCompiler._MAX_VARCHAR_SIZE})"
 
 
 # --- Numeric ----------------------------------------------------------------

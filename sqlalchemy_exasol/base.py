@@ -49,10 +49,6 @@ import logging
 import re
 from collections.abc import MutableMapping
 from contextlib import closing
-from datetime import (
-    datetime,
-    time,
-)
 from typing import Any
 
 import sqlalchemy.exc
@@ -65,8 +61,10 @@ from pyexasol.exceptions import (
     ExaRuntimeError,
 )
 from sqlalchemy import (
-    String,
     event,
+)
+from sqlalchemy import exc as sa_exc
+from sqlalchemy import (
     schema,
     sql,
 )
@@ -85,6 +83,11 @@ from sqlalchemy.schema import (
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql.elements import quoted_name
 from sqlalchemy.sql.type_api import TypeEngine
+
+from sqlalchemy_exasol.types import (
+    EXATimestamp,
+    EXATimestring,
+)
 
 from .constraints import DistributeByConstraint
 
@@ -697,24 +700,24 @@ class EXADDLCompiler(compiler.DDLCompiler):
 
 
 class EXATypeCompiler(compiler.GenericTypeCompiler):
-    """Type compiler for Exasol (WebSocket-only).
+    """Type compiler for Exasol (Only tested for WebSocket).
 
     Policy:
     - Do NOT override types Exasol already supports well via native names/aliases
       (BIGINT/INTEGER/SMALLINT, NUMERIC/DECIMAL, FLOAT/REAL/DOUBLE, etc.).
-    - Only override types that Exasol doesn't have as first-class SQL types or
+    - Only override types that Exasol doesn't have as first-class SQL type or
       where SQLAlchemy may emit a name Exasol won't accept (e.g. TIME, DATETIME,
       TEXT/LOB-ish types, UUID, binary types, ENUM).
-    - For long text, use explicit VARCHAR(n) for Alembic/reflection stability.
+    - For long text, use explicit VARCHAR(n) for reflection stability.
     """
 
-    # Exasol VARCHAR max length (per docs)
+    # Exasol VARCHAR max length (per docs https://docs.exasol.com/db/latest/sql_references/data_types/datatypedetails.htm#Stringdatatypes)
     _MAX_VARCHAR_SIZE = 2_000_000
 
     # ---- helpers ----
 
     def _varchar(self, length: int | None) -> str:
-        """Render Exasol VARCHAR(n). Clamp to max; default to max if None/0."""
+        """Render Exasol VARCHAR(n). Default to max if None, 0, or the max is exceeded."""
         n = int(length) if length else self._MAX_VARCHAR_SIZE
         if n > self._MAX_VARCHAR_SIZE:
             n = self._MAX_VARCHAR_SIZE
@@ -737,7 +740,6 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
         return self.visit_DATETIME(type_, **kw)
 
     def visit_TIME(self, type_: sqltypes.Time, **kw: Any) -> str:
-        # If you prefer to fail fast instead, raise NotImplementedError here.
         return self._varchar(16)
 
     def visit_time(self, type_: sqltypes.Time, **kw: Any) -> str:
@@ -863,51 +865,6 @@ class EXAExecutionContext(default.DefaultExecutionContext):
 
     def should_autocommit_text(self, statement):
         return AUTOCOMMIT_REGEXP.match(statement)
-
-
-class EXATimestamp(sqltypes.TypeDecorator):
-    """Coerce Python datetime to a JSON-serializable wire value for pyexasol.
-
-    Exasol TIMESTAMP has no timezone; we format naive/UTC datetimes accordingly.
-    """
-
-    impl = sqltypes.TIMESTAMP
-    cache_ok = True
-
-    def bind_processor(self, dialect):
-        def process(value):
-            if value is None:
-                return None
-            # Normal case: a Python datetime instance
-            if isinstance(value, datetime):
-                # Keep microseconds; Exasol accepts 'YYYY-MM-DD HH:MM:SS.ffffff'
-                return value.strftime("%Y-%m-%d %H:%M:%S.%f")
-            # Defensive: if a SA DateTime *type* accidentally lands here as a value
-            if isinstance(value, sqltypes.DateTime):
-                return None
-            return value
-
-        return process
-
-
-class EXATimestring(sqltypes.TypeDecorator):
-    impl = String(16)
-    cache_ok = True
-
-    def process_bind_param(self, value, dialect):
-        if value is None:
-            return None
-        if isinstance(value, time):
-            # ISO 8601 time
-            return value.isoformat()
-        return str(value)
-
-    def process_result_value(self, value, dialect):
-        # optional: return raw string or parse back
-        return value
-
-
-from sqlalchemy import exc as sa_exc
 
 
 class EXADialect(default.DefaultDialect):
@@ -1393,7 +1350,7 @@ class EXADialect(default.DefaultDialect):
     def type_descriptor(self, typeobj):
         """Return a DB-specific TypeEngine for a generic SA type.
 
-        We wrap DateTime columns so their Python values serialize cleanly for pyexasol.
+        We wrap DateTime columns so their Python values serialize cleanly for PyExasol.
         """
         if isinstance(typeobj, sqltypes.DateTime):
             return EXATimestamp()

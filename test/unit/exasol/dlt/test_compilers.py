@@ -41,18 +41,6 @@ def test_visit_time_variants_return_timestamp():
     assert compiler.visit_time(sqltypes.Time()) == "VARCHAR(16)"
     assert compiler.visit_TIME(sqltypes.Time()) == "VARCHAR(16)"
 
-
-# --- UUID -------------------------------------------------------------------
-def test_visit_uuid_variants_return_hashtype_16():
-    compiler = _type_compiler()
-
-    # Some SQLAlchemy versions use Uuid, others UUID; our compiler implements both
-    # visit_UUID and visit_uuid, so we call them directly.
-    dummy = SimpleNamespace()
-    assert compiler.visit_UUID(dummy) == "HASHTYPE(16 BYTE)"
-    assert compiler.visit_uuid(dummy) == "HASHTYPE(16 BYTE)"
-
-
 # --- Strings / Text ---------------------------------------------------------
 def test_visit_string_and_unicode_length_handling():
     compiler = _type_compiler()

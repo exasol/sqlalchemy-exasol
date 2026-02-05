@@ -748,9 +748,8 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
     # ---- UUID ----
 
     def visit_UUID(self, type_: sqltypes.Uuid[Any], **kw: Any) -> str:
-        # Exasol has no native UUID type. Compact storage choice:
-        # HASHTYPE(16 BYTE) fits UUID bytes.
-        return "HASHTYPE(16 BYTE)"
+        # Exasol has no native UUID type.
+        raise sa_exc.CompileError("BLOB is not supported by the Exasol dialect")
 
     def visit_uuid(self, type_: sqltypes.Uuid[Any], **kw: Any) -> str:
         return self.visit_UUID(type_, **kw)

@@ -749,7 +749,7 @@ class EXATypeCompiler(compiler.GenericTypeCompiler):
 
     def visit_UUID(self, type_: sqltypes.Uuid[Any], **kw: Any) -> str:
         # Exasol has no native UUID type.
-        raise sa_exc.CompileError("BLOB is not supported by the Exasol dialect")
+        raise sa_exc.CompileError("UUID is not supported by the Exasol dialect")
 
     def visit_uuid(self, type_: sqltypes.Uuid[Any], **kw: Any) -> str:
         return self.visit_UUID(type_, **kw)

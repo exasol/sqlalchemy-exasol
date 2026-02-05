@@ -41,6 +41,7 @@ def test_visit_time_variants_return_timestamp():
     assert compiler.visit_time(sqltypes.Time()) == "VARCHAR(16)"
     assert compiler.visit_TIME(sqltypes.Time()) == "VARCHAR(16)"
 
+
 # --- Strings / Text ---------------------------------------------------------
 def test_visit_string_and_unicode_length_handling():
     compiler = _type_compiler()

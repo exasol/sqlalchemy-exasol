@@ -4,8 +4,8 @@ from inspect import cleandoc
 from typing import NamedTuple
 
 import pytest
+import sqlalchemy
 import sqlalchemy as sa
-from pyexasol import ExaQueryError
 from sqlalchemy import Inspector
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.schema import (
@@ -22,7 +22,6 @@ from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import LongNameBlowoutTest as _LongNameBlowoutTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
-from sqlalchemy.testing.suite import ReturningGuardsTest as _ReturningGuardsTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
 from sqlalchemy.testing.suite.test_reflection import _multi_combination
@@ -51,33 +50,6 @@ class XfailRationale(str, Enum):
         Exasol dialect, the entire suite is set to xfail. For further info, see:
         https://github.com/sqlalchemy/sqlalchemy/issues/5456"""
     )
-
-
-class ReturningGuardsTest(_ReturningGuardsTest):
-    """
-    Exasol does not support the RETURNING clause. This is already the assumption
-    per the DefaultDialect.
-
-    The single tests of class sqlalchemy.testing.suite.ReturningGuardsTest are
-    overridden, as they are written to send the request to the DB and receive an
-    error from the DB itself. For the websocket driver (based on PyExasol), the
-    exception raised is an ExaQueryError and not a DBAPIError.
-    """
-
-    @staticmethod
-    def _run_test(test_method, connection, run_stmt):
-        with pytest.raises(ExaQueryError):
-            test_method(connection, run_stmt)
-
-    def test_delete_single(self, connection, run_stmt):
-        self._run_test(super().test_delete_single, connection, run_stmt)
-
-    def test_insert_single(self, connection, run_stmt):
-        self._run_test(super().test_insert_single, connection, run_stmt)
-
-    def test_update_single(self, connection, run_stmt):
-        self._run_test(super().test_update_single, connection, run_stmt)
-
 
 class RowFetchTest(_RowFetchTest):
     RATIONAL = cleandoc(

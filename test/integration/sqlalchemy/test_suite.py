@@ -13,6 +13,11 @@ from sqlalchemy.schema import (
 )
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
+from sqlalchemy.testing.suite import (
+    DateTimeCoercedToDateTimeTest as _DateTimeCoercedToDateTimeTest,
+)
+from sqlalchemy.testing.suite import DateTimeHistoricTest as _DateTimeHistoricTest
+from sqlalchemy.testing.suite import DateTimeTest as _DateTimeTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
@@ -50,6 +55,7 @@ class XfailRationale(str, Enum):
         https://github.com/sqlalchemy/sqlalchemy/issues/5456"""
     )
 
+
 class RowFetchTest(_RowFetchTest):
     RATIONAL = cleandoc(
         """
@@ -64,6 +70,68 @@ class RowFetchTest(_RowFetchTest):
     @pytest.mark.xfail(reason=RATIONAL, raises=DBAPIError, strict=True)
     def test_row_with_dupe_names(self, connection):
         super().test_row_with_dupe_names(connection)
+
+    @pytest.mark.xfail(
+        reason="Websocket DBAPI currently returns DATETIME values as strings.",
+        raises=AssertionError,
+        strict=True,
+    )
+    def test_row_w_scalar_select(self, connection):
+        super().test_row_w_scalar_select(connection)
+
+
+DATETIME_STRING_RATIONAL = (
+    "Websocket DBAPI currently returns DATETIME values as strings instead of "
+    "Python datetime objects."
+)
+
+
+class DateTimeTest(_DateTimeTest):
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_round_trip(self, connection):
+        super().test_round_trip(connection)
+
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_round_trip_decorated(self, connection):
+        super().test_round_trip_decorated(connection)
+
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_select_direct(self, connection):
+        super().test_select_direct(connection)
+
+
+class DateTimeHistoricTest(_DateTimeHistoricTest):
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_round_trip(self, connection):
+        super().test_round_trip(connection)
+
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_round_trip_decorated(self, connection):
+        super().test_round_trip_decorated(connection)
+
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_select_direct(self, connection):
+        super().test_select_direct(connection)
+
+
+class DateTimeCoercedToDateTimeTest(_DateTimeCoercedToDateTimeTest):
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_select_direct(self, connection):
+        super().test_select_direct(connection)
 
 
 class HasTableTest(_HasTableTest):
@@ -510,5 +578,3 @@ class DifficultParametersTest(_DifficultParametersTest):
             if paramname == "dot.s":
                 pytest.xfail(reason="dot.s does not work for <= 7.1.30")
         super().test_round_trip_same_named_column(paramname, connection, metadata)
-
-

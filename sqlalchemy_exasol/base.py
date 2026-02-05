@@ -49,13 +49,22 @@ import logging
 import re
 from collections.abc import MutableMapping
 from contextlib import closing
-from typing import (
-    Any,
-)
+from typing import Any
 
 import sqlalchemy.exc
+from pyexasol.exceptions import (
+    ExaAuthError,
+    ExaCommunicationError,
+    ExaError,
+    ExaQueryError,
+    ExaRequestError,
+    ExaRuntimeError,
+)
 from sqlalchemy import (
     event,
+)
+from sqlalchemy import exc as sa_exc
+from sqlalchemy import (
     schema,
     sql,
 )
@@ -74,6 +83,11 @@ from sqlalchemy.schema import (
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql.elements import quoted_name
 from sqlalchemy.sql.type_api import TypeEngine
+
+from sqlalchemy_exasol.types import (
+    EXATimestamp,
+    EXATimestring,
+)
 
 from .constraints import DistributeByConstraint
 
@@ -686,22 +700,105 @@ class EXADDLCompiler(compiler.DDLCompiler):
 
 
 class EXATypeCompiler(compiler.GenericTypeCompiler):
-    """force mapping of BIGINT to DECIMAL(19)
-    The mapping back is done by the driver using flag
-    INTTYPESINRESULTSIFPOSSIBLE=Y. This is enforced by default by this
-    dialect. However, BIGINT is mapped to DECIMAL(36) and the driver only
-    converts types decimal scale==0 and 9<precision<=19 back to BIGINT
-    https://www.exasol.com/support/browse/EXA-23267
+    """Type compiler for Exasol (Only tested for WebSocket).
+
+    Policy:
+    - Do NOT override types Exasol already supports well via native names/aliases
+      (BIGINT/INTEGER/SMALLINT, NUMERIC/DECIMAL, FLOAT/REAL/DOUBLE, etc.).
+    - Only override types that Exasol doesn't have as first-class SQL type or
+      where SQLAlchemy may emit a name Exasol won't accept (e.g. TIME, DATETIME,
+      TEXT/LOB-ish types, UUID, binary types, ENUM).
+    - For long text, use explicit VARCHAR(n) for reflection stability.
     """
 
-    def visit_big_integer(self, type_, **kw):
-        return "DECIMAL(19)"
+    # Exasol VARCHAR max length (per docs https://docs.exasol.com/db/latest/sql_references/data_types/datatypedetails.htm#Stringdatatypes)
+    _MAX_VARCHAR_SIZE = 2_000_000
 
-    def visit_large_binary(self, type_):
-        return self.visit_BLOB(type_)
+    # ---- helpers ----
 
-    def visit_datetime(self, type_):
-        return self.visit_TIMESTAMP(type_)
+    def _varchar(self, length: int | None) -> str:
+        """Render Exasol VARCHAR(n). Default to max if None, 0, or the max is exceeded."""
+        n = int(length) if length else self._MAX_VARCHAR_SIZE
+        if n > self._MAX_VARCHAR_SIZE:
+            n = self._MAX_VARCHAR_SIZE
+        return f"VARCHAR({n})"
+
+    def _varchar_max(self) -> str:
+        """Exasol 'CLOB' is an alias; we emit explicit max VARCHAR for stability."""
+        return f"VARCHAR({self._MAX_VARCHAR_SIZE})"
+
+    def _timestamp(self) -> str:
+        return "TIMESTAMP"
+
+    # ---- Date / Time ----
+
+    def visit_DATETIME(self, type_: sqltypes.DateTime, **kw: Any) -> str:
+        # Some SQLAlchemy versions dispatch DateTime() as DATETIME; Exasol uses TIMESTAMP.
+        return self._timestamp()
+
+    def visit_datetime(self, type_: sqltypes.DateTime, **kw: Any) -> str:
+        return self.visit_DATETIME(type_, **kw)
+
+    def visit_TIME(self, type_: sqltypes.Time, **kw: Any) -> str:
+        return self._varchar(16)
+
+    def visit_time(self, type_: sqltypes.Time, **kw: Any) -> str:
+        return self.visit_TIME(type_, **kw)
+
+    # ---- UUID ----
+
+    def visit_UUID(self, type_: sqltypes.Uuid[Any], **kw: Any) -> str:
+        # Exasol has no native UUID type.
+        raise sa_exc.CompileError("UUID is not supported by the Exasol dialect")
+
+    def visit_uuid(self, type_: sqltypes.Uuid[Any], **kw: Any) -> str:
+        return self.visit_UUID(type_, **kw)
+
+    # ---- Binary / blobs ----
+    def visit_BLOB(self, type_: sqltypes.LargeBinary, **kw: Any) -> str:
+        raise sa_exc.CompileError("BLOB is not supported by the Exasol dialect")
+
+    def visit_BINARY(self, type_: sqltypes.BINARY, **kw: Any) -> str:
+        raise sa_exc.CompileError("BINARY is not supported by the Exasol dialect")
+
+    def visit_VARBINARY(self, type_: sqltypes.VARBINARY, **kw: Any) -> str:
+        raise sa_exc.CompileError("VARBINARY is not supported by the Exasol dialect")
+
+    # ---- Text / long strings ----
+
+    def visit_TEXT(self, type_: sqltypes.Text, **kw: Any) -> str:
+        # Exasol has no TEXT type; treat as large string (explicit max VARCHAR).
+        return self._varchar_max()
+
+    def visit_text(self, type_: sqltypes.Text, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_CLOB(self, type_: sqltypes.CLOB, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_NCLOB(self, type_: sqltypes.Text, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_unicode_text(self, type_: sqltypes.UnicodeText, **kw: Any) -> str:
+        return self._varchar_max()
+
+    def visit_string(self, type_: sqltypes.String, **kw: Any) -> str:
+        # SA String(length) -> VARCHAR(length); String() -> VARCHAR(max) (Exasol requires length)
+        return self._varchar(getattr(type_, "length", None))
+
+    def visit_unicode(self, type_: sqltypes.Unicode, **kw: Any) -> str:
+        # Same policy as String
+        return self._varchar(getattr(type_, "length", None))
+
+    # ---- ENUM ----
+
+    def visit_enum(self, type_: sqltypes.Enum, **kw: Any) -> str:
+        # Exasol has no ENUM; store as VARCHAR(length_of_longest_value) or max VARCHAR.
+        enums = list(getattr(type_, "enums", []) or [])
+        if enums:
+            max_len = max(len(str(v)) for v in enums)
+            return self._varchar(max_len)
+        return self._varchar(None)
 
 
 class EXAIdentifierPreparer(compiler.IdentifierPreparer):
@@ -1248,3 +1345,33 @@ class EXADialect(default.DefaultDialect):
     def get_indexes(self, connection, table_name, schema=None, **kw):
         """Exasol has no explicit indexes"""
         return []
+
+    def type_descriptor(self, typeobj):
+        """Return a DB-specific TypeEngine for a generic SA type.
+
+        We wrap DateTime columns so their Python values serialize cleanly for PyExasol.
+        """
+        if isinstance(typeobj, sqltypes.DateTime):
+            return EXATimestamp()
+        if isinstance(typeobj, sqltypes.Time):
+            return EXATimestring()
+        return super().type_descriptor(typeobj)
+
+    # leave this for true DB-API remapping (ODBC etc.)
+    dbapi_exception_translation_map = {}
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+        try:
+            return super().do_execute(cursor, statement, parameters, context)
+
+        # Query-specific server errors
+        except ExaQueryError as e:
+            raise sa_exc.ProgrammingError(statement, parameters, e) from e
+
+        # Connection/auth/request/transport problems
+        except (ExaAuthError, ExaRequestError, ExaCommunicationError) as e:
+            raise sa_exc.OperationalError(statement, parameters, e) from e
+
+        # Everything else from pyexasol
+        except (ExaRuntimeError, ExaError) as e:
+            raise sa_exc.DatabaseError(statement, parameters, e) from e

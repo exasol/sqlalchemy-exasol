@@ -5,7 +5,6 @@ from typing import NamedTuple
 
 import pytest
 import sqlalchemy as sa
-from pyexasol import ExaQueryError
 from sqlalchemy import Inspector
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.schema import (
@@ -14,6 +13,11 @@ from sqlalchemy.schema import (
 )
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
+from sqlalchemy.testing.suite import (
+    DateTimeCoercedToDateTimeTest as _DateTimeCoercedToDateTimeTest,
+)
+from sqlalchemy.testing.suite import DateTimeHistoricTest as _DateTimeHistoricTest
+from sqlalchemy.testing.suite import DateTimeTest as _DateTimeTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
@@ -22,9 +26,9 @@ from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import LongNameBlowoutTest as _LongNameBlowoutTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
-from sqlalchemy.testing.suite import ReturningGuardsTest as _ReturningGuardsTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
+from sqlalchemy.testing.suite import UuidTest as _UuidTest
 from sqlalchemy.testing.suite.test_reflection import _multi_combination
 
 """
@@ -53,32 +57,6 @@ class XfailRationale(str, Enum):
     )
 
 
-class ReturningGuardsTest(_ReturningGuardsTest):
-    """
-    Exasol does not support the RETURNING clause. This is already the assumption
-    per the DefaultDialect.
-
-    The single tests of class sqlalchemy.testing.suite.ReturningGuardsTest are
-    overridden, as they are written to send the request to the DB and receive an
-    error from the DB itself. For the websocket driver (based on PyExasol), the
-    exception raised is an ExaQueryError and not a DBAPIError.
-    """
-
-    @staticmethod
-    def _run_test(test_method, connection, run_stmt):
-        with pytest.raises(ExaQueryError):
-            test_method(connection, run_stmt)
-
-    def test_delete_single(self, connection, run_stmt):
-        self._run_test(super().test_delete_single, connection, run_stmt)
-
-    def test_insert_single(self, connection, run_stmt):
-        self._run_test(super().test_insert_single, connection, run_stmt)
-
-    def test_update_single(self, connection, run_stmt):
-        self._run_test(super().test_update_single, connection, run_stmt)
-
-
 class RowFetchTest(_RowFetchTest):
     RATIONAL = cleandoc(
         """
@@ -93,6 +71,104 @@ class RowFetchTest(_RowFetchTest):
     @pytest.mark.xfail(reason=RATIONAL, raises=DBAPIError, strict=True)
     def test_row_with_dupe_names(self, connection):
         super().test_row_with_dupe_names(connection)
+
+    @pytest.mark.xfail(
+        reason="Websocket DBAPI currently returns DATETIME values as strings.",
+        raises=AssertionError,
+        strict=True,
+    )
+    def test_row_w_scalar_select(self, connection):
+        super().test_row_w_scalar_select(connection)
+
+
+DATETIME_STRING_RATIONAL = (
+    "Websocket DBAPI currently returns DATETIME values as strings instead of "
+    "Python datetime objects."
+)
+
+
+class DateTimeTest(_DateTimeTest):
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_round_trip(self, connection):
+        super().test_round_trip(connection)
+
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_round_trip_decorated(self, connection):
+        super().test_round_trip_decorated(connection)
+
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_select_direct(self, connection):
+        super().test_select_direct(connection)
+
+
+UUID_BLOB_RATIONALE = (
+    "The Exasol backend does not natively support UUID/BLOB types, so UUID literal "
+    "rendering and UUID result round-trips are not currently supported."
+)
+
+
+class UuidTest(_UuidTest):
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_literal_nonnative_text(self):
+        super().test_literal_nonnative_text()
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_literal_nonnative_uuid(self):
+        super().test_literal_nonnative_uuid()
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_literal_text(self):
+        super().test_literal_text()
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_literal_uuid(self):
+        super().test_literal_uuid()
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_uuid_returning(self, connection):
+        super().test_uuid_returning(connection)
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_uuid_round_trip(self, connection):
+        super().test_uuid_round_trip(connection)
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_uuid_text_round_trip(self, connection):
+        super().test_uuid_text_round_trip(connection)
+
+
+class DateTimeHistoricTest(_DateTimeHistoricTest):
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_round_trip(self, connection):
+        super().test_round_trip(connection)
+
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_round_trip_decorated(self, connection):
+        super().test_round_trip_decorated(connection)
+
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_select_direct(self, connection):
+        super().test_select_direct(connection)
+
+
+class DateTimeCoercedToDateTimeTest(_DateTimeCoercedToDateTimeTest):
+    @pytest.mark.xfail(
+        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
+    )
+    def test_select_direct(self, connection):
+        super().test_select_direct(connection)
 
 
 class HasTableTest(_HasTableTest):

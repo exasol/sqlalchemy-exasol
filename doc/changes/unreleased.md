@@ -10,6 +10,7 @@
 * #687: Re-locked the `poetry.lock` for vulnerabilities in the transitive dependencies: filelock, pynacl
 * #690: Re-locked the `poetry.lock` for vulnerabilities in the transitive dependency: urllib3
 * #710: Updated to `exasol-toolbox` 5.0.0
+* #721: Updated to `exasol-toolbox` 5.1.0
 
 ## Documentation
 

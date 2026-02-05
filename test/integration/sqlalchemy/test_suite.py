@@ -4,7 +4,6 @@ from inspect import cleandoc
 from typing import NamedTuple
 
 import pytest
-import sqlalchemy
 import sqlalchemy as sa
 from sqlalchemy import Inspector
 from sqlalchemy.exc import DBAPIError
@@ -511,3 +510,5 @@ class DifficultParametersTest(_DifficultParametersTest):
             if paramname == "dot.s":
                 pytest.xfail(reason="dot.s does not work for <= 7.1.30")
         super().test_round_trip_same_named_column(paramname, connection, metadata)
+
+

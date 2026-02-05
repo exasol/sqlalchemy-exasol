@@ -28,6 +28,7 @@ from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
+from sqlalchemy.testing.suite import UuidTest as _UuidTest
 from sqlalchemy.testing.suite.test_reflection import _multi_combination
 
 """
@@ -104,6 +105,42 @@ class DateTimeTest(_DateTimeTest):
     )
     def test_select_direct(self, connection):
         super().test_select_direct(connection)
+
+
+UUID_BLOB_RATIONALE = (
+    "The Exasol backend does not natively support UUID/BLOB types, so UUID literal "
+    "rendering and UUID result round-trips are not currently supported."
+)
+
+
+class UuidTest(_UuidTest):
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_literal_nonnative_text(self):
+        super().test_literal_nonnative_text()
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_literal_nonnative_uuid(self):
+        super().test_literal_nonnative_uuid()
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_literal_text(self):
+        super().test_literal_text()
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_literal_uuid(self):
+        super().test_literal_uuid()
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_uuid_returning(self, connection):
+        super().test_uuid_returning(connection)
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_uuid_round_trip(self, connection):
+        super().test_uuid_round_trip(connection)
+
+    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    def test_uuid_text_round_trip(self, connection):
+        super().test_uuid_text_round_trip(connection)
 
 
 class DateTimeHistoricTest(_DateTimeHistoricTest):

@@ -1,6 +1,6 @@
 [project]
 name = "sqlalchemy_exasol"
-version = "6.0.0"
+version = "6.1.0"
 description = "EXASOL dialect for SQLAlchemy"
 authors = [
     { name = "Exasol AG", email = "opensource@exasol.com" },

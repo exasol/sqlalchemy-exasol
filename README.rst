@@ -57,7 +57,9 @@ Features
 Getting Started
 ---------------
 
-Check out sqlalchemy-exasols's [User Guide(https://exasol.github.io/sqlalchemy-exasol/master/user_guide.html) page for your first steps.
+Check out sqlalchemy-exasols's `User Guide
+<https://exasol.github.io/sqlalchemy-exasol/master/user_guide>`_ for your
+first steps.
 
 .. _developer guide: https://github.com/exasol/sqlalchemy-exasol/blob/master/doc/developer_guide/developer_guide.rst
 .. _test_docker_image: https://github.com/exasol/docker-db

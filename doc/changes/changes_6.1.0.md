@@ -1,5 +1,23 @@
 # 6.1.0 - 2026-02-06
 
+## Summary
+
+In this minor release, we have greatly added on to the
+[User Guide](https://exasol.github.io/sqlalchemy-exasol/master/user_guide/index.html)
+for SQLAlchemy-Exasol:
+
+* For getting started, check out the remastered **Getting Started** page.
+* Our **Configuration** pages have been edited to be crisper and provide more information
+on forming your connection string and adhering to the best security practices.
+* We have added a **Features** page, which gives an overview of benefits of using it.
+Many of these entries contain links to our new **Examples** section and relevant
+SQLAlchemy documentation.
+* All of our code **Examples** are executed in the CI, so these should stay up-to-date
+as future work on SQLAlchemy-Exasol continues.
+
+Additionally, the `py.typed` file has been added, so type hints can propagate.
+
+
 ## Feature
 
 * #693: Added `py.typed` file so type hints can propagate and added CI setup to execute examples

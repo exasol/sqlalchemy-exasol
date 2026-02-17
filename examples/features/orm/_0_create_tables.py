@@ -20,7 +20,7 @@ from examples.config import (
     SQL_ALCHEMY,
 )
 
-# For more information on ORM table definition, check out:
+# For more information on ORM table definitions, check out:
 #    https://docs.sqlalchemy.org/en/20/orm/quickstart.html#orm-quick-start
 
 # 1. Ensure that the schema exists

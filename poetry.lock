@@ -1153,14 +1153,14 @@ types-requests = ">=2.31.0.6,<3.0.0.0"
 
 [[package]]
 name = "exasol-toolbox"
-version = "5.0.0"
+version = "5.1.0"
 description = "Your one-stop solution for managing all standard tasks and core workflows of your Python project."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "exasol_toolbox-5.0.0-py3-none-any.whl", hash = "sha256:eb391dbbe0baac62dea94948ea4fd6d16b153dc35c20a162a84f96ddd4c153af"},
-    {file = "exasol_toolbox-5.0.0.tar.gz", hash = "sha256:c00a6ed1830cc3dd95bbd3733d7f521fd4f85cf503cbc73fda07f9b51ebff32a"},
+    {file = "exasol_toolbox-5.1.0-py3-none-any.whl", hash = "sha256:baca05b4f33f4df1334efd0bc8688a554a8bd6b338fc3314ff49c28fdb6fabfe"},
+    {file = "exasol_toolbox-5.1.0.tar.gz", hash = "sha256:0522d30f4aa11e2a7b00b7456a815bc27afab839fc10bb07b88d8d1a64472133"},
 ]
 
 [package.dependencies]
@@ -1192,6 +1192,7 @@ sphinx-copybutton = ">=0.5.0,<0.6"
 sphinx-design = ">=0.5.0,<1"
 sphinx-inline-tabs = ">=2023.4.21,<2024"
 sphinx-toolbox = ">=4.0.0,<5"
+sphinxcontrib-mermaid = ">=2.0.0,<3.0.0"
 twine = ">=6.1.0,<7"
 typer = {version = ">=0.7.0", extras = ["all"]}
 
@@ -2686,14 +2687,14 @@ tests = ["pytest (>=9)", "typing-extensions (>=4.15)"]
 
 [[package]]
 name = "pip"
-version = "25.3"
+version = "26.0.1"
 description = "The PyPA recommended tool for installing Python packages."
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "pip-25.3-py3-none-any.whl", hash = "sha256:9655943313a94722b7774661c21049070f6bbb0a1516bf02f7c8d5d9201514cd"},
-    {file = "pip-25.3.tar.gz", hash = "sha256:8d0538dbbd7babbd207f261ed969c65de439f6bc9e5dbd3b3b9a77f25d95f343"},
+    {file = "pip-26.0.1-py3-none-any.whl", hash = "sha256:bdb1b08f4274833d62c1aa29e20907365a2ceb950410df15fc9521bad440122b"},
+    {file = "pip-26.0.1.tar.gz", hash = "sha256:c4037d8a277c89b320abe636d59f91e6d0922d08a05b60e85e53b296613346d8"},
 ]
 
 [[package]]
@@ -4473,6 +4474,26 @@ files = [
 test = ["flake8", "mypy", "pytest"]
 
 [[package]]
+name = "sphinxcontrib-mermaid"
+version = "2.0.0"
+description = "Mermaid diagrams in your Sphinx-powered docs"
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+files = [
+    {file = "sphinxcontrib_mermaid-2.0.0-py3-none-any.whl", hash = "sha256:59a73249bbee2c74b1a4db036f8e8899ade65982bdda6712cf22b4f4e9874bb5"},
+    {file = "sphinxcontrib_mermaid-2.0.0.tar.gz", hash = "sha256:cf4f7d453d001132eaba5d1fdf53d42049f02e913213cf8337427483bfca26f4"},
+]
+
+[package.dependencies]
+jinja2 = "*"
+pyyaml = "*"
+sphinx = "*"
+
+[package.extras]
+test = ["defusedxml", "myst-parser", "pytest", "ruff", "sphinx"]
+
+[[package]]
 name = "sphinxcontrib-qthelp"
 version = "2.0.0"
 description = "sphinxcontrib-qthelp is a sphinx extension which outputs QtHelp documents"
@@ -5081,4 +5102,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "a49c1783b0c9896d4446a5c2dbb0ce4ea8879b880aed667018f51be24ef2e393"
+content-hash = "883b2ec9aad41f13aa86ef1149ca5a36abe8b5dc40f21622b1af903b949e4dbc"

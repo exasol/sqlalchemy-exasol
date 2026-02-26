@@ -2,21 +2,21 @@ name: CI
 
 on:
   pull_request:
-      types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]
   schedule:
     # At 00:00 on every 7th day-of-month from 1 through 31. (https://crontab.guru)
     - cron: "0 0 1/7 * *"
 
 jobs:
-
-  CI:
+  merge-gate:
     uses: ./.github/workflows/merge-gate.yml
     secrets: inherit
     permissions:
       contents: read
 
-  Metrics:
-    needs: [ CI ]
+  report:
+    needs:
+      - merge-gate
     uses: ./.github/workflows/report.yml
     secrets: inherit
     permissions:

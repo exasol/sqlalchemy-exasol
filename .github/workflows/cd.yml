@@ -7,16 +7,16 @@ on:
       - '!v*'
 
 jobs:
-
-  check-tag-version-job:
+  check-release-tag:
     name: Check Release Tag
     uses: ./.github/workflows/check-release-tag.yml
     permissions:
       contents: read
 
-  cd-job:
-    needs: [ check-tag-version-job ]
-    name: Continuous Delivery
+  build-and-publish:
+    needs:
+      - check-release-tag
+    name: Build & Publish
     uses: ./.github/workflows/build-and-publish.yml
     permissions:
       contents: write
@@ -24,7 +24,8 @@ jobs:
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
 
   publish-docs:
-    needs: [ cd-job ]
+    needs:
+      - build-and-publish
     name: Publish Documentation
     uses: ./.github/workflows/gh-pages.yml
     permissions:

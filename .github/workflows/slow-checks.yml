@@ -42,7 +42,7 @@ jobs:
         run: poetry run -- nox -s test:${{ matrix.integration-group }}
       - name: Upload Artifacts
         id: upload-artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-python${{ matrix.python-version }}-${{ matrix.integration-group }}-exasol${{ matrix.exasol-version }}-${{matrix.connector}}-slow
           path: .coverage

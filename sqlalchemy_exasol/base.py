@@ -763,7 +763,7 @@ class EXAExecutionContext(default.DefaultExecutionContext):
         with closing(self.create_cursor()) as cursor:
             cursor.execute(sql_stmnt, args)
             result = cursor.fetchone()
-            return int(result[0]) - 1
+            return int(result[0])
 
     def should_autocommit_text(self, statement):
         return AUTOCOMMIT_REGEXP.match(statement)

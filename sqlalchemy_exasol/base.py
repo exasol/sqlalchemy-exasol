@@ -742,26 +742,28 @@ class EXAExecutionContext(default.DefaultExecutionContext):
             """Get the schema while taking the translation-map and the de-normalization into account"""
             translate_map = sql_compiler.schema_translate_map
             schema_dispatcher = translate_map if translate_map else {}
-            schema = sql_compiler.statement.table.schema
-            schema = (
-                schema_dispatcher[schema] if schema in schema_dispatcher else schema
+            tmp_schema = sql_compiler.statement.table.schema
+            tmp_schema = (
+                schema_dispatcher[tmp_schema]
+                if tmp_schema in schema_dispatcher
+                else tmp_schema
             )
-            return dialect.denormalize_name(schema)
+            return dialect.denormalize_name(tmp_schema)
 
-        schema = _get_schema(self.compiled.sql_compiler, self.dialect)
-
-        sql_stmnt = " ".join(
-            (
-                "SELECT column_identity from SYS.EXA_ALL_COLUMNS",
-                "WHERE column_object_type = 'TABLE' and column_table",
-                "= ? AND column_name = ?",
-            )
+        query = (
+            "SELECT column_identity FROM SYS.EXA_ALL_COLUMNS "
+            "WHERE column_object_type = 'TABLE' "
+            "AND column_table = ? "
+            "AND column_name = ?"
         )
-        sql_stmnt += " AND column_schema = ?" if schema else ""
-        args = (table, id_col, schema) if schema else (table, id_col)
+        params = [table, id_col]
+
+        if found_schema := _get_schema(self.compiled.sql_compiler, self.dialect):
+            query += " AND column_schema = ?"
+            params.append(found_schema)
 
         with closing(self.create_cursor()) as cursor:
-            cursor.execute(sql_stmnt, args)
+            cursor.execute(query, params)
             result = cursor.fetchone()
             return int(result[0])
 

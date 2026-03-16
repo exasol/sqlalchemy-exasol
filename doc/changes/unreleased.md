@@ -11,6 +11,29 @@ during data inserts, potentially breaking relational integrity in your sessions.
 now fixed the logic to ensure the returned IDs are accurate and implemented new tests
 that specifically validate row ID retrieval during ORM flushes.
 
+The error would have only happened for ORM sessions like this example:
+```python
+with Session(ENGINE) as session:
+    new_user = User(first_name="Jax", last_name="Doe")
+
+    session.add(new_user)
+    session.flush()
+
+    # Here, we use the ID from the post-flush SQLAlchemy object. Before this update,
+    # this value was off by 1. Now, this has been corrected.
+    new_email = EmailAddress(
+        user_id=new_user.id,
+        email_address="jax.doe@example.com",
+    )
+
+    session.add(new_email)
+    session.commit()
+```
+
+While this method ensures accurate ID retrieval, it is not the most performant way to
+insert data in SQLAlchemy-Exasol. For high-volume inserts, consider using more
+efficient bulk processing methods
+
 ## Refactoring
 
 * #724: Updated to `exasol-toolbox` 6.0.0

@@ -56,7 +56,7 @@ with Session(ENGINE) as session:
     for entry in data:
         u = User(first_name=entry["first_name"], last_name=entry["last_name"])
         # Store a reference to the emails inside the object to process later
-        u._pending_emails = entry["email_addresses"]
+        u._pending_emails = entry["email_addresses"]  # type: ignore
         user_objects.append(u)
 
     # b. Send the pending changes to the session WITHOUT committing it yet;
@@ -67,7 +67,7 @@ with Session(ENGINE) as session:
     # c. Insert email for each user in the dictionary
     email_payload = []
     for u in user_objects:
-        for email in u._pending_emails:
+        for email in u._pending_emails:  # type: ignore
             email_payload.append({"user_id": u.id, "email_address": email})
 
     # d. Insert and commit

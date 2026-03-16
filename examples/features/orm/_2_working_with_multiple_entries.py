@@ -52,25 +52,26 @@ data = [
 
 with Session(ENGINE) as session:
     # a. Add more entries using a dictionary
-    session.execute(insert(User), data)
+    user_objects = []
+    for entry in data:
+        u = User(first_name=entry["first_name"], last_name=entry["last_name"])
+        # Store a reference to the emails inside the object to process later
+        u._pending_emails = entry["email_addresses"]
+        user_objects.append(u)
 
     # b. Send the pending changes to the session WITHOUT committing it yet;
     # this updates Users with id values.
+    session.add_all(user_objects)
     session.flush()
 
-    # c. Retrieve user ids
-    stmt = select(User.id, User.first_name, User.last_name)
-    user_map = {(u.first_name, u.last_name): u.id for u in session.execute(stmt)}
-
-    # d. Insert email for each user in the dictionary
+    # c. Insert email for each user in the dictionary
     email_payload = []
-    for entry in data:
-        user_id = user_map.get((entry["first_name"], entry["last_name"]))
-        for email in entry["email_addresses"]:
-            email_payload.append({"user_id": user_id, "email_address": email})
-    session.execute(insert(EmailAddress), email_payload)
+    for u in user_objects:
+        for email in u._pending_emails:
+            email_payload.append({"user_id": u.id, "email_address": email})
 
-    # e. Commit all changes
+    # d. Insert and commit
+    session.execute(insert(EmailAddress), email_payload)
     session.commit()
 
 

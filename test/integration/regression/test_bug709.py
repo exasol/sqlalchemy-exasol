@@ -23,6 +23,7 @@ from sqlalchemy.orm import (
 from sqlalchemy.schema import (
     CreateSchema,
 )
+from sqlalchemy.sql.ddl import DropSchema
 
 SCHEMA_NAME = "bug_709"
 metadata_obj = MetaData(schema=SCHEMA_NAME)
@@ -63,7 +64,7 @@ class EmailAddress(Base):
     user: Mapped[User] = relationship(back_populates="email_addresses")
 
     def __repr__(self) -> str:
-        return f"Address(id={self.id!r}, email_address={self.email_address!r})"
+        return f"EmailAddress(id={self.id!r}, email_address={self.email_address!r})"
 
 
 @pytest.fixture(scope="module")
@@ -97,9 +98,11 @@ def data():
 @pytest.fixture(scope="module")
 def add_tables(engine):
     with engine.begin() as conn:
-        # Create schema once for the whole test suite
         conn.execute(CreateSchema(SCHEMA_NAME))
     Base.metadata.create_all(engine)
+    yield
+    with engine.begin() as conn:
+        conn.execute(DropSchema(SCHEMA_NAME, cascade=True))
 
 
 def test_lastrowid_works_without_error_for_linked_tables(add_tables, engine, data):

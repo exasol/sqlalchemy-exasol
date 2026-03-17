@@ -11,6 +11,7 @@ from sqlalchemy import (
     String,
     create_engine,
     insert,
+    select,
 )
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import (
@@ -135,6 +136,13 @@ class TestGetLastRowID:
             session.execute(insert(EmailAddress), email_addresses)
             session.commit()
 
+            statement = select(User.id).where(
+                User.first_name == "Lux", User.last_name == "Noceda"
+            )
+            user_id = session.execute(statement).scalar()
+
+            assert users[0].id == user_id == 1
+
     def test_returns_incorrect_value_to_raise_error(self, add_tables, engine):
         context_cls = engine.dialect.execution_ctx_cls
 
@@ -145,3 +153,11 @@ class TestGetLastRowID:
 
                 with pytest.raises(DBAPIError):
                     session.execute(insert(EmailAddress), email_addresses)
+
+                statement = select(User.id).where(
+                    User.first_name == "Lux", User.last_name == "Noceda"
+                )
+                user_id = session.execute(statement).scalar()
+
+                assert user_id == 1
+                assert users[0].id == 999

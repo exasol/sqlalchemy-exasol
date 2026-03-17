@@ -84,17 +84,6 @@ def engine():
     return create_engine(url_object)
 
 
-@pytest.fixture
-def data():
-    return [
-        {
-            "first_name": "Lux",
-            "last_name": "Noceda",
-            "email_addresses": ["fantasy4l!fe@hotmail.com", "lux.noceda@hexside.com"],
-        }
-    ]
-
-
 @pytest.fixture(scope="module")
 def add_tables(engine):
     with engine.begin() as conn:
@@ -105,44 +94,54 @@ def add_tables(engine):
         conn.execute(DropSchema(SCHEMA_NAME, cascade=True))
 
 
-def test_lastrowid_works_without_error_for_linked_tables(add_tables, engine, data):
-    with Session(engine) as session:
-        user_objects = []
+class TestGetLastRowID:
+    @staticmethod
+    def create_and_flush_users(session) -> list[User]:
+        data = [
+            {
+                "first_name": "Lux",
+                "last_name": "Noceda",
+                "email_addresses": [
+                    "fantasy4l!fe@hotmail.com",
+                    "lux.noceda@hexside.com",
+                ],
+            }
+        ]
+
+        users = []
         for entry in data:
             u = User(first_name=entry["first_name"], last_name=entry["last_name"])
             u._pending_emails = entry["email_addresses"]
-            user_objects.append(u)
+            users.append(u)
 
-        session.add_all(user_objects)
+        session.add_all(users)
         session.flush()
 
-        email_payload = []
-        for u in user_objects:
+        return users
+
+    @staticmethod
+    def create_email_addresses(users: list[User]) -> list[EmailAddress]:
+        email_addresses = []
+        for u in users:
             for email in u._pending_emails:
-                email_payload.append({"user_id": u.id, "email_address": email})
+                email_addresses.append({"user_id": u.id, "email_address": email})
+        return email_addresses
 
-        session.execute(insert(EmailAddress), email_payload)
-        session.commit()
-
-
-def test_lastrowid_gives_incorrect_value_to_raise_error(add_tables, engine, data):
-    context_cls = engine.dialect.execution_ctx_cls
-
-    with patch.object(context_cls, "get_lastrowid", return_value=999):
+    def test_works_as_expected(self, add_tables, engine):
         with Session(engine) as session:
-            user_objects = []
-            for entry in data:
-                u = User(first_name=entry["first_name"], last_name=entry["last_name"])
-                u._pending_emails = entry["email_addresses"]
-                user_objects.append(u)
+            users = self.create_and_flush_users(session)
+            email_addresses = self.create_email_addresses(users)
 
-            session.add_all(user_objects)
-            session.flush()
+            session.execute(insert(EmailAddress), email_addresses)
+            session.commit()
 
-            email_payload = []
-            for u in user_objects:
-                for email in u._pending_emails:
-                    email_payload.append({"user_id": u.id, "email_address": email})
+    def test_returns_incorrect_value_to_raise_error(self, add_tables, engine):
+        context_cls = engine.dialect.execution_ctx_cls
 
-            with pytest.raises(DBAPIError):
-                session.execute(insert(EmailAddress), email_payload)
+        with patch.object(context_cls, "get_lastrowid", return_value=999):
+            with Session(engine) as session:
+                users = self.create_and_flush_users(session)
+                email_addresses = self.create_email_addresses(users)
+
+                with pytest.raises(DBAPIError):
+                    session.execute(insert(EmailAddress), email_addresses)

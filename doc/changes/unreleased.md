@@ -20,7 +20,7 @@ with Session(ENGINE) as session:
     session.flush()
 
     # Here, we use the ID from the post-flush SQLAlchemy object. Before this update,
-    # this value was off by 1. Now, this has been corrected.
+    # this value was off by 1 (ID - 1). Now, this has been corrected (ID).
     new_email = EmailAddress(
         user_id=new_user.id,
         email_address="jax.doe@example.com",
@@ -32,7 +32,7 @@ with Session(ENGINE) as session:
 
 While this method ensures accurate ID retrieval, it is not the most performant way to
 insert data in SQLAlchemy-Exasol. For high-volume inserts, consider using more
-efficient bulk processing methods
+efficient bulk processing methods.
 
 ## Refactoring
 

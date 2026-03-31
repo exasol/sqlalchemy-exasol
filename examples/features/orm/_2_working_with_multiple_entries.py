@@ -114,7 +114,7 @@ select_all_entries()
 with Session(ENGINE) as session:
     # a. Get the User.id for affected Users
     targets = [("Amity", "Blight"), ("Willow", "Park"), ("Lux", "Noceda")]
-    stmt = select(User.id).filter(  # type:ignore
+    stmt = select(User.id).filter(  # type: ignore
         tuple_(User.first_name, User.last_name).in_(targets)
     )
     user_ids = session.scalars(stmt).all()

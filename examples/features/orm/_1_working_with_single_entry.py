@@ -69,7 +69,7 @@ with Session(ENGINE) as session:
 
         if user_to_update.email_addresses:
             user_to_update.email_addresses[0].email_address = (
-                "paris.doe@example.com"  # type:ignore
+                "paris.doe@example.com"  # type: ignore
             )
 
         session.commit()

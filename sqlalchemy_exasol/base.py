@@ -1215,7 +1215,7 @@ class EXADialect(default.DefaultDialect):
             connection, table_name=table_name, schema=schema_int, **kw
         )
         for row in constraints:
-            (cons_name, local_column, remote_schema, remote_table, remote_column) = (
+            cons_name, local_column, remote_schema, remote_table, remote_column = (
                 row[0],
                 row[1],
                 row[2],

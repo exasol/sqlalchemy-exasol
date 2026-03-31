@@ -39,7 +39,7 @@ provided to the engine.
     support these.
 
 .. _on-premise authentication: https://docs.exasol.com/db/latest/sql/create_user.htm
-.. _SAAS authentication: https://docs.exasol.com/saas/administration/access_mngt/access_management.htm#Databaseaccessmanagement
+.. _SAAS authentication: https://docs.exasol.com/db/latest/administration/access_mngt/access_management.htm#Databaseaccessmanagement
 .. _Docker authentication: https://github.com/exasol/docker-db?tab=readme-ov-file#connecting-to-the-database
 
 .. _tls:

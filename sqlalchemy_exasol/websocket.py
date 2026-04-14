@@ -39,7 +39,19 @@ class Date(sqltypes.DATE):
 
 class DateTime(sqltypes.DATETIME):
     def bind_processor(self, dialect):
-        return super().bind_processor(dialect)
+        super_proc = super().bind_processor(dialect)
+
+        def process(value):
+            if value is None:
+                return None
+            if isinstance(value, datetime.datetime):
+                # DLT / websocket-friendly TIMESTAMP wire format
+                return value.strftime("%Y-%m-%d %H:%M:%S.%f")
+            if super_proc is not None:
+                return super_proc(value)
+            return value
+
+        return process
 
     def result_processor(self, dialect, coltype):
         def datetime_fmt(v):

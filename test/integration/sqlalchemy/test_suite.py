@@ -72,39 +72,6 @@ class RowFetchTest(_RowFetchTest):
     def test_row_with_dupe_names(self, connection):
         super().test_row_with_dupe_names(connection)
 
-    @pytest.mark.xfail(
-        reason="Websocket DBAPI currently returns DATETIME values as strings.",
-        raises=AssertionError,
-        strict=True,
-    )
-    def test_row_w_scalar_select(self, connection):
-        super().test_row_w_scalar_select(connection)
-
-
-DATETIME_STRING_RATIONAL = (
-    "Websocket DBAPI currently returns DATETIME values as strings instead of "
-    "Python datetime objects."
-)
-
-
-class DateTimeTest(_DateTimeTest):
-    @pytest.mark.xfail(
-        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
-    )
-    def test_round_trip(self, connection):
-        super().test_round_trip(connection)
-
-    @pytest.mark.xfail(
-        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
-    )
-    def test_round_trip_decorated(self, connection):
-        super().test_round_trip_decorated(connection)
-
-    @pytest.mark.xfail(
-        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
-    )
-    def test_select_direct(self, connection):
-        super().test_select_direct(connection)
 
 
 UUID_BLOB_RATIONALE = (
@@ -143,32 +110,6 @@ class UuidTest(_UuidTest):
         super().test_uuid_text_round_trip(connection)
 
 
-class DateTimeHistoricTest(_DateTimeHistoricTest):
-    @pytest.mark.xfail(
-        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
-    )
-    def test_round_trip(self, connection):
-        super().test_round_trip(connection)
-
-    @pytest.mark.xfail(
-        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
-    )
-    def test_round_trip_decorated(self, connection):
-        super().test_round_trip_decorated(connection)
-
-    @pytest.mark.xfail(
-        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
-    )
-    def test_select_direct(self, connection):
-        super().test_select_direct(connection)
-
-
-class DateTimeCoercedToDateTimeTest(_DateTimeCoercedToDateTimeTest):
-    @pytest.mark.xfail(
-        reason=DATETIME_STRING_RATIONAL, raises=AssertionError, strict=True
-    )
-    def test_select_direct(self, connection):
-        super().test_select_direct(connection)
 
 
 class HasTableTest(_HasTableTest):

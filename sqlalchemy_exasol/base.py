@@ -1351,8 +1351,6 @@ class EXADialect(default.DefaultDialect):
 
         We wrap DateTime columns so their Python values serialize cleanly for PyExasol.
         """
-        if isinstance(typeobj, sqltypes.DateTime):
-            return EXATimestamp()
         if isinstance(typeobj, sqltypes.Time):
             return EXATimestring()
         return super().type_descriptor(typeobj)

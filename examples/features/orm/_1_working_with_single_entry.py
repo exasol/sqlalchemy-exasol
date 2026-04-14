@@ -23,33 +23,22 @@ with Session(ENGINE) as session:
 with Session(ENGINE) as session:
     # a. Create a new instance
     new_user = User(
-        # id is auto-incremented by the database; it is initially set to None.
         first_name="Jax",
         last_name="Doe",
     )
 
-    # b. Add to be inserted
+    # b. Add and flush to trigger the auto-increment ID generation
     session.add(new_user)
-
-    # c. Send the pending change to the session WITHOUT committing it yet;
-    # this updates the User with a numerical id value.
     session.flush()
 
-    # d. Retrieve user ids
-    stmt = select(User.id).where(
-        User.first_name == new_user.first_name, User.last_name == new_user.last_name
-    )
-    user_id = session.execute(stmt).scalar()
-
+    # c. Use the ID directly from the object
     new_email = EmailAddress(
-        user_id=user_id,
+        user_id=new_user.id,  # No SELECT required
         email_address="jax.doe@example.com",
     )
 
-    # b. Add the user and email address to the session
+    # d. Add and commit
     session.add(new_email)
-
-    # c. Commit the transaction to persist the changes
     session.commit()
 
 
@@ -80,7 +69,7 @@ with Session(ENGINE) as session:
 
         if user_to_update.email_addresses:
             user_to_update.email_addresses[0].email_address = (
-                "paris.doe@example.com"  # type:ignore
+                "paris.doe@example.com"  # type: ignore
             )
 
         session.commit()

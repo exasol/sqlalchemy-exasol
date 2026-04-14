@@ -37,12 +37,10 @@ from sqlalchemy.testing.suite import testing
 
 
 class XfailRationale(str, Enum):
-    MANUAL_INDEX = cleandoc(
-        """sqlalchemy-exasol does not support manual indexes.
+    MANUAL_INDEX = cleandoc("""sqlalchemy-exasol does not support manual indexes.
         (see https://docs.exasol.com/db/latest/performance/indexes.htm#Manualindexoperations)
         Manual indexes are not recommended within the Exasol DB.
-        """
-    )
+        """)
     QUOTING = cleandoc(
         """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
         issues in other dialects related to object names that contain quotes
@@ -53,14 +51,12 @@ class XfailRationale(str, Enum):
 
 
 class RowFetchTest(_RowFetchTest):
-    RATIONAL = cleandoc(
-        """
+    RATIONAL = cleandoc("""
     PyExasol currently does not support/allow duplicate names in the results set.
 
     See also:
     * pyexasol.statement.ExaStatement._check_duplicate_col_names
-    """
-    )
+    """)
 
     @testing.config.requirements.duplicate_names_in_cursor_description
     @pytest.mark.xfail(reason=RATIONAL, raises=DBAPIError, strict=True)

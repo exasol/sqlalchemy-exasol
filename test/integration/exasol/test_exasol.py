@@ -51,7 +51,7 @@ class DefaultsTest(fixtures.TablesTest):
             conn.execute(t.insert(), [{"name": "Henrik"}])
 
         with config.db.connect() as conn:
-            (_, _, active_from) = conn.execute(t.select()).fetchone()
+            _, _, active_from = conn.execute(t.select()).fetchone()
 
         assert active_from == datetime.date(1900, 1, 1)
 

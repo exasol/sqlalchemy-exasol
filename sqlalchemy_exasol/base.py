@@ -85,7 +85,6 @@ from sqlalchemy.sql.elements import quoted_name
 from sqlalchemy.sql.type_api import TypeEngine
 
 from sqlalchemy_exasol.types import (
-    EXATimestamp,
     EXATimestring,
 )
 

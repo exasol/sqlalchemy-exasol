@@ -13,11 +13,6 @@ from sqlalchemy.schema import (
 )
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
-from sqlalchemy.testing.suite import (
-    DateTimeCoercedToDateTimeTest as _DateTimeCoercedToDateTimeTest,
-)
-from sqlalchemy.testing.suite import DateTimeHistoricTest as _DateTimeHistoricTest
-from sqlalchemy.testing.suite import DateTimeTest as _DateTimeTest
 from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
@@ -73,7 +68,6 @@ class RowFetchTest(_RowFetchTest):
         super().test_row_with_dupe_names(connection)
 
 
-
 UUID_BLOB_RATIONALE = (
     "The Exasol backend does not natively support UUID/BLOB types, so UUID literal "
     "rendering and UUID result round-trips are not currently supported."
@@ -108,8 +102,6 @@ class UuidTest(_UuidTest):
     @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
     def test_uuid_text_round_trip(self, connection):
         super().test_uuid_text_round_trip(connection)
-
-
 
 
 class HasTableTest(_HasTableTest):

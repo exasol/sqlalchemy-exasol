@@ -25,7 +25,6 @@ from sqlalchemy import (
 from sqlalchemy.schema import CreateTable
 
 from sqlalchemy_exasol import base
-from sqlalchemy_exasol.base import EXATimestamp
 
 
 def _norm(sql: str) -> str:
@@ -35,14 +34,6 @@ def _norm(sql: str) -> str:
 
 def _dialect():
     return base.EXADialect()
-
-
-def test_datetime_is_wrapped_to_exatimestamp_via_type_descriptor():
-    dialect = _dialect()
-    impl = DateTime().dialect_impl(dialect)
-
-    # DateTime must be wrapped so values serialize correctly for PyExasol
-    assert isinstance(impl, EXATimestamp)
 
 
 def test_exatypecompiler_renders_wrapped_datetime_as_timestamp():

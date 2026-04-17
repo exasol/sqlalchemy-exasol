@@ -1349,15 +1349,10 @@ class EXADialect(default.DefaultDialect):
 
     def type_descriptor(self, typeobj):
         """Return a DB-specific TypeEngine for a generic SA type.
-
-        We wrap DateTime columns so their Python values serialize cleanly for PyExasol.
         """
         if isinstance(typeobj, sqltypes.Time):
             return EXATimestring()
         return super().type_descriptor(typeobj)
-
-    # leave this for true DB-API remapping (ODBC etc.)
-    dbapi_exception_translation_map = {}
 
     def do_execute(self, cursor, statement, parameters, context=None):
         try:

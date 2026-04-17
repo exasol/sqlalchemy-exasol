@@ -50,6 +50,10 @@ class XfailRationale(str, Enum):
         Exasol dialect, the entire suite is set to xfail. For further info, see:
         https://github.com/sqlalchemy/sqlalchemy/issues/5456"""
     )
+    UUID_BLOB_RATIONALE = cleandoc(
+    "The Exasol backend does not natively support UUID/BLOB types, so UUID literal "
+    "rendering and UUID result round-trips are not currently supported."
+    )
 
 
 class RowFetchTest(_RowFetchTest):
@@ -67,39 +71,32 @@ class RowFetchTest(_RowFetchTest):
     def test_row_with_dupe_names(self, connection):
         super().test_row_with_dupe_names(connection)
 
-
-UUID_BLOB_RATIONALE = (
-    "The Exasol backend does not natively support UUID/BLOB types, so UUID literal "
-    "rendering and UUID result round-trips are not currently supported."
-)
-
-
 class UuidTest(_UuidTest):
-    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
     def test_literal_nonnative_text(self):
         super().test_literal_nonnative_text()
 
-    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
     def test_literal_nonnative_uuid(self):
         super().test_literal_nonnative_uuid()
 
-    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
     def test_literal_text(self):
         super().test_literal_text()
 
-    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
     def test_literal_uuid(self):
         super().test_literal_uuid()
 
-    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
     def test_uuid_returning(self, connection):
         super().test_uuid_returning(connection)
 
-    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
     def test_uuid_round_trip(self, connection):
         super().test_uuid_round_trip(connection)
 
-    @pytest.mark.xfail(reason=UUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
     def test_uuid_text_round_trip(self, connection):
         super().test_uuid_text_round_trip(connection)
 

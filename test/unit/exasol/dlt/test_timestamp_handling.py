@@ -8,6 +8,7 @@ from sqlalchemy_exasol import base
 def dialect():
     return base.EXADialect()
 
+
 def test_type_descriptor_preserves_super_behavior_for_non_datetime(dialect):
     """For non-DateTime types, the override should behave like the base implementation."""
     # Compare to calling the parent class implementation directly.

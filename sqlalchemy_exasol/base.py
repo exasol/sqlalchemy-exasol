@@ -1348,8 +1348,7 @@ class EXADialect(default.DefaultDialect):
         return []
 
     def type_descriptor(self, typeobj):
-        """Return a DB-specific TypeEngine for a generic SA type.
-        """
+        """Return a DB-specific TypeEngine for a generic SA type."""
         if isinstance(typeobj, sqltypes.Time):
             return EXATimestring()
         return super().type_descriptor(typeobj)

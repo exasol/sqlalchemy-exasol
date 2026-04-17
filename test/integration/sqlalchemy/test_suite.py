@@ -72,31 +72,31 @@ class RowFetchTest(_RowFetchTest):
         super().test_row_with_dupe_names(connection)
 
 class UuidTest(_UuidTest):
-    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.UUID_BLOB_RATIONALE, strict=True)
     def test_literal_nonnative_text(self):
         super().test_literal_nonnative_text()
 
-    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.UUID_BLOB_RATIONALE, strict=True)
     def test_literal_nonnative_uuid(self):
         super().test_literal_nonnative_uuid()
 
-    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.UUID_BLOB_RATIONALE, strict=True)
     def test_literal_text(self):
         super().test_literal_text()
 
-    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.UUID_BLOB_RATIONALE, strict=True)
     def test_literal_uuid(self):
         super().test_literal_uuid()
 
-    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.UUID_BLOB_RATIONALE, strict=True)
     def test_uuid_returning(self, connection):
         super().test_uuid_returning(connection)
 
-    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.UUID_BLOB_RATIONALE, strict=True)
     def test_uuid_round_trip(self, connection):
         super().test_uuid_round_trip(connection)
 
-    @pytest.mark.xfail(reason=XfailRationale.MUUID_BLOB_RATIONALE, strict=True)
+    @pytest.mark.xfail(reason=XfailRationale.UUID_BLOB_RATIONALE, strict=True)
     def test_uuid_text_round_trip(self, connection):
         super().test_uuid_text_round_trip(connection)
 

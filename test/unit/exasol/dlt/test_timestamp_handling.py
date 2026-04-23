@@ -3,8 +3,10 @@ import datetime
 import pytest
 from sqlalchemy import types as sqltypes
 
-from sqlalchemy_exasol import base
-from sqlalchemy_exasol import websocket
+from sqlalchemy_exasol import (
+    base,
+    websocket,
+)
 
 
 @pytest.fixture()
@@ -54,9 +56,7 @@ def test_websocket_datetime_bind_processor_delegates_non_datetime_to_super_proce
 
         return process
 
-    monkeypatch.setattr(
-        sqltypes.DATETIME, "bind_processor", fake_super_bind_processor
-    )
+    monkeypatch.setattr(sqltypes.DATETIME, "bind_processor", fake_super_bind_processor)
 
     processor = websocket.DateTime().bind_processor(websocket_dialect)
 

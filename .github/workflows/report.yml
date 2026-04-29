@@ -20,7 +20,7 @@ jobs:
 
       - name: Set up Python & Poetry Environment
         id: set-up-python-and-poetry-environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v6
+        uses: exasol/python-toolbox/.github/actions/python-environment@v7
         with:
           python-version: "3.10"
           poetry-version: "2.3.0"
@@ -45,24 +45,8 @@ jobs:
           SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
         run: poetry run -- nox -s sonar:check
 
-      - name: Generate Report
-        id: generate-report
-        run: poetry run -- nox -s project:report -- --format json | tee metrics.json
-
-      - name: Upload Artifacts
-        id: upload-artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: metrics.json
-          path: metrics.json
-
       - name: Generate GitHub Summary
         id: generate-github-summary
         run: |-
           echo -e "# Summary\n" >> $GITHUB_STEP_SUMMARY
-          poetry run -- nox -s project:report -- --format markdown >> $GITHUB_STEP_SUMMARY
           poetry run -- nox -s dependency:licenses >> $GITHUB_STEP_SUMMARY
-          echo -e "\n\n# Coverage\n" >> $GITHUB_STEP_SUMMARY
-          poetry run -- coverage report --format markdown >> $GITHUB_STEP_SUMMARY || true
-          poetry run -- tbx lint pretty-print >> $GITHUB_STEP_SUMMARY
-          poetry run -- tbx security pretty-print .security.json >> $GITHUB_STEP_SUMMARY

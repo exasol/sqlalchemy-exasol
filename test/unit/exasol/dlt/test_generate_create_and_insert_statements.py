@@ -66,8 +66,7 @@ def test_create_table_and_insert_cover_many_types_as_compiled_strings():
     # --- CREATE TABLE ----------------------------------------------------
     create_sql = str(CreateTable(table).compile(dialect=dialect))
 
-    expected_create = _norm(
-        """
+    expected_create = _norm("""
         CREATE TABLE "T_ALL_TYPES" (
             "C_INT" INTEGER,
             "C_SMALLINT" SMALLINT,
@@ -80,8 +79,7 @@ def test_create_table_and_insert_cover_many_types_as_compiled_strings():
             "C_NUMERIC" NUMERIC(19, 0),
             "C_FLOAT" FLOAT
         )
-        """
-    )
+        """)
 
     assert _norm(create_sql) == expected_create
 
@@ -109,15 +107,13 @@ def test_create_table_and_insert_cover_many_types_as_compiled_strings():
 
     # This expected form matches your dialect’s quoting behavior.
     # If TIME renders as something other than '12:34:56', update just that token.
-    expected_insert = _norm(
-        """
+    expected_insert = _norm("""
         INSERT INTO "T_ALL_TYPES"
         ("C_INT", "C_SMALLINT", "C_BOOL", "C_DATE", "C_TIME", "C_DATETIME",
          "C_VARCHAR_10", "C_TEXT", "C_NUMERIC", "C_FLOAT")
         VALUES
         (1, 2, true, '2026-01-28', '12:34:56', '2026-01-28 12:34:56',
          'hello', 'world', 123, 1.25)
-        """
-    )
+        """)
 
     assert _norm(insert_sql) == expected_insert

@@ -59,8 +59,7 @@ class GenerateCreateAndInsertStatementsTest(fixtures.TablesTest):
         )
 
         create_sql = str(CreateTable(table).compile(dialect=config.db.dialect))
-        expected_create = _norm(
-            f"""
+        expected_create = _norm(f"""
             CREATE TABLE "{table_name}" (
                 "C_INT" INTEGER,
                 "C_SMALLINT" SMALLINT,
@@ -73,8 +72,7 @@ class GenerateCreateAndInsertStatementsTest(fixtures.TablesTest):
                 "C_NUMERIC" NUMERIC(19, 0),
                 "C_FLOAT" FLOAT
             )
-            """
-        )
+            """)
         assert _norm(create_sql) == expected_create
 
         insert_sql = str(
@@ -97,16 +95,14 @@ class GenerateCreateAndInsertStatementsTest(fixtures.TablesTest):
             )
         )
 
-        expected_insert = _norm(
-            f"""
+        expected_insert = _norm(f"""
             INSERT INTO "{table_name}"
             ("C_INT", "C_SMALLINT", "C_BOOL", "C_DATE", "C_TIME", "C_DATETIME",
              "C_VARCHAR_10", "C_TEXT", "C_NUMERIC", "C_FLOAT")
             VALUES
             (1, 2, true, '2026-01-28', '12:34:56', '2026-01-28 12:34:56',
              'hello', 'world', 123, 1.25)
-            """
-        )
+            """)
         assert _norm(insert_sql) == expected_insert
 
         with config.db.connect() as conn:

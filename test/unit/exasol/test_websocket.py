@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
 
-from sqlalchemy_exasol.version import VERSION
+from sqlalchemy_exasol._metadata import __version__
 from sqlalchemy_exasol.websocket import EXADialect_websocket
 
 
@@ -17,7 +17,7 @@ def set_kwargs(
         "tls": tls,
         "certificate_validation": certificate_validation,
         "client_name": "EXASOL:SQLA:WS",
-        "client_version": VERSION,
+        "client_version": __version__,
         **kwargs,
     }
 

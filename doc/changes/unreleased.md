@@ -1,7 +1,9 @@
 # Unreleased
 
 ## Summary
-This release fixes vulnerabilities by updating transitive dependencies in the `poetry.lock` file.
+
+* This release adds support for DLT.
+* This release fixes vulnerabilities by updating transitive dependencies in the `poetry.lock` file.
 
 | Name         | Version | ID             | Fix Versions | Updated to |
 |--------------|---------|----------------|--------------|------------|
@@ -11,6 +13,14 @@ This release fixes vulnerabilities by updating transitive dependencies in the `p
 | requests     | 2.32.5  | CVE-2026-25645 | 2.33.0       | 2.33.1     |
 
 To ensure usage of secure packages, it is up to the user to similarly relock their dependencies.
+
+## Features
+
+* #671: Added DLT support
+    * Adds an exception handler for PyExasol errors bubbling up and converts them to proper PEP*249 exceptions.
+    * Maps sqlalchemy `DATETIME` type to Exasol `TIMESTAMP`.
+    * Formats datetime so it works within DLT.
+    * Binary types such as `UUINT`, `BLOB`, `BINARY` and `VARBINARY` now throw a clear error when used.
 
 ## Security
 

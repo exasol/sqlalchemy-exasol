@@ -1127,14 +1127,14 @@ simplejson = ">=3.16.0"
 
 [[package]]
 name = "exasol-saas-api"
-version = "2.6.0"
+version = "2.10.0"
 description = "API enabling Python applications connecting to Exasol database SaaS instances and using their SaaS services"
 optional = false
-python-versions = "<4.0,>=3.10.0"
+python-versions = "<3.15,>=3.10.0"
 groups = ["dev"]
 files = [
-    {file = "exasol_saas_api-2.6.0-py3-none-any.whl", hash = "sha256:6518cf571fed74044cd67972cf24c36cf108170315f731950e59db0e2d4f3307"},
-    {file = "exasol_saas_api-2.6.0.tar.gz", hash = "sha256:43ae4eb076f4f402610daee024473bfcb631fc5f31a233b6f54173b750fb2ee1"},
+    {file = "exasol_saas_api-2.10.0-py3-none-any.whl", hash = "sha256:966a4576d67f47113159892bacf9b14d9b87c9f18381bb400ab73bcb1be3c56e"},
+    {file = "exasol_saas_api-2.10.0.tar.gz", hash = "sha256:7fca048ebd85ff3983aa259262ba8cf2535b1a678ee116b6e1291b16d9e1e956"},
 ]
 
 [package.dependencies]
@@ -1143,7 +1143,7 @@ httpx = ">=0.23.0"
 ifaddr = ">=0.2.0,<0.3.0"
 python-dateutil = ">=2.8.0,<3.0.0"
 requests = ">=2.32.4,<3.0.0"
-tenacity = ">=8.2.3,<9.0.0"
+tenacity = ">=8,<10"
 types-requests = ">=2.31.0.6,<3.0.0.0"
 
 [[package]]
@@ -3315,19 +3315,19 @@ dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests
 
 [[package]]
 name = "pytest-exasol-backend"
-version = "1.2.4"
+version = "1.4.0"
 description = ""
 optional = false
 python-versions = "<3.14,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest_exasol_backend-1.2.4-py3-none-any.whl", hash = "sha256:f7fde35be9cea11369a2c249a431f697ecae64276e3ad4764f4140fe5bb2e6e4"},
-    {file = "pytest_exasol_backend-1.2.4.tar.gz", hash = "sha256:ea8680a0fe7cc45626159a451da386ef7c6b90b19ad8c707e86cb7102b08de23"},
+    {file = "pytest_exasol_backend-1.4.0-py3-none-any.whl", hash = "sha256:16c2ecfcbbde8c8eee2ad06748d18cc77ff46d49ed60e4c3e4825dd35a9dcca1"},
+    {file = "pytest_exasol_backend-1.4.0.tar.gz", hash = "sha256:640131f69061ecc23f6ab2927d1dbda317a1a8569186c94ef5a1ca0e15429e91"},
 ]
 
 [package.dependencies]
-exasol-integration-test-docker-environment = ">=4.3,<6"
-exasol-saas-api = ">=2.3,<3"
+exasol-integration-test-docker-environment = ">=4.3,<7"
+exasol-saas-api = ">=2.8,<3"
 pytest = ">=7,<9"
 
 [[package]]

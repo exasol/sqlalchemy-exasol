@@ -71,7 +71,7 @@ dev = [
     "pytest>=6,<10",
     "exasol-integration-test-docker-environment>=5.0.0,<7",
     "pytest-exasol-backend>=1.0.0,<2",
-    "exasol-toolbox>=7.0.0,<8",
+    "exasol-toolbox>=8.0.0,<9",
     "pydantic>=2.12.5,<3",
     "pydantic-settings>=2.12.0,<3",
 ]

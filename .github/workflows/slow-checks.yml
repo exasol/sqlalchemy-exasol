@@ -37,9 +37,11 @@ jobs:
       - name: Start Test DB
         id: start-test-db
         run: poetry run -- nox -s db:start -- --db-version ${{ matrix.exasol-version }}
+
       - name: Run Integration Tests
         id: run-integration-tests
         run: poetry run -- nox -s test:${{ matrix.integration-group }}
+
       - name: Upload Artifacts
         id: upload-artifacts
         uses: actions/upload-artifact@v6
@@ -47,6 +49,7 @@ jobs:
           name: coverage-python${{ matrix.python-version }}-${{ matrix.integration-group }}-exasol${{ matrix.exasol-version }}-${{matrix.connector}}-slow
           path: .coverage
           include-hidden-files: true
+
       - name: Stop Test DB
         id: stop-test-db
         run: poetry run -- nox -s db:stop

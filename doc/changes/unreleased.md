@@ -5,6 +5,7 @@
 ## Refactoring
 
 * #738: Replaced `version.py` usage with method based on `pyproject.toml`
+* #743: Updated to `exasol-toolbox` version 8.0.0
 
 ## Security Issues
 

@@ -11,3 +11,4 @@
 ## Security Issues
 
 * #741: Resolved vulnerabilities by relocking `poetry.lock` and increased allowed `pytest` and `exasol-integration-test-docker-environment`
+* #749: Resolved vulnerabilities by relocking `poetry.lock`

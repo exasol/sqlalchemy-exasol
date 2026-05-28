@@ -1,6 +1,6 @@
 # Core Data and Locks
-sqlalchemy_exasol/version.py        linguist-generated=true
-poetry.lock                         linguist-generated=true
+poetry.lock               linguist-generated=true
+doc/changes/changelog.md  linguist-generated=true
 
 # PTB GitHub Workflows (CI/CD & Publishing)
 .github/workflows/build-and-publish.yml     linguist-generated=true

@@ -79,7 +79,10 @@ from sqlalchemy.engine import (
     default,
     reflection,
 )
-from sqlalchemy.engine.interfaces import ReflectedColumn
+from sqlalchemy.engine.interfaces import (
+    ReflectedColumn,
+    ReflectedTableComment,
+)
 from sqlalchemy.schema import (
     AddConstraint,
     ForeignKeyConstraint,
@@ -1139,6 +1142,19 @@ class EXADialect(default.DefaultDialect):
               AND column_table = :table_name
             """)
 
+    @staticmethod
+    def get_table_comments_sql_query_str() -> str:
+        return textwrap.dedent("""
+            SELECT
+              root_name AS "schema",
+              object_name AS "table_name",
+              object_comment AS "text"
+            FROM EXA_ALL_OBJECTS
+            WHERE object_type IN ('TABLE', 'VIEW')
+              AND root_name = :schema
+              AND object_name = :table_name
+            """)
+
     def _resolve_schema_table(
         self,
         connection: Connection,
@@ -1175,6 +1191,35 @@ class EXADialect(default.DefaultDialect):
             row._mapping["column_name"].upper(): row._mapping["comment"]
             for row in result
         }
+
+    @reflection.cache
+    def get_table_comment(
+        self,
+        connection: Connection,
+        table_name: str,
+        schema: str | None = None,
+        **kw: Any,  # pylint: disable=unused-argument
+    ) -> ReflectedTableComment:
+        schema_name, table_name = self._resolve_schema_table(
+            connection=connection,
+            table=table_name,
+            schema=schema,
+        )
+
+        result = (
+            connection.execute(
+                sql.text(self.get_table_comments_sql_query_str()),
+                {
+                    "schema": schema_name,
+                    "table_name": table_name,
+                },
+            )
+            .mappings()
+            .one_or_none()
+        )
+        if result is None:
+            return ReflectedTableComment(text=None)
+        return ReflectedTableComment(text=result.get("text"))
 
     @reflection.cache
     def _get_columns(

@@ -63,6 +63,12 @@ class MetadataTest(fixtures.TablesTest):
             )
             c.execute(
                 sql.text(
+                    "COMMENT ON TABLE %s.t_with_comments IS 'table comment'"
+                    % cls.schema
+                )
+            )
+            c.execute(
+                sql.text(
                     "CREATE TABLE {schema}.s (id1 int primary key, fid1 int, fid2 int, age int, CONSTRAINT fk_test FOREIGN KEY (fid1,fid2) REFERENCES {schema}.t(pid1,pid2))".format(
                         schema=cls.schema
                     )
@@ -297,6 +303,16 @@ class MetadataTest(fixtures.TablesTest):
             assert self._make_columns_comparable(
                 expected
             ) == self._make_columns_comparable(columns)
+
+    def test_get_table_comment(self, engine_name):
+        with self.engine_map[engine_name].begin() as c:
+            dialect = inspect(c).dialect
+            table_comment = dialect.get_table_comment(
+                connection=c,
+                schema=self.schema,
+                table_name="t_with_comments",
+            )
+            assert table_comment["text"] == "table comment"
 
     def test_get_columns_where_table_name_is_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:

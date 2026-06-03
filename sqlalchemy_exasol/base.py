@@ -1272,7 +1272,7 @@ class EXADialect(default.DefaultDialect):
                 "nullable": nullable,
                 "default": default,
                 "is_distribution_key": is_distribution_key,
-                "comment": column_comments.get(colname),
+                "comment": column_comments.get(colname.upper()),
             }
             if identity:
                 identity = int(identity)

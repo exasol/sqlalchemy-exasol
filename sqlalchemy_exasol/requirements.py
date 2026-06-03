@@ -235,3 +235,8 @@ class Requirements(SuiteRequirements):
         - SELECT * FROM <table> ORDER BY <col> ASC LIMIT <count> OFFSET <expr>;
         """
         return skip_if(BooleanPredicate(True, """Not Implemented Yet"""))
+
+    @property
+    def comment_reflection(self):
+        """Indicates if the database support table comment reflection"""
+        return exclusions.open()

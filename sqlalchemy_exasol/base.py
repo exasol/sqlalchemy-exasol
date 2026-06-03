@@ -876,6 +876,10 @@ class EXADialect(default.DefaultDialect):
     supports_native_boolean = True
     supports_native_decimal = True
     supports_alter = True
+    supports_comments = True
+    # While inline column comments are supported by Exasol, this is not the case for
+    # a table comment. This is done in a subsequent step.
+    inline_comments = False
     supports_unicode_statements = True
     supports_unicode_binds = True
     supports_default_values = True

@@ -1147,18 +1147,14 @@ class EXADialect(default.DefaultDialect):
         schema: str | None = None,
         **kw: Any,
     ):
-        schema_name, table_name = self._resolve_schema_table(
-            connection=connection, table=table_name, schema=schema
-        )
-
         sql_statement = self.get_column_sql_query_str().format(
-            schema=self._get_schema_replacement_string(schema_name=schema_name),
+            schema=self._get_schema_replacement_string(schema_name=schema),
             table=":table",
         )
         result = connection.execute(
             sql.text(sql_statement),
             {
-                "schema": self.denormalize_name(schema_name),
+                "schema": self.denormalize_name(schema),
                 "table": table_name,
             },
         )
@@ -1172,11 +1168,19 @@ class EXADialect(default.DefaultDialect):
         schema: str | None = None,
         **kw: Any,
     ) -> list[ReflectedColumn]:
+
         if table_name is None:
             return []
 
+        schema_name, table_name = self._resolve_schema_table(
+            connection=connection, table=table_name, schema=schema
+        )
+
+        rows = self._get_columns(
+            connection, table_name=table_name, schema=schema_name, **kw
+        )
+
         columns = []
-        rows = self._get_columns(connection, table_name=table_name, schema=schema, **kw)
         for row in rows:
             (
                 colname,

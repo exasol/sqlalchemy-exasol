@@ -77,6 +77,7 @@ from sqlalchemy.engine import (
     default,
     reflection,
 )
+from sqlalchemy.engine.interfaces import ReflectedColumn
 from sqlalchemy.schema import (
     AddConstraint,
     ForeignKeyConstraint,
@@ -1128,7 +1129,13 @@ class EXADialect(default.DefaultDialect):
             )
 
     @reflection.cache
-    def _get_columns(self, connection, table_name, schema=None, **kw):
+    def _get_columns(
+        self,
+        connection: Connection,
+        table_name: str,
+        schema: str | None = None,
+        **kw: Any,
+    ):
         schema_name = self._get_schema_for_input(connection, schema)
         table_name = self.denormalize_name(table_name)
         self._verify_table_exists(
@@ -1149,7 +1156,13 @@ class EXADialect(default.DefaultDialect):
         return list(result)
 
     @reflection.cache
-    def get_columns(self, connection, table_name, schema=None, **kw):
+    def get_columns(
+        self,
+        connection: Connection,
+        table_name: str | None,
+        schema: str | None = None,
+        **kw: Any,
+    ) -> list[ReflectedColumn]:
         if table_name is None:
             return []
 

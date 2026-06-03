@@ -48,6 +48,7 @@ representation (all uppercase).
 import logging
 import re
 import textwrap
+from collections import defaultdict
 from collections.abc import MutableMapping
 from contextlib import closing
 from typing import Any
@@ -1224,7 +1225,7 @@ class EXADialect(default.DefaultDialect):
             schema=schema_name,
         )
 
-        columns = []
+        columns: list[ReflectedColumn] = []
         for row in rows:
             (
                 colname,
@@ -1265,7 +1266,7 @@ class EXADialect(default.DefaultDialect):
                 util.warn(f"Did not recognize type '{coltype}' of column '{colname}'")
                 coltype = sqltypes.NULLTYPE
 
-            cdict = {
+            reflected_column: Any = {
                 "name": self.normalize_name(colname),
                 "type": coltype,
                 "nullable": nullable,
@@ -1277,12 +1278,13 @@ class EXADialect(default.DefaultDialect):
                 identity = int(identity)
             # if we have a positive identity value add a sequence
             if identity is not None and identity >= 0:
-                cdict["sequence"] = {"name": ""}
+                reflected_column["sequence"] = {"name": ""}
                 # TODO: we have to possibility to encode the current identity value count
                 # into the column metadata. But the consequence is that it would also be used
                 # as start value in CREATE statements. For now the current value is ignored.
                 # Add it by changing the dict to: {'name':'', 'start': int(identity)}
-            columns.append(cdict)
+
+            columns.append(reflected_column)
         return columns
 
     @staticmethod
@@ -1388,7 +1390,7 @@ class EXADialect(default.DefaultDialect):
                 "referred_columns": [],
             }
 
-        fkeys = util.defaultdict(fkey_rec)
+        fkeys: defaultdict[str, dict[str, Any]] = defaultdict(fkey_rec)
         constraints = self._get_foreign_keys(
             connection, table_name=table_name, schema=schema_int, **kw
         )

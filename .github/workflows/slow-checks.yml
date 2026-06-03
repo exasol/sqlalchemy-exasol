@@ -11,7 +11,7 @@ jobs:
       contents: read
 
   run-integration-tests:
-    name: Run Integration Tests (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
+    name: Integration-Tests (Python-${{ matrix.python-version }}, test:${{ matrix.integration-group }}, Exasol-${{ matrix.exasol-version}}, ${{matrix.connector}})
     needs:
       - build-matrix
     runs-on: "ubuntu-24.04"

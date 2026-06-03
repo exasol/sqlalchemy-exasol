@@ -47,6 +47,7 @@ representation (all uppercase).
 
 import logging
 import re
+import textwrap
 from collections.abc import MutableMapping
 from contextlib import closing
 from typing import Any
@@ -1120,6 +1121,19 @@ class EXADialect(default.DefaultDialect):
             "ORDER BY column_ordinal_position"
         )
 
+    @staticmethod
+    def get_column_comments_sql_query_str() -> str:
+        return textwrap.dedent("""
+            SELECT
+              column_schema AS "schema",
+              column_table AS "table_name",
+              column_name AS "column_name",
+              column_comment AS "comment"
+            FROM EXA_ALL_COLUMNS
+            WHERE column_schema = :schema
+              AND column_table = :table_name
+            """)
+
     def _resolve_schema_table(
         self,
         connection: Connection,
@@ -1139,6 +1153,24 @@ class EXADialect(default.DefaultDialect):
 
         return normalized_schema, normalized_table
 
+    def _get_column_comments(
+        self,
+        connection: Connection,
+        table_name: str,
+        schema: str | None = None,
+    ) -> dict[str, str | None]:
+        result = connection.execute(
+            sql.text(self.get_column_comments_sql_query_str()),
+            {
+                "schema": schema,
+                "table_name": table_name,
+            },
+        )
+        return {
+            row._mapping["column_name"].upper(): row._mapping["comment"]
+            for row in result
+        }
+
     @reflection.cache
     def _get_columns(
         self,
@@ -1154,7 +1186,7 @@ class EXADialect(default.DefaultDialect):
         result = connection.execute(
             sql.text(sql_statement),
             {
-                "schema": self.denormalize_name(schema),
+                "schema": schema,
                 "table": table_name,
             },
         )
@@ -1177,7 +1209,15 @@ class EXADialect(default.DefaultDialect):
         )
 
         rows = self._get_columns(
-            connection, table_name=table_name, schema=schema_name, **kw
+            connection,
+            table_name=table_name,
+            schema=schema_name,
+            **kw,
+        )
+        column_comments = self._get_column_comments(
+            connection=connection,
+            table_name=table_name,
+            schema=schema_name,
         )
 
         columns = []
@@ -1227,6 +1267,7 @@ class EXADialect(default.DefaultDialect):
                 "nullable": nullable,
                 "default": default,
                 "is_distribution_key": is_distribution_key,
+                "comment": column_comments.get(colname),
             }
             if identity:
                 identity = int(identity)

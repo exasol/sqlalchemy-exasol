@@ -61,6 +61,7 @@ from pyexasol.exceptions import (
     ExaRuntimeError,
 )
 from sqlalchemy import (
+    Connection,
     event,
 )
 from sqlalchemy import exc as sa_exc
@@ -1270,7 +1271,13 @@ class EXADialect(default.DefaultDialect):
         return self._get_pk_constraint(connection, table_name, schema=schema, **kw)
 
     @reflection.cache
-    def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
+    def _get_foreign_keys(
+        self,
+        connection: Connection,
+        table_name: str,
+        schema: str | None = None,
+        **kw: Any,
+    ):
         schema_name = self._get_schema_for_input(connection, schema)
         table_name = self.denormalize_name(table_name)
         self._verify_table_exists(
@@ -1292,9 +1299,17 @@ class EXADialect(default.DefaultDialect):
         return list(result)
 
     @reflection.cache
-    def get_foreign_keys(self, connection, table_name, schema=None, **kw):
+    def get_foreign_keys(
+        self,
+        connection: Connection,
+        table_name: str | None,
+        schema: str | None = None,
+        **kw: Any,
+    ):
+
         if table_name is None:
             return []
+
         schema_int = self._get_schema_for_input_or_current(connection, schema)
 
         def fkey_rec():
@@ -1339,8 +1354,7 @@ class EXADialect(default.DefaultDialect):
             local_cols.append(self.normalize_name(local_column))
             remote_cols.append(self.normalize_name(remote_column))
 
-        result = list(fkeys.values())
-        return result
+        return list(fkeys.values())
 
     @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):

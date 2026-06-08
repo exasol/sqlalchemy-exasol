@@ -102,8 +102,8 @@ from .constraints import DistributeByConstraint
 
 logger = logging.getLogger("sqlalchemy_exasol")
 
-ColumnRow = namedtuple(
-    "ColumnRow",
+ColumnMetadata = namedtuple(
+    "ColumnMetadata",
     [
         "colname",
         "coltype",
@@ -1257,7 +1257,7 @@ class EXADialect(default.DefaultDialect):
                 "table": table_name,
             },
         )
-        return [ColumnRow(*row) for row in result]
+        return [ColumnMetadata(*column_metadata) for column_metadata in result]
 
     @reflection.cache
     def get_columns(
@@ -1275,7 +1275,7 @@ class EXADialect(default.DefaultDialect):
             connection=connection, table=table_name, schema=schema
         )
 
-        rows = self._get_columns(
+        column_metadata_rows = self._get_columns(
             connection,
             table_name=table_name,
             schema=schema_name,
@@ -1288,18 +1288,18 @@ class EXADialect(default.DefaultDialect):
         )
 
         columns: list[ReflectedColumn] = []
-        for row in rows:
-            coltype = self._get_coltype(row)
+        for column_metadata in column_metadata_rows:
+            coltype = self._get_coltype(column_metadata)
 
             reflected_column: Any = {
-                "name": self.normalize_name(row.colname),
+                "name": self.normalize_name(column_metadata.colname),
                 "type": coltype,
-                "nullable": row.nullable,
-                "default": row.default,
-                "is_distribution_key": row.is_distribution_key,
-                "comment": column_comments.get(row.colname.upper()),
+                "nullable": column_metadata.nullable,
+                "default": column_metadata.default,
+                "is_distribution_key": column_metadata.is_distribution_key,
+                "comment": column_comments.get(column_metadata.colname.upper()),
             }
-            identity = row.identity
+            identity = column_metadata.identity
             if identity:
                 identity = int(identity)
             # if we have a positive identity value add a sequence
@@ -1313,25 +1313,29 @@ class EXADialect(default.DefaultDialect):
             columns.append(reflected_column)
         return columns
 
-    def _get_coltype(self, row: ColumnRow) -> TypeEngine:
+    def _get_coltype(self, column_metadata: ColumnMetadata) -> TypeEngine:
         """Map a reflected column row to a SQLAlchemy type."""
         # FIXME: Missing type support: INTERVAL DAY [(p)] TO SECOND [(fp)], INTERVAL YEAR[(p)] TO MONTH
 
         # remove ASCII, UTF8 and spaces from char-like types
-        coltype = re.sub(r"ASCII|UTF8| ", "", row.coltype)
+        coltype = re.sub(r"ASCII|UTF8| ", "", column_metadata.coltype)
         # remove precision and scale addition from numeric types
         coltype = re.sub(r"\(\d+(\,\d+)?\)", "", coltype)
         try:
             if coltype == "VARCHAR":
-                return sqltypes.VARCHAR(row.length)
+                return sqltypes.VARCHAR(column_metadata.length)
             elif coltype == "CHAR":
-                return sqltypes.CHAR(row.length)
+                return sqltypes.CHAR(column_metadata.length)
             elif coltype == "DECIMAL":
-                return sqltypes.DECIMAL(row.precision, row.scale)
+                return sqltypes.DECIMAL(
+                    column_metadata.precision, column_metadata.scale
+                )
             else:
                 return self.ischema_names[coltype]()
         except KeyError:
-            util.warn(f"Did not recognize type '{coltype}' of column '{row.colname}'")
+            util.warn(
+                f"Did not recognize type '{coltype}' of column '{column_metadata.colname}'"
+            )
             return sqltypes.NULLTYPE
 
     @staticmethod

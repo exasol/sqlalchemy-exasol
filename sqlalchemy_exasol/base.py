@@ -47,6 +47,11 @@ representation (all uppercase).
 
 import logging
 import re
+import textwrap
+from collections import (
+    defaultdict,
+    namedtuple,
+)
 from collections.abc import MutableMapping
 from contextlib import closing
 from typing import Any
@@ -61,6 +66,7 @@ from pyexasol.exceptions import (
     ExaRuntimeError,
 )
 from sqlalchemy import (
+    Connection,
     event,
 )
 from sqlalchemy import exc as sa_exc
@@ -75,6 +81,10 @@ from sqlalchemy import (
 from sqlalchemy.engine import (
     default,
     reflection,
+)
+from sqlalchemy.engine.interfaces import (
+    ReflectedColumn,
+    ReflectedTableComment,
 )
 from sqlalchemy.schema import (
     AddConstraint,
@@ -91,6 +101,21 @@ from sqlalchemy_exasol.types import (
 from .constraints import DistributeByConstraint
 
 logger = logging.getLogger("sqlalchemy_exasol")
+
+ColumnMetadata = namedtuple(
+    "ColumnMetadata",
+    [
+        "colname",
+        "coltype",
+        "length",
+        "precision",
+        "scale",
+        "nullable",
+        "default",
+        "identity",
+        "is_distribution_key",
+    ],
+)
 
 AUTOCOMMIT_REGEXP = re.compile(
     r"\s*(?:UPDATE|INSERT|CREATE|DELETE|DROP|ALTER|TRUNCATE|MERGE)", re.I | re.UNICODE
@@ -873,6 +898,10 @@ class EXADialect(default.DefaultDialect):
     supports_native_boolean = True
     supports_native_decimal = True
     supports_alter = True
+    supports_comments = True
+    # While inline column comments are supported by Exasol, this is not the case for
+    # a table comment. This is done in a subsequent step.
+    inline_comments = False
     supports_unicode_statements = True
     supports_unicode_binds = True
     supports_default_values = True
@@ -1001,7 +1030,7 @@ class EXADialect(default.DefaultDialect):
             schema = self._get_current_schema(connection)
         return self.denormalize_name(schema)
 
-    def _get_schema_for_input(self, connection, schema):
+    def _get_schema_for_input(self, connection: Connection, schema: str | None):
         if not schema:
             backup_schema = self._get_schema_from_url(connection, schema)
             if backup_schema:
@@ -1108,8 +1137,7 @@ class EXADialect(default.DefaultDialect):
             "column_is_nullable, "
             "column_default, "
             "column_identity, "
-            "column_is_distribution_key, "
-            "column_table "
+            "column_is_distribution_key "
             "FROM sys.exa_all_columns "
             "WHERE "
             "column_object_type IN ('TABLE', 'VIEW') AND "
@@ -1118,100 +1146,202 @@ class EXADialect(default.DefaultDialect):
             "ORDER BY column_ordinal_position"
         )
 
-    def _verify_table_exists(self, connection, table_name, schema_name):
+    @staticmethod
+    def get_column_comments_sql_query_str() -> str:
+        return textwrap.dedent("""
+            SELECT
+              column_schema AS "schema",
+              column_table AS "table_name",
+              column_name AS "column_name",
+              column_comment AS "comment"
+            FROM EXA_ALL_COLUMNS
+            WHERE column_schema = :schema
+              AND column_table = :table_name
+            """)
+
+    @staticmethod
+    def get_table_comments_sql_query_str() -> str:
+        return textwrap.dedent("""
+            SELECT
+              root_name AS "schema",
+              object_name AS "table_name",
+              object_comment AS "text"
+            FROM EXA_ALL_OBJECTS
+            WHERE object_type IN ('TABLE', 'VIEW')
+              AND root_name = :schema
+              AND object_name = :table_name
+            """)
+
+    def _resolve_schema_table(
+        self,
+        connection: Connection,
+        table: str,
+        schema: str | None = None,
+    ):
+        normalized_schema = self._get_schema_for_input(connection, schema)
+        normalized_table = self.denormalize_name(table)
+
         if not self.has_table(
-            connection=connection, table_name=table_name, schema=schema_name
+            connection=connection, table_name=normalized_table, schema=normalized_schema
         ):
-            raise sqlalchemy.exc.NoSuchTableError(
-                f"{schema_name}.{table_name}" if schema_name else table_name
-            )
+            identifier = normalized_table
+            if normalized_schema is not None:
+                identifier = f"{normalized_schema}.{normalized_table}"
+            raise sqlalchemy.exc.NoSuchTableError(identifier)
+
+        return normalized_schema, normalized_table
+
+    def _get_column_comments(
+        self,
+        connection: Connection,
+        table_name: str,
+        schema: str | None = None,
+    ) -> dict[str, str | None]:
+        result = connection.execute(
+            sql.text(self.get_column_comments_sql_query_str()),
+            {
+                "schema": schema,
+                "table_name": table_name,
+            },
+        )
+        return {
+            row._mapping["column_name"].upper(): row._mapping["comment"]
+            for row in result
+        }
 
     @reflection.cache
-    def _get_columns(self, connection, table_name, schema=None, **kw):
-        schema_name = self._get_schema_for_input(connection, schema)
-        table_name = self.denormalize_name(table_name)
-        self._verify_table_exists(
-            connection=connection, table_name=table_name, schema_name=schema_name
+    def get_table_comment(
+        self,
+        connection: Connection,
+        table_name: str,
+        schema: str | None = None,
+        **kw: Any,  # pylint: disable=unused-argument
+    ) -> ReflectedTableComment:
+        schema_name, table_name = self._resolve_schema_table(
+            connection=connection,
+            table=table_name,
+            schema=schema,
         )
 
+        result = (
+            connection.execute(
+                sql.text(self.get_table_comments_sql_query_str()),
+                {
+                    "schema": schema_name,
+                    "table_name": table_name,
+                },
+            )
+            .mappings()
+            .one_or_none()
+        )
+        if result is None:
+            return ReflectedTableComment(text=None)
+        return ReflectedTableComment(text=result.get("text"))
+
+    @reflection.cache
+    def _get_columns(
+        self,
+        connection: Connection,
+        table_name: str,
+        schema: str | None = None,
+        **kw: Any,
+    ):
         sql_statement = self.get_column_sql_query_str().format(
-            schema=self._get_schema_replacement_string(schema_name=schema_name),
+            schema=self._get_schema_replacement_string(schema_name=schema),
             table=":table",
         )
         result = connection.execute(
             sql.text(sql_statement),
             {
-                "schema": self.denormalize_name(schema_name),
+                "schema": schema,
                 "table": table_name,
             },
         )
-        return list(result)
+        return [ColumnMetadata(*column_metadata) for column_metadata in result]
 
     @reflection.cache
-    def get_columns(self, connection, table_name, schema=None, **kw):
+    def get_columns(
+        self,
+        connection: Connection,
+        table_name: str | None,
+        schema: str | None = None,
+        **kw: Any,
+    ) -> list[ReflectedColumn]:
+
         if table_name is None:
             return []
 
-        columns = []
-        rows = self._get_columns(connection, table_name=table_name, schema=schema, **kw)
-        for row in rows:
-            (
-                colname,
-                coltype,
-                length,
-                precision,
-                scale,
-                nullable,
-                default,
-                identity,
-                is_distribution_key,
-            ) = (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
+        schema_name, table_name = self._resolve_schema_table(
+            connection=connection, table=table_name, schema=schema
+        )
 
-            # FIXME: Missing type support: INTERVAL DAY [(p)] TO SECOND [(fp)], INTERVAL YEAR[(p)] TO MONTH
+        column_metadata_rows = self._get_columns(
+            connection,
+            table_name=table_name,
+            schema=schema_name,
+            **kw,
+        )
+        column_comments = self._get_column_comments(
+            connection=connection,
+            table_name=table_name,
+            schema=schema_name,
+        )
 
-            # remove ASCII, UTF8 and spaces from char-like types
-            coltype = re.sub(r"ASCII|UTF8| ", "", coltype)
-            # remove precision and scale addition from numeric types
-            coltype = re.sub(r"\(\d+(\,\d+)?\)", "", coltype)
-            try:
-                if coltype == "VARCHAR":
-                    coltype = sqltypes.VARCHAR(length)
-                elif coltype == "CHAR":
-                    coltype = sqltypes.CHAR(length)
-                elif coltype == "DECIMAL":
-                    # this Dialect forces INTTYPESINRESULTSIFPOSSIBLE=y on ODBC level
-                    # thus, we need to convert DECIMAL(<=18,0) back to INTEGER type
-                    # and DECIMAL(36,0) back to BIGINT type
-                    if scale == 0 and precision <= 18:
-                        coltype = sqltypes.INTEGER()
-                    elif scale == 0 and precision == 36:
-                        coltype = sqltypes.BIGINT()
-                    else:
-                        coltype = sqltypes.DECIMAL(precision, scale)
-                else:
-                    coltype = self.ischema_names[coltype]
-            except KeyError:
-                util.warn(f"Did not recognize type '{coltype}' of column '{colname}'")
-                coltype = sqltypes.NULLTYPE
+        columns: list[ReflectedColumn] = []
+        for column_metadata in column_metadata_rows:
+            coltype = self._get_coltype(column_metadata)
 
-            cdict = {
-                "name": self.normalize_name(colname),
+            reflected_column: Any = {
+                "name": self.normalize_name(column_metadata.colname),
                 "type": coltype,
-                "nullable": nullable,
-                "default": default,
-                "is_distribution_key": is_distribution_key,
+                "nullable": column_metadata.nullable,
+                "default": column_metadata.default,
+                "is_distribution_key": column_metadata.is_distribution_key,
+                "comment": column_comments.get(column_metadata.colname.upper()),
             }
+            identity = column_metadata.identity
             if identity:
                 identity = int(identity)
             # if we have a positive identity value add a sequence
             if identity is not None and identity >= 0:
-                cdict["sequence"] = {"name": ""}
+                reflected_column["sequence"] = {"name": ""}
                 # TODO: we have to possibility to encode the current identity value count
                 # into the column metadata. But the consequence is that it would also be used
                 # as start value in CREATE statements. For now the current value is ignored.
                 # Add it by changing the dict to: {'name':'', 'start': int(identity)}
-            columns.append(cdict)
+
+            columns.append(reflected_column)
         return columns
+
+    def _get_coltype(self, column_metadata: ColumnMetadata) -> TypeEngine:
+        """Map reflected column metadata to a SQLAlchemy type."""
+        # FIXME: Missing type support: INTERVAL DAY [(p)] TO SECOND [(fp)], INTERVAL YEAR[(p)] TO MONTH
+
+        # remove ASCII, UTF8 and spaces from char-like types
+        coltype = re.sub(r"ASCII|UTF8| ", "", column_metadata.coltype)
+        # remove precision and scale addition from numeric types
+        coltype = re.sub(r"\(\d+(\,\d+)?\)", "", coltype)
+        try:
+            if coltype == "VARCHAR":
+                return sqltypes.VARCHAR(column_metadata.length)
+            elif coltype == "CHAR":
+                return sqltypes.CHAR(column_metadata.length)
+            elif coltype == "DECIMAL":
+                # Websocket metadata still reports some integer-backed columns as
+                # DECIMAL(p,0). Normalize the small exact numerics back to INTEGER so
+                # reflection matches the SQLAlchemy suite and user expectations.
+                if column_metadata.scale == 0 and column_metadata.precision <= 18:
+                    return sqltypes.INTEGER()
+                return sqltypes.DECIMAL(
+                    column_metadata.precision, column_metadata.scale
+                )
+            else:
+                return self.ischema_names[coltype]()
+        except KeyError:
+            util.warn(
+                f"Did not recognize type '{coltype}' of column '{column_metadata.colname}'"
+            )
+            return sqltypes.NULLTYPE
 
     @staticmethod
     def _get_constraint_sql_str(schema, table_name, contraint_type):
@@ -1234,10 +1364,8 @@ class EXADialect(default.DefaultDialect):
 
     @reflection.cache
     def _get_pk_constraint(self, connection, table_name, schema, **kw):
-        schema_name = self._get_schema_for_input(connection, schema)
-        table_name = self.denormalize_name(table_name)
-        self._verify_table_exists(
-            connection=connection, table_name=table_name, schema_name=schema_name
+        schema_name, table_name = self._resolve_schema_table(
+            connection=connection, table=table_name, schema=schema
         )
 
         sql_statement = self._get_constraint_sql_str(
@@ -1270,11 +1398,15 @@ class EXADialect(default.DefaultDialect):
         return self._get_pk_constraint(connection, table_name, schema=schema, **kw)
 
     @reflection.cache
-    def _get_foreign_keys(self, connection, table_name, schema=None, **kw):
-        schema_name = self._get_schema_for_input(connection, schema)
-        table_name = self.denormalize_name(table_name)
-        self._verify_table_exists(
-            connection=connection, table_name=table_name, schema_name=schema_name
+    def _get_foreign_keys(
+        self,
+        connection: Connection,
+        table_name: str,
+        schema: str | None = None,
+        **kw: Any,
+    ):
+        schema_name, table_name = self._resolve_schema_table(
+            connection=connection, table=table_name, schema=schema
         )
 
         sql_statement = self._get_constraint_sql_str(
@@ -1292,9 +1424,17 @@ class EXADialect(default.DefaultDialect):
         return list(result)
 
     @reflection.cache
-    def get_foreign_keys(self, connection, table_name, schema=None, **kw):
+    def get_foreign_keys(
+        self,
+        connection: Connection,
+        table_name: str | None,
+        schema: str | None = None,
+        **kw: Any,
+    ):
+
         if table_name is None:
             return []
+
         schema_int = self._get_schema_for_input_or_current(connection, schema)
 
         def fkey_rec():
@@ -1306,7 +1446,7 @@ class EXADialect(default.DefaultDialect):
                 "referred_columns": [],
             }
 
-        fkeys = util.defaultdict(fkey_rec)
+        fkeys: defaultdict[str, dict[str, Any]] = defaultdict(fkey_rec)
         constraints = self._get_foreign_keys(
             connection, table_name=table_name, schema=schema_int, **kw
         )
@@ -1339,8 +1479,7 @@ class EXADialect(default.DefaultDialect):
             local_cols.append(self.normalize_name(local_column))
             remote_cols.append(self.normalize_name(remote_column))
 
-        result = list(fkeys.values())
-        return result
+        return list(fkeys.values())
 
     @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):

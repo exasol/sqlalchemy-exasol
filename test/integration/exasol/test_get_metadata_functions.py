@@ -51,6 +51,24 @@ class MetadataTest(fixtures.TablesTest):
             )
             c.execute(
                 sql.text(
+                    "CREATE TABLE %s.t_with_comments (id int, name VARCHAR(20))"
+                    % cls.schema
+                )
+            )
+            c.execute(
+                sql.text(
+                    "COMMENT ON %s.t_with_comments (id IS 'id comment', name IS 'name comment')"
+                    % cls.schema
+                )
+            )
+            c.execute(
+                sql.text(
+                    "COMMENT ON TABLE %s.t_with_comments IS 'table comment'"
+                    % cls.schema
+                )
+            )
+            c.execute(
+                sql.text(
                     "CREATE TABLE {schema}.s (id1 int primary key, fid1 int, fid2 int, age int, CONSTRAINT fk_test FOREIGN KEY (fid1,fid2) REFERENCES {schema}.t(pid1,pid2))".format(
                         schema=cls.schema
                     )
@@ -123,7 +141,7 @@ class MetadataTest(fixtures.TablesTest):
         with self.engine_map[engine_name].begin() as c:
             dialect = inspect(c).dialect
             table_names = dialect.get_table_names(connection=c, schema=self.schema)
-            assert table_names == ["s", "t"]
+            assert table_names == ["s", "t", "t_with_comments"]
 
     def test_has_table_where_table_exists(self, engine_name):
         with self.engine_map[engine_name].begin() as c:
@@ -220,6 +238,7 @@ class MetadataTest(fixtures.TablesTest):
                 {
                     "default": None,
                     "is_distribution_key": False,
+                    "comment": None,
                     "name": "pid1",
                     "nullable": False,
                     "type": INTEGER(),
@@ -227,6 +246,7 @@ class MetadataTest(fixtures.TablesTest):
                 {
                     "default": None,
                     "is_distribution_key": False,
+                    "comment": None,
                     "name": "pid2",
                     "nullable": False,
                     "type": INTEGER(),
@@ -234,6 +254,7 @@ class MetadataTest(fixtures.TablesTest):
                 {
                     "default": None,
                     "is_distribution_key": False,
+                    "comment": None,
                     "name": "name",
                     "nullable": True,
                     "type": VARCHAR(length=20),
@@ -241,6 +262,7 @@ class MetadataTest(fixtures.TablesTest):
                 {
                     "default": None,
                     "is_distribution_key": False,
+                    "comment": None,
                     "name": "age",
                     "nullable": True,
                     "type": INTEGER(),
@@ -250,6 +272,47 @@ class MetadataTest(fixtures.TablesTest):
             assert self._make_columns_comparable(
                 expected
             ) == self._make_columns_comparable(columns)
+
+    def test_get_columns_with_comments(self, engine_name):
+        with self.engine_map[engine_name].begin() as c:
+            dialect = inspect(c).dialect
+            columns = dialect.get_columns(
+                connection=c,
+                schema=self.schema,
+                table_name="t_with_comments",
+            )
+            expected = [
+                {
+                    "default": None,
+                    "is_distribution_key": False,
+                    "comment": "id comment",
+                    "name": "id",
+                    "nullable": True,
+                    "type": INTEGER(),
+                },
+                {
+                    "default": None,
+                    "is_distribution_key": False,
+                    "comment": "name comment",
+                    "name": "name",
+                    "nullable": True,
+                    "type": VARCHAR(length=20),
+                },
+            ]
+
+            assert self._make_columns_comparable(
+                expected
+            ) == self._make_columns_comparable(columns)
+
+    def test_get_table_comment(self, engine_name):
+        with self.engine_map[engine_name].begin() as c:
+            dialect = inspect(c).dialect
+            table_comment = dialect.get_table_comment(
+                connection=c,
+                schema=self.schema,
+                table_name="t_with_comments",
+            )
+            assert table_comment["text"] == "table comment"
 
     def test_get_columns_where_table_name_is_none(self, engine_name):
         with self.engine_map[engine_name].begin() as c:

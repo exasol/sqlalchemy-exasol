@@ -2,6 +2,10 @@
 
 ## Summary
 
+## Feature
+
+* #753: Added access to table and column comments
+
 ## Refactoring
 
 * #738: Replaced `version.py` usage with method based on `pyproject.toml`

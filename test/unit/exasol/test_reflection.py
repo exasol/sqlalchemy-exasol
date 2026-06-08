@@ -38,15 +38,15 @@ def _make_column_row(**overrides):
         ),
         pytest.param(
             _make_column_row(coltype="DECIMAL", length=None, precision=18, scale=0),
-            sqltypes.INTEGER,
-            {},
-            id="decimal18-becomes-integer",
+            sqltypes.DECIMAL,
+            {"precision": 18, "scale": 0},
+            id="decimal18-stays-decimal",
         ),
         pytest.param(
             _make_column_row(coltype="DECIMAL", length=None, precision=36, scale=0),
-            sqltypes.BIGINT,
-            {},
-            id="decimal36-becomes-bigint",
+            sqltypes.DECIMAL,
+            {"precision": 36, "scale": 0},
+            id="decimal36-stays-decimal",
         ),
         pytest.param(
             _make_column_row(coltype="DECIMAL", length=None, precision=10, scale=2),

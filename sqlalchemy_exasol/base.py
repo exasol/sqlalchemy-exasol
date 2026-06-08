@@ -1327,15 +1327,7 @@ class EXADialect(default.DefaultDialect):
             elif coltype == "CHAR":
                 return sqltypes.CHAR(row.length)
             elif coltype == "DECIMAL":
-                # this Dialect forces INTTYPESINRESULTSIFPOSSIBLE=y on ODBC level
-                # thus, we need to convert DECIMAL(<=18,0) back to INTEGER type
-                # and DECIMAL(36,0) back to BIGINT type
-                if row.scale == 0 and row.precision <= 18:
-                    return sqltypes.INTEGER()
-                elif row.scale == 0 and row.precision == 36:
-                    return sqltypes.BIGINT()
-                else:
-                    return sqltypes.DECIMAL(row.precision, row.scale)
+                return sqltypes.DECIMAL(row.precision, row.scale)
             else:
                 return self.ischema_names[coltype]()
         except KeyError:

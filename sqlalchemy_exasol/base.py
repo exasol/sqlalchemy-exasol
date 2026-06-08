@@ -1338,7 +1338,7 @@ class EXADialect(default.DefaultDialect):
                 else:
                     return sqltypes.DECIMAL(row.precision, row.scale)
             else:
-                return self.ischema_names[coltype]
+                return self.ischema_names[coltype]()
         except KeyError:
             util.warn(f"Did not recognize type '{coltype}' of column '{row.colname}'")
             return sqltypes.NULLTYPE

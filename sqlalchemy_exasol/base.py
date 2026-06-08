@@ -48,7 +48,10 @@ representation (all uppercase).
 import logging
 import re
 import textwrap
-from collections import defaultdict
+from collections import (
+    defaultdict,
+    namedtuple,
+)
 from collections.abc import MutableMapping
 from contextlib import closing
 from typing import Any
@@ -98,6 +101,21 @@ from sqlalchemy_exasol.types import (
 from .constraints import DistributeByConstraint
 
 logger = logging.getLogger("sqlalchemy_exasol")
+
+ColumnRow = namedtuple(
+    "ColumnRow",
+    [
+        "colname",
+        "coltype",
+        "length",
+        "precision",
+        "scale",
+        "nullable",
+        "default",
+        "identity",
+        "is_distribution_key",
+    ],
+)
 
 AUTOCOMMIT_REGEXP = re.compile(
     r"\s*(?:UPDATE|INSERT|CREATE|DELETE|DROP|ALTER|TRUNCATE|MERGE)", re.I | re.UNICODE
@@ -1240,7 +1258,7 @@ class EXADialect(default.DefaultDialect):
                 "table": table_name,
             },
         )
-        return list(result)
+        return [ColumnRow(*row) for row in result]
 
     @reflection.cache
     def get_columns(
@@ -1272,53 +1290,17 @@ class EXADialect(default.DefaultDialect):
 
         columns: list[ReflectedColumn] = []
         for row in rows:
-            (
-                colname,
-                coltype,
-                length,
-                precision,
-                scale,
-                nullable,
-                default,
-                identity,
-                is_distribution_key,
-            ) = (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
-
-            # FIXME: Missing type support: INTERVAL DAY [(p)] TO SECOND [(fp)], INTERVAL YEAR[(p)] TO MONTH
-
-            # remove ASCII, UTF8 and spaces from char-like types
-            coltype = re.sub(r"ASCII|UTF8| ", "", coltype)
-            # remove precision and scale addition from numeric types
-            coltype = re.sub(r"\(\d+(\,\d+)?\)", "", coltype)
-            try:
-                if coltype == "VARCHAR":
-                    coltype = sqltypes.VARCHAR(length)
-                elif coltype == "CHAR":
-                    coltype = sqltypes.CHAR(length)
-                elif coltype == "DECIMAL":
-                    # this Dialect forces INTTYPESINRESULTSIFPOSSIBLE=y on ODBC level
-                    # thus, we need to convert DECIMAL(<=18,0) back to INTEGER type
-                    # and DECIMAL(36,0) back to BIGINT type
-                    if scale == 0 and precision <= 18:
-                        coltype = sqltypes.INTEGER()
-                    elif scale == 0 and precision == 36:
-                        coltype = sqltypes.BIGINT()
-                    else:
-                        coltype = sqltypes.DECIMAL(precision, scale)
-                else:
-                    coltype = self.ischema_names[coltype]
-            except KeyError:
-                util.warn(f"Did not recognize type '{coltype}' of column '{colname}'")
-                coltype = sqltypes.NULLTYPE
+            coltype = self._get_coltype(row)
 
             reflected_column: Any = {
-                "name": self.normalize_name(colname),
+                "name": self.normalize_name(row.colname),
                 "type": coltype,
-                "nullable": nullable,
-                "default": default,
-                "is_distribution_key": is_distribution_key,
-                "comment": column_comments.get(colname.upper()),
+                "nullable": row.nullable,
+                "default": row.default,
+                "is_distribution_key": row.is_distribution_key,
+                "comment": column_comments.get(row.colname.upper()),
             }
+            identity = row.identity
             if identity:
                 identity = int(identity)
             # if we have a positive identity value add a sequence
@@ -1331,6 +1313,35 @@ class EXADialect(default.DefaultDialect):
 
             columns.append(reflected_column)
         return columns
+
+    def _get_coltype(self, row: ColumnRow) -> TypeEngine:
+        """Map a reflected column row to a SQLAlchemy type."""
+        # FIXME: Missing type support: INTERVAL DAY [(p)] TO SECOND [(fp)], INTERVAL YEAR[(p)] TO MONTH
+
+        # remove ASCII, UTF8 and spaces from char-like types
+        coltype = re.sub(r"ASCII|UTF8| ", "", row.coltype)
+        # remove precision and scale addition from numeric types
+        coltype = re.sub(r"\(\d+(\,\d+)?\)", "", coltype)
+        try:
+            if coltype == "VARCHAR":
+                return sqltypes.VARCHAR(row.length)
+            elif coltype == "CHAR":
+                return sqltypes.CHAR(row.length)
+            elif coltype == "DECIMAL":
+                # this Dialect forces INTTYPESINRESULTSIFPOSSIBLE=y on ODBC level
+                # thus, we need to convert DECIMAL(<=18,0) back to INTEGER type
+                # and DECIMAL(36,0) back to BIGINT type
+                if row.scale == 0 and row.precision <= 18:
+                    return sqltypes.INTEGER()
+                elif row.scale == 0 and row.precision == 36:
+                    return sqltypes.BIGINT()
+                else:
+                    return sqltypes.DECIMAL(row.precision, row.scale)
+            else:
+                return self.ischema_names[coltype]
+        except KeyError:
+            util.warn(f"Did not recognize type '{coltype}' of column '{row.colname}'")
+            return sqltypes.NULLTYPE
 
     @staticmethod
     def _get_constraint_sql_str(schema, table_name, contraint_type):

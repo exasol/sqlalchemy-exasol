@@ -1314,7 +1314,7 @@ class EXADialect(default.DefaultDialect):
         return columns
 
     def _get_coltype(self, column_metadata: ColumnMetadata) -> TypeEngine:
-        """Map a reflected column row to a SQLAlchemy type."""
+        """Map reflected column metadata to a SQLAlchemy type."""
         # FIXME: Missing type support: INTERVAL DAY [(p)] TO SECOND [(fp)], INTERVAL YEAR[(p)] TO MONTH
 
         # remove ASCII, UTF8 and spaces from char-like types
@@ -1327,6 +1327,11 @@ class EXADialect(default.DefaultDialect):
             elif coltype == "CHAR":
                 return sqltypes.CHAR(column_metadata.length)
             elif coltype == "DECIMAL":
+                # Websocket metadata still reports some integer-backed columns as
+                # DECIMAL(p,0). Normalize the small exact numerics back to INTEGER so
+                # reflection matches the SQLAlchemy suite and user expectations.
+                if column_metadata.scale == 0 and column_metadata.precision <= 18:
+                    return sqltypes.INTEGER()
                 return sqltypes.DECIMAL(
                     column_metadata.precision, column_metadata.scale
                 )

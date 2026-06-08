@@ -40,9 +40,9 @@ def _make_column_metadata(**overrides):
             _make_column_metadata(
                 coltype="DECIMAL", length=None, precision=18, scale=0
             ),
-            sqltypes.DECIMAL,
-            {"precision": 18, "scale": 0},
-            id="decimal18-stays-decimal",
+            sqltypes.INTEGER,
+            {},
+            id="decimal18-becomes-integer",
         ),
         pytest.param(
             _make_column_metadata(

@@ -43,10 +43,7 @@ classifiers = [
 dependencies = [
     "packaging>=21.3",
     "pyexasol>=0.26.0,<3.0",
-    # sqlalchemy has been downpinned to exclude 2.0.45 released 2025-December
-    # as we had failing test suites. This will be resolved in :
-    #     https://github.com/exasol/sqlalchemy-exasol/issues/697
-    "sqlalchemy>=2.0.0,<2.0.45",
+    "sqlalchemy>=2.0.0,<3",
 ]
 license-files = ["LICENSE"]
 
@@ -58,6 +55,7 @@ Issues = "https://github.com/exasol/sqlalchemy-exasol/issues"
 Changelog = "https://exasol.github.io/sqlalchemy-exasol/changelog.html"
 
 [project.entry-points."sqlalchemy.dialects"]
+"exa" = "sqlalchemy_exasol:base"
 "exa.websocket" = "sqlalchemy_exasol.websocket:EXADialect_websocket"
 
 [build-system]
@@ -96,6 +94,8 @@ filterwarnings = [
 ]
 markers = [
     "backend: backend tests.",
+    "sparse_backend: tests that only apply to a sparse subset of backends.",
+    "sparse_driver_backend: tests that only apply to a sparse subset of drivers.",
     # needed for pytest >= 8.0, as the markers must be registered. This comes from
     # sqlalchemy's test suite.
     "mypy: mypy integration / plugin tests",

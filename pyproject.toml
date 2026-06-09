@@ -55,6 +55,7 @@ Issues = "https://github.com/exasol/sqlalchemy-exasol/issues"
 Changelog = "https://exasol.github.io/sqlalchemy-exasol/changelog.html"
 
 [project.entry-points."sqlalchemy.dialects"]
+"exa" = "sqlalchemy_exasol:base"
 "exa.websocket" = "sqlalchemy_exasol.websocket:EXADialect_websocket"
 
 [build-system]

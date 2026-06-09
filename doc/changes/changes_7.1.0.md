@@ -2,7 +2,7 @@
 
 ## Summary
 
-In this minor release, we add access to table comments via `get_table_comment` and column comments via `get_columns`.
+In this minor release, we added access to table comments via `get_table_comment` and column comments via `get_columns`.
 
 ## Feature
 

@@ -67,4 +67,5 @@ PROJECT_CONFIG = Config(
     # this issue:
     #     https://github.com/exasol/sqlalchemy-exasol/issues/674
     python_versions=("3.10", "3.11", "3.12", "3.13"),
+    exasol_versions=("8.29.13", "2025.1.8"),
 )

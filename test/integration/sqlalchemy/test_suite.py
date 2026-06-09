@@ -16,7 +16,6 @@ from sqlalchemy.schema import (
 )
 from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
-from sqlalchemy.testing.suite import DifficultParametersTest as _DifficultParametersTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
@@ -44,11 +43,6 @@ class XfailRationale(str, Enum):
         (see https://docs.exasol.com/db/latest/performance/indexes.htm#Manualindexoperations)
         Manual indexes are not recommended within the Exasol DB.
         """)
-    QUOTED_IDENTIFIER_DOT = cleandoc(
-        """Exasol does not allow '.' characters inside quoted identifiers,
-        so SQLAlchemy suite cases that create constraint names such as
-        'pk.with.dots' or 'fk.with.dots' cannot be executed."""
-    )
     QUOTING = cleandoc(
         """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
         issues in other dialects related to object names that contain quotes
@@ -389,22 +383,6 @@ class ComponentReflectionTest(_ComponentReflectionTest):
     def test_get_indexes(self, connection, use_schema):
         super().test_get_indexes()
 
-    def test_get_pk_constraint_quoted_name(self, connection, metadata, pk_name):
-        if (
-            connection.dialect.server_version_info <= (7, 1, 30)
-            and pk_name == "pk.with.dots"
-        ):
-            pytest.xfail(reason=XfailRationale.QUOTED_IDENTIFIER_DOT.value)
-        super().test_get_pk_constraint_quoted_name(connection, metadata, pk_name)
-
-    def test_get_foreign_keys_quoted_name(self, connection, metadata, fk_name):
-        if (
-            connection.dialect.server_version_info <= (7, 1, 30)
-            and fk_name == "fk.with.dots"
-        ):
-            pytest.xfail(reason=XfailRationale.QUOTED_IDENTIFIER_DOT.value)
-        super().test_get_foreign_keys_quoted_name(connection, metadata, fk_name)
-
     @_multi_combination
     def test_get_multi_columns(self, get_multi_exp, schema, scope, kind, use_filter):
         """
@@ -568,15 +546,3 @@ class NumericTest(_NumericTest):
     @testing.requires.float_is_numeric
     def test_float_is_not_numeric(self, connection, cls_):
         super().test_float_is_not_numeric(connection, cls_)
-
-
-class DifficultParametersTest(_DifficultParametersTest):
-    @_DifficultParametersTest.tough_parameters
-    @config.requirements.unusual_column_name_characters
-    def test_round_trip_same_named_column(self, paramname, connection, metadata):
-        if testing.db.dialect.server_version_info <= (7, 1, 30):
-            # This does not work for Exasol DB versions <= 7.1.30.
-            # See: https://github.com/exasol/sqlalchemy-exasol/issues/232
-            if paramname == "dot.s":
-                pytest.xfail(reason="dot.s does not work for <= 7.1.30")
-        super().test_round_trip_same_named_column(paramname, connection, metadata)

@@ -94,6 +94,8 @@ filterwarnings = [
 ]
 markers = [
     "backend: backend tests.",
+    "sparse_backend: tests that only apply to a sparse subset of backends.",
+    "sparse_driver_backend: tests that only apply to a sparse subset of drivers.",
     # needed for pytest >= 8.0, as the markers must be registered. This comes from
     # sqlalchemy's test suite.
     "mypy: mypy integration / plugin tests",

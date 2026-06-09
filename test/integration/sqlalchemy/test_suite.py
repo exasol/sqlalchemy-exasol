@@ -44,6 +44,11 @@ class XfailRationale(str, Enum):
         (see https://docs.exasol.com/db/latest/performance/indexes.htm#Manualindexoperations)
         Manual indexes are not recommended within the Exasol DB.
         """)
+    QUOTED_IDENTIFIER_DOT = cleandoc(
+        """Exasol does not allow '.' characters inside quoted identifiers,
+        so SQLAlchemy suite cases that create constraint names such as
+        'pk.with.dots' or 'fk.with.dots' cannot be executed."""
+    )
     QUOTING = cleandoc(
         """This suite was added to SQLAlchemy 1.3.19 on July 2020 to address
         issues in other dialects related to object names that contain quotes
@@ -383,6 +388,22 @@ class ComponentReflectionTest(_ComponentReflectionTest):
     @pytest.mark.xfail(reason=XfailRationale.MANUAL_INDEX.value, strict=True)
     def test_get_indexes(self, connection, use_schema):
         super().test_get_indexes()
+
+    def test_get_pk_constraint_quoted_name(self, connection, metadata, pk_name):
+        if (
+            connection.dialect.server_version_info <= (7, 1, 30)
+            and pk_name == "pk.with.dots"
+        ):
+            pytest.xfail(reason=XfailRationale.QUOTED_IDENTIFIER_DOT.value)
+        super().test_get_pk_constraint_quoted_name(connection, metadata, pk_name)
+
+    def test_get_foreign_keys_quoted_name(self, connection, metadata, fk_name):
+        if (
+            connection.dialect.server_version_info <= (7, 1, 30)
+            and fk_name == "fk.with.dots"
+        ):
+            pytest.xfail(reason=XfailRationale.QUOTED_IDENTIFIER_DOT.value)
+        super().test_get_foreign_keys_quoted_name(connection, metadata, fk_name)
 
     @_multi_combination
     def test_get_multi_columns(self, get_multi_exp, schema, scope, kind, use_filter):

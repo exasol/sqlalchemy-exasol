@@ -8,13 +8,13 @@ jobs:
     name: Build Matrix
     uses: ./.github/workflows/matrix.yml
     with:
-      matrix_keys_json: '["exasol_versions", "python_versions"]'
+      matrix_keys_json: '["connectors", "exasol_versions", "integration_group", "python_versions"]'
     permissions:
       contents: read
 
 
   run-integration-tests:
-    name: Integration-Tests (Python-${{ matrix.python_versions }}, test:${{ matrix.integration-group }}, Exasol-${{ matrix.exasol_versions}}, ${{matrix.connector}})
+    name: Integration-Tests (Python-${{ matrix.python_versions }}, test:${{ matrix.integration_group }}, Exasol-${{ matrix.exasol_versions}}, ${{matrix.connectors}})
     needs:
       - build-matrix
     runs-on: "ubuntu-24.04"
@@ -43,13 +43,13 @@ jobs:
 
       - name: Run Integration Tests
         id: run-integration-tests
-        run: poetry run -- nox -s test:${{ matrix.integration-group }}
+        run: poetry run -- nox -s test:${{ matrix.integration_group }}
 
       - name: Upload Artifacts
         id: upload-artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-python${{ matrix.python_versions }}-${{ matrix.integration-group }}-exasol${{ matrix.exasol_versions }}-${{matrix.connector}}-slow
+          name: coverage-python${{ matrix.python_versions }}-${{ matrix.integration_group }}-exasol${{ matrix.exasol_versions }}-${{matrix.connectors}}-slow
           path: .coverage
           include-hidden-files: true
           overwrite: false

@@ -43,6 +43,7 @@ class Config(BaseConfig):
     db_port: int = 8563
     bucketfs_port: int = 2580
     connectors: list[str] = ["websocket"]
+    integration_group: list[str] = ["exasol", "regression", "sqla"]
 
     @computed_field  # type: ignore[misc]
     @property

@@ -6,19 +6,20 @@ on:
 jobs:
   build-matrix:
     name: Build Matrix
-    uses: ./.github/workflows/matrix-all.yml
+    uses: ./.github/workflows/matrix.yml
+    with:
+      matrix_keys_json: '["exasol_versions", "python_versions"]'
     permissions:
       contents: read
 
+
   run-integration-tests:
-    name: Integration-Tests (Python-${{ matrix.python-version }}, test:${{ matrix.integration-group }}, Exasol-${{ matrix.exasol-version}}, ${{matrix.connector}})
+    name: Integration-Tests (Python-${{ matrix.python_versions }}, test:${{ matrix.integration-group }}, Exasol-${{ matrix.exasol_versions}}, ${{matrix.connector}})
     needs:
       - build-matrix
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
@@ -26,17 +27,19 @@ jobs:
       - name: Check out Repository
         id: check-out-repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Python & Poetry Environment
         id: set-up-python-and-poetry-environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        uses: exasol/python-toolbox/.github/actions/python-environment@v10
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python_versions }}
           poetry-version: "2.3.0"
 
       - name: Start Test DB
         id: start-test-db
-        run: poetry run -- nox -s db:start -- --db-version ${{ matrix.exasol-version }}
+        run: poetry run -- nox -s db:start -- --db-version ${{ matrix.exasol_versions }}
 
       - name: Run Integration Tests
         id: run-integration-tests
@@ -44,11 +47,12 @@ jobs:
 
       - name: Upload Artifacts
         id: upload-artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
-          name: coverage-python${{ matrix.python-version }}-${{ matrix.integration-group }}-exasol${{ matrix.exasol-version }}-${{matrix.connector}}-slow
+          name: coverage-python${{ matrix.python_versions }}-${{ matrix.integration-group }}-exasol${{ matrix.exasol_versions }}-${{matrix.connector}}-slow
           path: .coverage
           include-hidden-files: true
+          overwrite: false
 
       - name: Stop Test DB
         id: stop-test-db

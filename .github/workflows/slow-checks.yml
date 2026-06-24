@@ -12,7 +12,6 @@ jobs:
     permissions:
       contents: read
 
-
   run-integration-tests:
     name: Integration-Tests (Python-${{ matrix.python_versions }}, test:${{ matrix.integration_group }}, Exasol-${{ matrix.exasol_versions}}, ${{matrix.connectors}})
     needs:

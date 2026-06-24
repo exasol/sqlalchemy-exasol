@@ -33,7 +33,9 @@ jobs:
           python-version: ${{ matrix.minimum_python_version }}
 
       - name: Start test db
-        run: poetry run -- nox -s db:start -- --db-version ${{ matrix.exasol_versions }}
+        run: poetry run -- nox -s db:start -- --db-version ${MATRIX_EXASOL_VERSIONS}
+        env:
+          MATRIX_EXASOL_VERSIONS: ${{ matrix.exasol_versions }}
 
       - name: Run examples
         run: poetry run -- nox -s run:examples

@@ -39,11 +39,15 @@ jobs:
 
       - name: Start Test DB
         id: start-test-db
-        run: poetry run -- nox -s db:start -- --db-version ${{ matrix.exasol_versions }}
+        run: poetry run -- nox -s db:start -- --db-version ${MATRIX_EXASOL_VERSIONS}
+        env:
+          MATRIX_EXASOL_VERSIONS: ${{ matrix.exasol_versions }}
 
       - name: Run Integration Tests
         id: run-integration-tests
-        run: poetry run -- nox -s test:${{ matrix.integration_group }}
+        run: poetry run -- nox -s test:${MATRIX_INTEGRATION_GROUP}
+        env:
+          MATRIX_INTEGRATION_GROUP: ${{ matrix.integration_group }}
 
       - name: Upload Artifacts
         id: upload-artifacts

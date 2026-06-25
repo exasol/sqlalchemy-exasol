@@ -20,7 +20,6 @@ nox.options.sessions = ["format:fix"]
 
 from noxconfig import (
     PROJECT_CONFIG,
-    Config,
 )
 
 SCRIPTS = PROJECT_CONFIG.root_path / "scripts"
@@ -246,36 +245,6 @@ def report_skipped(session: Session) -> None:
                 f"{connector}",
                 f"{report}",
             )
-
-
-def _connector_matrix(config: Config):
-    connectors_list = ["websocket"]
-    attr = "connectors"
-    connectors = getattr(config, attr, connectors_list)
-    if not hasattr(config, attr):
-        _log.warning(
-            "Config does not contain '%s' setting. Using default: %s",
-            attr,
-            connectors_list,
-        )
-    return {"connector": connectors}
-
-
-@nox.session(name="matrix:all", python=False)
-def full_matrix(session: Session) -> None:
-    """Output the full build matrix for Python & Exasol versions as JSON."""
-    import json
-
-    from exasol.toolbox.nox._ci import (
-        _exasol_matrix,
-        _python_matrix,
-    )
-
-    matrix = _python_matrix(PROJECT_CONFIG)
-    matrix.update(_exasol_matrix(PROJECT_CONFIG))
-    matrix.update(_connector_matrix(PROJECT_CONFIG))
-    matrix["integration-group"] = ["exasol", "regression", "sqla"]
-    print(json.dumps(matrix))
 
 
 @nox.session(name="run:examples", python=False)

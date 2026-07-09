@@ -42,7 +42,7 @@ classifiers = [
 ]
 dependencies = [
     "packaging>=21.3",
-    "pyexasol>=0.26.0,<3.0",
+    "pyexasol>=2.2.2,<3.0",
     "sqlalchemy>=2.0.0,<3",
 ]
 license-files = ["LICENSE"]
@@ -66,10 +66,10 @@ build-backend = "poetry.core.masonry.api"
 dev = [
     "nox>=2022.1.7",
     "pytest-json-report>=1.5.0",
-    "pytest>=6,<10",
-    "exasol-integration-test-docker-environment>=5.0.0,<7",
-    "pytest-exasol-backend>=1.0.0,<2",
-    "exasol-toolbox>=10.0.0,<11",
+    "pytest>=9.1.1,<10",
+    "exasol-integration-test-docker-environment>=6.4.1,<7",
+    "pytest-exasol-backend>=1.5.0,<2",
+    "exasol-toolbox>=10.2.1,<11",
     "pydantic>=2.12.5,<3",
     "pydantic-settings>=2.12.0,<3",
 ]

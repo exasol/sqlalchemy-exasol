@@ -1151,14 +1151,14 @@ files = [
 
 [[package]]
 name = "exasol-integration-test-docker-environment"
-version = "6.2.0"
+version = "6.4.1"
 description = "Integration Test Docker Environment for Exasol"
 optional = false
 python-versions = "<3.15,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "exasol_integration_test_docker_environment-6.2.0-py3-none-any.whl", hash = "sha256:6bae833b3b304f2fdb5bbbda70438840583a086b9040f380a799e322718c34bc"},
-    {file = "exasol_integration_test_docker_environment-6.2.0.tar.gz", hash = "sha256:690960ce28768c371725a394d0b03c1f768cd656c3f3670bc75bce9d10c013f0"},
+    {file = "exasol_integration_test_docker_environment-6.4.1-py3-none-any.whl", hash = "sha256:c1132c00530455f6379d54582f36f7a5a92cb78fdb438c6d90df4621b9b9a4e4"},
+    {file = "exasol_integration_test_docker_environment-6.4.1.tar.gz", hash = "sha256:3beca9f7dd354c48f22aa2a631e3e5aa05a89cd39bda41a88bbaccca977270df"},
 ]
 
 [package.dependencies]
@@ -1203,14 +1203,14 @@ types-requests = ">=2.31.0.6,<3.0.0.0"
 
 [[package]]
 name = "exasol-toolbox"
-version = "10.0.0"
+version = "10.3.0"
 description = "Your one-stop solution for managing all standard tasks and core workflows of your Python project."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "exasol_toolbox-10.0.0-py3-none-any.whl", hash = "sha256:98c0456e7526ccffdfe74c727e74b706f9e613a0e42d6fffa8a0cbd2412299b8"},
-    {file = "exasol_toolbox-10.0.0.tar.gz", hash = "sha256:c2002f4cf7e8f94c9c72289a4acb98bfe6fa123942f488ecb5c84d82e92dd770"},
+    {file = "exasol_toolbox-10.3.0-py3-none-any.whl", hash = "sha256:79e9b2abe81617feed57ac390439902733611e2b67964a65d911ec16590d4e51"},
+    {file = "exasol_toolbox-10.3.0.tar.gz", hash = "sha256:b9514dfb3a6e34f6b7d79bcd54aff4febb3f78ac9255b345a16ecdb92c8ed1d0"},
 ]
 
 [package.dependencies]
@@ -2670,14 +2670,14 @@ files = [
 
 [[package]]
 name = "nox"
-version = "2026.4.10"
+version = "2026.7.11"
 description = "Flexible test automation."
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "nox-2026.4.10-py3-none-any.whl", hash = "sha256:082c117627590d9b90aa21f86df89b310b07c5842539524203bcb3c719f116c1"},
-    {file = "nox-2026.4.10.tar.gz", hash = "sha256:2d0af5374f3f37a295428c927d1b04a8182aa01762897d172446dda2f1ce9692"},
+    {file = "nox-2026.7.11-py3-none-any.whl", hash = "sha256:f5e811693ee8374d269396204eb39990d2084da67ed968239f94301805c9a169"},
+    {file = "nox-2026.7.11.tar.gz", hash = "sha256:dec9bd2c854540a2d5c0b841eaaf1d23a7c26cd90af36d9f1f1668b34524bfd9"},
 ]
 
 [package.dependencies]
@@ -2688,7 +2688,7 @@ dependency-groups = ">=1.1"
 humanize = ">=4"
 packaging = ">=22"
 tomli = {version = ">=1.1", markers = "python_version < \"3.11\""}
-virtualenv = {version = ">=20.15", markers = "python_version >= \"3.10\""}
+virtualenv = ">=20.15"
 
 [package.extras]
 pbs = ["pbs-installer[all] (>=2025.1.6)"]
@@ -3173,20 +3173,20 @@ types = ["mypy"]
 
 [[package]]
 name = "pyexasol"
-version = "2.2.1"
+version = "2.3.0"
 description = "Exasol python driver with extra features"
 optional = false
 python-versions = "<3.15,>=3.10"
 groups = ["main"]
 files = [
-    {file = "pyexasol-2.2.1-py3-none-any.whl", hash = "sha256:7503a7ccadff39bf83f5a56e9d4d503691bc1c6cfcd3714dbf989ea6c0b01629"},
-    {file = "pyexasol-2.2.1.tar.gz", hash = "sha256:90a2ff4d8393a8c6af9d129b4728237c13eff7ca4079b291dc46eba0a509c87d"},
+    {file = "pyexasol-2.3.0-py3-none-any.whl", hash = "sha256:d6aa66018dc0d2a776b7a81352c5db454150050aa8f8a229eea6a3902279f038"},
+    {file = "pyexasol-2.3.0.tar.gz", hash = "sha256:51c00b9b46d61fc28fa541c070d48f68d4ee7ecbfddab9bfc6396db3cea0e5b4"},
 ]
 
 [package.dependencies]
 cryptography = ">=45.0.7"
-packaging = ">=24.1.0,<26.0.0"
-websocket-client = ">=1.0.1,<1.9.0"
+packaging = ">=24.1.0"
+websocket-client = ">=1.0.1,<2"
 
 [package.extras]
 all = ["orjson (>=3.6,<4.0)", "pandas (>=2.0.0,<3.0.0)", "polars (>=1.10.0,<2.0.0)", "pproxy", "pyarrow (>=21.0.0)", "python-rapidjson (>=1.21.0,<2.0.0)", "ujson (>=5.10.0,<6.0.0)"]
@@ -3351,14 +3351,14 @@ tomli = ">=2.0,<3"
 
 [[package]]
 name = "pytest"
-version = "9.0.3"
+version = "9.1.1"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest-9.0.3-py3-none-any.whl", hash = "sha256:2c5efc453d45394fdd706ade797c0a81091eccd1d6e4bccfcd476e2b8e0ab5d9"},
-    {file = "pytest-9.0.3.tar.gz", hash = "sha256:b86ada508af81d19edeb213c681b1d48246c1a91d304c6c81a427674c17eb91c"},
+    {file = "pytest-9.1.1-py3-none-any.whl", hash = "sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c"},
+    {file = "pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313"},
 ]
 
 [package.dependencies]
@@ -3375,20 +3375,21 @@ dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests
 
 [[package]]
 name = "pytest-exasol-backend"
-version = "1.4.1"
+version = "1.5.1"
 description = ""
 optional = false
-python-versions = "<3.14,>=3.10"
+python-versions = "<3.15,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest_exasol_backend-1.4.1-py3-none-any.whl", hash = "sha256:208b5f6e3da31105a8e692c6aaa04775d3f2d29e3985f69092e2ed805c3285ca"},
-    {file = "pytest_exasol_backend-1.4.1.tar.gz", hash = "sha256:c89af2b959377cc2ac6fda81b6d433ecc66e9e9b6608f2a0048f3f1890223470"},
+    {file = "pytest_exasol_backend-1.5.1-py3-none-any.whl", hash = "sha256:1659e4124f439436dedd1ab746a544d7bdbc270b7532524d4654e70daca85cc6"},
+    {file = "pytest_exasol_backend-1.5.1.tar.gz", hash = "sha256:45c62972ed039dbd3037756dddfa5ac7eb041e2290a29b6b8421f52b0daa53a0"},
 ]
 
 [package.dependencies]
 exasol-integration-test-docker-environment = ">=4.3,<7"
 exasol-saas-api = ">=2.8,<3"
-pytest = ">=7,<10"
+pytest = ">=9,<10"
+pyyaml = ">=6.0.3,<7.0.0"
 
 [[package]]
 name = "pytest-json-report"
@@ -5153,4 +5154,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "446a7548c31d2094b6a1b59457717d4fbc1348a334a97bca39f1a993001096ba"
+content-hash = "29fdb00305db321832c2642815323ca8e4c22264d3f9bc993552ff3d3a9ee612"

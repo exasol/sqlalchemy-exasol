@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import subprocess
 import sys
 from argparse import ArgumentParser
@@ -251,11 +252,21 @@ def report_skipped(session: Session) -> None:
 def run_examples(session: Session) -> None:
     """Execute examples, assuming a DB already is ready."""
     examples_path = PROJECT_CONFIG.root_path / "examples"
+    environment = os.environ.copy()
+    pythonpath = environment.get("PYTHONPATH")
+    environment["PYTHONPATH"] = os.pathsep.join(
+        path for path in (str(PROJECT_CONFIG.root_path), pythonpath) if path
+    )
 
     files_with_errors = []
     for file in sorted(examples_path.rglob("*.py")):
         print(f"\033[32m{file.relative_to(examples_path)}\033[0m")
-        result = subprocess.run(["python", str(file)], capture_output=True, text=True)
+        result = subprocess.run(
+            [sys.executable, str(file)],
+            capture_output=True,
+            text=True,
+            env=environment,
+        )
         if result.stdout:
             print(result.stdout)
         if result.stderr:

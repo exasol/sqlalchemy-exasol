@@ -13,7 +13,7 @@ jobs:
       contents: read
 
   verify-examples:
-    name: Verify Examples (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol_versions}})
+    name: Verify Examples (Python-${{ matrix.minimum_python_version }}, Exasol-${{ matrix.exasol_versions}})
     needs: [ build-matrix ]
     runs-on:  "ubuntu-24.04"
     strategy:
@@ -39,6 +39,8 @@ jobs:
 
       - name: Run examples
         run: poetry run -- nox -s run:examples
+        env:
+          PYTHONPATH: .
 
       - name: Stop test db
         run: poetry run -- nox -s db:stop

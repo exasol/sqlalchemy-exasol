@@ -62,11 +62,6 @@ PROJECT_CONFIG = Config(
     root_path=Path(__file__).parent,
     project_name="sqlalchemy_exasol",
     plugins_for_nox_sessions=(StartDB, StopDB),
-    # pytest-exasol-backend requires Python <3.14. When pytest-exasol-backend has been
-    # updated to allow Python 3.14, then we can remove the override for python_versions.
-    # Keeping track of pytest-exasol-backend and removing the override is tracked in
-    # this issue:
-    #     https://github.com/exasol/sqlalchemy-exasol/issues/674
-    python_versions=("3.10", "3.11", "3.12", "3.13"),
+    python_versions=("3.10", "3.11", "3.12", "3.13", "3.14"),
     exasol_versions=("8.29.13", "2025.1.8"),
 )

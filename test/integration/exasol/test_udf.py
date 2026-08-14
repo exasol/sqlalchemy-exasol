@@ -21,8 +21,6 @@ class Udf(fixtures.TestBase):
             con.execute(text("DROP SCRIPT UDF"))
 
     def test_udf(self):
-        from sqlalchemy import create_engine, text
-
         engine = create_engine(config.db.url)
         UDF = cleandoc("""
             --/

@@ -13,6 +13,22 @@ from sqlalchemy.testing import (
 )
 
 
+class Listener:
+    def __init__(self, target: sqlalchemy.event.EventTarget):
+        self._target = target
+        self.connection_ids: set[str] = set()
+
+    def _on_checkout(self, dbapi_conn, connection_rec, connection_proxy):
+        self.connection_ids.add(id(dbapi_conn))
+
+    def listen(self, event: str) -> Listener:
+        sqlalchemy.event.listen(self._target, event, self._on_checkout)
+        return self
+
+    def unlisten(self, event: str) -> Listener:
+        sqlalchemy.event.remove(self._target, event, self._on_checkout)
+
+
 class Bench:
     def __init__(self, engine: sqlalchemy.Engine):
         self._engine = engine

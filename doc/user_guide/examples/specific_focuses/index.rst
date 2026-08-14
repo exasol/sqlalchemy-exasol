@@ -7,3 +7,4 @@ Specific Focuses
    autocommit
    object_name
    query_method_chaining
+   udfs

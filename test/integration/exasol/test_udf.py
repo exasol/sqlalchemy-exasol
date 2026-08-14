@@ -1,0 +1,28 @@
+from inspect import cleandoc
+
+from sqlalchemy import (
+    create_engine,
+    text,
+)
+from sqlalchemy.testing import (
+    config,
+    fixtures,
+)
+
+
+class Udf(fixtures.TestBase):
+    def test_udf(self):
+        engine = create_engine(config.db.url)
+        UDF = cleandoc(f"""
+            --/
+            CREATE OR REPLACE PYTHON3 SCALAR SCRIPT
+            UDF("a" VARCHAR(200))
+            EMITS ("result" VARCHAR(2000)) AS
+            def run(ctx):
+                ctx.emit("Input: " + ctx.a)
+            /
+        """)
+        with engine.connect() as con:
+            con.execute(text(UDF))
+            res = con.execute(text(f"""SELECT UDF('abc')""")).fetchone()
+        assert res[0] == "Input: abc"

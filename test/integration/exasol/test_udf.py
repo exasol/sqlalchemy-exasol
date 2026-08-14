@@ -18,24 +18,14 @@ class Udf(fixtures.TestBase):
     @classmethod
     def setup_class(cls):
         cls.schema = "test"
-        with config.db.begin() as conn:
-            conn.execute(CreateSchema(cls.schema))
-
-    @classmethod
-    def teardown_class(cls):
-        with config.db.begin() as conn:
-            conn.execute(DropSchema(cls.schema, cascade=True))
 
     def test_udf(self):
         engine = create_engine(config.db.url)
         UDF = cleandoc(f"""
             --/
             CREATE OR REPLACE PYTHON3 SCALAR SCRIPT
-              "{self.schema}".UDF(
-              "a" VARCHAR(200)
-            ) EMITS (
-              "result" VARCHAR(2000)
-            ) AS
+            "{self.schema}".UDF("a" VARCHAR(200))
+            EMITS ("result" VARCHAR(2000)) AS
             def run(ctx):
                 ctx.emit("Input: " + ctx.a)
             /

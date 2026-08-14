@@ -15,11 +15,8 @@ SQL_ALCHEMY.create_schema(engine=ENGINE, schema=DEFAULT_SCHEMA_NAME)
 UDF = cleandoc("""
     --/
     CREATE OR REPLACE PYTHON3 SCALAR SCRIPT
-    UDF(
-      "a" VARCHAR(200)
-    ) EMITS (
-      "result" VARCHAR(2000)
-    ) AS
+    UDF("a" VARCHAR(200))
+    EMITS ("result" VARCHAR(2000)) AS
     def run(ctx):
         ctx.emit("Input: " + ctx.a)
     /

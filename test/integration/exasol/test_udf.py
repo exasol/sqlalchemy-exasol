@@ -15,10 +15,10 @@ class Udf(fixtures.TestBase):
     def setup_class(cls):
         cls.schema = "test"
 
-    @classmethod
-    def teardown_class(cls):
-        with config.db.begin() as con:
-            con.execute(text("DROP SCRIPT UDF"))
+    # @classmethod
+    # def teardown_class(cls):
+    #     with config.db.begin() as con:
+    #         con.execute(text("DROP SCRIPT UDF"))
 
     def test_udf(self):
         engine = create_engine(config.db.url)

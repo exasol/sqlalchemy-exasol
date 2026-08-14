@@ -4,10 +4,6 @@ from sqlalchemy import (
     create_engine,
     text,
 )
-from sqlalchemy.schema import (
-    CreateSchema,
-    DropSchema,
-)
 from sqlalchemy.testing import (
     config,
     fixtures,

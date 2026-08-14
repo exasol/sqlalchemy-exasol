@@ -43,7 +43,8 @@ class Pooling(fixtures.TestBase):
         """
 
         url = config.db.url.set(password="wrong password")
+        engine = self.create_engine(url=url)
         with pytest.raises(sqlalchemy.exc.DBAPIError) as ex:
-            engine = self.create_engine(url=url).connect()
+            engine.connect()
         trace = "\n".join(self.exception_trace(ex.value))
         assert "wrong password" not in trace

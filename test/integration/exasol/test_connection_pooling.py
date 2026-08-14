@@ -1,4 +1,8 @@
+import contextlib
+import threading
 from collections.abc import Iterator
+from time import sleep
+from typing import Any
 
 import pytest
 import sqlalchemy
@@ -7,6 +11,33 @@ from sqlalchemy.testing import (
     config,
     fixtures,
 )
+
+
+class Bench:
+    def __init__(self, engine: sqlalchemy.Engine):
+        self._engine = engine
+
+    def connect(self, n: int) -> list[sqlalchemy.Connection]:
+        return [self._engine.connect() for _ in range(n)]
+
+    def close(self, connections: list[sqlalchemy.Connection]) -> None:
+        for con in connections:
+            con.close()
+
+    def execute(
+        self,
+        connections: list[sqlalchemy.Connection],
+        statement: str,
+    ) -> list[Any]:
+        return [
+            c.execute(sqlalchemy.text(statement)).fetchone()[0] for c in connections
+        ]
+
+    @contextlib.contextmanager
+    def listen(self, event: str):
+        listener = Listener(self._engine).listen(event)
+        yield listener
+        listener.unlisten(event)
 
 
 class Pooling(fixtures.TestBase):
@@ -47,3 +78,27 @@ class Pooling(fixtures.TestBase):
             engine = self.create_engine(url=url).connect()
         trace = "\n".join(self.exception_trace(ex.value))
         assert "wrong password" not in trace
+
+    def test_third_connection_blocks(self) -> None:
+        """
+        Allocate all connections of the pool. Assert subsequent connect()
+        blocks until one of the connections is returnd to the pool.
+        """
+
+        def get_third_connection(engine):
+            with engine.connect() as con:
+                nonlocal result
+                result = con.execute(sqlalchemy.text("SELECT 33")).fetchone()[0]
+
+        engine = self.create_engine()
+        result = None
+        bench = Bench(engine)
+        connections = bench.connect(2)
+        thread = threading.Thread(target=get_third_connection, args=(engine,))
+        thread.start()
+        sleep(1)
+        assert thread.is_alive()  # assert threat is blocking
+
+        bench.close(connections[:1])
+        thread.join()
+        assert result == 33

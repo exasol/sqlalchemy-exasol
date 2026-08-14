@@ -20,7 +20,7 @@ class Udf(fixtures.TestBase):
         cls.schema = "test"
         with config.db.begin() as conn:
             conn.execute(CreateSchema(cls.schema))
-            
+
     @classmethod
     def teardown_class(cls):
         with config.db.begin() as conn:
@@ -42,5 +42,5 @@ class Udf(fixtures.TestBase):
         """)
         with engine.connect() as con:
             con.execute(text(UDF))
-            res = con.execute(text(f"SELECT "{self.schema}".UDF('abc')")).fetchone()
+            res = con.execute(text(f"""SELECT "{self.schema}".UDF('abc')""")).fetchone()
         assert res[0] == "Input: abc"

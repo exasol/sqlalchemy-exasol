@@ -74,15 +74,17 @@ class Pooling(fixtures.TestBase):
         """
 
         url = config.db.url.set(password="wrong password")
+        engine = self.create_engine(url=url)
         with pytest.raises(sqlalchemy.exc.DBAPIError) as ex:
-            engine = self.create_engine(url=url).connect()
+            engine.connect()
         trace = "\n".join(self.exception_trace(ex.value))
         assert "wrong password" not in trace
 
     def test_third_connection_blocks(self) -> None:
         """
-        Allocate all connections of the pool. Assert subsequent connect()
-        blocks until one of the connections is returnd to the pool.
+        Allocate all connections of the pool. Assert subsequent
+        ``connect()`` blocks until one of the connections is returned to the
+        pool.
         """
 
         def get_third_connection(engine):

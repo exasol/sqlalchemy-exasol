@@ -2,9 +2,7 @@ from collections.abc import Iterator
 
 import pytest
 import sqlalchemy
-from sqlalchemy import (
-    create_engine,
-)
+from sqlalchemy import create_engine
 from sqlalchemy.testing import (
     config,
     fixtures,

@@ -1,11 +1,9 @@
 from collections.abc import Iterator
-from inspect import cleandoc
 
 import pytest
 import sqlalchemy
 from sqlalchemy import (
     create_engine,
-    text,
 )
 from sqlalchemy.testing import (
     config,
@@ -24,7 +22,7 @@ class Pooling(fixtures.TestBase):
         current = ex
         cause = "Initial exception"
         while current:
-            yield(f'{cause}: {type(current)}: {current}')
+            yield (f"{cause}: {type(current)}: {current}")
             current = current.__cause__
             cause = "Cause"
 

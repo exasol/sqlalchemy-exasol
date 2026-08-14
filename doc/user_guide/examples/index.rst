@@ -12,6 +12,7 @@ Examples
    non_orm/index.rst
    orm/index.rst
    specific_focuses/index.rst
+   udfs.rst
 
 SQLAlchemy-Exasol contains the following examples which are regularly verified in the CI to be correct.
 For a broader introduction and an overview, please see:

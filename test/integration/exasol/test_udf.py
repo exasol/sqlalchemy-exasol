@@ -11,16 +11,12 @@ from sqlalchemy.testing import (
 
 
 class Udf(fixtures.TestBase):
-    @classmethod
-    def setup_class(cls):
-        cls.schema = "test"
-
     def test_udf(self):
         engine = create_engine(config.db.url)
         UDF = cleandoc(f"""
             --/
             CREATE OR REPLACE PYTHON3 SCALAR SCRIPT
-            "{self.schema}".UDF("a" VARCHAR(200))
+            UDF("a" VARCHAR(200))
             EMITS ("result" VARCHAR(2000)) AS
             def run(ctx):
                 ctx.emit("Input: " + ctx.a)
@@ -28,5 +24,5 @@ class Udf(fixtures.TestBase):
         """)
         with engine.connect() as con:
             con.execute(text(UDF))
-            res = con.execute(text(f"""SELECT "{self.schema}".UDF('abc')""")).fetchone()
+            res = con.execute(text(f"""SELECT UDF('abc')""")).fetchone()
         assert res[0] == "Input: abc"

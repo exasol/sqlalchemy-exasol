@@ -27,7 +27,7 @@ UDF = cleandoc("""
 
 # 3. Create and execute the UDF
 with ENGINE.connect() as conn:
-    conn.execute(text(f"OPEN SCHEMA {DEFAULT_SCHEMA_NAME}))
+    conn.execute(text(f"OPEN SCHEMA {DEFAULT_SCHEMA_NAME}"))
     conn.execute(text(UDF))
     res = conn.execute(text("SELECT UDF('abc')")).fetchone()
-    print(f'Result: "{res[0]}"')
+    print(f'Result: "{res}"')

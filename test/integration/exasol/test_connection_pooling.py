@@ -15,6 +15,17 @@ from sqlalchemy.testing import (
 )
 
 
+class TestConfigurationError(Exception):
+    """Error in test configuration setup."""
+
+
+@pytest.fixture
+def config_url() -> sqlalchemy.URL:
+    if config.db:
+        return config.db.url
+    raise TestConfigurationError("config.db is None")
+
+
 class Listener:
     def __init__(self, target: sqlalchemy.event.EventTarget):
         self._target = target
@@ -29,6 +40,7 @@ class Listener:
 
     def unlisten(self, event: str) -> Listener:
         sqlalchemy.event.remove(self._target, event, self._on_checkout)
+        return self
 
 
 class Bench:
@@ -47,9 +59,11 @@ class Bench:
         connections: list[sqlalchemy.Connection],
         statement: str,
     ) -> list[Any]:
-        return [
-            c.execute(sqlalchemy.text(statement)).fetchone()[0] for c in connections
-        ]
+        def result(con: sqlalchemy.Connection) -> Any:
+            row = con.execute(sqlalchemy.text(statement)).fetchone()
+            return row[0] if row else None
+
+        return [result(c) for c in connections]
 
     @contextlib.contextmanager
     def listen(self, event: str):
@@ -66,7 +80,7 @@ class Pooling(fixtures.TestBase):
         linked by __cause__ and containing the exceptions's message.
         """
 
-        current = ex
+        current: BaseException | None = ex
         cause = "Initial exception"
         while current:
             yield (f"{cause}: {type(current)}: {current}")
@@ -74,31 +88,30 @@ class Pooling(fixtures.TestBase):
             cause = "Cause"
 
     @classmethod
-    def create_engine(cls, **kwargs) -> sqlalchemy.Engine:
+    def create_engine(cls, url: sqlalchemy.URL, **kwargs) -> sqlalchemy.Engine:
         args = {
-            "url": config.db.url,
             "poolclass": sqlalchemy.QueuePool,
             "pool_size": 2,
             "max_overflow": 0,
             "pool_recycle": 3600,  # recycle connections after an hour
             "pool_pre_ping": True,  # test connection before reuse
         } | kwargs
-        return create_engine(**args)
+        return create_engine(url, **args)
 
-    def test_exception(self) -> None:
+    def test_exception(self, config_url: sqlalchemy.URL) -> None:
         """
         Verify that the exception raised by a SQLALchemy Engine using a
         Connection Pool does not reveal any secret.
         """
 
-        url = config.db.url.set(password="wrong password")
-        engine = self.create_engine(url=url)
+        url = config_url.set(password="wrong password")
+        engine = self.create_engine(url)
         with pytest.raises(sqlalchemy.exc.DBAPIError) as ex:
             engine.connect()
         trace = "\n".join(self.exception_trace(ex.value))
         assert "wrong password" not in trace
 
-    def test_third_connection_blocks(self) -> None:
+    def test_third_connection_blocks(self, config_url: sqlalchemy.URL) -> None:
         """
         Allocate all connections of the pool. Assert subsequent
         ``connect()`` blocks until one of the connections is returned to the
@@ -110,7 +123,7 @@ class Pooling(fixtures.TestBase):
                 nonlocal result
                 result = con.execute(sqlalchemy.text("SELECT 33")).fetchone()[0]
 
-        engine = self.create_engine()
+        engine = self.create_engine(config_url)
         result = None
         bench = Bench(engine)
         connections = bench.connect(2)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -112,7 +113,7 @@ class TestGetLastRowID:
         users = []
         for entry in data:
             u = User(first_name=entry["first_name"], last_name=entry["last_name"])
-            u._pending_emails = entry["email_addresses"]
+            u._pending_emails = entry["email_addresses"]  # type: ignore[attr-defined]
             users.append(u)
 
         session.add_all(users)
@@ -121,10 +122,10 @@ class TestGetLastRowID:
         return users
 
     @staticmethod
-    def create_email_addresses(users: list[User]) -> list[EmailAddress]:
+    def create_email_addresses(users: list[User]) -> list[dict[str, Any]]:
         email_addresses = []
         for u in users:
-            for email in u._pending_emails:
+            for email in u._pending_emails:  # type: ignore[attr-defined]
                 email_addresses.append({"user_id": u.id, "email_address": email})
         return email_addresses
 

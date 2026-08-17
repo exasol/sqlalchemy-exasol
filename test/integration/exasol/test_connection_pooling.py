@@ -164,7 +164,7 @@ class Pooling(fixtures.TestBase):
     def test_recycle(self, config_url: sqlalchemy.URL) -> None:
         """
         Set ``pool_recycle`` to 1 second and verify that connection are
-        not reused after this time as passed.
+        not reused after this time has passed.
         """
         engine = self.create_engine(config_url, pool_recycle=1)
         scenario = Scenario(engine)

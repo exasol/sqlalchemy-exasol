@@ -173,7 +173,7 @@ class Pooling(fixtures.TestBase):
         assert round_1.results == [42, 42]
 
         reuse = round_1.connection_ids
-        sleep(2)
+        sleep(3)
 
         with scenario.listen("checkout") as round_2:
             connections = scenario.connect(1)

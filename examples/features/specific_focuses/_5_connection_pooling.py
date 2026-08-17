@@ -1,8 +1,11 @@
 import sqlalchemy
 
+from examples.config import (
+    SQL_ALCHEMY,
+)
+
 # 1. Create an engine using a connection pool
-engine = sqlalchemy.create_engine(
-    url,
+engine = SQL_ALCHEMY.create_engine(
     poolclass=sqlalchemy.QueuePool,
     pool_size=10,
     max_overflow=2,
@@ -12,5 +15,5 @@ engine = sqlalchemy.create_engine(
 
 # 2. Create and connection and execute a statement
 with engine.connect() as con:
-    res = con.excute(sqlalchemy.text("SELECT 1").fetchone()
+    res = con.execute(sqlalchemy.text("SELECT 1")).fetchone()
     print(f'Result: "{res}"')

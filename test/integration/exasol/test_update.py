@@ -1,4 +1,10 @@
-from sqlalchemy import *
+import sqlalchemy
+from sqlalchemy import (
+    ForeignKey,
+    Integer,
+    String,
+    bindparam,
+)
 from sqlalchemy.testing import (
     config,
     eq_,
@@ -8,6 +14,16 @@ from sqlalchemy.testing.schema import (
     Column,
     Table,
 )
+
+
+class TestConfigurationError(Exception):
+    """Error in test configuration setup."""
+
+
+def config_db() -> sqlalchemy.Engine:
+    if config.db:
+        return config.db
+    raise TestConfigurationError("config.db must not be None")
 
 
 class _UpdateTestBase:
@@ -83,11 +99,15 @@ class _UpdateTestBase:
 class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
     __backend__ = True
 
+    @property
+    def _users(self) -> sqlalchemy.Table:
+        return self.tables[f"{self.schema}.users"]  # type: ignore[attr-defined, index]
+
     def test_update_simple(self):
         """test simple update and assert that exasol returns the right rowcount"""
-        users = self.tables[f"{self.schema}.users"]
+        users = self._users
 
-        with config.db.begin() as conn:
+        with config_db().begin() as conn:
             result = conn.execute(
                 users.update().values(name="peter").where(users.c.id == 10)
             )
@@ -97,19 +117,19 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
 
     def test_update_simple_multiple_rows_rowcount(self):
         """test simple update and assert that exasol returns the right rowcount"""
-        users = self.tables[f"{self.schema}.users"]
+        users = self._users
 
-        with config.db.begin() as conn:
+        with config_db().begin() as conn:
             result = conn.execute(
                 users.update().values(name="peter").where(users.c.id >= 9)
             )
         assert result.rowcount == 2
         self._assert_users(users, [(7, "jack"), (8, "ed"), (9, "peter"), (10, "peter")])
 
-    def test_update_executemany(self):
+    def test_update_executemany(self) -> None:
         """test that update with executemany work as well, but rowcount
         is undefined for executemany updates"""
-        users = self.tables[f"{self.schema}.users"]
+        users = self._users
 
         stmt = (
             users.update()
@@ -122,7 +142,7 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
             {"oldname": "fred", "newname": "fred2"},
         ]
 
-        with config.db.begin() as conn:
+        with config_db().begin() as conn:
             result = conn.execute(stmt, values)
 
         assert result.rowcount == 2
@@ -133,9 +153,9 @@ class UpdateTest(_UpdateTestBase, fixtures.TablesTest):
 
     def _assert_addresses(self, addresses, expected):
         stmt = addresses.select().order_by(addresses.c.id)
-        eq_(config.db.execute(stmt).fetchall(), expected)
+        eq_(config_db().execute(stmt).fetchall(), expected)
 
     def _assert_users(self, users, expected):
         stmt = users.select().order_by(users.c.id)
-        with config.db.connect() as conn:
+        with config_db().connect() as conn:
             eq_(conn.execute(stmt).fetchall(), expected)

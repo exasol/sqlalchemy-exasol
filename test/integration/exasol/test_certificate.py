@@ -7,7 +7,6 @@ import sqlalchemy.exc
 from sqlalchemy import (
     create_engine,
     sql,
-    testing,
 )
 from sqlalchemy.testing import config
 from sqlalchemy.testing.fixtures import TestBase
@@ -56,11 +55,6 @@ class CertificateTest(TestBase):
             pass
         return url.set(query=query)
 
-    @pytest.mark.xfail(
-        testing.db.dialect.server_version_info < (7, 1, 0),
-        reason="DB version(s) before 7.1.0 don't enforce ssl/tls",
-        strict=True,
-    )
     def test_db_connection_fails_with_default_settings_for_self_signed_certificates(
         self,
     ):

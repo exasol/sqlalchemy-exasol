@@ -130,7 +130,7 @@ unfixable = []
 
 [[tool.mypy.overrides]]
 module = [
-    "test.*",
+     "exasol.driver.websocket.*",
 ]
 ignore_errors = true
 follow_untyped_imports = true

@@ -35,7 +35,7 @@ def _pyexasol_connection(dsn="localhost:8563", user="SYS", password="exasol"):
     connection.close()
 
 
-def pytest_sessionstart(session):
+def pytest_sessionstart(session):  # type: ignore[no-redef]
     with _pyexasol_connection() as con:
         for schema in _TEST_SCHEMAS:
             con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE;")
@@ -45,7 +45,7 @@ def pytest_sessionstart(session):
     _pytest_sessionstart(session)
 
 
-def pytest_sessionfinish(session):
+def pytest_sessionfinish(session):  # type: ignore[no-redef]
     with _pyexasol_connection() as con:
         for schema in _TEST_SCHEMAS:
             con.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE;")

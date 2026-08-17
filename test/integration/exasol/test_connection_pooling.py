@@ -135,3 +135,20 @@ class Pooling(fixtures.TestBase):
         scenario.close(connections[:1])
         thread.join()
         assert result == 33
+
+    def test_reuse(self, config_url: sqlalchemy.URL) -> None:
+        engine = self.create_engine(config_url)
+        scenario = Scenario(engine)
+        with scenario.listen("checkout") as round_1:
+            connections = scenario.connect(2)
+            assert scenario.execute(connections, "SELECT 42") == [42, 42]
+            scenario.close(connections)
+
+        known = round_1.connection_ids
+
+        with scenario.listen("checkout") as round_2:
+            connections = scenario.connect(2)
+            assert scenario.execute(connections, "SELECT 42") == [42, 42]
+            scenario.close(connections)
+
+        assert round_2.connection_ids.issubset(known)

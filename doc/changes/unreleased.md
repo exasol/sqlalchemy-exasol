@@ -8,3 +8,4 @@
 * #784: Added test for exception to not reveal the password for connection pool
 * #786: Added test for n+1 `connect()` to block
 * #788: Enabled mypy type checks for tests
+* #792: Added test to verify connections are reused by the connection pool

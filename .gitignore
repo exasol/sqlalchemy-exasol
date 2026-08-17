@@ -47,3 +47,6 @@ nosetests.xml
 .project
 .pydevproject
 .vscode/settings.json
+
+# Emacs
+/TAGS

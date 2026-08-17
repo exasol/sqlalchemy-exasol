@@ -30,6 +30,7 @@ class Listener:
     def __init__(self, target: sqlalchemy.event.EventTarget):
         self._target = target
         self.connection_ids: set[str] = set()
+        self.results: list[Any] = []
 
     def _on_checkout(self, dbapi_conn, connection_rec, connection_proxy):
         self.connection_ids.add(id(dbapi_conn))
@@ -70,6 +71,13 @@ class Scenario:
         listener = Listener(self._engine).listen(event)
         yield listener
         listener.unlisten(event)
+
+    def round_trip(self, sql_statement: str) -> Listener:
+        with self.listen("checkout") as listener:
+            connections = self.connect(2)
+            listener.results = self.execute(connections, sql_statement)
+            self.close(connections)
+        return listener
 
 
 class Pooling(fixtures.TestBase):
@@ -139,16 +147,12 @@ class Pooling(fixtures.TestBase):
     def test_reuse(self, config_url: sqlalchemy.URL) -> None:
         engine = self.create_engine(config_url)
         scenario = Scenario(engine)
-        with scenario.listen("checkout") as round_1:
-            connections = scenario.connect(2)
-            assert scenario.execute(connections, "SELECT 42") == [42, 42]
-            scenario.close(connections)
+
+        round_1 = scenario.round_trip("SELECT 42")
+        assert round_1.results == [42, 42]
 
         known = round_1.connection_ids
 
-        with scenario.listen("checkout") as round_2:
-            connections = scenario.connect(2)
-            assert scenario.execute(connections, "SELECT 42") == [42, 42]
-            scenario.close(connections)
-
+        round_2 = scenario.round_trip("SELECT 43")
+        assert round_2.results == [43, 43]
         assert round_2.connection_ids.issubset(known)

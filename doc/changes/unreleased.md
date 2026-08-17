@@ -13,3 +13,4 @@
 * #786: Added test for n+1 `connect()` to block
 * #788: Enabled mypy type checks for tests
 * #792: Added test to verify connections are reused by the connection pool
+* #794: Added test to verify recycle timeout

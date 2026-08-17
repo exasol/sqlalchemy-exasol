@@ -1,3 +1,4 @@
+# mypy: disable-error-code="no-redef"
 # import all SQLAlchemy tests for this dialect
 from enum import Enum
 from inspect import cleandoc

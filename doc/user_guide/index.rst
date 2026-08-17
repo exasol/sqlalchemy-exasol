@@ -11,6 +11,7 @@
     configuration/index
     examples/index
     features/index
+    pooling/pooling
 
 Welcome to SQLAlchemy-Exasol
 -----------------------------

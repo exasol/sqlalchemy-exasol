@@ -78,7 +78,7 @@ class SqlAlchemyFactory(BaseSettings):
             query=self.config.query,
         )
 
-    def create_engine(self) -> Engine:
+    def create_engine(self, **kwargs) -> Engine:
         """
         Create a new `Engine` instance. This is used to create a connection via
         `connect()`. Throughout the examples, the default values for `create_engine()`
@@ -87,7 +87,7 @@ class SqlAlchemyFactory(BaseSettings):
         """
 
         url = self.create_url()
-        return create_engine(url)
+        return create_engine(url, **kwargs)
 
     @staticmethod
     def create_schema(engine: Engine, schema: str = DEFAULT_SCHEMA_NAME) -> None:

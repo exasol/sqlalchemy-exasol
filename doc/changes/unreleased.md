@@ -2,6 +2,10 @@
 
 ## Summary
 
+## Documentation
+
+* #781: Added Connection Pooling to the User Guide
+
 ## Refactorings
 
 * #782: Added an integration test for creating a UDF incl. an example in the User Guide

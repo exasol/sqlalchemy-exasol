@@ -43,7 +43,7 @@ class Listener:
         return self
 
 
-class Bench:
+class Scenario:
     def __init__(self, engine: sqlalchemy.Engine):
         self._engine = engine
 
@@ -111,27 +111,27 @@ class Pooling(fixtures.TestBase):
         trace = "\n".join(self.exception_trace(ex.value))
         assert "wrong password" not in trace
 
-    def test_third_connection_blocks(self, config_url: sqlalchemy.URL) -> None:
+    def test_another_connection_blocks(self, config_url: sqlalchemy.URL) -> None:
         """
-        Allocate all connections of the pool. Assert subsequent
-        ``connect()`` blocks until one of the connections is returned to the
-        pool.
+        Allocate all connections of the pool. Assert trying to
+        ``connect()`` one more time blocks until one of the connections is
+        returned to the pool and can be reused.
         """
 
-        def get_third_connection(engine):
+        def get_another_connection(engine):
             with engine.connect() as con:
                 nonlocal result
                 result = con.execute(sqlalchemy.text("SELECT 33")).fetchone()[0]
 
         engine = self.create_engine(config_url)
         result = None
-        bench = Bench(engine)
-        connections = bench.connect(2)
-        thread = threading.Thread(target=get_third_connection, args=(engine,))
+        scenario = Scenario(engine)
+        connections = scenario.connect(2)
+        thread = threading.Thread(target=get_another_connection, args=(engine,))
         thread.start()
         sleep(1)
         assert thread.is_alive()  # assert threat is blocking
 
-        bench.close(connections[:1])
+        scenario.close(connections[:1])
         thread.join()
         assert result == 33

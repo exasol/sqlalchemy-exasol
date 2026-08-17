@@ -177,4 +177,4 @@ class Pooling(fixtures.TestBase):
 
         round_2 = scenario.round_trip("SELECT 43")
         assert round_2.results == [43, 43]
-        assert round_2.connection_ids & reuse == set()
+        assert round_2.connection_ids.isdisjoint(reuse)

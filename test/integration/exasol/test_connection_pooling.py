@@ -145,6 +145,10 @@ class Pooling(fixtures.TestBase):
         assert result == 33
 
     def test_reuse(self, config_url: sqlalchemy.URL) -> None:
+        """
+        Allocate 2 connections, use and close them and when requesting
+        another 2 connections, verify the initial 2 connections are reused.
+        """
         engine = self.create_engine(config_url)
         scenario = Scenario(engine)
 
@@ -156,3 +160,21 @@ class Pooling(fixtures.TestBase):
         round_2 = scenario.round_trip("SELECT 43")
         assert round_2.results == [43, 43]
         assert round_2.connection_ids.issubset(known)
+
+    def test_recycle(self, config_url: sqlalchemy.URL) -> None:
+        """
+        Set ``pool_recycle`` to 1 second and verify that connection are
+        not reused after this time as passed.
+        """
+        engine = self.create_engine(config_url, pool_recycle=1)
+        scenario = Scenario(engine)
+
+        round_1 = scenario.round_trip("SELECT 42")
+        assert round_1.results == [42, 42]
+
+        reuse = round_1.connection_ids
+        sleep(2)
+
+        round_2 = scenario.round_trip("SELECT 43")
+        assert round_2.results == [43, 43]
+        assert round_2.connection_ids & reuse == set()

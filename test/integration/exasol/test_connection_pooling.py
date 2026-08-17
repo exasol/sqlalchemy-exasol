@@ -1,4 +1,10 @@
+from __future__ import annotations
+
+import contextlib
+import threading
 from collections.abc import Iterator
+from time import sleep
+from typing import Any
 
 import pytest
 import sqlalchemy
@@ -9,6 +15,63 @@ from sqlalchemy.testing import (
 )
 
 
+class TestConfigurationError(Exception):
+    """Error in test configuration setup."""
+
+
+@pytest.fixture
+def config_url() -> sqlalchemy.URL:
+    if config.db:
+        return config.db.url
+    raise TestConfigurationError("config.db is None")
+
+
+class Listener:
+    def __init__(self, target: sqlalchemy.event.EventTarget):
+        self._target = target
+        self.connection_ids: set[str] = set()
+
+    def _on_checkout(self, dbapi_conn, connection_rec, connection_proxy):
+        self.connection_ids.add(id(dbapi_conn))
+
+    def listen(self, event: str) -> Listener:
+        sqlalchemy.event.listen(self._target, event, self._on_checkout)
+        return self
+
+    def unlisten(self, event: str) -> Listener:
+        sqlalchemy.event.remove(self._target, event, self._on_checkout)
+        return self
+
+
+class Scenario:
+    def __init__(self, engine: sqlalchemy.Engine):
+        self._engine = engine
+
+    def connect(self, n: int) -> list[sqlalchemy.Connection]:
+        return [self._engine.connect() for _ in range(n)]
+
+    def close(self, connections: list[sqlalchemy.Connection]) -> None:
+        for con in connections:
+            con.close()
+
+    def execute(
+        self,
+        connections: list[sqlalchemy.Connection],
+        statement: str,
+    ) -> list[Any]:
+        def result(con: sqlalchemy.Connection) -> Any:
+            row = con.execute(sqlalchemy.text(statement)).fetchone()
+            return row[0] if row else None
+
+        return [result(c) for c in connections]
+
+    @contextlib.contextmanager
+    def listen(self, event: str):
+        listener = Listener(self._engine).listen(event)
+        yield listener
+        listener.unlisten(event)
+
+
 class Pooling(fixtures.TestBase):
     @classmethod
     def exception_trace(cls, ex: Exception) -> Iterator[str]:
@@ -17,7 +80,7 @@ class Pooling(fixtures.TestBase):
         linked by __cause__ and containing the exceptions's message.
         """
 
-        current = ex
+        current: BaseException | None = ex
         cause = "Initial exception"
         while current:
             yield (f"{cause}: {type(current)}: {current}")
@@ -25,26 +88,50 @@ class Pooling(fixtures.TestBase):
             cause = "Cause"
 
     @classmethod
-    def create_engine(cls, **kwargs) -> sqlalchemy.Engine:
+    def create_engine(cls, url: sqlalchemy.URL, **kwargs) -> sqlalchemy.Engine:
         args = {
-            "url": config.db.url,
             "poolclass": sqlalchemy.QueuePool,
             "pool_size": 2,
             "max_overflow": 0,
             "pool_recycle": 3600,  # recycle connections after an hour
             "pool_pre_ping": True,  # test connection before reuse
         } | kwargs
-        return create_engine(**args)
+        return create_engine(url, **args)
 
-    def test_exception(self) -> None:
+    def test_exception(self, config_url: sqlalchemy.URL) -> None:
         """
         Verify that the exception raised by a SQLALchemy Engine using a
         Connection Pool does not reveal any secret.
         """
 
-        url = config.db.url.set(password="wrong password")
-        engine = self.create_engine(url=url)
+        url = config_url.set(password="wrong password")
+        engine = self.create_engine(url)
         with pytest.raises(sqlalchemy.exc.DBAPIError) as ex:
             engine.connect()
         trace = "\n".join(self.exception_trace(ex.value))
         assert "wrong password" not in trace
+
+    def test_another_connection_blocks(self, config_url: sqlalchemy.URL) -> None:
+        """
+        Allocate all connections of the pool. Assert trying to
+        ``connect()`` one more time blocks until one of the connections is
+        returned to the pool and can be reused.
+        """
+
+        def get_another_connection(engine):
+            with engine.connect() as con:
+                nonlocal result
+                result = con.execute(sqlalchemy.text("SELECT 33")).fetchone()[0]
+
+        engine = self.create_engine(config_url)
+        result = None
+        scenario = Scenario(engine)
+        connections = scenario.connect(2)
+        thread = threading.Thread(target=get_another_connection, args=(engine,))
+        thread.start()
+        sleep(1)
+        assert thread.is_alive()  # assert threat is blocking
+
+        scenario.close(connections[:1])
+        thread.join()
+        assert result == 33

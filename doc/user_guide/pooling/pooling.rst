@@ -73,3 +73,13 @@ with ``__cause__``. The password is not revealed.
         session_id  =>
         code        =>  08004
     )
+
+Events
+------
+
+You can use SQLAlchemy's `Pool Events <pool_events_>`_ to react on each time a
+connection is checked out or handed back to the pool, see
+:ref:`example_connection_pooling` in our list of examples.
+
+.. _pool_events:
+   https://docs.sqlalchemy.org/en/20/core/events.html#sqlalchemy.events.PoolEvents

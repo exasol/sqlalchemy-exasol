@@ -13,7 +13,15 @@ engine = SQL_ALCHEMY.create_engine(
     pool_pre_ping=True,  # test connection liveness before use
 )
 
-# 2. Create a connection and execute a statement
+
+# 2. Listen when a connection is checked out from the pool
+def on_checkout(dbapi_conn, connection_rec, connection_proxy):
+    print(f"checkout: {dbapi_conn}")
+
+
+sqlalchemy.event.listen(engine, "checkout", on_checkout)
+
+# 3. Create a connection and execute a statement
 with engine.connect() as con:
     res = con.execute(sqlalchemy.text("SELECT 1")).fetchone()
     print(f'Result: "{res}"')

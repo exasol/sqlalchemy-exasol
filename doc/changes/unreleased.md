@@ -5,6 +5,7 @@
 ## Documentation
 
 * #781: Added Connection Pooling to the User Guide
+* #797: Enhanced example and added documentation for listening to pool events
 
 ## Refactorings
 

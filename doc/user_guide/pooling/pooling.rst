@@ -82,4 +82,4 @@ connection is checked out or handed back to the pool, see
 :ref:`example_connection_pooling` in our list of examples.
 
 .. _pool_events:
-   https://docs.sqlalchemy.org/en/21/core/events.html#sqlalchemy.events.PoolEvents
+   https://docs.sqlalchemy.org/en/20/core/events.html#sqlalchemy.events.PoolEvents

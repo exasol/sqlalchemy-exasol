@@ -71,7 +71,7 @@ html_theme = "shibuya"
 html_static_path = ["_static"]
 html_title = "sqlalchemy-exasol"
 html_css_files = [
-    'my.css',
+    "my.css",
 ]
 html_theme_options = {
     "light_logo": "_static/light-exasol-logo.svg",

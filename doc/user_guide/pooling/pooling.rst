@@ -142,8 +142,8 @@ The same applies to MySQL Pooling.  Instead, the application could use a
 dedicated pool for each user (account, tenant, client).  ``psycopg`` for
 PostgreSQL offers an argument ``key`` that could be used for this purpose.
 
-Exasol offers a statement ``IMPERSONATE`` allowing user :var:`<U1>` to
-impersonate another user :var:`<U2>`.
+Exasol offers statement `IMPERSONATE <impersonate_>`_ allowing user
+:var:`<U1>` to impersonate another user :var:`<U2>`.
 
 * User :var:`<U1>` must therefore have related privileges for any or a specific
   user or role to impersonate.
@@ -155,3 +155,4 @@ is a one-way operation that cannot be reverted.  Hence, when executing this
 statement within a given connection, the connection may not be used to
 impersonate other users afterward.
 
+.. _impersonate: https://docs.exasol.com/db/latest/sql/impersonate.htm

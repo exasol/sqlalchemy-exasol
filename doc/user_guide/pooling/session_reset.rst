@@ -26,7 +26,7 @@ Tied to a session are
   supports to either commit or rollback open transaction when returning a
   connection to the pool.
 * Changes with SQL command ``ALTER SESSION``
-* The Current user, see section :ref:`change_user` below.
+* The current user, see section :ref:`change_user` below.
 * Temporary objects: Not available in Exasol
 
 .. _reset_on_return:

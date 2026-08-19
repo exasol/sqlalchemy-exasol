@@ -6,6 +6,9 @@ import sqlalchemy
 from examples.config import ENGINE
 
 
+# 1. Define a class to conveniently reset EXA_PARAMETERS to
+# their resp. system values
+
 @dataclass
 class ExaParam:
     name: str
@@ -33,11 +36,15 @@ class ExaParam:
 
 
 with ENGINE.connect() as con:
+    # 2. Intentionally modify one parameter to showcase an example
     con.execute(ExaParam.alter_statement("IDLE_TIMEOUT", "80000"))
+
+    # 3. Retrieve changed parameters
     altered_parameters = (
         exa_param for row in con.execute(ExaParam.QUERY).fetchall()
         if (exa_param := ExaParam(*row)).differs
     )
+    # 4. Reset parameter values
     for p in altered_parameters:
         reset = p.alter_session
         print(f'{reset}')

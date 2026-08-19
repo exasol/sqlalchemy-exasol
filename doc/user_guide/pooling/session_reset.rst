@@ -69,7 +69,7 @@ one-way operation that cannot be reverted.  Hence, when executing this
 statement within a given connection, the connection may not be used to
 impersonate other users afterward.
 
-In consequence auch a connection may not be suited for further reuse and needs
+In consequence such a connection may not be suited for further reuse and needs
 to be discarded.
 
 .. _impersonate: https://docs.exasol.com/db/latest/sql/impersonate.htm

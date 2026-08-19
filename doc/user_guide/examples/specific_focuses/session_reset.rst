@@ -3,7 +3,7 @@
 Session Reset
 =============
 
-This examples demonstrates how to reset Exasol parameters changes in the
+These examples demonstrates how to reset Exasol parameter changes in the
 context of a database session to the global system values.
 
 .. literalinclude:: ../../../../examples/features/specific_focuses/_6_session_reset.py

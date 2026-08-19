@@ -6,6 +6,7 @@
 
 * #781: Added Connection Pooling to the User Guide
 * #797: Enhanced example and added documentation for listening to pool events
+* #799: Added session reset to user guide section on Connection Pooling
 
 ## Refactorings
 

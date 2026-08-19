@@ -113,7 +113,7 @@ Tied to a session are
 * Temporary objects: Not available in Exasol
 
 .. _reset_on_return:
-   https://docs.sqlalchemy.org/en/21/core/pooling.html#sqlalchemy.pool.Pool.params.reset_on_return
+   https://docs.sqlalchemy.org/en/20/core/pooling.html#sqlalchemy.pool.Pool.params.reset_on_return
 .. _alter_session:
    https://docs.exasol.com/db/latest/sql/alter_session.htm
 
@@ -124,11 +124,11 @@ However, the application could listen to an appropriate event, e.g. `checkin
 execute additional commands to reset the session as desired.
 
 .. _checkin:
-   https://docs.sqlalchemy.org/en/21/core/events.html#sqlalchemy.events.PoolEvents.checkin
+   https://docs.sqlalchemy.org/en/20/core/events.html#sqlalchemy.events.PoolEvents.checkin
 .. _checkout:
-   https://docs.sqlalchemy.org/en/21/core/events.html#sqlalchemy.events.PoolEvents.checkout
+   https://docs.sqlalchemy.org/en/20/core/events.html#sqlalchemy.events.PoolEvents.checkout
 .. _reset:
-   https://docs.sqlalchemy.org/en/21/core/events.html#sqlalchemy.events.PoolEvents.reset
+   https://docs.sqlalchemy.org/en/20/core/events.html#sqlalchemy.events.PoolEvents.reset
 
 .. _change_user:
 

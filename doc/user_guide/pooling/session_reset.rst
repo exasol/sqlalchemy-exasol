@@ -56,8 +56,8 @@ Changing the User for an Existing Connection
 .. role:: var
 
 SQLAlchemy API does not allow altering the user for an existing connection.
-The same applies to MySQL Pooling.  Instead, the application could use a
-dedicated pool for each user (account, tenant, client).
+Instead, the application could use a dedicated pool for each user (account,
+tenant, client).
 
 Exasol offers statement `IMPERSONATE <impersonate_>`_ allowing user
 :var:`<U1>` to impersonate another user :var:`<U2>`.  User :var:`<U1>` must

@@ -36,15 +36,10 @@ Tied to a session are
 
 Currently there is no command in Exasol to reset the current session.
 
-However, the application could listen to an appropriate event, e.g. `checkin
-<checkin_>`_, `checkout <checkout_>`_, or `reset <reset_>`_ and manually
-execute additional commands to reset the session as desired, see
+However, the application could listen to event `reset <reset_>`_ and execute
+additional commands to reset the session as desired, see
 :ref:`example_session_reset` in our list of examples.
 
-.. _checkin:
-   https://docs.sqlalchemy.org/en/20/core/events.html#sqlalchemy.events.PoolEvents.checkin
-.. _checkout:
-   https://docs.sqlalchemy.org/en/20/core/events.html#sqlalchemy.events.PoolEvents.checkout
 .. _reset:
    https://docs.sqlalchemy.org/en/20/core/events.html#sqlalchemy.events.PoolEvents.reset
 

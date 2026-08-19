@@ -1,13 +1,12 @@
 from dataclasses import dataclass
-from typing import Any
 
 import sqlalchemy
 
 from examples.config import ENGINE
 
-
 # 1. Define a class to conveniently reset EXA_PARAMETERS to
 # their resp. system values
+
 
 @dataclass
 class ExaParam:
@@ -41,11 +40,12 @@ with ENGINE.connect() as con:
 
     # 3. Retrieve changed parameters
     altered_parameters = (
-        exa_param for row in con.execute(ExaParam.QUERY).fetchall()
+        exa_param
+        for row in con.execute(ExaParam.QUERY).fetchall()
         if (exa_param := ExaParam(*row)).differs
     )
     # 4. Reset parameter values
     for p in altered_parameters:
         reset = p.alter_session
-        print(f'{reset}')
+        print(f"{reset}")
         con.execute(reset)

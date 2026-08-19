@@ -108,9 +108,9 @@ Tied to a session are
 * Transactions: SQLAlchemy parameter `reset_on_return <reset_on_return_>`_
   supports to either commit or rollback open transaction when returning a
   connection to the pool.
-* Changes with SQL command `ALTER SESSION <alter_session_>`_.
+* Changes with SQL command ``ALTER SESSION``
 * The Current user, see section :ref:`change_user` below.
-* Temporary objects: not available in Exasol.
+* Temporary objects: Not available in Exasol
 
 .. _reset_on_return:
    https://docs.sqlalchemy.org/en/21/core/pooling.html#sqlalchemy.pool.Pool.params.reset_on_return

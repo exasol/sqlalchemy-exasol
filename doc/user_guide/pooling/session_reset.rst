@@ -36,7 +36,8 @@ Tied to a session are
 
 Currently there is no command in Exasol to reset the current session.
 
-However, the application could listen to event `reset <reset_>`_ and execute
+However, the application could use the default value "commit" for
+``Pool.reset_on_return``, listen to event `reset <reset_>`_, and execute
 additional commands to reset the session as desired, see
 :ref:`example_session_reset` in our list of examples.
 

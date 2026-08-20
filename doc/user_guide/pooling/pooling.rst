@@ -1,6 +1,13 @@
 Connection Pooling
 ==================
 
+.. toctree::
+    :maxdepth: 1
+    :hidden:
+
+    sessions
+
+
 This chapter gives a tutorial for pooling Exasol connections in Python.
 
 Creating a database connection can be slow. Connection pooling is a way to

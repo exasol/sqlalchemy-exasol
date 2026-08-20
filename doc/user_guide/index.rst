@@ -12,7 +12,6 @@
     examples/index
     features/index
     pooling/pooling
-    pooling/session_reset
 
 Welcome to SQLAlchemy-Exasol
 -----------------------------

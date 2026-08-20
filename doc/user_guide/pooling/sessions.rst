@@ -1,5 +1,5 @@
-Connections and Sessions
-========================
+Database Sessions
+=================
 
 Normally a connection is tied to a *database session*.  Hence, when the
 Connection Pool *reuses* a connection, the resp. session is reused, too.

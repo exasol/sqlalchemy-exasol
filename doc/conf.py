@@ -70,6 +70,9 @@ html_theme = "shibuya"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 html_title = "sqlalchemy-exasol"
+html_css_files = [
+    "my.css",
+]
 html_theme_options = {
     "light_logo": "_static/light-exasol-logo.svg",
     "dark_logo": "_static/dark-exasol-logo.svg",

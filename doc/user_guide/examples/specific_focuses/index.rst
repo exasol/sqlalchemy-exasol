@@ -8,4 +8,5 @@ Specific Focuses
    object_name
    query_method_chaining
    connection_pooling
+   session_reset
    udfs

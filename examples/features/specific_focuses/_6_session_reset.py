@@ -50,9 +50,7 @@ def on_reset(con, connection_record, reset_state):
         # Retrieve changed parameters
         cur.execute(ExaParam.QUERY)
         altered_parameters = (
-            exa_param
-            for row in cur.fetchall()
-            if (exa_param := ExaParam(*row)).differs
+            exa_param for row in cur.fetchall() if (exa_param := ExaParam(*row)).differs
         )
         # Reset parameter values
         for p in altered_parameters:

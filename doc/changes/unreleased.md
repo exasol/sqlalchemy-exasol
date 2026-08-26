@@ -2,6 +2,12 @@
 
 ## Summary
 
+## Bugfix
+
+* Corrected the bare `exa` SQLAlchemy entry point to load the default websocket
+  dialect class directly. This keeps entry-point consumers such as Apache Superset
+  working while preserving both `exa://` and `exa+websocket://` engine URLs.
+
 ## Documentation
 
 * #781: Added Connection Pooling to the User Guide

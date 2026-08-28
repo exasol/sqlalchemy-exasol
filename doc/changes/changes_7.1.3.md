@@ -2,6 +2,10 @@
 
 ## Summary
 
+This patch release fixes loading of the bare `exa` SQLAlchemy entry point,
+expands the User Guide with connection pooling, pool events, and session reset
+guidance, and adds test coverage for connection pooling and UDF creation.
+
 ## Security Issues
 
 This release fixes vulnerabilities by updating dependencies:

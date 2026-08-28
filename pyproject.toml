@@ -60,7 +60,7 @@ build-backend = "poetry.core.masonry.api"
 
 [dependency-groups]
 dev = [
-    "nox>=2022.1.7",
+    "nox>=2026.8.17",
     "pytest-json-report>=1.5.0",
     "pytest>=6,<10",
     "exasol-integration-test-docker-environment>=5.0.0,<7",

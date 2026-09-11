@@ -1,11 +1,11 @@
 import datetime
-import time
 from collections import (
     ChainMap,
     defaultdict,
     namedtuple,
 )
 
+from pyexasol.exceptions import ExaCommunicationError
 from sqlalchemy.exc import ArgumentError
 from sqlalchemy.sql import sqltypes
 
@@ -54,22 +54,17 @@ class DateTime(sqltypes.DATETIME):
         return process
 
     def result_processor(self, dialect, coltype):
-        def datetime_fmt(v):
-            formats = ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M:%S.%f")
-            for fmt in formats:
-                try:
-                    time.strptime(v, fmt)
-                except ValueError:
-                    continue
-                return fmt
-            raise ValueError("Unknown date/time format")
-
         def to_datetime(v):
             if not isinstance(v, str):
                 return v
-            fmt = datetime_fmt(v)
-            timestamp = time.strptime(v, fmt)
-            return datetime.datetime.fromtimestamp(time.mktime(timestamp))
+            # Parse wall time directly: time.strptime/mktime loses fractions and
+            # can normalize timestamps according to the client's local timezone.
+            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M:%S.%f"):
+                try:
+                    return datetime.datetime.strptime(v, fmt)
+                except ValueError:
+                    continue
+            raise ValueError("Unknown date/time format")
 
         return to_datetime
 
@@ -92,6 +87,14 @@ class EXADialect_websocket(EXADialect):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    def is_disconnect(self, e, connection, cursor):
+        # The websocket DBAPI preserves the transport error as the direct cause.
+        # Query/authentication errors and generic DBAPI errors are not evidence
+        # of a lost connection. Let SQLAlchemy recover the pool, not replay SQL.
+        return isinstance(e, self.loaded_dbapi.Error) and isinstance(
+            e.__cause__, ExaCommunicationError
+        )
 
     def create_connect_args(self, url):
         Converter = namedtuple("Converter", ["name", "map"])

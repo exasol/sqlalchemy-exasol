@@ -602,6 +602,21 @@ ischema_names = {
 
 
 class EXACompiler(compiler.SQLCompiler):
+    # Fields Exasol's EXTRACT accepts: YEAR, MONTH, DAY for DATE; TIMESTAMP and
+    # INTERVAL DAY TO SECOND add HOUR, MINUTE, SECOND. See the Exasol EXTRACT reference:
+    # https://docs.exasol.com/db/latest/sql_references/functions/alphabeticallistfunctions/extract.htm
+    _supported_extract_fields = frozenset(
+        {"year", "month", "day", "hour", "minute", "second"}
+    )
+
+    def visit_extract(self, extract, **kw):
+        if extract.field.lower() not in self._supported_extract_fields:
+            raise sa_exc.CompileError(
+                f"EXTRACT field '{extract.field}' is not supported "
+                "by the Exasol dialect"
+            )
+        return super().visit_extract(extract, **kw)
+
     def visit_now_func(self, fn, **kw):
         return "CURRENT_TIMESTAMP"
 

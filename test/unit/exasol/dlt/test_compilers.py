@@ -5,8 +5,12 @@ from sqlalchemy import (
     Column,
     MetaData,
     Table,
+    column,
 )
 from sqlalchemy import exc as sa_exc
+from sqlalchemy import (
+    extract,
+)
 from sqlalchemy import types as sqltypes
 from sqlalchemy.schema import CreateTable
 
@@ -146,3 +150,10 @@ def test_binary_types_are_rejected_at_ddl_compile(type_, expected_msg):
 
     with pytest.raises(sa_exc.CompileError, match=expected_msg):
         _compile_create_table(t)
+
+
+# --- EXTRACT ----------------------------------------------------------------
+@pytest.mark.parametrize("field", ["year", "month", "day", "hour", "minute", "second"])
+def test_extract_renders_sql_date_part(field):
+    compiled = str(extract(field, column("c")).compile(dialect=base.EXADialect()))
+    assert compiled == f"EXTRACT({field} FROM c)"

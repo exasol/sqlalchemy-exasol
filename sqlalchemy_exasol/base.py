@@ -602,22 +602,6 @@ ischema_names = {
 
 
 class EXACompiler(compiler.SQLCompiler):
-    extract_map = util.update_copy(
-        compiler.SQLCompiler.extract_map,
-        {
-            "month": "%m",
-            "day": "%d",
-            "year": "%Y",
-            "second": "%S",
-            "hour": "%H",
-            "doy": "%j",
-            "minute": "%M",
-            "epoch": "%s",
-            "dow": "%w",
-            "week": "%W",
-        },
-    )
-
     def visit_now_func(self, fn, **kw):
         return "CURRENT_TIMESTAMP"
 

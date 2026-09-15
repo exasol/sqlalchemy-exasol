@@ -8,8 +8,10 @@ from sqlalchemy import (
     MetaData,
     String,
     Table,
+    extract,
     inspect,
     or_,
+    select,
     sql,
     testing,
 )
@@ -160,3 +162,38 @@ class UtilTest(fixtures.TablesTest):
             "FROM t \n"
             "WHERE t.id = 1 OR t.name = 'bob' OR t.\"day\" = to_date('2017-01-01', 'YYYY-MM-DD') OR t.created = to_timestamp('2017-01-01 12:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.FF6')"
         )
+
+
+class ExtractTest(fixtures.TablesTest):
+    __backend__ = True
+
+    @classmethod
+    def define_tables(cls, metadata):
+        Table(
+            "t",
+            metadata,
+            Column("id", Integer),
+            Column("created", DateTime),
+        )
+
+    @classmethod
+    def insert_data(cls, connection):
+        connection.execute(
+            cls.tables.t.insert(),
+            [{"id": 1, "created": datetime.datetime(2017, 3, 5, 12, 34, 56)}],
+        )
+
+    @testing.combinations(
+        ("year", 2017),
+        ("month", 3),
+        ("day", 5),
+        ("hour", 12),
+        ("minute", 34),
+        ("second", 56),
+        argnames="field,expected",
+    )
+    def test_extract_returns_date_part(self, field, expected):
+        t = self.tables.t
+        with config.db.connect() as conn:
+            result = conn.execute(select(extract(field, t.c.created))).scalar()
+        assert result == expected

@@ -82,6 +82,7 @@ class WebsocketRecovery(fixtures.TestBase):
     def test_typed_timestamp_preserves_server_fraction(
         self, pooled_engine, schema, precision, fraction
     ):
+        # Setup: create and reflect a timestamp table with the requested precision.
         expected = dt.datetime(2026, 9, 11, 12, 34, 56, fraction)
         with pooled_engine.begin() as connection:
             # Before 8.32, TIMESTAMP(6) was an alias for millisecond precision.
@@ -95,15 +96,17 @@ class WebsocketRecovery(fixtures.TestBase):
         table = sa.Table(
             "t", sa.MetaData(), schema=schema.lower(), autoload_with=pooled_engine
         )
+
+        # Action: insert one typed value, one NULL, and one independently seeded value.
         with pooled_engine.begin() as connection:
-            # Exercise the typed bind and reflected result processors together.
             connection.execute(
                 table.insert(), [{"id": 1, "ts": expected}, {"id": 2, "ts": None}]
             )
-            # Independently seeded literal rules out a compensating bind/result bug.
             connection.exec_driver_sql(
                 f"INSERT INTO {schema}.T VALUES (3, TIMESTAMP '{expected.isoformat(sep=' ')}')"
             )
+
+        # Assert: both raw and reflected reads preserve the expected timestamp values.
         with pooled_engine.connect() as connection:
             raw = connection.exec_driver_sql(
                 f"SELECT TS FROM {schema}.T WHERE ID=1"

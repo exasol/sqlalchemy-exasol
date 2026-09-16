@@ -73,21 +73,20 @@ class WebsocketRecovery(fixtures.TestBase):
     def test_typed_timestamp_preserves_server_fraction(
         self, pooled_engine, schema, precision, fraction
     ):
-        engine = pooled_engine
         expected = dt.datetime(2026, 9, 11, 12, 34, 56, fraction)
-        with engine.begin() as connection:
+        with pooled_engine.begin() as connection:
             # Before 8.32, TIMESTAMP(6) was an alias for millisecond precision.
             # Keep the millisecond regression on every supported server.
             # https://docs.exasol.com/db/latest/changelogs/13712.htm
-            if precision > 3 and engine.dialect.server_version_info < (8, 32, 0):
+            if precision > 3 and pooled_engine.dialect.server_version_info < (8, 32, 0):
                 pytest.skip("Microsecond storage requires Exasol >= 8.32")
             connection.exec_driver_sql(
                 f"CREATE TABLE {schema}.T (ID INT, TS TIMESTAMP({precision}))"
             )
         table = sa.Table(
-            "t", sa.MetaData(), schema=schema.lower(), autoload_with=engine
+            "t", sa.MetaData(), schema=schema.lower(), autoload_with=pooled_engine
         )
-        with engine.begin() as connection:
+        with pooled_engine.begin() as connection:
             # Exercise the typed bind and reflected result processors together.
             connection.execute(
                 table.insert(), [{"id": 1, "ts": expected}, {"id": 2, "ts": None}]
@@ -96,7 +95,7 @@ class WebsocketRecovery(fixtures.TestBase):
             connection.exec_driver_sql(
                 f"INSERT INTO {schema}.T VALUES (3, TIMESTAMP '{expected.isoformat(sep=' ')}')"
             )
-        with engine.connect() as connection:
+        with pooled_engine.connect() as connection:
             raw = connection.exec_driver_sql(
                 f"SELECT TS FROM {schema}.T WHERE ID=1"
             ).scalar_one()
@@ -108,17 +107,16 @@ class WebsocketRecovery(fixtures.TestBase):
     def test_first_checkout_pre_ping_recovers_without_application_retry(
         self, pooled_engine, admin_engine, schema
     ):
-        engine = pooled_engine
-        with engine.begin() as connection:
+        with pooled_engine.begin() as connection:
             connection.exec_driver_sql(f"CREATE TABLE {schema}.T (ID INT)")
             connection.exec_driver_sql(f"INSERT INTO {schema}.T VALUES (1)")
-        with engine.connect() as connection:
+        with pooled_engine.connect() as connection:
             old = connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one()
         with admin_engine.begin() as connection:
-            # Only kill the idle session that THIS engine just returned to its pool.
+            # Only kill the idle session that pooled_engine just returned to its pool.
             connection.exec_driver_sql(f"KILL SESSION {int(old)}")
         # No try/retry/dispose/invalidate: the very first checkout must work.
-        with engine.connect() as connection:
+        with pooled_engine.connect() as connection:
             assert (
                 connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one() != old
             )
@@ -132,10 +130,9 @@ class WebsocketRecovery(fixtures.TestBase):
     def test_disconnect_does_not_replay_uncommitted_write(
         self, pooled_engine, admin_engine, schema
     ):
-        engine = pooled_engine
-        with engine.begin() as connection:
+        with pooled_engine.begin() as connection:
             connection.exec_driver_sql(f"CREATE TABLE {schema}.T (ID INT)")
-        with engine.connect() as connection:
+        with pooled_engine.connect() as connection:
             old = connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one()
             connection.exec_driver_sql(f"INSERT INTO {schema}.T VALUES (1)")
             with admin_engine.begin() as killer:
@@ -145,7 +142,7 @@ class WebsocketRecovery(fixtures.TestBase):
             assert caught.value.connection_invalidated
             # SQLAlchemy requires rollback of the lost transaction; no replay.
             connection.rollback()
-        with engine.connect() as connection:
+        with pooled_engine.connect() as connection:
             assert (
                 connection.exec_driver_sql(
                     f"SELECT COUNT(*) FROM {schema}.T"
@@ -156,8 +153,7 @@ class WebsocketRecovery(fixtures.TestBase):
     def test_server_error_does_not_invalidate_healthy_connection(
         self, pooled_engine, schema
     ):
-        engine = pooled_engine
-        with engine.connect() as connection:
+        with pooled_engine.connect() as connection:
             old = connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one()
             with pytest.raises(sa.exc.DBAPIError) as caught:
                 connection.exec_driver_sql(f"SELECT * FROM {schema}.DOES_NOT_EXIST")

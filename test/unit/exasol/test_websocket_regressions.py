@@ -22,7 +22,12 @@ from sqlalchemy import (
 from sqlalchemy.exc import DBAPIError
 
 
-@pytest.fixture(params=["exa", "exa+websocket"])
+@pytest.fixture(
+    params=[
+        pytest.param("exa", id="exa-driver"),
+        pytest.param("exa+websocket", id="websocket-driver"),
+    ]
+)
 def engine(request, monkeypatch):
     engine = create_engine(
         f"{request.param}://localhost:8563",
@@ -39,42 +44,71 @@ def engine(request, monkeypatch):
 @pytest.mark.parametrize(
     "text,expected",
     [
-        ("2026-09-11 12:34:56", datetime.datetime(2026, 9, 11, 12, 34, 56)),
-        ("2026-09-11 12:34:56.1", datetime.datetime(2026, 9, 11, 12, 34, 56, 100000)),
-        ("2026-09-11 12:34:56.123", datetime.datetime(2026, 9, 11, 12, 34, 56, 123000)),
-        (
+        pytest.param(
+            "2026-09-11 12:34:56",
+            datetime.datetime(2026, 9, 11, 12, 34, 56),
+            id="no-fraction",
+        ),
+        pytest.param(
+            "2026-09-11 12:34:56.1",
+            datetime.datetime(2026, 9, 11, 12, 34, 56, 100000),
+            id="one-digit-fraction-is-padded",
+        ),
+        pytest.param(
+            "2026-09-11 12:34:56.123",
+            datetime.datetime(2026, 9, 11, 12, 34, 56, 123000),
+            id="millisecond-fraction-is-padded",
+        ),
+        pytest.param(
             "2026-09-11 12:34:56.123456",
             datetime.datetime(2026, 9, 11, 12, 34, 56, 123456),
+            id="full-microsecond-precision",
         ),
-        ("2024-02-29 00:00:00.000001", datetime.datetime(2024, 2, 29, 0, 0, 0, 1)),
-        ("1900-01-01 00:00:00.999999", datetime.datetime(1900, 1, 1, 0, 0, 0, 999999)),
-        (
+        pytest.param(
+            "2024-02-29 00:00:00.000001",
+            datetime.datetime(2024, 2, 29, 0, 0, 0, 1),
+            id="leap-day",
+        ),
+        pytest.param(
+            "1900-01-01 00:00:00.999999",
+            datetime.datetime(1900, 1, 1, 0, 0, 0, 999999),
+            id="early-supported-date",
+        ),
+        pytest.param(
             "9999-12-31 23:59:59.999999",
             datetime.datetime(9999, 12, 31, 23, 59, 59, 999999),
+            id="latest-supported-date",
         ),
-        (None, None),
-        (
+        pytest.param(None, None, id="null-stays-null"),
+        pytest.param(
             datetime.datetime(2026, 1, 1, 0, 0, 0, 123456),
             datetime.datetime(2026, 1, 1, 0, 0, 0, 123456),
+            id="datetime-stays-unchanged",
         ),
     ],
 )
-def test_datetime_result(engine, text, expected):
-    processor = (
-        DateTime().dialect_impl(engine.dialect).result_processor(engine.dialect, None)
-    )
-    assert processor(text) == expected
+def test_datetime_result(datetime_processor, text, expected):
+    assert datetime_processor(text) == expected
 
 
 @pytest.mark.parametrize(
-    "value", ["invalid", "2024-02-30 00:00:00", "2026-09-11 12:34:56.1234567"]
+    "value",
+    [
+        pytest.param("invalid", id="not-a-datetime"),
+        pytest.param("2024-02-30 00:00:00", id="invalid-calendar-date"),
+        pytest.param("2026-09-11 12:34:56.1234567", id="too-many-fraction-digits"),
+    ],
 )
-def test_datetime_invalid(engine, value):
-    processor = (
+def test_datetime_invalid(datetime_processor, value):
+    with pytest.raises(ValueError):
+        datetime_processor(value)
+
+
+@pytest.fixture
+def datetime_processor(engine):
+    return (
         DateTime().dialect_impl(engine.dialect).result_processor(engine.dialect, None)
     )
-    with pytest.raises(ValueError):
-        processor(value)
 
 
 def test_datetime_is_not_interpreted_in_local_timezone(engine, monkeypatch):
@@ -125,7 +159,12 @@ def test_first_checkout_recovers_after_communication_error(engine, monkeypatch):
 
 @pytest.mark.parametrize(
     "error_type",
-    [ExaQueryError, ExaAuthError, ExaQueryTimeoutError, ExaQueryAbortError],
+    [
+        pytest.param(ExaQueryError, id="query-error"),
+        pytest.param(ExaAuthError, id="authentication-error"),
+        pytest.param(ExaQueryTimeoutError, id="query-timeout"),
+        pytest.param(ExaQueryAbortError, id="query-abort"),
+    ],
 )
 def test_server_errors_are_not_disconnects(engine, monkeypatch, error_type):
     server = transport()
@@ -164,7 +203,14 @@ def test_in_flight_failure_is_not_replayed(engine, monkeypatch):
         assert connect.call_count == 1
 
 
-@pytest.mark.parametrize("wrapper", ["non_dbapi", "indirect", "context_only"])
+@pytest.mark.parametrize(
+    "wrapper",
+    [
+        pytest.param("non_dbapi", id="non-dbapi-cause"),
+        pytest.param("indirect", id="indirect-dbapi-cause"),
+        pytest.param("context_only", id="context-only-cause"),
+    ],
+)
 def test_only_direct_dbapi_communication_cause_is_disconnect(engine, wrapper):
     cause = ExaCommunicationError(transport(), "socket closed")
     error = dbapi2.Error()

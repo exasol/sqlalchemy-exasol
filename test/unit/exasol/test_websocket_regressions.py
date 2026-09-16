@@ -172,6 +172,13 @@ def test_plain_dbapi_error_is_not_disconnect(engine):
     assert not engine.dialect.is_disconnect(dbapi2.Error("socket closed"), None, None)
 
 
+def test_direct_dbapi_communication_cause_is_disconnect(engine):
+    error = dbapi2.Error()
+    error.__cause__ = ExaCommunicationError(_mock_connection(), "socket closed")
+
+    assert engine.dialect.is_disconnect(error, None, None)
+
+
 def test_in_flight_failure_is_not_replayed(engine, monkeypatch):
     server = _mock_connection()
     connect = Mock(return_value=server)
@@ -186,24 +193,25 @@ def test_in_flight_failure_is_not_replayed(engine, monkeypatch):
         assert connect.call_count == 1
 
 
-@pytest.mark.parametrize(
-    "wrapper",
-    [
-        pytest.param("non_dbapi", id="non-dbapi-cause"),
-        pytest.param("indirect", id="indirect-dbapi-cause"),
-        pytest.param("context_only", id="context-only-cause"),
-    ],
-)
-def test_only_direct_dbapi_communication_cause_is_disconnect(engine, wrapper):
-    cause = ExaCommunicationError(_mock_connection(), "socket closed")
-    error = dbapi2.Error()
-    if wrapper == "non_dbapi":
+class TestDisconnectCause:
+    def test_non_dbapi_error_with_communication_cause_is_not_disconnect(self, engine):
         error = ValueError()
-        error.__cause__ = cause
-    elif wrapper == "indirect":
+        error.__cause__ = ExaCommunicationError(_mock_connection(), "socket closed")
+
+        assert not engine.dialect.is_disconnect(error, None, None)
+
+    def test_indirect_communication_cause_is_not_disconnect(self, engine):
         intermediate = ValueError()
-        intermediate.__cause__ = cause
+        intermediate.__cause__ = ExaCommunicationError(
+            _mock_connection(), "socket closed"
+        )
+        error = dbapi2.Error()
         error.__cause__ = intermediate
-    else:
-        error.__context__ = cause
-    assert not engine.dialect.is_disconnect(error, None, None)
+
+        assert not engine.dialect.is_disconnect(error, None, None)
+
+    def test_context_only_communication_cause_is_not_disconnect(self, engine):
+        error = dbapi2.Error()
+        error.__context__ = ExaCommunicationError(_mock_connection(), "socket closed")
+
+        assert not engine.dialect.is_disconnect(error, None, None)

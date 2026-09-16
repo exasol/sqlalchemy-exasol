@@ -152,7 +152,7 @@ class WebsocketRecovery(fixtures.TestBase):
 
             kill_session(admin_engine, old_session)
 
-            # Test: the failed write is reported and must not be replayed.
+            # Assert: the failed write is reported and must not be replayed.
             with pytest.raises(sa.exc.DBAPIError) as caught:
                 connection.exec_driver_sql(f"INSERT INTO {schema}.T VALUES (2)")
             assert caught.value.connection_invalidated
@@ -160,7 +160,7 @@ class WebsocketRecovery(fixtures.TestBase):
             # The lost transaction must be rolled back before the connection closes.
             connection.rollback()
 
-        # Assert: neither the original nor the failed write reached the table.
+        # Neither the original nor the failed write reached the table.
         with pooled_engine.connect() as connection:
             assert (
                 connection.exec_driver_sql(
@@ -172,12 +172,17 @@ class WebsocketRecovery(fixtures.TestBase):
     def test_server_error_does_not_invalidate_healthy_connection(
         self, pooled_engine, schema
     ):
+        # Setup: open a connection
         with pooled_engine.connect() as connection:
-            old = connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one()
+            old_session = current_session(connection)
+
+            # Action: execute a query that the server rejects.
             with pytest.raises(sa.exc.DBAPIError) as caught:
                 connection.exec_driver_sql(f"SELECT * FROM {schema}.DOES_NOT_EXIST")
+
+            # Assert: a server-side query error must not invalidate the connection.
             assert not caught.value.connection_invalidated
+            # Clear the failed transaction before using the connection again.
             connection.rollback()
-            assert (
-                connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one() == old
-            )
+            # The same session remains usable.
+            assert current_session(connection) == old_session

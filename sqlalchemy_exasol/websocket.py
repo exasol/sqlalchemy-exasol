@@ -57,6 +57,8 @@ class DateTime(sqltypes.DATETIME):
         def to_datetime(v):
             if not isinstance(v, str):
                 return v
+            # There is an issue to improve this in PyExasol:
+            #   https://github.com/exasol/pyexasol/issues/409
             # Parse wall time directly: time.strptime/mktime loses fractions and
             # can normalize timestamps according to the client's local timezone.
             for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M:%S.%f"):

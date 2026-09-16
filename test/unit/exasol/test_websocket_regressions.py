@@ -117,14 +117,15 @@ def test_datetime_is_not_interpreted_in_local_timezone(timezone_datetime_process
     ) == datetime.datetime(2026, 3, 8, 2, 30, 0, 123456)
 
 
-def transport():
+def _mock_connection():
+    """Return a minimal PyExasol connection mock for dialect tests."""
     connection = Mock(is_closed=False)
     connection.options = {"verbose_error": False}
     return connection
 
 
 def test_first_checkout_recovers_after_communication_error(engine, monkeypatch):
-    stale, fresh = transport(), transport()
+    stale, fresh = _mock_connection(), _mock_connection()
     connect = Mock(side_effect=[stale, fresh])
     monkeypatch.setattr(pyexasol, "connect", connect)
     with engine.connect() as connection:
@@ -149,7 +150,7 @@ def test_first_checkout_recovers_after_communication_error(engine, monkeypatch):
     ],
 )
 def test_server_errors_are_not_disconnects(engine, monkeypatch, error_type):
-    server = transport()
+    server = _mock_connection()
     connect = Mock(return_value=server)
     monkeypatch.setattr(pyexasol, "connect", connect)
     with engine.connect():
@@ -172,7 +173,7 @@ def test_plain_dbapi_error_is_not_disconnect(engine):
 
 
 def test_in_flight_failure_is_not_replayed(engine, monkeypatch):
-    server = transport()
+    server = _mock_connection()
     connect = Mock(return_value=server)
     monkeypatch.setattr(pyexasol, "connect", connect)
     with engine.connect() as connection:
@@ -194,7 +195,7 @@ def test_in_flight_failure_is_not_replayed(engine, monkeypatch):
     ],
 )
 def test_only_direct_dbapi_communication_cause_is_disconnect(engine, wrapper):
-    cause = ExaCommunicationError(transport(), "socket closed")
+    cause = ExaCommunicationError(_mock_connection(), "socket closed")
     error = dbapi2.Error()
     if wrapper == "non_dbapi":
         error = ValueError()

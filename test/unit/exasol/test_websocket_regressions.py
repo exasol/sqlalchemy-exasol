@@ -1,7 +1,6 @@
 """Regression contracts for both registered websocket aliases; no database needed."""
 
 import datetime
-import os
 import time
 from unittest.mock import Mock
 
@@ -114,25 +113,23 @@ def datetime_processor(engine):
 def test_datetime_is_not_interpreted_in_local_timezone(engine, monkeypatch):
     if not hasattr(time, "tzset"):
         pytest.skip("requires tzset")
-    old_tz = os.environ.get("TZ")
-    try:
+    with monkeypatch.context() as timezone_patch:
         # A nonexistent local wall time must not be normalized through mktime.
-        monkeypatch.setenv("TZ", "EST5EDT,M3.2.0,M11.1.0")
+        timezone_patch.setenv("TZ", "EST5EDT,M3.2.0,M11.1.0")
         time.tzset()
-        processor = (
-            DateTime()
-            .dialect_impl(engine.dialect)
-            .result_processor(engine.dialect, None)
-        )
-        assert processor("2026-03-08 02:30:00.123456") == datetime.datetime(
-            2026, 3, 8, 2, 30, 0, 123456
-        )
-    finally:
-        if old_tz is None:
-            os.environ.pop("TZ", None)
-        else:
-            os.environ["TZ"] = old_tz
-        time.tzset()
+        try:
+            processor = (
+                DateTime()
+                .dialect_impl(engine.dialect)
+                .result_processor(engine.dialect, None)
+            )
+            assert processor("2026-03-08 02:30:00.123456") == datetime.datetime(
+                2026, 3, 8, 2, 30, 0, 123456
+            )
+        finally:
+            # tzset() reads TZ once; refresh it after monkeypatch restores TZ.
+            timezone_patch.undo()
+            time.tzset()
 
 
 def transport():

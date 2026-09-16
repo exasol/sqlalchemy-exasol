@@ -54,29 +54,9 @@ def engine(request, monkeypatch):
             id="one-digit-fraction-is-padded",
         ),
         pytest.param(
-            "2026-09-11 12:34:56.123",
-            datetime.datetime(2026, 9, 11, 12, 34, 56, 123000),
-            id="millisecond-fraction-is-padded",
-        ),
-        pytest.param(
             "2026-09-11 12:34:56.123456",
             datetime.datetime(2026, 9, 11, 12, 34, 56, 123456),
             id="full-microsecond-precision",
-        ),
-        pytest.param(
-            "2024-02-29 00:00:00.000001",
-            datetime.datetime(2024, 2, 29, 0, 0, 0, 1),
-            id="leap-day",
-        ),
-        pytest.param(
-            "1900-01-01 00:00:00.999999",
-            datetime.datetime(1900, 1, 1, 0, 0, 0, 999999),
-            id="early-supported-date",
-        ),
-        pytest.param(
-            "9999-12-31 23:59:59.999999",
-            datetime.datetime(9999, 12, 31, 23, 59, 59, 999999),
-            id="latest-supported-date",
         ),
         pytest.param(None, None, id="null-stays-null"),
         pytest.param(

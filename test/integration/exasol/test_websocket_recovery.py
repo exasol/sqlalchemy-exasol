@@ -1,9 +1,6 @@
-"""Destructive tests for the dedicated database configured by the test suite.
+"""Integration tests for websocket behavior requires a disposable test database.
 
-Run only against a disposable test database with CREATE/DROP SCHEMA and KILL
-SESSION privileges, never a shared/customer database. Both aliases retain the
-configured database URL's credentials and TLS options. Only test-owned schemas
-and sessions are modified; the configured database itself is not dropped.
+The tests create and drop temporary schemas and kill test sessions.
 """
 
 import datetime as dt

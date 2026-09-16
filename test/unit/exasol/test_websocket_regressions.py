@@ -34,7 +34,8 @@ def engine(request, monkeypatch):
         pool_size=1,
         max_overflow=0,
     )
-    # Server metadata is irrelevant to checkout. Keep real pool, ping, DBAPI and cursor.
+    # pyexasol.connect is mocked below, so dialect initialization cannot query a server.
+    # Leave pooling, pre-ping, and DBAPI connection/cursor behavior real.
     monkeypatch.setattr(engine.dialect, "initialize", lambda connection: None)
     yield engine
     engine.dispose()

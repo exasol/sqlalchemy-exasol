@@ -18,7 +18,12 @@ from sqlalchemy.testing import (
 )
 
 
-@pytest.fixture(params=["exa", "exa+websocket"])
+@pytest.fixture(
+    params=[
+        pytest.param("exa", id="exa-driver"),
+        pytest.param("exa+websocket", id="websocket-driver"),
+    ]
+)
 def pooled_engine(request):
     if config.db is None:
         pytest.fail("Requires the SQLAlchemy integration test database configuration")
@@ -57,7 +62,14 @@ def schema(admin_engine):
 
 
 class WebsocketRecovery(fixtures.TestBase):
-    @pytest.mark.parametrize("precision,fraction", [(3, 123000), (6, 123456), (6, 1)])
+    @pytest.mark.parametrize(
+        "precision,fraction",
+        [
+            pytest.param(3, 123000, id="millisecond-precision"),
+            pytest.param(6, 123456, id="full-microsecond-precision"),
+            pytest.param(6, 1, id="microsecond-with-zero-padding"),
+        ],
+    )
     def test_typed_timestamp_preserves_server_fraction(
         self, pooled_engine, schema, precision, fraction
     ):

@@ -61,6 +61,15 @@ def schema(admin_engine):
             connection.exec_driver_sql(f"DROP SCHEMA {name} CASCADE")
 
 
+def current_session(connection):
+    return connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one()
+
+
+def kill_session(admin_engine, session_id):
+    with admin_engine.begin() as connection:
+        connection.exec_driver_sql(f"KILL SESSION {int(session_id)}")
+
+
 class WebsocketRecovery(fixtures.TestBase):
     @pytest.mark.parametrize(
         "precision,fraction",
@@ -107,19 +116,20 @@ class WebsocketRecovery(fixtures.TestBase):
     def test_first_checkout_pre_ping_recovers_without_application_retry(
         self, pooled_engine, admin_engine, schema
     ):
+        # Setup: create committed data and return one connection to the pool.
         with pooled_engine.begin() as connection:
             connection.exec_driver_sql(f"CREATE TABLE {schema}.T (ID INT)")
             connection.exec_driver_sql(f"INSERT INTO {schema}.T VALUES (1)")
         with pooled_engine.connect() as connection:
-            old = connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one()
-        with admin_engine.begin() as connection:
-            # Only kill the idle session that pooled_engine just returned to its pool.
-            connection.exec_driver_sql(f"KILL SESSION {int(old)}")
-        # No try/retry/dispose/invalidate: the very first checkout must work.
+            old_session = current_session(connection)
+
+        # Action: kill the idle pooled session from an independent connection.
+        kill_session(admin_engine, old_session)
+
+        # Asserts: the first checkout succeeds without application retry,
+        # disposal, or manual invalidation, using a replacement session.
         with pooled_engine.connect() as connection:
-            assert (
-                connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one() != old
-            )
+            assert current_session(connection) != old_session
             assert (
                 connection.exec_driver_sql(
                     f"SELECT COUNT(*) FROM {schema}.T"

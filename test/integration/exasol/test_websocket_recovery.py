@@ -70,7 +70,7 @@ def kill_session(admin_engine, session_id):
         connection.exec_driver_sql(f"KILL SESSION {int(session_id)}")
 
 
-class WebsocketRecovery(fixtures.TestBase):
+class WebsocketTimestamp(fixtures.TestBase):
     @pytest.mark.parametrize(
         "precision,fraction",
         [
@@ -116,6 +116,8 @@ class WebsocketRecovery(fixtures.TestBase):
                 sa.select(table.c.ts).order_by(table.c.id)
             ).scalars().all() == [expected, None, expected]
 
+
+class WebsocketRecovery(fixtures.TestBase):
     def test_first_checkout_pre_ping_recovers_without_application_retry(
         self, pooled_engine, admin_engine, schema
     ):

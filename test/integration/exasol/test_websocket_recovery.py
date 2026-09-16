@@ -126,7 +126,7 @@ class WebsocketRecovery(fixtures.TestBase):
         # Action: kill the idle pooled session from an independent connection.
         kill_session(admin_engine, old_session)
 
-        # Asserts: the first checkout succeeds without application retry,
+        # Assert: the first checkout succeeds without application retry,
         # disposal, or manual invalidation, using a replacement session.
         with pooled_engine.connect() as connection:
             assert current_session(connection) != old_session
@@ -140,18 +140,27 @@ class WebsocketRecovery(fixtures.TestBase):
     def test_disconnect_does_not_replay_uncommitted_write(
         self, pooled_engine, admin_engine, schema
     ):
+        # Setup: create an empty table and begin an uncommitted transaction.
         with pooled_engine.begin() as connection:
             connection.exec_driver_sql(f"CREATE TABLE {schema}.T (ID INT)")
+
+        # Action: Keep the test write separate so it remains uncommitted when the session
+        # is killed; putting it in the begin() block above would commit it.
         with pooled_engine.connect() as connection:
-            old = connection.exec_driver_sql("SELECT CURRENT_SESSION").scalar_one()
+            old_session = current_session(connection)
             connection.exec_driver_sql(f"INSERT INTO {schema}.T VALUES (1)")
-            with admin_engine.begin() as killer:
-                killer.exec_driver_sql(f"KILL SESSION {int(old)}")
+
+            kill_session(admin_engine, old_session)
+
+            # Test: the failed write is reported and must not be replayed.
             with pytest.raises(sa.exc.DBAPIError) as caught:
                 connection.exec_driver_sql(f"INSERT INTO {schema}.T VALUES (2)")
             assert caught.value.connection_invalidated
-            # SQLAlchemy requires rollback of the lost transaction; no replay.
+
+            # The lost transaction must be rolled back before the connection closes.
             connection.rollback()
+
+        # Assert: neither the original nor the failed write reached the table.
         with pooled_engine.connect() as connection:
             assert (
                 connection.exec_driver_sql(

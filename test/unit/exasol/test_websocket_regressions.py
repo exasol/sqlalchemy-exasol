@@ -41,6 +41,13 @@ def engine(request, monkeypatch):
     engine.dispose()
 
 
+@pytest.fixture
+def datetime_processor(engine):
+    return (
+        DateTime().dialect_impl(engine.dialect).result_processor(engine.dialect, None)
+    )
+
+
 @pytest.mark.parametrize(
     "text,expected",
     [
@@ -82,13 +89,6 @@ def test_datetime_result(datetime_processor, text, expected):
 def test_datetime_invalid(datetime_processor, value):
     with pytest.raises(ValueError):
         datetime_processor(value)
-
-
-@pytest.fixture
-def datetime_processor(engine):
-    return (
-        DateTime().dialect_impl(engine.dialect).result_processor(engine.dialect, None)
-    )
 
 
 def test_datetime_is_not_interpreted_in_local_timezone(engine, monkeypatch):

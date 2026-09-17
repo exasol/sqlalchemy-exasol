@@ -3,7 +3,7 @@
 ## Summary
 
 In this patch release, `EXTRACT` compilation is fixed. The `extract_map` override in
-`EXACompiler`, copied from the SQLite dialect, rendered C `strftime` format codes such
+`EXACompiler` was copied from the SQLite dialect and incorrectly rendered C `strftime` format codes (e.g. `EXTRACT(%Y FROM c)`) instead of SQL date parts.
 as `EXTRACT(%Y FROM c)` instead of SQL date parts. The six fields Exasol supports,
 `year`, `month`, `day`, `hour`, `minute` and `second`, now render correctly as
 `EXTRACT(year FROM c)`. Fields Exasol's `EXTRACT` does not support, such as `week`,

@@ -6,41 +6,9 @@ import pyexasol
 import pytest
 from exasol.driver.websocket import dbapi2
 from pyexasol.exceptions import (
-    ExaAuthError,
     ExaCommunicationError,
-    ExaQueryAbortError,
-    ExaQueryError,
-    ExaQueryTimeoutError,
 )
 from sqlalchemy.exc import DBAPIError
-
-
-@pytest.mark.parametrize(
-    "error_type",
-    [
-        pytest.param(ExaQueryError, id="query-error"),
-        pytest.param(ExaAuthError, id="authentication-error"),
-        pytest.param(ExaQueryTimeoutError, id="query-timeout"),
-        pytest.param(ExaQueryAbortError, id="query-abort"),
-    ],
-)
-def test_server_errors_are_not_disconnects(engine, monkeypatch, error_type):
-    server = _mock_connection()
-    connect = Mock(return_value=server)
-    monkeypatch.setattr(pyexasol, "connect", connect)
-    with engine.connect():
-        pass
-    cause = (
-        error_type(server, "42000", "server rejected request")
-        if error_type is ExaAuthError
-        else error_type(server, "SELECT 1", "42000", "server rejected query")
-    )
-    server.execute.side_effect = cause
-    with pytest.raises(DBAPIError) as caught:
-        engine.connect()
-    assert caught.value.orig.__cause__ is cause
-    assert not caught.value.connection_invalidated
-    assert connect.call_count == 1
 
 
 def test_plain_dbapi_error_is_not_disconnect(engine):

@@ -9,6 +9,9 @@ from sqlalchemy import (
     MetaData,
     String,
     Table,
+)
+from sqlalchemy import exc as sa_exc
+from sqlalchemy import (
     extract,
     inspect,
     or_,
@@ -16,7 +19,6 @@ from sqlalchemy import (
     sql,
     testing,
 )
-from sqlalchemy import exc as sa_exc
 from sqlalchemy.schema import (
     AddConstraint,
     DropConstraint,

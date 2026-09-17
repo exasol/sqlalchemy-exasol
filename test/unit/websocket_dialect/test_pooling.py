@@ -84,19 +84,20 @@ def test_server_errors_are_not_disconnects(
     assert connect.call_count == 1
 
 
-def test_direct_dbapi_communication_cause_is_disconnect(
-    uninitialized_engine, mock_connection_factory
-):
-    error = dbapi2.Error()
-    error.__cause__ = ExaCommunicationError(mock_connection_factory(), "socket closed")
+class TestIsDisconnect:
+    def test_is_disconnect_for_direct_dbapi_communication_error(
+        self, uninitialized_engine, mock_connection_factory
+    ):
+        error = dbapi2.Error()
+        error.__cause__ = ExaCommunicationError(
+            mock_connection_factory(), "socket closed"
+        )
 
-    is_disconnect = uninitialized_engine.dialect.is_disconnect(error, None, None)
+        is_disconnect = uninitialized_engine.dialect.is_disconnect(error, None, None)
 
-    assert is_disconnect
+        assert is_disconnect
 
-
-class TestDisconnectCause:
-    def test_non_dbapi_error_with_communication_cause_is_not_disconnect(
+    def test_is_not_disconnect_for_non_dbapi_error_with_direct_communication_cause(
         self, uninitialized_engine, mock_connection_factory
     ):
         error = ValueError()
@@ -108,7 +109,7 @@ class TestDisconnectCause:
 
         assert not is_disconnect
 
-    def test_indirect_communication_cause_is_not_disconnect(
+    def test_is_not_disconnect_for_dbapi_error_with_indirect_communication_cause(
         self, uninitialized_engine, mock_connection_factory
     ):
         intermediate = ValueError()
@@ -122,7 +123,7 @@ class TestDisconnectCause:
 
         assert not is_disconnect
 
-    def test_context_only_communication_cause_is_not_disconnect(
+    def test_is_not_disconnect_for_dbapi_error_with_context_only_communication_cause(
         self, uninitialized_engine, mock_connection_factory
     ):
         error = dbapi2.Error()

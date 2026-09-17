@@ -1,5 +1,6 @@
 import datetime
 
+import pytest
 from sqlalchemy import (
     Column,
     Date,
@@ -15,6 +16,7 @@ from sqlalchemy import (
     sql,
     testing,
 )
+from sqlalchemy import exc as sa_exc
 from sqlalchemy.schema import (
     AddConstraint,
     DropConstraint,
@@ -174,13 +176,20 @@ class ExtractTest(fixtures.TablesTest):
             metadata,
             Column("id", Integer),
             Column("created", DateTime),
+            Column("date_value", Date),
         )
 
     @classmethod
     def insert_data(cls, connection):
         connection.execute(
             cls.tables.t.insert(),
-            [{"id": 1, "created": datetime.datetime(2017, 3, 5, 12, 34, 56)}],
+            [
+                {
+                    "id": 1,
+                    "created": datetime.datetime(2017, 3, 5, 12, 34, 56),
+                    "date_value": datetime.date(2017, 3, 5),
+                }
+            ],
         )
 
     @testing.combinations(
@@ -197,3 +206,29 @@ class ExtractTest(fixtures.TablesTest):
         with config.db.connect() as conn:
             result = conn.execute(select(extract(field, t.c.created))).scalar()
         assert result == expected
+
+    # Unlike the test above, this verifies EXTRACT behavior for a DATE column,
+    # which supports only year, month, and day.
+    @testing.combinations(
+        ("year", 2017),
+        ("month", 3),
+        ("day", 5),
+        argnames="field,expected",
+    )
+    def test_extract_returns_date_part_from_date(self, field, expected):
+        t = self.tables.t
+        with config.db.connect() as conn:
+            result = conn.execute(select(extract(field, t.c.date_value))).scalar()
+        assert result == expected
+
+    @testing.combinations(
+        ("hour",),
+        ("minute",),
+        ("second",),
+        argnames="field",
+    )
+    def test_extract_rejects_timestamp_date_parts_from_date(self, field):
+        t = self.tables.t
+        with pytest.raises(sa_exc.ProgrammingError):
+            with config.db.connect() as conn:
+                conn.execute(select(extract(field, t.c.date_value))).scalar()

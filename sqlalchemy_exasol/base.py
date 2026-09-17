@@ -613,6 +613,7 @@ class EXACompiler(compiler.SQLCompiler):
         if extract.field.lower() not in self._supported_extract_fields:
             raise sa_exc.CompileError(
                 f"EXTRACT field '{extract.field}' is not supported "
+                f"supported fields are: {self._supported_extract_fields}."
                 "by the Exasol dialect"
             )
         return super().visit_extract(extract, **kw)

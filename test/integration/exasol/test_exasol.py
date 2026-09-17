@@ -106,8 +106,8 @@ class ConstraintsTest(fixtures.TablesTest):
         try:
             with testing.db.connect() as conn:
                 Table("t", MetaData(), autoload_with=conn)
-        except:
-            assert False
+        except Exception as exc:
+            pytest.fail(f"Reflecting table t raised unexpectedly: {exc}")
         # TODO: check that reflected table object is identical
         # i.e. contains the constraint
         insp = inspect(testing.db)

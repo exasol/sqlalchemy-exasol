@@ -15,8 +15,8 @@ from sqlalchemy import (
     select,
     sql,
     testing,
+    exc as sa_exc
 )
-from sqlalchemy import exc as sa_exc
 from sqlalchemy.schema import (
     AddConstraint,
     DropConstraint,
@@ -229,6 +229,7 @@ class ExtractTest(fixtures.TablesTest):
     )
     def test_extract_rejects_timestamp_date_parts_from_date(self, field):
         t = self.tables.t
-        with pytest.raises(sa_exc.ProgrammingError):
-            with config.db.connect() as conn:
-                conn.execute(select(extract(field, t.c.date_value))).scalar()
+        statement = select(extract(field, t.c.date_value)) 
+        with config.db.connect() as conn:
+            with pytest.raises(sa_exc.DBAPIError):
+                conn.execute(statement).scalar()

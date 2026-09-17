@@ -9,6 +9,9 @@ from sqlalchemy import (
     MetaData,
     String,
     Table,
+)
+from sqlalchemy import exc as sa_exc
+from sqlalchemy import (
     extract,
     inspect,
     or_,

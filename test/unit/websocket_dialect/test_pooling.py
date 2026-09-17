@@ -84,6 +84,27 @@ def test_server_errors_are_not_disconnects(
     assert connect.call_count == 1
 
 
+def test_in_flight_failure_is_not_replayed(
+    uninitialized_engine, mock_connection_factory, monkeypatch
+):
+    # Setup: open a connection and make its in-flight operation fail.
+    server = mock_connection_factory()
+    connect = Mock(return_value=server)
+    monkeypatch.setattr(pyexasol, "connect", connect)
+    with uninitialized_engine.connect() as connection:
+        server.is_closed = True
+        server.execute.side_effect = ExaCommunicationError(server, "socket closed")
+
+        # Action: execute an INSERT while the connection is failing.
+        with pytest.raises(DBAPIError) as caught:
+            connection.exec_driver_sql("INSERT INTO T VALUES (1)")
+
+    # Assert: the INSERT is not replayed on a replacement connection.
+    assert caught.value.connection_invalidated
+    server.execute.assert_called_once_with("INSERT INTO T VALUES (1)")
+    assert connect.call_count == 1
+
+
 class TestIsDisconnect:
     def test_is_disconnect_for_direct_dbapi_communication_error(
         self, uninitialized_engine, mock_connection_factory

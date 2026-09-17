@@ -27,27 +27,3 @@ def test_in_flight_failure_is_not_replayed(engine, monkeypatch):
         assert caught.value.connection_invalidated
         server.execute.assert_called_once_with("INSERT INTO T VALUES (1)")
         assert connect.call_count == 1
-
-
-class TestDisconnectCause:
-    def test_non_dbapi_error_with_communication_cause_is_not_disconnect(self, engine):
-        error = ValueError()
-        error.__cause__ = ExaCommunicationError(_mock_connection(), "socket closed")
-
-        assert not engine.dialect.is_disconnect(error, None, None)
-
-    def test_indirect_communication_cause_is_not_disconnect(self, engine):
-        intermediate = ValueError()
-        intermediate.__cause__ = ExaCommunicationError(
-            _mock_connection(), "socket closed"
-        )
-        error = dbapi2.Error()
-        error.__cause__ = intermediate
-
-        assert not engine.dialect.is_disconnect(error, None, None)
-
-    def test_context_only_communication_cause_is_not_disconnect(self, engine):
-        error = dbapi2.Error()
-        error.__context__ = ExaCommunicationError(_mock_connection(), "socket closed")
-
-        assert not engine.dialect.is_disconnect(error, None, None)

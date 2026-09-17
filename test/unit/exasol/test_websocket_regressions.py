@@ -16,29 +16,8 @@ from pyexasol.exceptions import (
 )
 from sqlalchemy import (
     DateTime,
-    create_engine,
 )
 from sqlalchemy.exc import DBAPIError
-
-
-@pytest.fixture(
-    params=[
-        pytest.param("exa", id="exa-driver"),
-        pytest.param("exa+websocket", id="websocket-driver"),
-    ]
-)
-def engine(request, monkeypatch):
-    engine = create_engine(
-        f"{request.param}://localhost:8563",
-        pool_pre_ping=True,
-        pool_size=1,
-        max_overflow=0,
-    )
-    # pyexasol.connect is mocked below, so dialect initialization cannot query a server.
-    # Leave pooling, pre-ping, and DBAPI connection/cursor behavior real.
-    monkeypatch.setattr(engine.dialect, "initialize", lambda connection: None)
-    yield engine
-    engine.dispose()
 
 
 @pytest.fixture

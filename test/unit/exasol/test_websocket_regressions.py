@@ -4,15 +4,10 @@ from unittest.mock import Mock
 
 import pyexasol
 import pytest
-from exasol.driver.websocket import dbapi2
 from pyexasol.exceptions import (
     ExaCommunicationError,
 )
 from sqlalchemy.exc import DBAPIError
-
-
-def test_plain_dbapi_error_is_not_disconnect(engine):
-    assert not engine.dialect.is_disconnect(dbapi2.Error("socket closed"), None, None)
 
 
 def test_in_flight_failure_is_not_replayed(engine, monkeypatch):

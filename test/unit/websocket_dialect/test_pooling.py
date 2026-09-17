@@ -97,6 +97,13 @@ class TestIsDisconnect:
 
         assert is_disconnect
 
+    def test_is_not_disconnect_for_plain_dbapi_error(self, uninitialized_engine):
+        error = dbapi2.Error("socket closed")
+
+        is_disconnect = uninitialized_engine.dialect.is_disconnect(error, None, None)
+
+        assert not is_disconnect
+
     def test_is_not_disconnect_for_non_dbapi_error_with_direct_communication_cause(
         self, uninitialized_engine, mock_connection_factory
     ):

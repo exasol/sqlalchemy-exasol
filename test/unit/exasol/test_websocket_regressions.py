@@ -15,13 +15,6 @@ def test_plain_dbapi_error_is_not_disconnect(engine):
     assert not engine.dialect.is_disconnect(dbapi2.Error("socket closed"), None, None)
 
 
-def test_direct_dbapi_communication_cause_is_disconnect(engine):
-    error = dbapi2.Error()
-    error.__cause__ = ExaCommunicationError(_mock_connection(), "socket closed")
-
-    assert engine.dialect.is_disconnect(error, None, None)
-
-
 def test_in_flight_failure_is_not_replayed(engine, monkeypatch):
     server = _mock_connection()
     connect = Mock(return_value=server)

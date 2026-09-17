@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 import pyexasol
 import pytest
+from exasol.driver.websocket import dbapi2
 from pyexasol.exceptions import (
     ExaAuthError,
     ExaCommunicationError,
@@ -81,3 +82,14 @@ def test_server_errors_are_not_disconnects(
     assert caught.value.orig.__cause__ is cause
     assert not caught.value.connection_invalidated
     assert connect.call_count == 1
+
+
+def test_direct_dbapi_communication_cause_is_disconnect(
+    uninitialized_engine, mock_connection_factory
+):
+    error = dbapi2.Error()
+    error.__cause__ = ExaCommunicationError(mock_connection_factory(), "socket closed")
+
+    is_disconnect = uninitialized_engine.dialect.is_disconnect(error, None, None)
+
+    assert is_disconnect

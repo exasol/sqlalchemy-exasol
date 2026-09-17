@@ -88,7 +88,14 @@ Running tests
 Unit Tests
 ++++++++++
 
-The unit tests are located in the directory ``test/unit``.
+The unit tests are being organized by implementation area ``test/unit```, with
+``test/unit/websocket_dialect`` serving as an example of the preferred structure. The following
+legacy directories should be gradually reorganized and not added to:
+
+* ``test/unit/exasol`` is a historical catch-all. New tests should not be added there; existing
+  tests should be moved to directories organized by layer or topic.
+* ``test/unit/exasol/dlt`` was added with DLT support. Its tests should be reviewed and moved to
+  layer/topic directories when they cover general Exasol or SQLAlchemy behavior rather than DLT.
 
 .. code-block:: shell
 
@@ -107,7 +114,7 @@ The integration tests are located in the directory ``test/integration``.
 
 The integration tests are split into three groups to reduce the likelihood of test side effects:
 
-#. The SQLAlchemy Conformance Test Suite
+#. The SQLAlchemy Conformance Test Suite (``test/integration/sqlalchemy``)
 
     The SQLAlchemy conformance test suite is provided and maintained by the sqlalchemy project and intended to support third party dialect developers.
     For further details, see also `README.dialects.rst <https://docs.exasol.com/db/latest/sql_reference.htm>`_.
@@ -122,7 +129,7 @@ The integration tests are split into three groups to reduce the likelihood of te
 
         poetry run -- nox -s test:sqla -- --connector websocket
 
-#. Our Custom Exasol Test Suite
+#. Our Custom Exasol Test Suite (``test/integration/exasol``)
 
     The Exasol test suite consists of tests written and maintained by Exasol. These
     have a slight reliance upon the generic test classes provided by the SQLAlchemy
@@ -134,11 +141,13 @@ The integration tests are split into three groups to reduce the likelihood of te
 
         poetry run -- nox -s test:exasol -- --connector websocket
 
-#. Regression Test Suite
+#. Regression Test Suite (``test/integration/regression``)
 
-    This is an extension to the custom Exasol test suite that ensures that previously
-    reported bugs are not experienced by customers as there are upgrades to the
-    SQLAlchemy API and Exasol databases.
+    This is an extension to the custom Exasol test suite that keeps historical tests for
+    previously reported bugs, ensuring that they are not experienced by customers as there
+    are upgrades to the SQLAlchemy API and Exasol databases. New tests should generally be
+    organized by software layer and topic instead of being added here solely because they
+    originated from a bug report.
 
     .. code-block:: shell
 

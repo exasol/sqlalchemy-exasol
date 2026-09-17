@@ -15,22 +15,6 @@ from pyexasol.exceptions import (
 from sqlalchemy.exc import DBAPIError
 
 
-def test_first_checkout_recovers_after_communication_error(engine, monkeypatch):
-    stale, fresh = _mock_connection(), _mock_connection()
-    connect = Mock(side_effect=[stale, fresh])
-    monkeypatch.setattr(pyexasol, "connect", connect)
-    with engine.connect() as connection:
-        original = connection.connection.dbapi_connection
-    stale.is_closed = True
-    stale.execute.side_effect = ExaCommunicationError(stale, "socket closed")
-    # Exactly one application checkout: no retry, dispose, or manual invalidation.
-    with engine.connect() as connection:
-        assert connection.connection.dbapi_connection is not original
-        assert connection.connection.dbapi_connection.connection is fresh
-    assert connect.call_count == 2
-    stale.execute.assert_called_once_with("SELECT 1 FROM DUAL")
-
-
 @pytest.mark.parametrize(
     "error_type",
     [

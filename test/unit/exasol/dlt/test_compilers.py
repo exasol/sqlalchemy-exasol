@@ -176,8 +176,10 @@ def test_extract_renders_sql_date_part(field):
     ],
 )
 def test_extract_rejects_unsupported_field_at_compile(field):
+    expression = extract(field, column("c"))
+
     with pytest.raises(sa_exc.CompileError, match=f"'{field}' is not supported"):
-        extract(field, column("c")).compile(dialect=base.EXADialect())
+        expression.compile(dialect=base.EXADialect())
 
 
 def test_extract_accepts_upper_case_supported_field():

@@ -16,6 +16,7 @@ from sqlalchemy.schema import CreateTable
 
 from sqlalchemy_exasol import base
 from sqlalchemy_exasol.base import EXATypeCompiler
+from test.unit.exasol.dlt.test_timestamp_handling import dialect
 
 
 def _type_compiler():
@@ -177,9 +178,9 @@ def test_extract_renders_sql_date_part(field):
 )
 def test_extract_rejects_unsupported_field_at_compile(field):
     expression = extract(field, column("c"))
-
+    dialect = base.EXADialect()
     with pytest.raises(sa_exc.CompileError, match=f"'{field}' is not supported"):
-        expression.compile(dialect=base.EXADialect())
+        expression.compile(dialect=dialect)
 
 
 def test_extract_accepts_upper_case_supported_field():

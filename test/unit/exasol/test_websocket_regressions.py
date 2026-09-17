@@ -15,13 +15,6 @@ from pyexasol.exceptions import (
 from sqlalchemy.exc import DBAPIError
 
 
-def _mock_connection():
-    """Return a minimal PyExasol connection mock for dialect tests."""
-    connection = Mock(is_closed=False)
-    connection.options = {"verbose_error": False}
-    return connection
-
-
 def test_first_checkout_recovers_after_communication_error(engine, monkeypatch):
     stale, fresh = _mock_connection(), _mock_connection()
     connect = Mock(side_effect=[stale, fresh])

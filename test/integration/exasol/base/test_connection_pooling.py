@@ -87,7 +87,7 @@ class Pooling(fixtures.TestBase):
     def exception_trace(cls, ex: Exception) -> Iterator[str]:
         """
         Return a sequence of strings, each representing one of the exceptions
-        linked by __cause__ and containing the exceptions's message.
+        linked by __cause__ and containing the exception's message.
         """
 
         current: BaseException | None = ex

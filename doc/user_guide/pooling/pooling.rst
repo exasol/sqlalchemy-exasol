@@ -62,12 +62,14 @@ which invokes the DBAPI-specific ``ping()`` method, or uses SQL statement
 Errors
 ------
 
-Invalid credentials will raise an error in SQLAlchemy as shown below, chained
-with ``__cause__``. The password is not revealed.
+Invalid credentials raise an error in SQLAlchemy, chained with ``__cause__``.
+The password is not revealed. With PyExasol 2.4.1 and newer, the initial
+exception is a ``sqlalchemy.exc.DatabaseError``. Older supported PyExasol
+versions expose the same failure as a generic ``sqlalchemy.exc.DBAPIError``.
 
 .. code-block:: shell
 
-    Initial exception: <class 'sqlalchemy.exc.DBAPIError'>:
+    Initial exception: <class 'sqlalchemy.exc.DatabaseError'>:
       (exasol.driver.websocket._errors.Error)
       (Background on this error at: https://sqlalche.me/e/20/dbapi)
     __cause__: <class 'exasol.driver.websocket._errors.Error'>:

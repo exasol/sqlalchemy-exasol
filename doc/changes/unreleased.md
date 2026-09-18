@@ -2,7 +2,7 @@
 
 ## Summary
 
-In this patch release, three issues were fixed:
+In this patch release, four issues were fixed:
 
 * `EXTRACT` compilation is fixed. The previous `extract_map` override in
   `EXACompiler` was copied from the SQLite dialect and incorrectly rendered C
@@ -20,9 +20,18 @@ In this patch release, three issues were fixed:
   while server query/authentication errors remain connected and in-flight SQL is
   not replayed.
 
+* PyExasol exception handling has been aligned with the DB-API exception mapping
+  introduced in PyExasol 2.4.1, while retaining compatibility with older supported
+  PyExasol versions.
+  * `ExaAuthError` and `ExaRequestError` are now mapped to `DatabaseError` instead
+    of `OperationalError`, and `ExaConcurrencyError` is now mapped to
+    `InterfaceError`.
+
 ## Bugfixes
 
 * #810: Fixed `EXTRACT` compilation to render SQL date parts and reject fields Exasol
   does not support
 * #807: Preserved fractional seconds and naive wall time in websocket `TIMESTAMP` results.
 * #807: Recognized wrapped PyExasol communication errors as disconnects.
+* #812: Aligned PyExasol exception handling with the DB-API exception mapping provided
+  by PyExasol 2.4.1 and newer.

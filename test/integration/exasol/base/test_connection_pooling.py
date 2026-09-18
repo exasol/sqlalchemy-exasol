@@ -6,8 +6,10 @@ from collections.abc import Iterator
 from time import sleep
 from typing import Any
 
+import pyexasol
 import pytest
 import sqlalchemy
+from packaging.version import Version
 from sqlalchemy import create_engine
 from sqlalchemy.testing import (
     config,
@@ -85,7 +87,7 @@ class Pooling(fixtures.TestBase):
     def exception_trace(cls, ex: Exception) -> Iterator[str]:
         """
         Return a sequence of strings, each representing one of the exceptions
-        linked by __cause__ and containing the exceptions's message.
+        linked by __cause__ and containing the exception's message.
         """
 
         current: BaseException | None = ex
@@ -114,10 +116,18 @@ class Pooling(fixtures.TestBase):
 
         url = config_url.set(password="wrong password")
         engine = self.create_engine(url)
-        with pytest.raises(sqlalchemy.exc.DBAPIError) as ex:
+        # Compatibility path tracked in
+        # https://github.com/exasol/sqlalchemy-exasol/issues/814.
+        expected_exception = (
+            sqlalchemy.exc.DatabaseError
+            if Version(pyexasol.__version__) >= Version("2.4.1")
+            else sqlalchemy.exc.DBAPIError
+        )
+        with pytest.raises(expected_exception) as ex:
             engine.connect()
         trace = "\n".join(self.exception_trace(ex.value))
         assert "wrong password" not in trace
+        assert "ExaAuthError" in trace
 
     def test_another_connection_blocks(self, config_url: sqlalchemy.URL) -> None:
         """

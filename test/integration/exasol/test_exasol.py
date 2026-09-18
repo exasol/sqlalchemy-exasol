@@ -234,4 +234,4 @@ class ExtractTest(fixtures.TablesTest):
         statement = select(extract(field, t.c.date_value))
         with config.db.connect() as conn:
             with pytest.raises(sa_exc.DBAPIError):
-                conn.execute(statement).scalar()
+                conn.scalar(statement)

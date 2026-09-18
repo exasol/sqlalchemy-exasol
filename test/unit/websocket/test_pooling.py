@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import pyexasol
 import pytest
 from exasol.driver.websocket import dbapi2
+from packaging.version import Version
 from pyexasol.exceptions import (
     ExaAuthError,
     ExaCommunicationError,
@@ -104,7 +105,14 @@ class TestIsDisconnect:
     def test_is_disconnect_for_direct_dbapi_communication_error(
         self, uninitialized_engine, mock_connection_factory
     ):
-        error = dbapi2.Error()
+        # Compatibility path tracked in
+        # https://github.com/exasol/sqlalchemy-exasol/issues/814.
+        dbapi_error_type = (
+            dbapi2.OperationalError
+            if Version(pyexasol.__version__) >= Version("2.4.1")
+            else dbapi2.Error
+        )
+        error = dbapi_error_type()
         error.__cause__ = ExaCommunicationError(
             mock_connection_factory(), "socket closed"
         )

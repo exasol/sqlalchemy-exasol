@@ -1497,6 +1497,7 @@ class EXADialect(default.DefaultDialect):
 
         # PyExasol version 2.4.1 and newer already perform this mapping in the DB-API
         # layer. This can be removed when support for older versions is dropped.
+        # Tracked in https://github.com/exasol/sqlalchemy-exasol/issues/814.
         except ExaQueryError as e:
             raise sa_exc.ProgrammingError(statement, parameters, e) from e
         except (ExaConnectionError, ExaCommunicationError) as e:

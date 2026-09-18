@@ -73,6 +73,8 @@ class TestConnectionPoolBehavior(fixtures.TestBase):
                 == 0
             )
 
+    # Compatibility path tracked in
+    # https://github.com/exasol/sqlalchemy-exasol/issues/814.
     @pytest.mark.parametrize(
         "expected_exception",
         [

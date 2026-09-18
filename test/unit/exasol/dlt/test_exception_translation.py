@@ -1,4 +1,5 @@
 import pytest
+from exasol.driver.websocket import _errors as dbapi_exc
 from pyexasol.exceptions import (
     ExaAuthError,
     ExaCommunicationError,
@@ -33,69 +34,56 @@ class DummyConnection:
         return "0"
 
 
-def make_pyexasol_exception(exc_type):
-    conn = DummyConnection()
+class TestDoExecute:
+    """Test error translation kept for PyExasol versions older than 2.4.1.
 
-    if exc_type is ExaQueryError:
-        return ExaQueryError(conn, "SELECT 1", 1, "pyexasol boom")
+    PyExasol version 2.4.1 and newer already perform this mapping in the
+    DB-API layer. This can be removed when support for older versions is
+    dropped. Tracked in https://github.com/exasol/sqlalchemy-exasol/issues/814.
+    """
 
-    if exc_type is ExaAuthError:
-        # ExaAuthError inherits ExaRequestError signature
-        return ExaAuthError(conn, 1, "pyexasol boom")
+    @pytest.mark.parametrize(
+        "exception_type,constructor_args,expected_sa_exc",
+        (
+            (ExaQueryError, ("SELECT 1", 1), sa_exc.ProgrammingError),
+            (ExaAuthError, (1,), sa_exc.DatabaseError),
+            (ExaRequestError, (1,), sa_exc.DatabaseError),
+            (ExaConnectionError, (), sa_exc.OperationalError),
+            (ExaCommunicationError, (), sa_exc.OperationalError),
+            (ExaConcurrencyError, (), sa_exc.InterfaceError),
+            (ExaRuntimeError, (), sa_exc.DatabaseError),
+            (ExaError, (), sa_exc.DatabaseError),
+        ),
+    )
+    def test_translates_pyexasol_errors(
+        self, exception_type, constructor_args, expected_sa_exc
+    ):
+        connection = DummyConnection()
+        pyexasol_exc = exception_type(connection, *constructor_args, "unexpected error")
+        dialect = EXADialect()
+        cursor = DummyCursor(pyexasol_exc)
 
-    if exc_type is ExaRequestError:
-        return ExaRequestError(conn, 1, "pyexasol boom")
+        with pytest.raises(expected_sa_exc) as exception:
+            dialect.do_execute(cursor, "SELECT 1", {"foo": "bar"})
 
-    if exc_type is ExaCommunicationError:
-        return ExaCommunicationError(conn, "pyexasol boom")
+        assert exception.value.__cause__ is pyexasol_exc
+        assert exception.value.statement == "SELECT 1"
+        assert exception.value.params == {"foo": "bar"}
 
-    if exc_type is ExaConnectionError:
-        return ExaConnectionError(conn, "pyexasol boom")
+    @pytest.mark.parametrize(
+        "exception_type",
+        [
+            RuntimeError,
+            dbapi_exc.Error,
+            dbapi_exc.DatabaseError,
+        ],
+    )
+    def test_propagates_unmapped_exceptions(self, exception_type):
+        dialect = EXADialect()
+        original_exc = exception_type("unexpected error")
+        cursor = DummyCursor(original_exc)
 
-    if exc_type is ExaConcurrencyError:
-        return ExaConcurrencyError(conn, "pyexasol boom")
+        with pytest.raises(exception_type) as exception:
+            dialect.do_execute(cursor, "SELECT 1", {})
 
-    if exc_type is ExaRuntimeError:
-        return ExaRuntimeError(conn, "pyexasol boom")
-
-    if exc_type is ExaError:
-        return ExaError(conn, "pyexasol boom")
-
-    raise AssertionError(f"Unhandled exception type in test: {exc_type!r}")
-
-
-@pytest.mark.parametrize(
-    "exc_type,expected_sa_exc",
-    (
-        (ExaQueryError, sa_exc.ProgrammingError),
-        (ExaAuthError, sa_exc.DatabaseError),
-        (ExaRequestError, sa_exc.DatabaseError),
-        (ExaConnectionError, sa_exc.OperationalError),
-        (ExaCommunicationError, sa_exc.OperationalError),
-        (ExaConcurrencyError, sa_exc.InterfaceError),
-        (ExaRuntimeError, sa_exc.DatabaseError),
-        (ExaError, sa_exc.DatabaseError),
-    ),
-)
-def test_do_execute_translates_pyexasol_errors(exc_type, expected_sa_exc):
-    pyexasol_exc = make_pyexasol_exception(exc_type)
-    dialect = EXADialect()
-    cursor = DummyCursor(pyexasol_exc)
-
-    with pytest.raises(expected_sa_exc) as excinfo:
-        dialect.do_execute(cursor, "SELECT 1", {"foo": "bar"})
-
-    assert excinfo.value.__cause__ is pyexasol_exc
-    assert excinfo.value.statement == "SELECT 1"
-    assert excinfo.value.params == {"foo": "bar"}
-
-
-def test_do_execute_propagates_unmapped_exceptions():
-    dialect = EXADialect()
-    original_exc = RuntimeError("unexpected")
-    cursor = DummyCursor(original_exc)
-
-    with pytest.raises(RuntimeError) as excinfo:
-        dialect.do_execute(cursor, "SELECT 1", {})
-
-    assert excinfo.value is original_exc
+        assert exception.value is original_exc

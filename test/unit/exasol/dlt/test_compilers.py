@@ -16,7 +16,6 @@ from sqlalchemy.schema import CreateTable
 
 from sqlalchemy_exasol import base
 from sqlalchemy_exasol.base import EXATypeCompiler
-from test.unit.exasol.dlt.test_timestamp_handling import dialect
 
 
 def _type_compiler():

@@ -24,7 +24,7 @@ class DummyCursor:
 
 
 class DummyConnection:
-    # pyexasol exceptions may access connection options in __str__/helpers
+    # PyExasol exceptions may access connection options in __str__/helpers
     options = {"dsn": "dummy", "user": "dummy", "verbose_error": False}
 
     def current_schema(self):
@@ -34,7 +34,7 @@ class DummyConnection:
         return "0"
 
 
-class TestDoExecute:
+class TestDoExecuteException:
     """Test error translation kept for PyExasol versions older than 2.4.1.
 
     PyExasol version 2.4.1 and newer already perform this mapping in the

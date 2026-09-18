@@ -2,6 +2,8 @@ import pytest
 from pyexasol.exceptions import (
     ExaAuthError,
     ExaCommunicationError,
+    ExaConcurrencyError,
+    ExaConnectionError,
     ExaError,
     ExaQueryError,
     ExaRequestError,
@@ -47,6 +49,12 @@ def make_pyexasol_exception(exc_type):
     if exc_type is ExaCommunicationError:
         return ExaCommunicationError(conn, "pyexasol boom")
 
+    if exc_type is ExaConnectionError:
+        return ExaConnectionError(conn, "pyexasol boom")
+
+    if exc_type is ExaConcurrencyError:
+        return ExaConcurrencyError(conn, "pyexasol boom")
+
     if exc_type is ExaRuntimeError:
         return ExaRuntimeError(conn, "pyexasol boom")
 
@@ -60,9 +68,11 @@ def make_pyexasol_exception(exc_type):
     "exc_type,expected_sa_exc",
     (
         (ExaQueryError, sa_exc.ProgrammingError),
-        (ExaAuthError, sa_exc.OperationalError),
-        (ExaRequestError, sa_exc.OperationalError),
+        (ExaAuthError, sa_exc.DatabaseError),
+        (ExaRequestError, sa_exc.DatabaseError),
+        (ExaConnectionError, sa_exc.OperationalError),
         (ExaCommunicationError, sa_exc.OperationalError),
+        (ExaConcurrencyError, sa_exc.InterfaceError),
         (ExaRuntimeError, sa_exc.DatabaseError),
         (ExaError, sa_exc.DatabaseError),
     ),

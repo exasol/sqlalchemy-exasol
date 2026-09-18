@@ -1,7 +1,9 @@
 """Integration tests for websocket connection-pool behavior."""
 
+import pyexasol
 import pytest
 import sqlalchemy as sa
+from packaging.version import Version
 from sqlalchemy.testing import fixtures
 
 
@@ -71,19 +73,31 @@ class TestConnectionPoolBehavior(fixtures.TestBase):
                 == 0
             )
 
+    @pytest.mark.parametrize(
+        "expected_exception",
+        [
+            (
+                sa.exc.ProgrammingError
+                if Version(pyexasol.__version__) >= Version("2.4.1")
+                else sa.exc.DBAPIError
+            )
+        ],
+    )
     def test_server_error_does_not_invalidate_healthy_connection(
-        self, pooled_engine, schema
+        self, pooled_engine, schema, expected_exception
     ):
         # Setup: open a connection
         with pooled_engine.connect() as connection:
             old_session = current_session(connection)
 
             # Action: execute a query that the server rejects.
-            with pytest.raises(sa.exc.DBAPIError) as caught:
+            with pytest.raises(expected_exception) as exception:
                 connection.exec_driver_sql(f"SELECT * FROM {schema}.DOES_NOT_EXIST")
 
             # Assert: a server-side query error must not invalidate the connection.
-            assert not caught.value.connection_invalidated
+            cause = exception.value.__cause__.__cause__
+            assert f"object {schema}.DOES_NOT_EXIST not found" in str(cause)
+            assert not exception.value.connection_invalidated
             # Clear the failed transaction before using the connection again.
             connection.rollback()
             # The same session remains usable.

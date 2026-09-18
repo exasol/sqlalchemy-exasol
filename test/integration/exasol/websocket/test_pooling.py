@@ -15,7 +15,7 @@ def kill_session(admin_engine, session_id):
 
 
 class TestConnectionPoolBehavior(fixtures.TestBase):
-    def test_first_checkout_pre_ping_recovers_without_application_retry(
+    def test_checkout_pooled_connection_recovers_after_communication_error(
         self, pooled_engine, admin_engine, schema
     ):
         # Setup: create committed data and return one connection to the pool.

@@ -60,15 +60,12 @@ def test_checkout_pooled_connection_recovers_after_communication_error(
 )
 def test_server_errors_are_not_disconnects(
     uninitialized_engine,
-    mock_connection_factory,
-    monkeypatch,
+    mock_pyexasol_connection,
     error_type,
     exception_factory,
 ):
     # Setup: prepare a healthy connection that will return a server-side error.
-    server = mock_connection_factory()
-    connect = Mock(return_value=server)
-    monkeypatch.setattr(pyexasol, "connect", connect)
+    server = mock_pyexasol_connection
     with uninitialized_engine.connect():
         pass
     cause = exception_factory(server, error_type)
@@ -81,16 +78,14 @@ def test_server_errors_are_not_disconnects(
     # Assert: server errors do not invalidate a healthy pooled connection.
     assert caught.value.orig.__cause__ is cause
     assert not caught.value.connection_invalidated
-    assert connect.call_count == 1
+    assert pyexasol.connect.call_count == 1
 
 
 def test_in_flight_failure_is_not_replayed(
-    uninitialized_engine, mock_connection_factory, monkeypatch
+    uninitialized_engine, mock_pyexasol_connection
 ):
     # Setup: open a connection and make its in-flight operation fail.
-    server = mock_connection_factory()
-    connect = Mock(return_value=server)
-    monkeypatch.setattr(pyexasol, "connect", connect)
+    server = mock_pyexasol_connection
     with uninitialized_engine.connect() as connection:
         server.is_closed = True
         server.execute.side_effect = ExaCommunicationError(server, "socket closed")
@@ -102,7 +97,7 @@ def test_in_flight_failure_is_not_replayed(
     # Assert: the INSERT is not replayed on a replacement connection.
     assert caught.value.connection_invalidated
     server.execute.assert_called_once_with("INSERT INTO T VALUES (1)")
-    assert connect.call_count == 1
+    assert pyexasol.connect.call_count == 1
 
 
 class TestIsDisconnect:

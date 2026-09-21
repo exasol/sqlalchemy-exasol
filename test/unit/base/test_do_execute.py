@@ -38,8 +38,10 @@ class TestDoExecuteException:
     """Test error translation kept for PyExasol versions older than 2.4.1.
 
     PyExasol version 2.4.1 and newer already perform this mapping in the
-    DB-API layer. This can be removed when support for older versions is
-    dropped. Tracked in https://github.com/exasol/sqlalchemy-exasol/issues/814.
+    DB-API layer. This can be removed only after
+    https://github.com/exasol/pyexasol/issues/411 is resolved and a new
+    PyExasol release containing the fix has been published. Tracked in
+    https://github.com/exasol/sqlalchemy-exasol/issues/814.
     """
 
     @pytest.mark.parametrize(

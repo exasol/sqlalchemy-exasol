@@ -106,7 +106,9 @@ class TestIsDisconnect:
         self, uninitialized_engine, mock_connection_factory
     ):
         # Compatibility path tracked in
-        # https://github.com/exasol/sqlalchemy-exasol/issues/814.
+        # https://github.com/exasol/sqlalchemy-exasol/issues/814. It can be
+        # removed only after https://github.com/exasol/pyexasol/issues/411 is
+        # resolved and a new PyExasol release containing the fix is published.
         dbapi_error_type = (
             dbapi2.OperationalError
             if Version(pyexasol.__version__) >= Version("2.4.1")

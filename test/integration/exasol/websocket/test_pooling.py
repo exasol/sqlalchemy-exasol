@@ -74,7 +74,9 @@ class TestConnectionPoolBehavior(fixtures.TestBase):
             )
 
     # Compatibility path tracked in
-    # https://github.com/exasol/sqlalchemy-exasol/issues/814.
+    # https://github.com/exasol/sqlalchemy-exasol/issues/814. It can be
+    # removed only after https://github.com/exasol/pyexasol/issues/411 is
+    # resolved and a new PyExasol release containing the fix is published.
     @pytest.mark.parametrize(
         "expected_exception",
         [

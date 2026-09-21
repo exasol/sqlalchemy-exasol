@@ -117,7 +117,9 @@ class Pooling(fixtures.TestBase):
         url = config_url.set(password="wrong password")
         engine = self.create_engine(url)
         # Compatibility path tracked in
-        # https://github.com/exasol/sqlalchemy-exasol/issues/814.
+        # https://github.com/exasol/sqlalchemy-exasol/issues/814. It can be
+        # removed only after https://github.com/exasol/pyexasol/issues/411 is
+        # resolved and a new PyExasol release containing the fix is published.
         expected_exception = (
             sqlalchemy.exc.DatabaseError
             if Version(pyexasol.__version__) >= Version("2.4.1")

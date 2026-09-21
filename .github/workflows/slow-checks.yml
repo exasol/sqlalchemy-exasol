@@ -6,7 +6,7 @@ on:
 jobs:
   build-matrix:
     name: Build Matrix
-    uses: ./.github/workflows/matrix.yml
+    uses: $/.github/workflows/matrix.yml
     with:
       matrix_keys_json: '["connectors", "exasol_versions", "integration_group", "python_versions"]'
     permissions:

@@ -17,6 +17,6 @@ jobs:
   verify-examples:
     name: Verify examples
     needs: [ approve-run-merge-gate-extension ]
-    uses: ./.github/workflows/verify-examples.yml
+    uses: $/.github/workflows/verify-examples.yml
     permissions:
       contents: read

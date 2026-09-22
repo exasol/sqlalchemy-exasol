@@ -58,12 +58,11 @@ from typing import Any
 
 import sqlalchemy.exc
 from pyexasol.exceptions import (
-    ExaAuthError,
     ExaCommunicationError,
+    ExaConcurrencyError,
+    ExaConnectionError,
     ExaError,
     ExaQueryError,
-    ExaRequestError,
-    ExaRuntimeError,
 )
 from sqlalchemy import (
     Connection,
@@ -1496,14 +1495,16 @@ class EXADialect(default.DefaultDialect):
         try:
             return super().do_execute(cursor, statement, parameters, context)
 
-        # Query-specific server errors
+        # PyExasol version 2.4.1 and newer already perform this mapping in the DB-API
+        # layer. This can be removed only after
+        # https://github.com/exasol/pyexasol/issues/411 is resolved and a new
+        # PyExasol release containing the fix has been published. Tracked in
+        # https://github.com/exasol/sqlalchemy-exasol/issues/814.
         except ExaQueryError as e:
             raise sa_exc.ProgrammingError(statement, parameters, e) from e
-
-        # Connection/auth/request/transport problems
-        except (ExaAuthError, ExaRequestError, ExaCommunicationError) as e:
+        except (ExaConnectionError, ExaCommunicationError) as e:
             raise sa_exc.OperationalError(statement, parameters, e) from e
-
-        # Everything else from pyexasol
-        except (ExaRuntimeError, ExaError) as e:
+        except ExaConcurrencyError as e:
+            raise sa_exc.InterfaceError(statement, parameters, e) from e
+        except ExaError as e:
             raise sa_exc.DatabaseError(statement, parameters, e) from e

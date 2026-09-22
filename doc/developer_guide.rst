@@ -89,7 +89,7 @@ Unit Tests
 ++++++++++
 
 The unit tests are being organized by implementation area ``test/unit```, with
-``test/unit/websocket_dialect`` serving as an example of the preferred structure. The following
+``test/unit/websocket`` serving as an example of the preferred structure. The following
 legacy directories should be gradually reorganized and not added to:
 
 * ``test/unit/exasol`` is a historical catch-all. New tests should not be added there; existing

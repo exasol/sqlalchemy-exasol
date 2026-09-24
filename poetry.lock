@@ -3636,12 +3636,10 @@ name = "pyexasol"
 version = "2.4.1"
 description = "Exasol python driver with extra features"
 optional = false
-python-versions = "<3.15,>=3.10"
+python-versions = ">=3.10,<3.15"
 groups = ["main"]
-files = [
-    {file = "pyexasol-2.4.1-py3-none-any.whl", hash = "sha256:a2ddb92ddeb57fa1da36c4fc985b780148a79ce667910c9ae344af5b8caae72f"},
-    {file = "pyexasol-2.4.1.tar.gz", hash = "sha256:c0a8799443873f996a8d945dfa129c8d0cc0b9c0b865500b268dff1345218514"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 cryptography = ">=45.0.7"
@@ -3659,6 +3657,12 @@ polars = ["polars (>=1.10.0,<2.0.0)"]
 pyarrow = ["pyarrow (>=21.0.0)"]
 rapidjson = ["python-rapidjson (>=1.21.0,<2.0.0)"]
 ujson = ["ujson (>=5.10.0,<6.0.0)"]
+
+[package.source]
+type = "git"
+url = "https://github.com/exasol/pyexasol.git"
+reference = "bugfix/361-use-fetch_mapper-as-default"
+resolved_reference = "fb22c39918558766448dfc289f3fff9bbb0dfe9a"
 
 [[package]]
 name = "pygments"
@@ -6043,4 +6047,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "1a128c0e0d6d8df6550c9e46bb50e5d7d08a7665de847e97b232af8a4989a051"
+content-hash = "fa92f770a19564fe5bfd89a33b3767cc54ecdc229ed5f4d25128c724540a209a"

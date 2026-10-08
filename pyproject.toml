@@ -38,7 +38,7 @@ classifiers = [
 ]
 dependencies = [
     "packaging>=21.3",
-    "pyexasol @ git+https://github.com/exasol/pyexasol.git@bugfix/361-use-fetch_mapper-as-default",
+    "pyexasol @ git+https://github.com/exasol/pyexasol.git@bugfix/436-hard-code-fetch-mapper",
     "sqlalchemy>=2.0.0,<3",
 ]
 license-files = ["LICENSE"]

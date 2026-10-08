@@ -3661,8 +3661,8 @@ ujson = ["ujson (>=5.10.0,<6.0.0)"]
 [package.source]
 type = "git"
 url = "https://github.com/exasol/pyexasol.git"
-reference = "bugfix/361-use-fetch_mapper-as-default"
-resolved_reference = "fb22c39918558766448dfc289f3fff9bbb0dfe9a"
+reference = "bugfix/436-hard-code-fetch-mapper"
+resolved_reference = "b641fda83e9b02b8066eea1b5bb6ab58b90cec5a"
 
 [[package]]
 name = "pygments"
@@ -6047,4 +6047,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "fa92f770a19564fe5bfd89a33b3767cc54ecdc229ed5f4d25128c724540a209a"
+content-hash = "57c3f8745bd249d1aa50a2ab78f6f5ce032c72c961db57e80b4670d27c0110db"

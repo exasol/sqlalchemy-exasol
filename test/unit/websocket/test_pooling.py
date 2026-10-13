@@ -21,7 +21,7 @@ def _fail_after_session_probe(connection):
     """Allow the newer DB-API session probe before simulating a failure."""
 
     def execute(statement):
-        # PyExasol > 2.4.1 checks these session formats before executing SQL.
+        # PyExasol 3.0.0+ checks these session formats before executing SQL.
         if "EXA_PARAMETERS" in statement:
             result = Mock()
             result.fetchall.return_value = [
@@ -129,7 +129,7 @@ class TestIsDisconnect:
         # resolved and a new PyExasol release containing the fix is published.
         dbapi_error_type = (
             dbapi2.OperationalError
-            if Version(pyexasol.__version__) >= Version("2.4.1")
+            if Version(pyexasol.__version__) >= Version("3.0.0")
             else dbapi2.Error
         )
         error = dbapi_error_type()

@@ -51,10 +51,10 @@ class TestTimestampRoundTrip(fixtures.TestBase):
                 f"SELECT TS FROM {schema}.T WHERE ID=1"
             ).scalar_one()
 
-            if Version(pyexasol.__version__) > Version("2.4.1"):
+            if Version(pyexasol.__version__) >= Version("3.0.0"):
                 assert isinstance(raw, dt.datetime)
             else:
-                # For PyExasol versions <= 2.4.1, this was a string.
+                # For PyExasol versions below 3.0.0, this is a string.
                 assert isinstance(raw, str)
                 raw = dt.datetime.fromisoformat(raw)
 

@@ -4,6 +4,7 @@ import datetime as dt
 from contextlib import contextmanager
 from decimal import Decimal
 
+import pytest
 import sqlalchemy as sa
 from sqlalchemy.testing import fixtures
 
@@ -91,14 +92,22 @@ class TestFloatType(TypeRoundTrip):
 
 
 class TestIntegerType(TypeRoundTrip):
-    def test_round_trip(self, engine, schema):
+    @pytest.mark.parametrize(
+        "input_value",
+        (
+            pytest.param("42", id="string"),
+            pytest.param(42, id="integer"),
+            pytest.param(42.5, id="float"),
+            pytest.param(Decimal(42.5), id="decimal"),
+        ),
+    )
+    def test_round_trip(self, engine, schema, input_value):
         with self.create_table(engine, schema, sa.Integer):
-            expected = 42
-            self.insert_value(engine, expected)
+            self.insert_value(engine, input_value)
             actual = self.select_value(engine)
 
             assert isinstance(actual, int)
-            assert actual == expected
+            assert actual == 42
 
 
 class TestTimeType(TypeRoundTrip):

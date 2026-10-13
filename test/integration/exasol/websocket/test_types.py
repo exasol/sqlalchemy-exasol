@@ -40,22 +40,30 @@ class TypeRoundTrip(fixtures.TestBase):
             self.table.drop(engine)
 
     @contextmanager
-    def create_timestamp_table(self, engine, schema, precision):
+    def create_raw_table(self, engine, schema, raw_column_type, column_type=sa.String):
         self.table = sa.Table(
             "test_type",
             sa.MetaData(),
-            sa.Column("value", sa.TIMESTAMP),
+            sa.Column("value", column_type),
             schema=schema,
         )
         with engine.begin() as connection:
             connection.exec_driver_sql(
-                f'CREATE TABLE {schema}.test_type ("value" TIMESTAMP({precision}))'
+                f'CREATE TABLE {schema}.test_type ("value" {raw_column_type})'
             )
 
         try:
             yield
         finally:
             self.table.drop(engine)
+
+    def create_timestamp_table(self, engine, schema, precision):
+        return self.create_raw_table(
+            engine,
+            schema,
+            f"TIMESTAMP({precision})",
+            column_type=sa.TIMESTAMP,
+        )
 
     def insert_value(self, engine, value):
         with engine.begin() as connection:
@@ -199,6 +207,36 @@ class TestFloatType(TypeRoundTrip):
             assert result == 42.5
 
 
+class TestGeometryType(TypeRoundTrip):
+    # Exasol GEOMETRY has no first-class SQLAlchemy-Exasol type. This test uses
+    # raw DDL and a generic String column only to exercise the database value.
+    def test_round_trip(self, engine, schema):
+        value = "LINESTRING (10 20, 30 40)"
+        with self.create_raw_table(engine, schema, "GEOMETRY"):
+            self.insert_value(engine, value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, str)
+        assert result == value
+
+
+class TestHashType(TypeRoundTrip):
+    # Exasol HASHTYPE has no first-class SQLAlchemy-Exasol type. This test uses
+    # raw DDL and a generic String column only to exercise the database value.
+    def test_round_trip(self, engine, schema):
+        pytest.importorskip(
+            "pyexasol.data_types",
+            reason="HASHTYPE metadata requires the newer PyExasol type support",
+        )
+        value = "6ba7b8109dad11d180b400c04fd430c8"
+        with self.create_raw_table(engine, schema, "HASHTYPE(16 BYTE)"):
+            self.insert_value(engine, value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, str)
+        assert result == value
+
+
 class TestIntegerType(TypeRoundTrip):
     @pytest.mark.parametrize(
         "input_value",
@@ -211,6 +249,39 @@ class TestIntegerType(TypeRoundTrip):
 
         assert isinstance(result, int)
         assert result == 42
+
+
+class TestIntervalDaySecondType(TypeRoundTrip):
+    # Exasol INTERVAL has no first-class SQLAlchemy-Exasol type. This test uses
+    # raw DDL and a generic String column for a serialized interval value.
+    def test_round_trip(self, engine, schema):
+        value = "+000000003 04:05:06.654"
+        with self.create_raw_table(engine, schema, "INTERVAL DAY(9) TO SECOND(6)"):
+            self.insert_value(engine, value)
+            result = self.select_value(engine)
+
+        if isinstance(result, str):
+            # PyExasol < 3.0 returns serialized interval values as strings.
+            assert result == "+000000003 04:05:06.654000"
+        else:
+            # PyExasol 3.0 returns the same value as an ExaTimeDelta.
+            assert result.__class__.__name__ == "ExaTimeDelta"
+            assert result == dt.timedelta(
+                days=3, hours=4, minutes=5, seconds=6, microseconds=654000
+            )
+
+
+class TestIntervalYearMonthType(TypeRoundTrip):
+    # Exasol INTERVAL has no first-class SQLAlchemy-Exasol type. This test uses
+    # raw DDL and a generic String column for a serialized interval value.
+    def test_round_trip(self, engine, schema):
+        value = "+0001-11"
+        with self.create_raw_table(engine, schema, "INTERVAL YEAR(4) TO MONTH"):
+            self.insert_value(engine, value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, str)
+        assert result == value
 
 
 class TestTimeType(TypeRoundTrip):
@@ -257,11 +328,24 @@ class TestTimestampType(TypeRoundTrip):
             result = self.select_value(engine)
 
         assert isinstance(result, dt.datetime)
-        expected = dt.datetime(2026, 9, 11, 12, 34, 56, 123400)
-        # Exasol version <= 8.32.0 store TIMESTAMP values with millisecond precision.
-        if engine.dialect.server_version_info <= (8, 32, 0):
-            expected = expected.replace(microsecond=123000)
+        # The dialect emits an unqualified TIMESTAMP, whose server default is
+        # millisecond precision.
+        expected = dt.datetime(2026, 9, 11, 12, 34, 56, 123000)
         assert result == expected
+
+    @pytest.mark.parametrize(
+        "input_value",
+        TIMESTAMP_INPUTS,
+    )
+    def test_round_trip_timestamp_with_explicit_precision_3(
+        self, engine, schema, input_value
+    ):
+        with self.create_timestamp_table(engine, schema, precision=3):
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, dt.datetime)
+        assert result == dt.datetime(2026, 9, 11, 12, 34, 56, 123000)
 
     @pytest.mark.parametrize(
         "precision,fraction",
@@ -278,6 +362,8 @@ class TestTimestampType(TypeRoundTrip):
             pytest.xfail("Custom timestamp precision requires Exasol > 8.32")
 
         expected = dt.datetime(2026, 9, 11, 12, 34, 56, fraction)
+        if precision == 2:
+            expected = expected.replace(microsecond=120000)
         with self.create_timestamp_table(engine, schema, precision):
             self.insert_value(engine, expected)
             result = self.select_value(engine)
@@ -285,19 +371,30 @@ class TestTimestampType(TypeRoundTrip):
         assert isinstance(result, dt.datetime)
         assert result == expected
 
-    @pytest.mark.parametrize(
-        "input_value",
-        TIMESTAMP_INPUTS,
-    )
-    def test_round_trip_timestamp_with_explicit_precision_3(
-        self, engine, schema, input_value
-    ):
-        with self.create_timestamp_table(engine, schema, precision=3):
+    def test_round_trip_timestamp_with_lower_precision(self, engine, schema):
+        if engine.dialect.server_version_info <= (8, 32, 0):
+            pytest.xfail("Custom timestamp precision requires Exasol > 8.32")
+
+        input_value = dt.datetime(2026, 9, 11, 12, 34, 56, 120000)
+        with self.create_timestamp_table(engine, schema, precision=1):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
         assert isinstance(result, dt.datetime)
-        assert result == dt.datetime(2026, 9, 11, 12, 34, 56, 123000)
+        assert result == dt.datetime(2026, 9, 11, 12, 34, 56, 100000)
+
+
+class TestTimestampLocalTimeZoneType(TypeRoundTrip):
+    # Exasol TIMESTAMP WITH LOCAL TIME ZONE has no first-class
+    # SQLAlchemy-Exasol type. This test uses raw DDL and a generic String column.
+    def test_round_trip(self, engine, schema):
+        value = "2026-09-11 12:34:56.654000"
+        with self.create_raw_table(engine, schema, "TIMESTAMP WITH LOCAL TIME ZONE"):
+            self.insert_value(engine, value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, str)
+        assert result == value
 
 
 class TestVarcharType(TypeRoundTrip):

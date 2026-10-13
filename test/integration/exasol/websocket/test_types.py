@@ -44,14 +44,37 @@ class TypeRoundTrip(fixtures.TestBase):
 
 
 class TestBooleanType(TypeRoundTrip):
-    def test_round_trip(self, engine, schema):
+    @pytest.mark.parametrize(
+        "input_value",
+        (
+            pytest.param(True, id="boolean"),
+            pytest.param(1, id="integer"),
+        ),
+    )
+    def test_round_trip(self, engine, schema, input_value):
         with self.create_table(engine, schema, sa.Boolean):
-            expected = True
-            self.insert_value(engine, expected)
-            actual = self.select_value(engine)
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
 
-            assert isinstance(actual, bool)
-            assert actual is expected
+        assert isinstance(result, bool)
+        assert result is True
+
+    def test_round_trip_none(self, engine, schema):
+        with self.create_table(engine, schema, sa.Boolean):
+            self.insert_value(engine, None)
+            result = self.select_value(engine)
+
+        assert result is None
+
+    def test_rejects_string_input(self, engine, schema):
+        # Strings are rejected by SQLAlchemy's strict Boolean validation as our dialect
+        # advertises native Boolean support (supports_native_boolean = True). So this
+        # exception is raised before it reaches PyExasol.
+        with self.create_table(engine, schema, sa.Boolean):
+            with pytest.raises(sa.exc.StatementError) as error:
+                self.insert_value(engine, "TRUE")
+
+        assert isinstance(error.value.orig, TypeError)
 
 
 class TestCharType(TypeRoundTrip):

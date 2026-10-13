@@ -12,38 +12,29 @@ from sqlalchemy.testing import config
         pytest.param("exa+websocket", id="websocket-driver"),
     ]
 )
-def pooled_engine(request):
-    if config.db is None:
-        pytest.fail("Requires the SQLAlchemy integration test database configuration")
+def engine(request):
+    """Create a basic SQLAlchemy engine for dialect/type integration tests."""
     url = config.db.url.set(drivername=request.param)
     url = url.update_query_dict({"AUTOCOMMIT": "no"})
-    engine = sa.create_engine(
-        url, pool_pre_ping=True, pool_size=1, max_overflow=0, hide_parameters=True
-    )
+    test_engine = sa.create_engine(url, poolclass=NullPool, hide_parameters=True)
     try:
-        yield engine
+        yield test_engine
     finally:
-        engine.dispose()
+        test_engine.dispose()
 
 
 @pytest.fixture
-def admin_engine(pooled_engine):
-    engine = sa.create_engine(
-        pooled_engine.url, poolclass=NullPool, hide_parameters=True
-    )
-    try:
-        yield engine
-    finally:
-        engine.dispose()
+def schema_engine(engine):
+    return engine
 
 
 @pytest.fixture
-def schema(admin_engine):
+def schema(schema_engine):
     name = "EXA_REG_" + uuid.uuid4().hex[:16].upper()
-    with admin_engine.begin() as connection:
+    with schema_engine.begin() as connection:
         connection.exec_driver_sql(f"CREATE SCHEMA {name}")
     try:
         yield name
     finally:
-        with admin_engine.begin() as connection:
+        with schema_engine.begin() as connection:
             connection.exec_driver_sql(f"DROP SCHEMA {name} CASCADE")

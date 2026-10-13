@@ -4,7 +4,45 @@ import pyexasol
 import pytest
 import sqlalchemy as sa
 from packaging.version import Version
-from sqlalchemy.testing import fixtures
+from sqlalchemy.pool import NullPool
+from sqlalchemy.testing import (
+    config,
+    fixtures,
+)
+
+
+@pytest.fixture(
+    params=[
+        pytest.param("exa", id="exa-driver"),
+        pytest.param("exa+websocket", id="websocket-driver"),
+    ]
+)
+def pooled_engine(request):
+    url = config.db.url.set(drivername=request.param)
+    url = url.update_query_dict({"AUTOCOMMIT": "no"})
+    engine = sa.create_engine(
+        url, pool_pre_ping=True, pool_size=1, max_overflow=0, hide_parameters=True
+    )
+    try:
+        yield engine
+    finally:
+        engine.dispose()
+
+
+@pytest.fixture
+def admin_engine(pooled_engine):
+    engine = sa.create_engine(
+        pooled_engine.url, poolclass=NullPool, hide_parameters=True
+    )
+    try:
+        yield engine
+    finally:
+        engine.dispose()
+
+
+@pytest.fixture
+def schema_engine(pooled_engine):
+    return pooled_engine
 
 
 def current_session(connection):

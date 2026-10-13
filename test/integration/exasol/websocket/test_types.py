@@ -203,11 +203,22 @@ class TestTimeType(TypeRoundTrip):
 
 
 class TestVarcharType(TypeRoundTrip):
-    def test_round_trip(self, engine, schema):
+    @pytest.mark.parametrize(
+        "input_value",
+        (
+            pytest.param("Exasol", id="shorter"),
+            pytest.param("x" * 20, id="right-length"),
+        ),
+    )
+    def test_round_trip(self, engine, schema, input_value):
         with self.create_table(engine, schema, sa.String(20)):
-            expected = "Exasol"
-            self.insert_value(engine, expected)
-            actual = self.select_value(engine)
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
 
-            assert isinstance(actual, str)
-            assert actual == expected
+        assert isinstance(result, str)
+        assert result == input_value
+
+    def test_rejects_too_long(self, engine, schema):
+        with self.create_table(engine, schema, sa.String(20)):
+            with pytest.raises(sa.exc.DatabaseError):
+                self.insert_value(engine, "x" * 21)

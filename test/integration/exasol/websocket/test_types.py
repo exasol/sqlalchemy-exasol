@@ -89,14 +89,20 @@ class TestCharType(TypeRoundTrip):
 
 
 class TestDateType(TypeRoundTrip):
-    def test_round_trip(self, engine, schema):
+    @pytest.mark.parametrize(
+        "input_value",
+        (
+            pytest.param(dt.date(2026, 9, 11), id="date"),
+            pytest.param("2026-09-11", id="string"),
+        ),
+    )
+    def test_round_trip(self, engine, schema, input_value):
         with self.create_table(engine, schema, sa.Date):
-            expected = dt.date(2026, 9, 11)
-            self.insert_value(engine, expected)
-            actual = self.select_value(engine)
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
 
-            assert isinstance(actual, dt.date)
-            assert actual == expected
+        assert isinstance(result, dt.date)
+        assert result == dt.date(2026, 9, 11)
 
 
 class TestDecimalType(TypeRoundTrip):

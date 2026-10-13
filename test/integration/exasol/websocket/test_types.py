@@ -78,14 +78,22 @@ class TestBooleanType(TypeRoundTrip):
 
 
 class TestCharType(TypeRoundTrip):
-    def test_round_trip(self, engine, schema):
+    @pytest.mark.parametrize(
+        "input_value",
+        (pytest.param("xy", id="too_short"), pytest.param("xy   ", id="right-length")),
+    )
+    def test_round_trip(self, engine, schema, input_value):
         with self.create_table(engine, schema, sa.CHAR(5)):
-            expected = "xy   "
-            self.insert_value(engine, expected)
+            self.insert_value(engine, input_value)
             actual = self.select_value(engine)
 
-            assert isinstance(actual, str)
-            assert actual == expected
+        assert isinstance(actual, str)
+        assert actual == "xy   "
+
+    def test_rejects_too_long(self, engine, schema):
+        with self.create_table(engine, schema, sa.CHAR(5)):
+            with pytest.raises(sa.exc.DatabaseError):
+                self.insert_value(engine, "x" * 6)
 
 
 class TestDateType(TypeRoundTrip):

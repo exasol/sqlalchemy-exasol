@@ -58,6 +58,24 @@ class TypeRoundTrip(fixtures.TestBase):
         finally:
             self.table.drop(engine)
 
+    @contextmanager
+    def create_timestamp_table(self, engine, schema, precision):
+        self.table = sa.Table(
+            "test_type",
+            sa.MetaData(),
+            sa.Column("value", sa.TIMESTAMP),
+            schema=schema,
+        )
+        with engine.begin() as connection:
+            connection.exec_driver_sql(
+                f'CREATE TABLE {schema}.test_type ("value" TIMESTAMP({precision}))'
+            )
+
+        try:
+            yield
+        finally:
+            self.table.drop(engine)
+
     def insert_value(self, engine, value):
         with engine.begin() as connection:
             connection.execute(self.table.insert(), {"value": value})

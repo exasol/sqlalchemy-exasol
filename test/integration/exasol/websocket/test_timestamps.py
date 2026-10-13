@@ -2,8 +2,10 @@
 
 import datetime as dt
 
+import pyexasol
 import pytest
 import sqlalchemy as sa
+from packaging.version import Version
 from sqlalchemy.testing import fixtures
 
 
@@ -48,7 +50,15 @@ class TestTimestampRoundTrip(fixtures.TestBase):
             raw = connection.exec_driver_sql(
                 f"SELECT TS FROM {schema}.T WHERE ID=1"
             ).scalar_one()
-            assert dt.datetime.fromisoformat(raw) == expected
+
+            if Version(pyexasol.__version__) > Version("2.4.1"):
+                assert isinstance(raw, dt.datetime)
+            else:
+                # For PyExasol versions <= 2.4.1, this was a string.
+                assert isinstance(raw, str)
+                raw = dt.datetime.fromisoformat(raw)
+
+            assert raw == expected
             assert connection.execute(
                 sa.select(table.c.ts).order_by(table.c.id)
             ).scalars().all() == [expected, None, expected]

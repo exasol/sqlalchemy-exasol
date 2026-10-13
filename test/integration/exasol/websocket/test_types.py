@@ -105,6 +105,23 @@ class TestDecimalType(TypeRoundTrip):
             assert result == Decimal("42.5")
 
 
+class TestDoubleType(TypeRoundTrip):
+    @pytest.mark.parametrize(
+        "input_value",
+        NUMERIC_INPUTS,
+    )
+    def test_round_trip(self, engine, schema, input_value):
+        with self.create_table(engine, schema, sa.Double):
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, float)
+        if isinstance(input_value, int):
+            assert result == 42.0
+        else:
+            assert result == 42.5
+
+
 class TestFloatType(TypeRoundTrip):
     @pytest.mark.parametrize(
         "input_value",

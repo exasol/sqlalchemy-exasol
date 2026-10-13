@@ -129,7 +129,7 @@ class TestIsDisconnect:
         # resolved and a new PyExasol release containing the fix is published.
         dbapi_error_type = (
             dbapi2.OperationalError
-            if Version(pyexasol.__version__) >= Version("3.0.0")
+            if Version(pyexasol.__version__) >= Version("2.4.1")
             else dbapi2.Error
         )
         error = dbapi_error_type()

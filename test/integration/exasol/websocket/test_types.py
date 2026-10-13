@@ -8,6 +8,13 @@ import pytest
 import sqlalchemy as sa
 from sqlalchemy.testing import fixtures
 
+NUMERIC_INPUTS = (
+    pytest.param("42.5", id="string"),
+    pytest.param(42, id="integer"),
+    pytest.param(42.5, id="float"),
+    pytest.param(Decimal("42.5"), id="decimal"),
+)
+
 
 class TypeRoundTrip(fixtures.TestBase):
     table = None
@@ -70,44 +77,63 @@ class TestDateType(TypeRoundTrip):
 
 
 class TestDecimalType(TypeRoundTrip):
-    def test_round_trip(self, engine, schema):
-        with self.create_table(engine, schema, sa.Numeric(18, 2)):
-            expected = Decimal("123.45")
-            self.insert_value(engine, expected)
-            actual = self.select_value(engine)
+    @pytest.mark.parametrize(
+        "input_value",
+        NUMERIC_INPUTS,
+    )
+    def test_round_trip_decimal_scale_0(self, engine, schema, input_value):
+        with self.create_table(engine, schema, sa.Numeric(18, 0)):
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
 
-            assert isinstance(actual, Decimal)
-            assert actual == expected
+        assert isinstance(result, Decimal)
+        assert result == Decimal("42")
+
+    @pytest.mark.parametrize(
+        "input_value",
+        NUMERIC_INPUTS,
+    )
+    def test_round_trip_decimal_scale_1(self, engine, schema, input_value):
+        with self.create_table(engine, schema, sa.Numeric(18, 1)):
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, Decimal)
+        if isinstance(input_value, int):
+            assert result == Decimal("42")
+        else:
+            assert result == Decimal("42.5")
 
 
 class TestFloatType(TypeRoundTrip):
-    def test_round_trip(self, engine, schema):
+    @pytest.mark.parametrize(
+        "input_value",
+        NUMERIC_INPUTS,
+    )
+    def test_round_trip(self, engine, schema, input_value):
         with self.create_table(engine, schema, sa.Float):
-            expected = 1.25
-            self.insert_value(engine, expected)
-            actual = self.select_value(engine)
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
 
-            assert isinstance(actual, float)
-            assert actual == expected
+        assert isinstance(result, float)
+        if isinstance(input_value, int):
+            assert result == 42.0
+        else:
+            assert result == 42.5
 
 
 class TestIntegerType(TypeRoundTrip):
     @pytest.mark.parametrize(
         "input_value",
-        (
-            pytest.param("42", id="string"),
-            pytest.param(42, id="integer"),
-            pytest.param(42.5, id="float"),
-            pytest.param(Decimal(42.5), id="decimal"),
-        ),
+        NUMERIC_INPUTS,
     )
     def test_round_trip(self, engine, schema, input_value):
         with self.create_table(engine, schema, sa.Integer):
             self.insert_value(engine, input_value)
-            actual = self.select_value(engine)
+            result = self.select_value(engine)
 
-            assert isinstance(actual, int)
-            assert actual == 42
+        assert isinstance(result, int)
+        assert result == 42
 
 
 class TestTimeType(TypeRoundTrip):

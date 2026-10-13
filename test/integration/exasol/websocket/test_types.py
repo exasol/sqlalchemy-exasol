@@ -249,20 +249,6 @@ class TestTimestampType(TypeRoundTrip):
         "input_value",
         TIMESTAMP_INPUTS,
     )
-    def test_round_trip_timestamp_with_explicit_precision_3(
-        self, engine, schema, input_value
-    ):
-        with self.create_timestamp_table(engine, schema, precision=3):
-            self.insert_value(engine, input_value)
-            result = self.select_value(engine)
-
-        assert isinstance(result, dt.datetime)
-        assert result == dt.datetime(2026, 9, 11, 12, 34, 56, 123000)
-
-    @pytest.mark.parametrize(
-        "input_value",
-        TIMESTAMP_INPUTS,
-    )
     def test_round_trip_timestamp(self, engine, schema, input_value):
         # Explicit timestamp precision is currently discarded by the dialect;
         # EXATypeCompiler._timestamp() in sqlalchemy_exasol/base.py emits TIMESTAMP.
@@ -276,6 +262,42 @@ class TestTimestampType(TypeRoundTrip):
         if engine.dialect.server_version_info <= (8, 32, 0):
             expected = expected.replace(microsecond=123000)
         assert result == expected
+
+    @pytest.mark.parametrize(
+        "precision,fraction",
+        [
+            pytest.param(2, 123400, id="precision-2"),
+            pytest.param(6, 123456, id="full-microsecond-precision"),
+            pytest.param(6, 1, id="microsecond-with-zero-padding"),
+        ],
+    )
+    def test_typed_timestamp_preserves_server_fraction(
+        self, engine, schema, precision, fraction
+    ):
+        if engine.dialect.server_version_info <= (8, 32, 0):
+            pytest.xfail("Custom timestamp precision requires Exasol > 8.32")
+
+        expected = dt.datetime(2026, 9, 11, 12, 34, 56, fraction)
+        with self.create_timestamp_table(engine, schema, precision):
+            self.insert_value(engine, expected)
+            result = self.select_value(engine)
+
+        assert isinstance(result, dt.datetime)
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        "input_value",
+        TIMESTAMP_INPUTS,
+    )
+    def test_round_trip_timestamp_with_explicit_precision_3(
+        self, engine, schema, input_value
+    ):
+        with self.create_timestamp_table(engine, schema, precision=3):
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, dt.datetime)
+        assert result == dt.datetime(2026, 9, 11, 12, 34, 56, 123000)
 
 
 class TestVarcharType(TypeRoundTrip):

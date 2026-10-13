@@ -191,15 +191,22 @@ class TestIntegerType(TypeRoundTrip):
 
 
 class TestTimeType(TypeRoundTrip):
-    def test_round_trip(self, engine, schema):
+    # Exasol has no native TIME type. The dialect maps sa.Time to VARCHAR(16) in
+    # EXATypeCompiler.visit_TIME() and uses EXATimestring in type_descriptor().
+    @pytest.mark.parametrize(
+        "input_value",
+        (
+            pytest.param(dt.time(12, 34, 56, 123456), id="time"),
+            pytest.param("12:34:56.123456", id="string"),
+        ),
+    )
+    def test_round_trip(self, engine, schema, input_value):
         with self.create_table(engine, schema, sa.Time):
-            value = dt.time(12, 34, 56, 123456)
-            expected = "12:34:56.123456"
-            self.insert_value(engine, value)
-            actual = self.select_value(engine)
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
 
-            assert isinstance(actual, str)
-            assert actual == expected
+        assert isinstance(result, str)
+        assert result == "12:34:56.123456"
 
 
 class TestVarcharType(TypeRoundTrip):

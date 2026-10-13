@@ -1,4 +1,7 @@
-from unittest.mock import Mock
+from unittest.mock import (
+    Mock,
+    call,
+)
 
 import pyexasol
 import pytest
@@ -12,6 +15,23 @@ from pyexasol.exceptions import (
     ExaQueryTimeoutError,
 )
 from sqlalchemy.exc import DBAPIError
+
+
+def _fail_after_session_probe(connection):
+    """Allow the newer DB-API session probe before simulating a failure."""
+
+    def execute(statement):
+        # PyExasol > 2.4.1 checks these session formats before executing SQL.
+        if "EXA_PARAMETERS" in statement:
+            result = Mock()
+            result.fetchall.return_value = [
+                ("NLS_DATE_FORMAT", "YYYY-MM-DD"),
+                ("NLS_TIMESTAMP_FORMAT", "YYYY-MM-DD HH24:MI:SS.FF6"),
+            ]
+            return result
+        raise ExaCommunicationError(connection, "socket closed")
+
+    return execute
 
 
 def _create_query_error(server, error_type):
@@ -33,9 +53,7 @@ def test_checkout_pooled_connection_recovers_after_communication_error(
     with uninitialized_engine.connect() as connection:
         original = connection.connection.dbapi_connection
     old_connection.is_closed = True
-    old_connection.execute.side_effect = ExaCommunicationError(
-        old_connection, "socket closed"
-    )
+    old_connection.execute.side_effect = _fail_after_session_probe(old_connection)
 
     # Action: perform one application checkout after the pooled connection fails.
     with uninitialized_engine.connect() as connection:
@@ -45,7 +63,7 @@ def test_checkout_pooled_connection_recovers_after_communication_error(
     assert replacement is not original
     assert replacement.connection is new_connection
     assert connect.call_count == 2
-    old_connection.execute.assert_called_once_with("SELECT 1 FROM DUAL")
+    assert call("SELECT 1 FROM DUAL") in old_connection.execute.call_args_list
 
 
 @pytest.mark.parametrize(
@@ -89,7 +107,7 @@ def test_in_flight_failure_is_not_replayed(
     server = mock_pyexasol_connection
     with uninitialized_engine.connect() as connection:
         server.is_closed = True
-        server.execute.side_effect = ExaCommunicationError(server, "socket closed")
+        server.execute.side_effect = _fail_after_session_probe(server)
 
         # Action: execute an INSERT while the connection is failing.
         with pytest.raises(DBAPIError) as caught:
@@ -97,7 +115,7 @@ def test_in_flight_failure_is_not_replayed(
 
     # Assert: the INSERT is not replayed on a replacement connection.
     assert caught.value.connection_invalidated
-    server.execute.assert_called_once_with("INSERT INTO T VALUES (1)")
+    assert server.execute.call_args_list.count(call("INSERT INTO T VALUES (1)")) == 1
     assert pyexasol.connect.call_count == 1
 
 

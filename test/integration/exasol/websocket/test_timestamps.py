@@ -19,25 +19,25 @@ class TestTimestampRoundTrip(fixtures.TestBase):
         ],
     )
     def test_typed_timestamp_preserves_server_fraction(
-        self, pooled_engine, schema, precision, fraction
+        self, engine, schema, precision, fraction
     ):
         # Setup: create and reflect a timestamp table with the requested precision.
         expected = dt.datetime(2026, 9, 11, 12, 34, 56, fraction)
-        with pooled_engine.begin() as connection:
-            # Before 8.32, TIMESTAMP(6) was an alias for millisecond precision.
+        with engine.begin() as connection:
+            # In Exasol version < 8.32, TIMESTAMP(6) was an alias for millisecond precision.
             # Keep the millisecond regression on every supported server.
             # https://docs.exasol.com/db/latest/changelogs/13712.htm
-            if precision > 3 and pooled_engine.dialect.server_version_info < (8, 32, 0):
+            if precision > 3 and engine.dialect.server_version_info < (8, 32, 0):
                 pytest.skip("Microsecond storage requires Exasol >= 8.32")
             connection.exec_driver_sql(
                 f"CREATE TABLE {schema}.T (ID INT, TS TIMESTAMP({precision}))"
             )
         table = sa.Table(
-            "t", sa.MetaData(), schema=schema.lower(), autoload_with=pooled_engine
+            "t", sa.MetaData(), schema=schema.lower(), autoload_with=engine
         )
 
         # Action: insert one typed value, one NULL, and one independently seeded value.
-        with pooled_engine.begin() as connection:
+        with engine.begin() as connection:
             connection.execute(
                 table.insert(), [{"id": 1, "ts": expected}, {"id": 2, "ts": None}]
             )
@@ -46,7 +46,7 @@ class TestTimestampRoundTrip(fixtures.TestBase):
             )
 
         # Assert: both raw and reflected reads preserve the expected timestamp values.
-        with pooled_engine.connect() as connection:
+        with engine.connect() as connection:
             raw = connection.exec_driver_sql(
                 f"SELECT TS FROM {schema}.T WHERE ID=1"
             ).scalar_one()

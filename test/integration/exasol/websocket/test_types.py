@@ -102,9 +102,13 @@ class TestBooleanType(TypeRoundTrip):
 
 
 class TestCharType(TypeRoundTrip):
+
     @pytest.mark.parametrize(
         "input_value",
-        (pytest.param("xy", id="too_short"), pytest.param("xy   ", id="right-length")),
+        (
+            pytest.param("xy", id="too_short"),
+            pytest.param("xy" + " " * 3, id="correct-length"),
+        ),
     )
     def test_round_trip(self, engine, schema, input_value):
         with self.create_table(engine, schema, sa.CHAR(5)):
@@ -112,7 +116,7 @@ class TestCharType(TypeRoundTrip):
             actual = self.select_value(engine)
 
         assert isinstance(actual, str)
-        assert actual == "xy   "
+        assert actual == "xy" + " " * 3
 
     def test_rejects_too_long(self, engine, schema):
         with self.create_table(engine, schema, sa.CHAR(5)):

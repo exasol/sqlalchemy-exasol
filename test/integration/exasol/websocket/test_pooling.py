@@ -2,8 +2,12 @@
 
 import pyexasol
 import pytest
-import sqlalchemy as sa
 from packaging.version import Version
+from sqlalchemy import create_engine
+from sqlalchemy.exc import (
+    DBAPIError,
+    ProgrammingError,
+)
 from sqlalchemy.pool import NullPool
 from sqlalchemy.testing import fixtures
 
@@ -15,7 +19,7 @@ def pooled_engine(engine_url):
     Once using the exa driver, once using the websocket driver.
     The tests using this fixture will be executed for each variant.
     """
-    engine = sa.create_engine(
+    engine = create_engine(
         engine_url,
         pool_pre_ping=True,
         pool_size=1,
@@ -30,9 +34,7 @@ def pooled_engine(engine_url):
 
 @pytest.fixture
 def admin_engine(pooled_engine):
-    engine = sa.create_engine(
-        pooled_engine.url, poolclass=NullPool, hide_parameters=True
-    )
+    engine = create_engine(pooled_engine.url, poolclass=NullPool, hide_parameters=True)
     try:
         yield engine
     finally:
@@ -94,7 +96,7 @@ class TestConnectionPoolBehavior(fixtures.TestBase):
             kill_session(admin_engine, old_session)
 
             # Assert: the failed write is reported and must not be replayed.
-            with pytest.raises(sa.exc.DBAPIError) as caught:
+            with pytest.raises(DBAPIError) as caught:
                 connection.exec_driver_sql(f"INSERT INTO {schema}.T VALUES (2)")
             assert caught.value.connection_invalidated
 
@@ -118,9 +120,9 @@ class TestConnectionPoolBehavior(fixtures.TestBase):
         "expected_exception",
         [
             (
-                sa.exc.ProgrammingError
+                ProgrammingError
                 if Version(pyexasol.__version__) >= Version("2.4.1")
-                else sa.exc.DBAPIError
+                else DBAPIError
             )
         ],
     )

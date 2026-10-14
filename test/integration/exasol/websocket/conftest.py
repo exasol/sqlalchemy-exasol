@@ -1,7 +1,7 @@
 import uuid
 
 import pytest
-import sqlalchemy as sa
+from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.testing import config
 
@@ -21,7 +21,7 @@ def engine_url(request):
 @pytest.fixture
 def engine(engine_url):
     """Create a non-pooled engine for dialect/type integration tests."""
-    test_engine = sa.create_engine(engine_url, poolclass=NullPool, hide_parameters=True)
+    test_engine = create_engine(engine_url, poolclass=NullPool, hide_parameters=True)
     try:
         yield test_engine
     finally:

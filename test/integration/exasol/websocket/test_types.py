@@ -313,7 +313,7 @@ class TestTimestampType(TypeRoundTrip):
     def test_round_trip_timestamp_with_explicit_precision_6(
         self, engine, schema, fraction
     ):
-        # In Exasol version < 8.32, TIMESTAMP(6) was an alias for millisecond precision.
+        # In Exasol version <= 8.32.0, TIMESTAMP(6) was an alias for millisecond precision.
         # Thus, it will not appropriately work for this test.
         # https://docs.exasol.com/db/latest/changelogs/13712.htm
         if engine.dialect.server_version_info <= (8, 32, 0):

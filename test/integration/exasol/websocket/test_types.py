@@ -27,6 +27,7 @@ from sqlalchemy.exc import (
     StatementError,
 )
 from sqlalchemy.testing import fixtures
+from sqlalchemy.types import NullType
 
 NUMERIC_INPUTS = (
     pytest.param(42, id="integer"),
@@ -38,6 +39,20 @@ NUMERIC_INPUTS = (
 TIMESTAMP_INPUTS = (
     pytest.param(dt.datetime(2026, 9, 11, 12, 34, 56, 123400), id="datetime"),
     pytest.param("2026-09-11 12:34:56.1234", id="string"),
+)
+
+NULLABLE_TYPES = (
+    pytest.param(Boolean, id="boolean"),
+    pytest.param(CHAR(5), id="char"),
+    pytest.param(Date, id="date"),
+    pytest.param(Numeric(18, 1), id="numeric"),
+    pytest.param(Double, id="double"),
+    pytest.param(Float, id="float"),
+    pytest.param(Integer, id="integer"),
+    pytest.param(Time, id="time"),
+    pytest.param(DateTime, id="datetime"),
+    pytest.param(TIMESTAMP, id="timestamp"),
+    pytest.param(String(20), id="string"),
 )
 
 
@@ -87,6 +102,16 @@ class TypeRoundTrip(fixtures.TestBase):
             return connection.execute(select(self.table.c.value)).scalar_one()
 
 
+class TestNullType(TypeRoundTrip):
+    @pytest.mark.parametrize("column_type", NULLABLE_TYPES)
+    def test_round_trip_none(self, engine, schema, column_type):
+        with self.create_table(engine, schema, column_type):
+            self.insert_value(engine, None)
+            result = self.select_value(engine)
+
+        assert result is None
+
+
 class TestBooleanType(TypeRoundTrip):
     @pytest.mark.parametrize(
         "input_value",
@@ -102,13 +127,6 @@ class TestBooleanType(TypeRoundTrip):
 
         assert isinstance(result, bool)
         assert result is True
-
-    def test_round_trip_none(self, engine, schema):
-        with self.create_table(engine, schema, Boolean):
-            self.insert_value(engine, None)
-            result = self.select_value(engine)
-
-        assert result is None
 
     def test_rejects_string_input(self, engine, schema):
         # Strings are rejected by SQLAlchemy's strict Boolean validation as our dialect
@@ -222,6 +240,20 @@ class TestFloatType(TypeRoundTrip):
             assert result == 42.0
         else:
             assert result == 42.5
+
+
+class TestGeometryType(TypeRoundTrip):
+    # Exasol GEOMETRY has no first-class SQLAlchemy-Exasol type.
+    def test_round_trip(self, engine, schema):
+        value = "LINESTRING (10 20, 30 40)"
+        # NullType is a placeholder because GEOMETRY has no SQLAlchemy mapping;
+        # the DDL aspect is used to create the actual GEOMETRY column.
+        with self.create_table_with_ddl(engine, schema, NullType(), "GEOMETRY"):
+            self.insert_value(engine, value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, str)
+        assert result == value
 
 
 class TestIntegerType(TypeRoundTrip):

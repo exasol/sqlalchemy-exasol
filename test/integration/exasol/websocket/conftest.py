@@ -1,7 +1,7 @@
 import uuid
 
 import pytest
-import sqlalchemy as sa
+from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.testing import config
 
@@ -12,11 +12,16 @@ from sqlalchemy.testing import config
         pytest.param("exa+websocket", id="websocket-driver"),
     ]
 )
-def engine(request):
-    """Create a basic SQLAlchemy engine for dialect/type integration tests."""
+def engine_url(request):
+    """Return a driver-specific URL with autocommit disabled."""
     url = config.db.url.set(drivername=request.param)
-    url = url.update_query_dict({"AUTOCOMMIT": "no"})
-    test_engine = sa.create_engine(url, poolclass=NullPool, hide_parameters=True)
+    return url.update_query_dict({"AUTOCOMMIT": "no"})
+
+
+@pytest.fixture
+def engine(engine_url):
+    """Create a non-pooled engine for dialect/type integration tests."""
+    test_engine = create_engine(engine_url, poolclass=NullPool, hide_parameters=True)
     try:
         yield test_engine
     finally:

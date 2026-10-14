@@ -24,7 +24,7 @@ class TestTimestampRoundTrip(fixtures.TestBase):
         # Setup: create and reflect a timestamp table with the requested precision.
         expected = dt.datetime(2026, 9, 11, 12, 34, 56, fraction)
         with engine.begin() as connection:
-            # Before 8.32, TIMESTAMP(6) was an alias for millisecond precision.
+            # In Exasol version < 8.32, TIMESTAMP(6) was an alias for millisecond precision.
             # Keep the millisecond regression on every supported server.
             # https://docs.exasol.com/db/latest/changelogs/13712.htm
             if precision > 3 and engine.dialect.server_version_info < (8, 32, 0):

@@ -5,14 +5,34 @@ from contextlib import contextmanager
 from decimal import Decimal
 
 import pytest
-import sqlalchemy as sa
+from sqlalchemy import (
+    CHAR,
+    TIMESTAMP,
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    Double,
+    Float,
+    Integer,
+    MetaData,
+    Numeric,
+    String,
+    Table,
+    Time,
+    select,
+)
+from sqlalchemy.exc import (
+    DatabaseError,
+    StatementError,
+)
 from sqlalchemy.testing import fixtures
 
 NUMERIC_INPUTS = (
-    pytest.param("42.5", id="string"),
     pytest.param(42, id="integer"),
     pytest.param(42.5, id="float"),
     pytest.param(Decimal("42.5"), id="decimal"),
+    pytest.param("42.5", id="string-encoded-float"),
 )
 
 TIMESTAMP_INPUTS = (
@@ -26,10 +46,10 @@ class TypeRoundTrip(fixtures.TestBase):
 
     @contextmanager
     def create_table(self, engine, schema, column_type):
-        self.table = sa.Table(
+        self.table = Table(
             "test_type",
-            sa.MetaData(),
-            sa.Column("value", column_type),
+            MetaData(),
+            Column("value", column_type),
             schema=schema,
         )
         self.table.create(engine)
@@ -42,10 +62,10 @@ class TypeRoundTrip(fixtures.TestBase):
     @contextmanager
     def create_table_with_ddl(self, engine, schema, column_type, ddl_type):
         """Create a table with explicit DDL when no native SQLAlchemy equivalent exists."""
-        self.table = sa.Table(
+        self.table = Table(
             "test_type",
-            sa.MetaData(),
-            sa.Column("value", column_type),
+            MetaData(),
+            Column("value", column_type),
             schema=schema,
         )
         with engine.begin() as connection:
@@ -82,7 +102,7 @@ class TypeRoundTrip(fixtures.TestBase):
 
     def select_value(self, engine):
         with engine.connect() as connection:
-            return connection.execute(sa.select(self.table.c.value)).scalar_one()
+            return connection.execute(select(self.table.c.value)).scalar_one()
 
 
 class TestBooleanType(TypeRoundTrip):
@@ -94,7 +114,7 @@ class TestBooleanType(TypeRoundTrip):
         ),
     )
     def test_round_trip(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.Boolean):
+        with self.create_table(engine, schema, Boolean):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -102,7 +122,7 @@ class TestBooleanType(TypeRoundTrip):
         assert result is True
 
     def test_round_trip_none(self, engine, schema):
-        with self.create_table(engine, schema, sa.Boolean):
+        with self.create_table(engine, schema, Boolean):
             self.insert_value(engine, None)
             result = self.select_value(engine)
 
@@ -112,29 +132,33 @@ class TestBooleanType(TypeRoundTrip):
         # Strings are rejected by SQLAlchemy's strict Boolean validation as our dialect
         # advertises native Boolean support (supports_native_boolean = True). So this
         # exception is raised before it reaches PyExasol.
-        with self.create_table(engine, schema, sa.Boolean):
-            with pytest.raises(sa.exc.StatementError) as error:
+        with self.create_table(engine, schema, Boolean):
+            with pytest.raises(StatementError) as error:
                 self.insert_value(engine, "TRUE")
 
         assert isinstance(error.value.orig, TypeError)
 
 
 class TestCharType(TypeRoundTrip):
+
     @pytest.mark.parametrize(
         "input_value",
-        (pytest.param("xy", id="too_short"), pytest.param("xy   ", id="right-length")),
+        (
+            pytest.param("xy", id="too_short"),
+            pytest.param("xy" + " " * 3, id="correct-length"),
+        ),
     )
     def test_round_trip(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.CHAR(5)):
+        with self.create_table(engine, schema, CHAR(5)):
             self.insert_value(engine, input_value)
             actual = self.select_value(engine)
 
         assert isinstance(actual, str)
-        assert actual == "xy   "
+        assert actual == "xy" + " " * 3
 
     def test_rejects_too_long(self, engine, schema):
-        with self.create_table(engine, schema, sa.CHAR(5)):
-            with pytest.raises(sa.exc.DatabaseError):
+        with self.create_table(engine, schema, CHAR(5)):
+            with pytest.raises(DatabaseError):
                 self.insert_value(engine, "x" * 6)
 
 
@@ -147,7 +171,7 @@ class TestDateType(TypeRoundTrip):
         ),
     )
     def test_round_trip(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.Date):
+        with self.create_table(engine, schema, Date):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -161,7 +185,7 @@ class TestDecimalType(TypeRoundTrip):
         NUMERIC_INPUTS,
     )
     def test_round_trip_decimal_scale_0(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.Numeric(18, 0)):
+        with self.create_table(engine, schema, Numeric(18, 0)):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -173,7 +197,7 @@ class TestDecimalType(TypeRoundTrip):
         NUMERIC_INPUTS,
     )
     def test_round_trip_decimal_scale_1(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.Numeric(18, 1)):
+        with self.create_table(engine, schema, Numeric(18, 1)):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -190,7 +214,7 @@ class TestDoubleType(TypeRoundTrip):
         NUMERIC_INPUTS,
     )
     def test_round_trip(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.Double):
+        with self.create_table(engine, schema, Double):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -207,7 +231,7 @@ class TestFloatType(TypeRoundTrip):
         NUMERIC_INPUTS,
     )
     def test_round_trip(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.Float):
+        with self.create_table(engine, schema, Float):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -224,7 +248,7 @@ class TestIntegerType(TypeRoundTrip):
         NUMERIC_INPUTS,
     )
     def test_round_trip(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.Integer):
+        with self.create_table(engine, schema, Integer):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -233,7 +257,7 @@ class TestIntegerType(TypeRoundTrip):
 
 
 class TestTimeType(TypeRoundTrip):
-    # Exasol has no native TIME type. The dialect maps sa.Time to VARCHAR(16) in
+    # Exasol has no native TIME type. The dialect maps Time to VARCHAR(16) in
     # EXATypeCompiler.visit_TIME() and uses EXATimestring in type_descriptor().
     @pytest.mark.parametrize(
         "input_value",
@@ -243,7 +267,7 @@ class TestTimeType(TypeRoundTrip):
         ),
     )
     def test_round_trip(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.Time):
+        with self.create_table(engine, schema, Time):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -257,7 +281,7 @@ class TestTimestampType(TypeRoundTrip):
         TIMESTAMP_INPUTS,
     )
     def test_round_trip_datetime(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.DateTime):
+        with self.create_table(engine, schema, DateTime):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -271,7 +295,7 @@ class TestTimestampType(TypeRoundTrip):
     def test_round_trip_timestamp(self, engine, schema, input_value):
         # Explicit timestamp precision is currently discarded by the dialect;
         # EXATypeCompiler._timestamp() in sqlalchemy_exasol/base.py emits TIMESTAMP.
-        with self.create_table(engine, schema, sa.TIMESTAMP):
+        with self.create_table(engine, schema, TIMESTAMP):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -290,7 +314,7 @@ class TestTimestampType(TypeRoundTrip):
     def test_round_trip_timestamp_with_explicit_precision_3(
         self, engine, schema, input_value
     ):
-        with self.create_table_with_ddl(engine, schema, sa.TIMESTAMP, "TIMESTAMP(3)"):
+        with self.create_table_with_ddl(engine, schema, TIMESTAMP, "TIMESTAMP(3)"):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -307,7 +331,7 @@ class TestVarcharType(TypeRoundTrip):
         ),
     )
     def test_round_trip(self, engine, schema, input_value):
-        with self.create_table(engine, schema, sa.String(20)):
+        with self.create_table(engine, schema, String(20)):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -315,6 +339,6 @@ class TestVarcharType(TypeRoundTrip):
         assert result == input_value
 
     def test_rejects_too_long(self, engine, schema):
-        with self.create_table(engine, schema, sa.String(20)):
-            with pytest.raises(sa.exc.DatabaseError):
+        with self.create_table(engine, schema, String(20)):
+            with pytest.raises(DatabaseError):
                 self.insert_value(engine, "x" * 21)

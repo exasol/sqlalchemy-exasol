@@ -303,6 +303,30 @@ class TestTimestampType(TypeRoundTrip):
         assert isinstance(result, dt.datetime)
         assert result == dt.datetime(2026, 9, 11, 12, 34, 56, 123000)
 
+    @pytest.mark.parametrize(
+        "fraction",
+        [
+            pytest.param(123456, id="full-microsecond-precision"),
+            pytest.param(1, id="microsecond-with-zero-padding"),
+        ],
+    )
+    def test_round_trip_timestamp_with_explicit_precision_6(
+        self, engine, schema, fraction
+    ):
+        # In Exasol version <= 8.32.0, TIMESTAMP(6) was an alias for millisecond precision.
+        # Thus, it will not appropriately work for this test.
+        # https://docs.exasol.com/db/latest/changelogs/13712.htm
+        if engine.dialect.server_version_info <= (8, 32, 0):
+            pytest.xfail("Microsecond storage requires Exasol > 8.32")
+
+        expected = dt.datetime(2026, 9, 11, 12, 34, 56, fraction)
+        with self.create_table_with_ddl(engine, schema, TIMESTAMP, "TIMESTAMP(6)"):
+            self.insert_value(engine, expected)
+            result = self.select_value(engine)
+
+        assert isinstance(result, dt.datetime)
+        assert result == expected
+
 
 class TestVarcharType(TypeRoundTrip):
     @pytest.mark.parametrize(

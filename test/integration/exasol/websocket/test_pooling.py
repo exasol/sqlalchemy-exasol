@@ -5,28 +5,22 @@ import pytest
 import sqlalchemy as sa
 from packaging.version import Version
 from sqlalchemy.pool import NullPool
-from sqlalchemy.testing import (
-    config,
-    fixtures,
-)
+from sqlalchemy.testing import fixtures
 
 
-@pytest.fixture(
-    params=[
-        pytest.param("exa", id="exa-driver"),
-        pytest.param("exa+websocket", id="websocket-driver"),
-    ]
-)
-def pooled_engine(request):
+@pytest.fixture
+def pooled_engine(engine_url):
     """
     Returns different variants of an SQLAlchemy engine with connection pooling.
     Once using the exa driver, once using the websocket driver.
     The tests using this fixture will be executed for each variant.
     """
-    url = config.db.url.set(drivername=request.param)
-    url = url.update_query_dict({"AUTOCOMMIT": "no"})
     engine = sa.create_engine(
-        url, pool_pre_ping=True, pool_size=1, max_overflow=0, hide_parameters=True
+        engine_url,
+        pool_pre_ping=True,
+        pool_size=1,
+        max_overflow=0,
+        hide_parameters=True,
     )
     try:
         yield engine

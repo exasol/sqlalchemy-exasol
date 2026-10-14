@@ -18,6 +18,11 @@ from sqlalchemy.testing import (
     ]
 )
 def pooled_engine(request):
+    """
+    Returns different variants of an SQLAlchemy engine with connection pooling.
+    Once using the exa driver, once using the websocket driver.
+    The tests using this fixture will be executed for each variant.
+    """
     url = config.db.url.set(drivername=request.param)
     url = url.update_query_dict({"AUTOCOMMIT": "no"})
     engine = sa.create_engine(

@@ -9,10 +9,10 @@ import sqlalchemy as sa
 from sqlalchemy.testing import fixtures
 
 NUMERIC_INPUTS = (
-    pytest.param("42.5", id="string"),
     pytest.param(42, id="integer"),
     pytest.param(42.5, id="float"),
     pytest.param(Decimal("42.5"), id="decimal"),
+    pytest.param("42.5", id="string-encoded-float"),
 )
 
 TIMESTAMP_INPUTS = (

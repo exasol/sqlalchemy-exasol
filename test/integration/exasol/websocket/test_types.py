@@ -451,6 +451,24 @@ class TestTimestampType(TypeRoundTrip):
         assert result == expected
 
 
+class TestTimestampLocalTimeZoneType(TypeRoundTrip):
+    # Exasol TIMESTAMP WITH LOCAL TIME ZONE has no first-class SQLAlchemy-Exasol type.
+    @pytest.mark.parametrize("input_value", TIMESTAMP_INPUTS)
+    def test_round_trip(self, engine, schema, input_value):
+        with self.create_table_with_ddl(
+            engine, schema, String(), "TIMESTAMP WITH LOCAL TIME ZONE"
+        ):
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
+
+        if Version(pyexasol.__version__) < Version("3.0.0"):
+            assert isinstance(result, str)
+            assert result == "2026-09-11 12:34:56.123000"
+        else:
+            assert isinstance(result, dt.datetime)
+            assert result == dt.datetime(2026, 9, 11, 12, 34, 56, 123000)
+
+
 class TestVarcharType(TypeRoundTrip):
     @pytest.mark.parametrize(
         "input_value",

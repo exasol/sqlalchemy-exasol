@@ -7,6 +7,7 @@ from decimal import Decimal
 import pyexasol
 import pytest
 from packaging.version import Version
+from pyexasol import ExaTimeDelta
 from sqlalchemy import (
     CHAR,
     TIMESTAMP,
@@ -268,6 +269,77 @@ class TestHashType(TypeRoundTrip):
 
         value = "6ba7b8109dad11d180b400c04fd430c8"
         with self.create_table_with_ddl(engine, schema, String(), "HASHTYPE(16 BYTE)"):
+            self.insert_value(engine, value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, str)
+        assert result == value
+
+
+class TestIntervalDaySecondType(TypeRoundTrip):
+    # Exasol INTERVAL has no first-class SQLAlchemy-Exasol type.
+    @pytest.mark.parametrize(
+        "input_value",
+        (
+            pytest.param("+000000003 04:05:06.654", id="string"),
+            pytest.param(
+                dt.timedelta(
+                    days=3,
+                    hours=4,
+                    minutes=5,
+                    seconds=6,
+                    microseconds=654000,
+                ),
+                id="timedelta",
+            ),
+            pytest.param(
+                pyexasol.ExaTimeDelta(
+                    days=3,
+                    hours=4,
+                    minutes=5,
+                    seconds=6,
+                    microseconds=654000,
+                ),
+                id="exa-timedelta",
+            ),
+        ),
+    )
+    def test_round_trip(self, engine, schema, input_value):
+        if not isinstance(input_value, str):
+            pytest.xfail(
+                "PyExasol does not support interval input values; "
+                "see https://github.com/exasol/pyexasol/issues/428"
+            )
+
+        with self.create_table_with_ddl(
+            engine, schema, String(), "INTERVAL DAY(9) TO SECOND(6)"
+        ):
+            self.insert_value(engine, input_value)
+            result = self.select_value(engine)
+
+        if Version(pyexasol.__version__) < Version("3.0.0"):
+            # PyExasol before 3.0.0 returns serialized interval values.
+            assert isinstance(result, str)
+            assert result == "+000000003 04:05:06.654000"
+        else:
+            # PyExasol 3.0.0 returns day-to-second intervals as ExaTimeDelta.
+            assert isinstance(result, ExaTimeDelta)
+            assert result == dt.timedelta(
+                days=3,
+                hours=4,
+                minutes=5,
+                seconds=6,
+                microseconds=654000,
+            )
+
+
+class TestIntervalYearMonthType(TypeRoundTrip):
+    # Exasol INTERVAL has no first-class SQLAlchemy-Exasol type.
+    def test_round_trip(self, engine, schema):
+        value = "+0001-11"
+        with self.create_table_with_ddl(
+            engine, schema, String(), "INTERVAL YEAR(4) TO MONTH"
+        ):
             self.insert_value(engine, value)
             result = self.select_value(engine)
 

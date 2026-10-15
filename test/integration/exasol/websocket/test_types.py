@@ -4,7 +4,9 @@ import datetime as dt
 from contextlib import contextmanager
 from decimal import Decimal
 
+import pyexasol
 import pytest
+from packaging.version import Version
 from sqlalchemy import (
     CHAR,
     TIMESTAMP,
@@ -249,6 +251,23 @@ class TestGeometryType(TypeRoundTrip):
         # NullType is a placeholder because GEOMETRY has no SQLAlchemy mapping;
         # the DDL aspect is used to create the actual GEOMETRY column.
         with self.create_table_with_ddl(engine, schema, NullType(), "GEOMETRY"):
+            self.insert_value(engine, value)
+            result = self.select_value(engine)
+
+        assert isinstance(result, str)
+        assert result == value
+
+
+class TestHashType(TypeRoundTrip):
+    # Exasol HASHTYPE has no first-class SQLAlchemy-Exasol type.
+    def test_round_trip(self, engine, schema):
+        if Version(pyexasol.__version__) < Version("3.0.0"):
+            # PyExasol versions before 3.0.0 do not map HASHTYPE in the
+            # WebSocket cursor metadata, causing a KeyError during SELECT.
+            pytest.xfail("HASHTYPE metadata mapping requires PyExasol >= 3.0.0")
+
+        value = "6ba7b8109dad11d180b400c04fd430c8"
+        with self.create_table_with_ddl(engine, schema, String(), "HASHTYPE(16 BYTE)"):
             self.insert_value(engine, value)
             result = self.select_value(engine)
 

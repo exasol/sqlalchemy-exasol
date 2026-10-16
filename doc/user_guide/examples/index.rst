@@ -8,6 +8,7 @@ Examples
    :hidden:
 
    connection_configuration
+   fetch_mapper
    testing_connection
    non_orm/index.rst
    orm/index.rst

@@ -5,8 +5,8 @@ Connection Parameters
 
 .. _sqlalchemy_parameters:
 
-General SQLAlchemy Parameters
------------------------------
+General SQLAlchemy Engine Parameters
+------------------------------------
 
 The table below lists parameters used in the :ref:`connection_specification`.
 
@@ -31,15 +31,27 @@ The table below lists parameters used in the :ref:`connection_specification`.
      - A dictionary of string keys to string values to be passed
        to the dialect upon connecting, e.g. ``{"AUTOCOMMIT": "y"}``.
        For other relevant keywords, see :ref:`dialect_specific_params`.
+   * - connect_args
+     - A dictionary of options supported by the PyExasol WebSocket DBAPI,
+       passed to ``create_engine``.
+
+       * ``fetch_mapper``: Available since PyExasol 3.0.0. Use this callable
+         to customize the mapping of returned database values to Python types;
+         it receives ``(value, data_type)``. See the
+         :ref:`custom fetch mapper example <custom_fetch_mapper_example>` and
+         :ref:`PyExasol Compatibility and Value Conversion
+         <pyexasol_compatibility>`.
 
 
 
 .. _dialect_specific_params:
 
-Specific Parameters for Dialect SQLAlchemy-Exasol
--------------------------------------------------
-The table below lists additional parameters that are specific to the SQLAlchemy-Exasol
-dialect and gives the values as needed for the :ref:`connection_specification`.
+Specific URL Query Parameters for SQLAlchemy-Exasol
+----------------------------------------------------
+The table below lists URL query parameters supported by the SQLAlchemy-Exasol
+dialect. Add them to the URL query string or the ``query`` dictionary passed to
+``URL.create``; their values are supplied as strings and converted by the
+dialect as needed.
 
 .. list-table::
    :header-rows: 1
@@ -81,3 +93,90 @@ dialect and gives the values as needed for the :ref:`connection_specification`.
 
        For more information about verifying the SSL certificate, please see
        :ref:`certificate_verification`.
+
+
+.. _pyexasol_compatibility:
+
+PyExasol Compatibility and Value Conversion
+--------------------------------------------
+
+SQLAlchemy-Exasol uses the WebSocket DBAPI provided by
+`PyExasol <https://exasol.github.io/pyexasol/master/user_guide/exploring_features/advanced_topics/dbapi.html>`__.
+PyExasol 3.0.0 changed the default WebSocket DBAPI conversion so that values are converted to
+Python types as early as possible, in accordance with PEP 249.
+
+The following table describes values exposed by SQLAlchemy-Exasol through the
+WebSocket DBAPI. The PyExasol version columns show the version-dependent
+behavior seen by SQLAlchemy-Exasol; ``None`` is returned for ``NULL`` values
+for all types.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Exasol type
+     - SQLAlchemy-Exasol with PyExasol < 3.0.0
+     - SQLAlchemy-Exasol with PyExasol >= 3.0.0
+   * - ``BOOLEAN``
+     - ``bool``
+     - ``bool``
+   * - ``CHAR``
+     - ``str``
+     - ``str``
+   * - ``DATE``
+     - ``datetime.date``
+     - ``datetime.date``
+   * - ``DECIMAL(p, 0)``
+     - ``int`` [#conversion-note]_
+     - ``int``
+   * - ``DECIMAL(p, s)`` where ``s > 0``
+     - ``decimal.Decimal`` [#conversion-note]_
+     - ``decimal.Decimal``
+   * - ``DOUBLE``
+     - ``float``
+     - ``float``
+   * - ``GEOMETRY``
+     - ``str``
+     - ``str``
+   * - ``HASHTYPE``
+     - metadata ``KeyError`` (``str``)
+     - ``str``
+   * - ``INTERVAL DAY TO SECOND``
+     - ``str``
+     - ``ExaTimeDelta``
+   * - ``INTERVAL YEAR TO MONTH``
+     - ``str``
+     - ``str``
+   * - ``TIMESTAMP``
+     - ``datetime.datetime`` [#conversion-note]_
+     - ``datetime.datetime``
+   * - ``TIMESTAMP WITH LOCAL TIME ZONE``
+     - ``str``
+     - ``datetime.datetime``
+   * - ``VARCHAR``
+     - ``str``
+     - ``str``
+
+.. [#conversion-note] PyExasol versions before 3.0.0 returned strings for these
+   types, and SQLAlchemy-Exasol converted those strings to the displayed Python
+   types.
+
+The SQLAlchemy column type declaration can change the Python type returned.
+With PyExasol >= 3.0.0, a native Exasol ``DECIMAL(p, 0)`` value is returned as
+``int``. If the column is instead declared with SQLAlchemy's
+``Numeric(18, 0)`` type, SQLAlchemy applies its decimal result processor and
+returns ``decimal.Decimal``.
+
+For release-specific conversion details and the complete list of changes, see the
+`PyExasol 3.0.0 release notes <https://github.com/exasol/pyexasol/releases/tag/3.0.0>`__.
+
+
+Custom fetch mapper
+~~~~~~~~~~~~~~~~~~~
+
+Applications can provide their own PyExasol ``fetch_mapper`` through
+SQLAlchemy's ``connect_args``. The mapper receives ``(value, data_type)`` for
+each fetched value, as described in PyExasol's
+`DBAPI documentation <https://exasol.github.io/pyexasol/master/user_guide/exploring_features/advanced_topics/dbapi.html>`__.
+It replaces PyExasol's default mapper, so applications must handle the value
+types they need. See the :ref:`custom fetch mapper example
+<custom_fetch_mapper_example>`.

@@ -34,6 +34,11 @@ def datetime_processor(uninitialized_engine):
             datetime.datetime(2026, 9, 11, 12, 34, 56, 123456),
             id="full-microsecond-precision",
         ),
+        pytest.param(
+            "2026-09-11 12:34:56.123456789",
+            datetime.datetime(2026, 9, 11, 12, 34, 56, 123456),
+            id="nanosecond-precision-is-truncated",
+        ),
         pytest.param(None, None, id="null-stays-null"),
         pytest.param(
             datetime.datetime(2026, 1, 1, 0, 0, 0, 123456),
@@ -51,11 +56,14 @@ def test_datetime_result(datetime_processor, text, expected):
     [
         pytest.param("invalid", id="not-a-datetime"),
         pytest.param("2024-02-30 00:00:00", id="invalid-calendar-date"),
-        pytest.param("2026-09-11 12:34:56.1234567", id="too-many-fraction-digits"),
+        pytest.param("2026-09-11 12:34:56.", id="missing-fraction-digits"),
+        pytest.param("2026-09-11 12:34:56.123456x", id="non-numeric-fraction-digits"),
     ],
 )
 def test_datetime_invalid(datetime_processor, value):
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="configure the session's NLS_TIMESTAMP_FORMAT"
+    ):
         datetime_processor(value)
 
 

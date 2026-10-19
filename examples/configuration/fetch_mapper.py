@@ -105,12 +105,6 @@ def ensure_demo_table(engine):
     SQL_ALCHEMY.create_schema(engine=engine, schema=DEFAULT_SCHEMA_NAME)
     with engine.begin() as connection:
         connection.execute(text(CREATE_TABLE))
-        connection.execute(
-            text(
-                f"UPDATE {FULL_TABLE_NAME} "
-                "SET TIMESTAMP_LOCAL_VALUE = TIMESTAMP '2026-09-11 12:34:56.123456'"
-            )
-        )
         connection.execute(text(INSERT_ROW))
 
 

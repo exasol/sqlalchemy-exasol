@@ -16,7 +16,7 @@ for all types.
 | ``BOOLEAN``                        | ``bool``                                | ``bool``                                 |
 | ``CHAR``                           | ``str``                                 | ``str``                                  |
 | ``DATE``                           | ``datetime.date``                       | ``datetime.date``                        |
-| ``DECIMAL(p, 0)``                  | ``decimal.Decimal``*                    | ``decimal.Decimal``                      |
+| ``DECIMAL(p, 0)``                  | ``int``                                 | ``int``                                  |
 | ``DECIMAL(p, s)`` where ``s > 0``  | ``decimal.Decimal``*                    | ``decimal.Decimal``                      |
 | ``DOUBLE``                         | ``float``                               | ``float``                                |
 | ``GEOMETRY``                       | ``str``                                 | ``str``                                  |
@@ -29,6 +29,12 @@ for all types.
 
 \* PyExasol versions before 3.0.0 returned strings for these types, and
 SQLAlchemy-Exasol converted those strings to the displayed Python types.
+
+The SQLAlchemy column type declaration can change the Python type returned.
+A native Exasol ``DECIMAL(p, 0)`` value is returned as
+``int``. If the column is instead declared with SQLAlchemy's
+``Numeric(18, 0)`` type, SQLAlchemy applies its decimal result processor and
+returns ``decimal.Decimal``.
 
 For additional details about the PyExasol 3.0.0 behavior changes, see the
 [PyExasol 3.0.0 release notes](https://github.com/exasol/pyexasol/releases/tag/3.0.0).

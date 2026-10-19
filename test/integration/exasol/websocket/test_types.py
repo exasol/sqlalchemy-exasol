@@ -187,7 +187,7 @@ class TestDecimalType(TypeRoundTrip):
         "input_value",
         NUMERIC_INPUTS,
     )
-    def test_round_trip_decimal_scale_0(self, engine, schema, input_value):
+    def test_round_trip_numeric_scale_0(self, engine, schema, input_value):
         with self.create_table(engine, schema, Numeric(18, 0)):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
@@ -195,11 +195,20 @@ class TestDecimalType(TypeRoundTrip):
         assert isinstance(result, Decimal)
         assert result == Decimal("42")
 
+    def test_round_trip_decimal_scale_0(self, engine, schema):
+        # String is only a placeholder for the helper; the DDL creates DECIMAL.
+        with self.create_table_with_ddl(engine, schema, String(), "DECIMAL(18, 0)"):
+            self.insert_value(engine, 42)
+            result = self.select_value(engine)
+
+        assert isinstance(result, int)
+        assert result == 42
+
     @pytest.mark.parametrize(
         "input_value",
         NUMERIC_INPUTS,
     )
-    def test_round_trip_decimal_scale_1(self, engine, schema, input_value):
+    def test_round_trip_numeric_scale_1(self, engine, schema, input_value):
         with self.create_table(engine, schema, Numeric(18, 1)):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)

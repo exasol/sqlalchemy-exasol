@@ -18,7 +18,8 @@ INVALID_DATETIME_MESSAGE = (
     "configure the session's NLS_TIMESTAMP_FORMAT EXA_PARAMETERS value to "
     "produce timestamps in 'YYYY-MM-DD HH24:MI:SS[.FF]' format. With "
     "PyExasol >= 3.0.0, timestamps are normally returned as datetime objects; "
-    "if a custom fetch_mapper is configured, it must return datetime objects."
+    "if a custom fetch_mapper is configured, it can instead return a non-string "
+    "value such as a datetime object to avoid the automated conversion."
 )
 
 

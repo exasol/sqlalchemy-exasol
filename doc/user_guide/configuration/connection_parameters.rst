@@ -3,22 +3,10 @@
 Connection Parameters
 =====================
 
-Connection Parameter Locations
-------------------------------
-
-SQLAlchemy-Exasol connection settings are supplied in one of three places:
-
-* Connection URL fields such as ``drivername``, ``username``, ``password``,
-  ``host``, and ``port`` are specified in the URL passed to ``create_engine``.
-* SQLAlchemy-Exasol URL query parameters are supplied as string values in the
-  URL's ``query`` dictionary or query string.
-* DBAPI options that require Python values, such as ``fetch_mapper``, are
-  supplied in SQLAlchemy's ``connect_args`` dictionary.
-
 .. _sqlalchemy_parameters:
 
-General SQLAlchemy Parameters
------------------------------
+General SQLAlchemy Engine Parameters
+------------------------------------
 
 The table below lists parameters used in the :ref:`connection_specification`.
 
@@ -43,6 +31,16 @@ The table below lists parameters used in the :ref:`connection_specification`.
      - A dictionary of string keys to string values to be passed
        to the dialect upon connecting, e.g. ``{"AUTOCOMMIT": "y"}``.
        For other relevant keywords, see :ref:`dialect_specific_params`.
+   * - connect_args
+     - A dictionary of options supported by the PyExasol WebSocket DBAPI,
+       passed to ``create_engine``.
+
+       * ``fetch_mapper``: Available since PyExasol 3.0.0. Use this callable
+         to customize the mapping of returned database values to Python types;
+         it receives ``(value, data_type)``. See the
+         :ref:`custom fetch mapper example <custom_fetch_mapper_example>` and
+         :ref:`PyExasol Compatibility and Value Conversion
+         <pyexasol_compatibility>`.
 
 
 
@@ -95,25 +93,6 @@ dialect as needed.
 
        For more information about verifying the SSL certificate, please see
        :ref:`certificate_verification`.
-
-
-DBAPI Connection Arguments
---------------------------
-
-Some PyExasol DBAPI options are Python values rather than URL-compatible
-strings. Pass these through SQLAlchemy's ``connect_args`` dictionary in
-``create_engine`` instead of putting them in the connection URL.
-
-.. list-table::
-   :header-rows: 1
-
-   * - Argument
-     - Description
-   * - ``fetch_mapper``
-     - Available with PyExasol 3.0.0 and newer. A callable
-       ``fetch_mapper(value, data_type)`` is used to convert values returned by
-       the WebSocket DBAPI. See the
-       :ref:`custom fetch mapper example <custom_fetch_mapper_example>`.
 
 
 .. _pyexasol_compatibility:

@@ -35,7 +35,7 @@ For additional details about the PyExasol 3.0.0 behavior changes, see the
 
 ## Features
 
-* #833: Widened PyExasol range to include 3.x
+* #833: Widened PyExasol range to include 3.x & improved datetime conversion for PyExasol < 3.x
 
 ## Refactorings
 

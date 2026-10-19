@@ -13,6 +13,14 @@ from sqlalchemy_exasol._metadata import __version__
 from sqlalchemy_exasol.base import EXADialect
 from sqlalchemy_exasol.types import ExaDecimal
 
+INVALID_DATETIME_MESSAGE = (
+    "Could not convert timestamp string to datetime. With PyExasol < 3.0.0, "
+    "configure the session's NLS_TIMESTAMP_FORMAT EXA_PARAMETERS value to "
+    "produce timestamps in 'YYYY-MM-DD HH24:MI:SS[.FF]' format. With "
+    "PyExasol >= 3.0.0, timestamps are normally returned as datetime objects; "
+    "if a custom fetch_mapper is configured, it must return datetime objects."
+)
+
 
 class Integer(sqltypes.INTEGER):
     def result_processor(self, dialect, coltype):
@@ -57,16 +65,22 @@ class DateTime(sqltypes.DATETIME):
         def to_datetime(v):
             if not isinstance(v, str):
                 return v
-            # There is an issue to improve this in PyExasol:
-            #   https://github.com/exasol/pyexasol/issues/409
             # Parse wall time directly: time.strptime/mktime loses fractions and
             # can normalize timestamps according to the client's local timezone.
-            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M:%S.%f"):
-                try:
-                    return datetime.datetime.strptime(v, fmt)
-                except ValueError:
-                    continue
-            raise ValueError("Unknown date/time format")
+            timestamp_format = "%Y-%m-%d %H:%M:%S"
+            timestamp, separator, fractional_seconds = v.partition(".")
+            if separator:
+                # Exasol supports nanosecond precision, while Python datetime
+                # stores at most six fractional digits.
+                timestamp_format = "%Y-%m-%d %H:%M:%S.%f"
+                if not fractional_seconds.isdigit():
+                    raise ValueError(INVALID_DATETIME_MESSAGE)
+                v = f"{timestamp}.{fractional_seconds[:6].ljust(6, '0')}"
+
+            try:
+                return datetime.datetime.strptime(v, timestamp_format)
+            except ValueError as error:
+                raise ValueError(INVALID_DATETIME_MESSAGE) from error
 
         return to_datetime
 

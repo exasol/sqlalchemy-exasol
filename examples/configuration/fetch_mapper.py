@@ -1,5 +1,7 @@
 import pyexasol
 from packaging.version import Version
+from pyexasol.data_types.websocket_types import WebSocketDataType
+from sqlalchemy import text
 
 from examples.config import (
     DEFAULT_SCHEMA_NAME,
@@ -32,7 +34,6 @@ DATA_TYPE_COLUMNS = (
     ("VARCHAR_VALUE", "VARCHAR(20)"),
 )
 EXASOL_TYPES = tuple(data_type for _, data_type in DATA_TYPE_COLUMNS)
-SELECT_COLUMNS = ", ".join(column_name for column_name, _ in DATA_TYPE_COLUMNS)
 CREATE_TABLE = f"""
 CREATE TABLE IF NOT EXISTS {FULL_TABLE_NAME} (
     BOOLEAN_VALUE BOOLEAN,
@@ -85,28 +86,32 @@ VALUES (
 
 
 def custom_fetch_mapper(value, data_type):
-    """Return the raw WebSocket value without PyExasol's default conversion."""
+    """Convert VARCHAR values to uppercase and leave other values unchanged."""
+    if value is None:
+        return None
+    if data_type["type"] == WebSocketDataType.String.value:
+        return value.upper()
     return value
 
 
 def fetch_one_row(engine):
     """Fetch one row through SQLAlchemy."""
     with engine.connect() as connection:
-        return connection.exec_driver_sql(
-            f"SELECT {SELECT_COLUMNS} FROM {FULL_TABLE_NAME} LIMIT 1"
-        ).first()
+        return connection.execute(text(f"SELECT * FROM {FULL_TABLE_NAME}")).fetchone()
 
 
 def ensure_demo_table(engine):
     """Create and seed the demonstration table when it is not already populated."""
     SQL_ALCHEMY.create_schema(engine=engine, schema=DEFAULT_SCHEMA_NAME)
     with engine.begin() as connection:
-        connection.exec_driver_sql(CREATE_TABLE)
-        connection.exec_driver_sql(
-            f"UPDATE {FULL_TABLE_NAME} "
-            "SET TIMESTAMP_LOCAL_VALUE = TIMESTAMP '2026-09-11 12:34:56.123456'"
+        connection.execute(text(CREATE_TABLE))
+        connection.execute(
+            text(
+                f"UPDATE {FULL_TABLE_NAME} "
+                "SET TIMESTAMP_LOCAL_VALUE = TIMESTAMP '2026-09-11 12:34:56.123456'"
+            )
         )
-        connection.exec_driver_sql(INSERT_ROW)
+        connection.execute(text(INSERT_ROW))
 
 
 def print_comparison(default_row, custom_row):
@@ -132,7 +137,7 @@ def print_comparison(default_row, custom_row):
         f"{BLUE}{'PyExasol default mapper':<{default_width}}{RESET} | "
         f"{GREEN}{'Custom mapper':<{custom_width}}{RESET}"
     )
-    print(f"{'-' * type_width}-+-" f"{'-' * default_width}-+-" f"{'-' * custom_width}")
+    print(f"{'-' * type_width}-+-{'-' * default_width}-+-{'-' * custom_width}")
     for data_type, default_value, custom_value in rows:
         print(
             f"{data_type:<{type_width}} | "

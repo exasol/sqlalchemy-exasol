@@ -30,7 +30,6 @@ from sqlalchemy.exc import (
     StatementError,
 )
 from sqlalchemy.testing import fixtures
-from sqlalchemy.types import NullType
 
 NUMERIC_INPUTS = (
     pytest.param(42, id="integer"),
@@ -78,12 +77,14 @@ class TypeRoundTrip(fixtures.TestBase):
             self.table.drop(engine)
 
     @contextmanager
-    def create_table_with_ddl(self, engine, schema, column_type, ddl_type):
-        """Create a table with explicit DDL when no native SQLAlchemy equivalent exists."""
+    def create_table_with_ddl(self, engine, schema, ddl_type):
+        """Create a table with explicit DDL."""
         self.table = Table(
             "test_type",
             MetaData(),
-            Column("value", column_type),
+            # String is a placeholder as these cases have no native
+            # SQLAlchemy equivalent.
+            Column("value", String()),
             schema=schema,
         )
         with engine.begin() as connection:
@@ -196,8 +197,7 @@ class TestDecimalType(TypeRoundTrip):
         assert result == Decimal("42")
 
     def test_round_trip_decimal_scale_0(self, engine, schema):
-        # String is only a placeholder for the helper; the DDL creates DECIMAL.
-        with self.create_table_with_ddl(engine, schema, String(), "DECIMAL(18, 0)"):
+        with self.create_table_with_ddl(engine, schema, "DECIMAL(18, 0)"):
             self.insert_value(engine, 42)
             result = self.select_value(engine)
 
@@ -258,9 +258,8 @@ class TestGeometryType(TypeRoundTrip):
     # Exasol GEOMETRY has no first-class SQLAlchemy-Exasol type.
     def test_round_trip(self, engine, schema):
         value = "LINESTRING (10 20, 30 40)"
-        # NullType is a placeholder because GEOMETRY has no SQLAlchemy mapping;
-        # the DDL aspect is used to create the actual GEOMETRY column.
-        with self.create_table_with_ddl(engine, schema, NullType(), "GEOMETRY"):
+        # String is a placeholder; the DDL creates the actual GEOMETRY column.
+        with self.create_table_with_ddl(engine, schema, "GEOMETRY"):
             self.insert_value(engine, value)
             result = self.select_value(engine)
 
@@ -277,7 +276,7 @@ class TestHashType(TypeRoundTrip):
             pytest.xfail("HASHTYPE metadata mapping requires PyExasol >= 3.0.0")
 
         value = "6ba7b8109dad11d180b400c04fd430c8"
-        with self.create_table_with_ddl(engine, schema, String(), "HASHTYPE(16 BYTE)"):
+        with self.create_table_with_ddl(engine, schema, "HASHTYPE(16 BYTE)"):
             self.insert_value(engine, value)
             result = self.select_value(engine)
 
@@ -320,9 +319,7 @@ class TestIntervalDaySecondType(TypeRoundTrip):
                 "see https://github.com/exasol/pyexasol/issues/428"
             )
 
-        with self.create_table_with_ddl(
-            engine, schema, String(), "INTERVAL DAY(9) TO SECOND(6)"
-        ):
+        with self.create_table_with_ddl(engine, schema, "INTERVAL DAY(9) TO SECOND(6)"):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -346,9 +343,7 @@ class TestIntervalYearMonthType(TypeRoundTrip):
     # Exasol INTERVAL has no first-class SQLAlchemy-Exasol type.
     def test_round_trip(self, engine, schema):
         value = "+0001-11"
-        with self.create_table_with_ddl(
-            engine, schema, String(), "INTERVAL YEAR(4) TO MONTH"
-        ):
+        with self.create_table_with_ddl(engine, schema, "INTERVAL YEAR(4) TO MONTH"):
             self.insert_value(engine, value)
             result = self.select_value(engine)
 
@@ -428,7 +423,7 @@ class TestTimestampType(TypeRoundTrip):
     def test_round_trip_timestamp_with_explicit_precision_3(
         self, engine, schema, input_value
     ):
-        with self.create_table_with_ddl(engine, schema, TIMESTAMP, "TIMESTAMP(3)"):
+        with self.create_table_with_ddl(engine, schema, "TIMESTAMP(3)"):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
@@ -452,7 +447,7 @@ class TestTimestampType(TypeRoundTrip):
             pytest.xfail("Microsecond storage requires Exasol > 8.32")
 
         expected = dt.datetime(2026, 9, 11, 12, 34, 56, fraction)
-        with self.create_table_with_ddl(engine, schema, TIMESTAMP, "TIMESTAMP(6)"):
+        with self.create_table_with_ddl(engine, schema, "TIMESTAMP(6)"):
             self.insert_value(engine, expected)
             result = self.select_value(engine)
 
@@ -465,7 +460,7 @@ class TestTimestampLocalTimeZoneType(TypeRoundTrip):
     @pytest.mark.parametrize("input_value", TIMESTAMP_INPUTS)
     def test_round_trip(self, engine, schema, input_value):
         with self.create_table_with_ddl(
-            engine, schema, String(), "TIMESTAMP WITH LOCAL TIME ZONE"
+            engine, schema, "TIMESTAMP WITH LOCAL TIME ZONE"
         ):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)

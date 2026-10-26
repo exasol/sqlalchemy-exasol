@@ -8,13 +8,9 @@ from typing import NamedTuple
 import pytest
 import sqlalchemy as sa
 from sqlalchemy import (
-    Float,
     Inspector,
     Numeric,
     cast,
-    func,
-    literal_column,
-    select,
 )
 from sqlalchemy.exc import (
     CompileError,
@@ -24,14 +20,12 @@ from sqlalchemy.schema import (
     DDL,
     Index,
 )
-from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import LongNameBlowoutTest as _LongNameBlowoutTest
-from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
@@ -544,19 +538,6 @@ class ExceptionTest(_ExceptionTest):
 @pytest.mark.xfail(reason=XfailRationale.QUOTING.value, raises=DBAPIError, strict=True)
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):
     pass
-
-
-class NumericTest(_NumericTest):
-    RATIONALE = """
-    The Exasol target backend maps Numeric to Decimal. Decimal is also used for both
-    Float & Double. Thus, we expect this test to fail.
-    """
-
-    @pytest.mark.xfail(reason=RATIONALE, raises=AssertionError, strict=True)
-    @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
-    @testing.requires.float_is_numeric
-    def test_float_is_not_numeric(self, connection, cls_):
-        super().test_float_is_not_numeric(connection, cls_)
 
 
 class TrueDivTest(_TrueDivTest):

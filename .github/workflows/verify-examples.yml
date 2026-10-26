@@ -15,7 +15,7 @@ jobs:
   verify-examples:
     name: Verify Examples (Python-${{ matrix.minimum_python_version }}, Exasol-${{ matrix.exasol_versions}})
     needs: [ build-matrix ]
-    runs-on:  "ubuntu-24.04"
+    runs-on:  "ubuntu-26.04"
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}

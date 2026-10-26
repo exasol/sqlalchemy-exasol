@@ -46,8 +46,8 @@ SQLAlchemy-Exasol supports a Websocket-based dialect for interacting with an Exa
 
 System Requirements
 -------------------
-- Exasol >= 7.1 (e.g. `docker-db <test_docker_image_>`_ or a `Exasol SaaS instance <test_drive_>`_)
-- Python >= 3.10
+- Exasol >= 8 (e.g. `docker-db <test_docker_image_>`_ or a `Exasol SaaS instance <test_drive_>`_)
+- Python >= 3.11
 
 Features
 --------

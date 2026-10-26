@@ -184,6 +184,15 @@ class TestDateType(TypeRoundTrip):
 
 
 class TestDecimalType(TypeRoundTrip):
+    def test_precision_above_exasol_limit_rejected(self, engine, schema):
+        # Companion to TrueDivTest.test_truediv_divisor in
+        # test/integration/sqlalchemy/test_suite.py: if this limit changes, update
+        # those cases too.
+        numeric_37_0 = Numeric(37, 0)
+        with pytest.raises(DatabaseError):
+            with self.create_table(engine, schema, numeric_37_0):
+                pass
+
     @pytest.mark.parametrize(
         "input_value",
         NUMERIC_INPUTS,

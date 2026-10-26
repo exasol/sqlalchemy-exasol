@@ -6,7 +6,11 @@ from typing import NamedTuple
 
 import pytest
 import sqlalchemy as sa
-from sqlalchemy import Inspector
+from sqlalchemy import (
+    Inspector,
+    Numeric,
+    cast,
+)
 from sqlalchemy.exc import (
     CompileError,
     DBAPIError,
@@ -15,17 +19,16 @@ from sqlalchemy.schema import (
     DDL,
     Index,
 )
-from sqlalchemy.sql import sqltypes
 from sqlalchemy.testing.suite import ComponentReflectionTest as _ComponentReflectionTest
 from sqlalchemy.testing.suite import ExceptionTest as _ExceptionTest
 from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
 from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import LongNameBlowoutTest as _LongNameBlowoutTest
-from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
+from sqlalchemy.testing.suite import TrueDivTest as _TrueDivTest
 from sqlalchemy.testing.suite import UuidTest as _UuidTest
 from sqlalchemy.testing.suite.test_reflection import _multi_combination
 
@@ -536,14 +539,54 @@ class QuotedNameArgumentTest(_QuotedNameArgumentTest):
     pass
 
 
-class NumericTest(_NumericTest):
-    RATIONALE = """
-    The Exasol target backend maps Numeric to Decimal. Decimal is also used for both
-    Float & Double. Thus, we expect this test to fail.
-    """
-
-    @pytest.mark.xfail(reason=RATIONALE, raises=AssertionError, strict=True)
-    @testing.combinations(sqltypes.Float, sqltypes.Double, argnames="cls_")
-    @testing.requires.float_is_numeric
-    def test_float_is_not_numeric(self, connection, cls_):
-        super().test_float_is_not_numeric(connection, cls_)
+class TrueDivTest(_TrueDivTest):
+    @testing.combinations(
+        ("typed", lambda divisor: divisor),
+        (
+            "untyped_function",
+            lambda divisor: cast(
+                func.nullif(divisor, cast(0, divisor.type)), divisor.type
+            ),
+        ),
+        id_="ia",
+        argnames="wrap_divisor",
+    )
+    @testing.combinations(
+        ("float", "7.0", "3.5", Float(), "2", testing.requires.float_cast),
+        ("numeric_whole_number", "1", "2.00", Numeric(10, 2), "0.5"),
+        (
+            "numeric_many_decimals",
+            "5.02797279921331664759",
+            "0.71828182845904523537",
+            Numeric(22, 20),
+            "7",
+            testing.requires.precision_numerics_many_significant_digits.as_skips(),
+        ),
+        (
+            "numeric_tiny_divisor",
+            "0.00000000000049382716",
+            "0.00000000000012345679",
+            Numeric(36, 20),
+            "4",
+        ),
+        (
+            "numeric_36_digit_divisor",
+            "300000000000000000000000000000000000",
+            "100000000000000000000000000000000000",
+            Numeric(36, 0),
+            "3",
+        ),
+        id_="iaaaa",
+        argnames="left, right, type_, expected",
+    )
+    # Override the SQLAlchemy cases because Exasol supports Numeric precision
+    # only up to 36, while the base test includes precision-38 values. Companion:
+    # test/integration/exasol/websocket/test_types.py::
+    # TestDecimalType.test_precision_above_exasol_limit_rejected; update these
+    # cases too if Exasol's precision limit changes.
+    def test_truediv_divisor(
+        self, connection, wrap_divisor, left, right, type_, expected
+    ):
+        super().test_truediv_divisor(
+            connection, wrap_divisor, left, right, type_, expected, ()
+        )

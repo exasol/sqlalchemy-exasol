@@ -71,7 +71,7 @@ class MetadataTest(fixtures.TablesTest):
     def watchdog(self, session0, schema):
         while self.watchdog_run:
             rs = session0.execute(sql.text("SELECT * FROM SYS.EXA_ALL_SESSIONS"))
-            rs = [row for row in rs]
+            rs = [*rs]
             if self.WATCHDOG_ECHO:
                 print()
                 print("===========================================")

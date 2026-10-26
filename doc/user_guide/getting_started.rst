@@ -8,8 +8,8 @@ This guide is designed to get a new user started with ``sqlalchemy-exasol``.
 Prerequisites
 -------------
 
-- Exasol >= 7.1
-- Python >= 3.10
+- Exasol >= 8
+- Python >= 3.11
 
 Installing
 ----------

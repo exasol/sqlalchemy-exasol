@@ -16,7 +16,7 @@ jobs:
     name: Integration-Tests (Python-${{ matrix.python_versions }}, test:${{ matrix.integration_group }}, Exasol-${{ matrix.exasol_versions}}, ${{matrix.connectors}})
     needs:
       - build-matrix
-    runs-on: "ubuntu-24.04"
+    runs-on: "ubuntu-26.04"
     permissions:
       contents: read
     strategy:
@@ -34,7 +34,7 @@ jobs:
 
       - name: Set up Python & Poetry Environment
         id: set-up-python-and-poetry-environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v10
+        uses: exasol/python-toolbox/.github/actions/python-environment@v12
         with:
           python-version: ${{ matrix.python_versions }}
           poetry-version: "2.3.0"

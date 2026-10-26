@@ -1,6 +1,5 @@
 # mypy: disable-error-code="no-redef"
 # import all SQLAlchemy tests for this dialect
-import decimal
 from enum import Enum
 from inspect import cleandoc
 from typing import NamedTuple
@@ -544,7 +543,7 @@ class TrueDivTest(_TrueDivTest):
     @testing.combinations(
         ("typed", lambda divisor: divisor),
         (
-            "nullif_cast_as_exasol",
+            "untyped_function",
             lambda divisor: cast(
                 func.nullif(divisor, cast(0, divisor.type)), divisor.type
             ),
@@ -580,13 +579,14 @@ class TrueDivTest(_TrueDivTest):
         id_="iaaaa",
         argnames="left, right, type_, expected",
     )
+    # Override the SQLAlchemy cases because Exasol supports Numeric precision
+    # only up to 36, while the base test includes precision-38 values. Companion:
+    # test/integration/exasol/websocket/test_types.py::
+    # TestDecimalType.test_precision_above_exasol_limit_rejected; update these
+    # cases too if Exasol's precision limit changes.
     def test_truediv_divisor(
         self, connection, wrap_divisor, left, right, type_, expected
     ):
-        # Exasol needs NULLIF's zero and result explicitly typed. Type coercion
-        # alone only affects SQLAlchemy's expression metadata, not emitted SQL.
-        expr = cast(literal_column(left), type_) / wrap_divisor(
-            cast(literal_column(right), type_)
+        super().test_truediv_divisor(
+            connection, wrap_divisor, left, right, type_, expected, ()
         )
-        result = connection.scalar(select(expr))
-        assert decimal.Decimal(str(result)) == decimal.Decimal(expected)

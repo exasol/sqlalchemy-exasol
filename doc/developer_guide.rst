@@ -42,7 +42,7 @@ Set up Your Workspace
 #. Set up the Tooling & Virtual Environment
     .. code-block::
 
-        poetry env use python3.10
+        poetry env use python3.11
         poetry install
 
 

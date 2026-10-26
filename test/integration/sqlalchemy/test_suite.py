@@ -1,12 +1,21 @@
 # mypy: disable-error-code="no-redef"
 # import all SQLAlchemy tests for this dialect
+import decimal
 from enum import Enum
 from inspect import cleandoc
 from typing import NamedTuple
 
 import pytest
 import sqlalchemy as sa
-from sqlalchemy import Inspector
+from sqlalchemy import (
+    Float,
+    Inspector,
+    Numeric,
+    cast,
+    func,
+    literal_column,
+    select,
+)
 from sqlalchemy.exc import (
     CompileError,
     DBAPIError,
@@ -26,6 +35,7 @@ from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import RowCountTest as _RowCountTest
 from sqlalchemy.testing.suite import RowFetchTest as _RowFetchTest
+from sqlalchemy.testing.suite import TrueDivTest as _TrueDivTest
 from sqlalchemy.testing.suite import UuidTest as _UuidTest
 from sqlalchemy.testing.suite.test_reflection import _multi_combination
 
@@ -547,3 +557,55 @@ class NumericTest(_NumericTest):
     @testing.requires.float_is_numeric
     def test_float_is_not_numeric(self, connection, cls_):
         super().test_float_is_not_numeric(connection, cls_)
+
+
+class TrueDivTest(_TrueDivTest):
+    @testing.combinations(
+        ("typed", lambda divisor: divisor),
+        (
+            "nullif_cast_as_exasol",
+            lambda divisor: cast(
+                func.nullif(divisor, cast(0, divisor.type)), divisor.type
+            ),
+        ),
+        id_="ia",
+        argnames="wrap_divisor",
+    )
+    @testing.combinations(
+        ("float", "7.0", "3.5", Float(), "2", testing.requires.float_cast),
+        ("numeric_whole_number", "1", "2.00", Numeric(10, 2), "0.5"),
+        (
+            "numeric_many_decimals",
+            "5.02797279921331664759",
+            "0.71828182845904523537",
+            Numeric(22, 20),
+            "7",
+            testing.requires.precision_numerics_many_significant_digits.as_skips(),
+        ),
+        (
+            "numeric_tiny_divisor",
+            "0.00000000000049382716",
+            "0.00000000000012345679",
+            Numeric(36, 20),
+            "4",
+        ),
+        (
+            "numeric_36_digit_divisor",
+            "300000000000000000000000000000000000",
+            "100000000000000000000000000000000000",
+            Numeric(36, 0),
+            "3",
+        ),
+        id_="iaaaa",
+        argnames="left, right, type_, expected",
+    )
+    def test_truediv_divisor(
+        self, connection, wrap_divisor, left, right, type_, expected
+    ):
+        # Exasol needs NULLIF's zero and result explicitly typed. Type coercion
+        # alone only affects SQLAlchemy's expression metadata, not emitted SQL.
+        expr = cast(literal_column(left), type_) / wrap_divisor(
+            cast(literal_column(right), type_)
+        )
+        result = connection.scalar(select(expr))
+        assert decimal.Decimal(str(result)) == decimal.Decimal(expected)

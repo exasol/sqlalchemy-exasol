@@ -6,7 +6,6 @@ from decimal import Decimal
 
 import pyexasol
 import pytest
-from packaging.version import Version
 from pyexasol import ExaTimeDelta
 from sqlalchemy import (
     CHAR,
@@ -27,9 +26,16 @@ from sqlalchemy import (
 )
 from sqlalchemy.exc import (
     DatabaseError,
+    DataError,
     StatementError,
 )
 from sqlalchemy.testing import fixtures
+
+from test.helpers.pyexasol_versions import (
+    PYEXASOL_3,
+    PYEXASOL_4,
+    requires_pyexasol_4,
+)
 
 NUMERIC_INPUTS = (
     pytest.param(42, id="integer"),
@@ -41,6 +47,10 @@ NUMERIC_INPUTS = (
 TIMESTAMP_INPUTS = (
     pytest.param(dt.datetime(2026, 9, 11, 12, 34, 56, 123400), id="datetime"),
     pytest.param("2026-09-11 12:34:56.1234", id="string"),
+)
+
+AWARE_DATETIME = dt.datetime(
+    2026, 9, 11, 14, 34, 56, tzinfo=dt.timezone(dt.timedelta(hours=2))
 )
 
 NULLABLE_TYPES = (
@@ -182,6 +192,13 @@ class TestDateType(TypeRoundTrip):
         assert isinstance(result, dt.date)
         assert result == dt.date(2026, 9, 11)
 
+    @requires_pyexasol_4
+    def test_rejects_timezone_aware_datetime(self, engine, schema):
+        # PyExasol >= 4.0.0 only accepts naive datetime objects.
+        with self.create_table(engine, schema, Date):
+            with pytest.raises(DataError):
+                self.insert_value(engine, AWARE_DATETIME)
+
 
 class TestDecimalType(TypeRoundTrip):
     def test_precision_above_exasol_limit_rejected(self, engine, schema):
@@ -279,7 +296,7 @@ class TestGeometryType(TypeRoundTrip):
 class TestHashType(TypeRoundTrip):
     # Exasol HASHTYPE has no first-class SQLAlchemy-Exasol type.
     def test_round_trip(self, engine, schema):
-        if Version(pyexasol.__version__) < Version("3.0.0"):
+        if not PYEXASOL_3:
             # PyExasol versions before 3.0.0 do not map HASHTYPE in the
             # WebSocket cursor metadata, causing a KeyError during SELECT.
             pytest.xfail("HASHTYPE metadata mapping requires PyExasol >= 3.0.0")
@@ -322,9 +339,9 @@ class TestIntervalDaySecondType(TypeRoundTrip):
         ),
     )
     def test_round_trip(self, engine, schema, input_value):
-        if not isinstance(input_value, str):
+        if not isinstance(input_value, str) and not PYEXASOL_4:
             pytest.xfail(
-                "PyExasol does not support interval input values; "
+                "PyExasol < 4.0.0 does not support interval input values; "
                 "see https://github.com/exasol/pyexasol/issues/428"
             )
 
@@ -332,7 +349,7 @@ class TestIntervalDaySecondType(TypeRoundTrip):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
-        if Version(pyexasol.__version__) < Version("3.0.0"):
+        if not PYEXASOL_3:
             # PyExasol before 3.0.0 returns serialized interval values.
             assert isinstance(result, str)
             assert result == "+000000003 04:05:06.654000"
@@ -463,6 +480,19 @@ class TestTimestampType(TypeRoundTrip):
         assert isinstance(result, dt.datetime)
         assert result == expected
 
+    @pytest.mark.parametrize("column_type", (DateTime, TIMESTAMP))
+    def test_timezone_aware_datetime_loses_timezone(self, engine, schema, column_type):
+        # websocket.DateTime.bind_processor formats datetime objects with
+        # strftime("%Y-%m-%d %H:%M:%S.%f"), which drops the UTC offset. PyExasol
+        # therefore receives a string, and its >= 4.0.0 rejection of aware
+        # datetime objects is not triggered. The wall-clock time is stored
+        # unchanged, i.e. 14:34:56+02:00 is stored as 14:34:56 (no conversion).
+        with self.create_table(engine, schema, column_type):
+            self.insert_value(engine, AWARE_DATETIME)
+            result = self.select_value(engine)
+
+        assert result == dt.datetime(2026, 9, 11, 14, 34, 56)
+
 
 class TestTimestampLocalTimeZoneType(TypeRoundTrip):
     # Exasol TIMESTAMP WITH LOCAL TIME ZONE has no first-class SQLAlchemy-Exasol type.
@@ -474,12 +504,21 @@ class TestTimestampLocalTimeZoneType(TypeRoundTrip):
             self.insert_value(engine, input_value)
             result = self.select_value(engine)
 
-        if Version(pyexasol.__version__) < Version("3.0.0"):
+        if not PYEXASOL_3:
             assert isinstance(result, str)
             assert result == "2026-09-11 12:34:56.123000"
         else:
             assert isinstance(result, dt.datetime)
             assert result == dt.datetime(2026, 9, 11, 12, 34, 56, 123000)
+
+    @requires_pyexasol_4
+    def test_rejects_timezone_aware_datetime(self, engine, schema):
+        # No SQLAlchemy-Exasol type is involved, so the value reaches PyExasol as is.
+        with self.create_table_with_ddl(
+            engine, schema, "TIMESTAMP WITH LOCAL TIME ZONE"
+        ):
+            with pytest.raises(DataError):
+                self.insert_value(engine, AWARE_DATETIME)
 
 
 class TestVarcharType(TypeRoundTrip):
@@ -502,3 +541,17 @@ class TestVarcharType(TypeRoundTrip):
         with self.create_table(engine, schema, String(20)):
             with pytest.raises(DatabaseError):
                 self.insert_value(engine, "x" * 21)
+
+    @requires_pyexasol_4
+    @pytest.mark.parametrize(
+        "input_value",
+        (
+            pytest.param(42, id="integer"),
+            pytest.param(dt.date(2026, 9, 11), id="date"),
+        ),
+    )
+    def test_rejects_non_string_input(self, engine, schema, input_value):
+        # PyExasol >= 4.0.0 no longer converts VARCHAR input with str().
+        with self.create_table(engine, schema, String(20)):
+            with pytest.raises(DataError):
+                self.insert_value(engine, input_value)

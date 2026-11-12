@@ -3656,14 +3656,14 @@ types = ["mypy"]
 
 [[package]]
 name = "pyexasol"
-version = "3.0.1"
+version = "4.0.0"
 description = "Exasol python driver with extra features"
 optional = false
-python-versions = "<3.15,>=3.10"
+python-versions = "<3.15,>=3.11"
 groups = ["main"]
 files = [
-    {file = "pyexasol-3.0.1-py3-none-any.whl", hash = "sha256:9365dab62ddf07940e6357ed114262a8c4f47a823823a90bfda60e4efea72f5b"},
-    {file = "pyexasol-3.0.1.tar.gz", hash = "sha256:59407accc766efc27ac7d4d4f20aab8b308931e61299a59f1d7b9ad8a3bfd3d2"},
+    {file = "pyexasol-4.0.0-py3-none-any.whl", hash = "sha256:92b6e06d971a93fec62504c6845bc41a10cbf31a3a119cad414829dfeeb5d8c6"},
+    {file = "pyexasol-4.0.0.tar.gz", hash = "sha256:efc58ee4956058e736384c394b0aec0f3c9a40ec279fd5a9de079e9af72231b8"},
 ]
 
 [package.dependencies]
@@ -6027,4 +6027,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.15"
-content-hash = "d48725fed89fd589a4cb8561126be8b3479883d9f0f58553788636617ff7202d"
+content-hash = "f9486a65ab67bc496bd3c425c0dc05a015e5f31120ecb8062b5251e40aa193e2"

@@ -9,7 +9,7 @@ Prerequisites
 -------------
 
 - Exasol >= 8
-- Python >= 3.11
+- Python >= 3.11.5
 
 Installing
 ----------

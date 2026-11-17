@@ -86,8 +86,11 @@ addopts = "--tb native -v -r fxX"
 filterwarnings = [
     "error",
     "ignore::pytest.PytestUnraisableExceptionWarning",
-    # luigi >= 3.6.0 warns on import; triggered by the exasol pytest plugin
-    "ignore:\\s*Autoloading range tasks:DeprecationWarning",
+    # Import-time deprecation warnings from the exasol pytest plugin and its
+    # dependencies (luigi, importlib.abc.Traversable) are not under our control.
+    "ignore::DeprecationWarning:luigi",
+    "ignore::DeprecationWarning:exasol.pytest_backend",
+    "ignore::DeprecationWarning:exasol_integration_test_docker_environment",
 ]
 markers = [
     "backend: backend tests.",

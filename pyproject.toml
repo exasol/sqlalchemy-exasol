@@ -6,7 +6,7 @@ authors = [
     { name = "Exasol AG", email = "opensource@exasol.com" },
     { name = "Blue Yonder GmbH" },
 ]
-requires-python = ">=3.11,<3.15"
+requires-python = ">=3.11.5,<3.15"
 readme = "README.rst"
 license = "BSD-2-Clause"
 keywords = [
@@ -86,6 +86,11 @@ addopts = "--tb native -v -r fxX"
 filterwarnings = [
     "error",
     "ignore::pytest.PytestUnraisableExceptionWarning",
+    # Import-time deprecation warnings from the exasol pytest plugin and its
+    # dependencies (luigi, importlib.abc.Traversable) are not under our control.
+    "ignore::DeprecationWarning:luigi",
+    "ignore::DeprecationWarning:exasol.pytest_backend",
+    "ignore::DeprecationWarning:exasol_integration_test_docker_environment",
 ]
 markers = [
     "backend: backend tests.",

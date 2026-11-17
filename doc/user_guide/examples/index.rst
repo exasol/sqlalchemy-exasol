@@ -49,7 +49,7 @@ Some basic preparation steps are required to see the examples in action:
 
 #. Make sure you have installed or have access to an Exasol database. For **testing** purposes, you may use:
     - `exasol/docker-db <https://hub.docker.com/r/exasol/docker-db/tags>`__, which can be easily accessed by using ``poetry run -- nox -s db:start``
-    - the free `Exasol Community Edition <https://www.exasol.com/free-signup-community-edition/>`__
+    - the free `Exasol Personal Edition <https://www.exasol.com/personal/>`__
 
 #. Open the ``/examples/`` directory and edit the configuration file, as described in :ref:`example_configuration`.
 #. To verify that your connection configuration is correct, run the code, as described in :ref:`example_connection`.
